@@ -1,7 +1,7 @@
-# bytework
+# nettyx
 
 #### 介绍
-适用于Java跨平台解析基于C, C++等基于字节偏移型协议, 提供ByteBuf和Java对象之间的灵活转换, JDK-version: 1.8x及以上可以使用
+基于netty4.x进行了超轻量级的封装, 提供了一些工具和基础模板
 
 #### 安装教程
 1. 安装极其简单, 先添加gitee库
