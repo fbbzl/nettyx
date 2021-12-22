@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * wrap channel event to ChannelEvent, keep channel event could propagate in ApplicationContext and the oters
+ * wrap channel event to ChannelEvent, keep channel event could propagate in ApplicationContext and the others
  */
 @RequiredArgsConstructor
 public abstract class ChannelEvent<T> {
