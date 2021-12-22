@@ -59,4 +59,10 @@
 
   </dependencies>
 
+  <distributionManagement>
+    <repository>
+      <id>gitee</id>
+      <url>file:${user.home}/.m2/distribute</url>
+    </repository>
+  </distributionManagement>
 </project>
