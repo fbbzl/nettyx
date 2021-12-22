@@ -1,23 +1,27 @@
-# nettyx
+# bytework
 
 #### 介绍
-对netty进行超轻量级封装, 提供了一些工具和基础实现
-
-#### 软件架构
-软件架构说明
-
+适用于Java跨平台解析基于C, C++等基于字节偏移型协议, 提供ByteBuf和Java对象之间的灵活转换, JDK-version: 1.8x及以上可以使用
 
 #### 安装教程
+1. 安装极其简单, 先添加gitee库
+```xml
+<repositories>
+  <repository>
+    <id>fz</id>
+    <url>https://gitee.com/fbb9290/maven-repository</url>
+  </repository>
+</repositories>
+```
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+2. 然后在项目添加以下依赖包：
+```xml
+<dependency>
+  <groupId>org.fz</groupId>
+  <artifactId>nettyx</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</dependency>
+```
 
 #### 参与贡献
 
