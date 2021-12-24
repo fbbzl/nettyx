@@ -1,4 +1,4 @@
-package org.fz.nettyx;
+package org.fz.nettyx.support;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
