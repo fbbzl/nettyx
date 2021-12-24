@@ -1,4 +1,4 @@
-package nettyx.codec;
+package org.fz.nettyx.codec;
 
 
 import io.netty.buffer.ByteBuf;
@@ -6,7 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
+import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
 
 /**
  * @author fengbinbin
