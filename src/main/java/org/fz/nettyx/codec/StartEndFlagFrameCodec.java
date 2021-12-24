@@ -65,6 +65,9 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         super(decoder, encoder);
     }
 
+    /**
+     * decoder
+     */
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
         private final ByteBuf startFlag;
@@ -105,22 +108,17 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
 
-            if (decodedByteBuf != null) {
-                try {
-                    if (decodedByteBuf.readableBytes() > 0) {
-                        return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag, decodedByteBuf, endFlag);
-                    }
-                }
-                // its important to release the bytebuf
-                finally {
-                    decodedByteBuf.release();
-                }
+            if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0) {
+                return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag, decodedByteBuf, endFlag);
             }
 
             return null;
         }
     }
 
+    /**
+     * encoder
+     */
     public static class StartEndFlagFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final ByteBuf startFlag;
