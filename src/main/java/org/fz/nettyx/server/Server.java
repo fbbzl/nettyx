@@ -16,9 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Server {
 
     private EventLoopGroup
-        parentGroup = new NioEventLoopGroup(),
+        parentGroup = new NioEventLoopGroup(1),
         childGroup = new NioEventLoopGroup();
     private ServerBootstrap serverBootstrap = new ServerBootstrap().group(parentGroup, childGroup).channel(NioServerSocketChannel.class);
-
 
 }
