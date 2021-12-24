@@ -22,7 +22,41 @@
   <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
-
+## api
+```
+client                              提供一些抽象客户端基础实现
+  ---Client                            顶级Client抽象
+  ---MultiChannelClient                多Channel的Client 
+  ---SingleChannelClient               单Channel的Client
+codec                               提供了一些基础的编解码器
+  ---DelimiterBasedFrameCodec          基于分隔符codec
+  ---StartEndFlagFrameCodec            基于起止符codec
+  ---StringMessageCodec                字符串Codec
+envet
+  ---ChannelEvent                      Channel事件对象, 建议配合Spring容器事件使用
+  ---ChannelEvents                     Channel事件对象工具
+function                            包含了充足的函数式接口, 为函数式编程提供支持                         
+  ---Action                            
+  ---ChannelAction                      
+  ---ChannelBindAction
+  ---ChannelConnectAction
+  ---ChannelEventAction
+  ---ChannelExceptionAction
+  ---ChannelFutureAction
+  ---ChannelHandlerContextAction
+  ---ChannelPromiseAction
+  ---ChannelReadAction
+  ---ChannelWriteAction
+handler                             提供了一些基础的channel handler实现
+  ---ChannelAdvice                     提供了channel事件谏言  
+  ---ChannelInterceptor                channel拦截器, 适用于协议握手等场景
+server
+  ---Server                         暂未提供server基础实现, 后续更新
+support                             基础工具类
+  ---ChannelStorage                 存储channel, 内部使用KV存储
+  ---ConnectListener                轻度封装后的连接监听器
+  ---Logs                           日志工具
+```
 #### 参与贡献
 
 1.  Fork 本仓库

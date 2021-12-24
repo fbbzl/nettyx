@@ -1,10 +1,10 @@
 package org.fz.nettyx.handler;
 
 
-import static org.fz.nettyx.Logs.debug;
-import static org.fz.nettyx.Logs.error;
-import static org.fz.nettyx.Logs.info;
-import static org.fz.nettyx.Logs.warn;
+import static org.fz.nettyx.support.Logs.debug;
+import static org.fz.nettyx.support.Logs.error;
+import static org.fz.nettyx.support.Logs.info;
+import static org.fz.nettyx.support.Logs.warn;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -253,66 +253,73 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
        static final  OutboundAdvice NONE = new OutboundAdvice();
 
-        private ChannelBindAction           bind;
-        private ChannelConnectAction        connect;
-        private ChannelPromiseAction        disconnect, close, deregister;
-        private ChannelHandlerContextAction read, flush;
-        private ChannelWriteAction          write;
+        private ChannelBindAction           whenBind;
+        private ChannelConnectAction        whenConnect;
+        private ChannelPromiseAction        whenDisconnect, whenClose, whenDeregister;
+        private ChannelHandlerContextAction whenRead, whenFlush;
+        private ChannelWriteAction          whenWrite;
 
-        @Override
-        public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        public void whenBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             debug(log, "channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
 
-            act(bind, ctx, localAddress, promise);
+            act(whenBind, ctx, localAddress, promise);
+
             super.bind(ctx, localAddress, promise);
         }
 
-        @Override
-        public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        public void whenConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+            debug(log, "channel connecting, remote-address is [{}], local-address is [{}]", remoteAddress, localAddress);
 
-            act(connect, ctx, remoteAddress, localAddress, promise);
+            act(whenConnect, ctx, remoteAddress, localAddress, promise);
+
             super.connect(ctx, remoteAddress, localAddress, promise);
         }
 
-        @Override
-        public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public void whenDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+            debug(log, "channel disconnect, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-            act(disconnect, ctx, promise);
+            act(whenDisconnect, ctx, promise);
+
             super.disconnect(ctx, promise);
         }
 
-        @Override
-        public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public void whenClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+            debug(log, "channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-            act(close, ctx, promise);
+            act(whenClose, ctx, promise);
+
             super.close(ctx, promise);
         }
 
-        @Override
-        public void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public void whenDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+            debug(log, "channel deregister, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-            act(deregister, ctx, promise);
+            act(whenDeregister, ctx, promise);
+
             super.deregister(ctx, promise);
         }
 
-        @Override
-        public void read(ChannelHandlerContext ctx) throws Exception {
+        public void whenRead(ChannelHandlerContext ctx) throws Exception {
+            debug(log, "channel read, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-            act(read, ctx);
+            act(whenRead, ctx);
+
             super.read(ctx);
         }
 
-        @Override
-        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        public void whenWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+            debug(log, "channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-            act(write, ctx, msg, promise);
+            act(whenWrite, ctx, msg, promise);
+
             super.write(ctx, msg, promise);
         }
 
-        @Override
-        public void flush(ChannelHandlerContext ctx) throws Exception {
+        public void whenFlush(ChannelHandlerContext ctx) throws Exception {
+            debug(log, "channel flush, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-            act(flush, ctx);
+            act(whenFlush, ctx);
+
             super.flush(ctx);
         }
     }

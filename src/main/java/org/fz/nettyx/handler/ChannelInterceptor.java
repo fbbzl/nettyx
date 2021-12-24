@@ -361,7 +361,7 @@ public abstract class ChannelInterceptor<T> extends ChannelInboundHandlerAdapter
          * @param pipeline pipeline
          */
         public static void freeAll(ChannelPipeline pipeline) {
-            getInterceptors(pipeline).stream().filter(ChannelInterceptor::unfreed).forEach(ChannelInterceptor::reset);
+            getInterceptors(pipeline).stream().filter(ChannelInterceptor::unfreed).forEach(ChannelInterceptor::free);
         }
 
         /**

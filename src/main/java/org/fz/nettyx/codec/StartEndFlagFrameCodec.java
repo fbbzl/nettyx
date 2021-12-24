@@ -4,6 +4,7 @@ package org.fz.nettyx.codec;
 import static io.netty.buffer.Unpooled.copiedBuffer;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
@@ -64,13 +65,6 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         super(decoder, encoder);
     }
 
-    /**
-     * start and end will be removed
-     *
-     * @author fengbinbin
-     * @version 1.0
-     * @since 2021/1/12 19:59
-     */
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
         private final ByteBuf startFlag;
@@ -114,7 +108,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             if (decodedByteBuf != null) {
                 try {
                     if (decodedByteBuf.readableBytes() > 0) {
-                        return wrapStartEndFlags(decodedByteBuf);
+                        return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag, decodedByteBuf, endFlag);
                     }
                 }
                 // its important to release the bytebuf
@@ -125,22 +119,8 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
 
             return null;
         }
-
-        private ByteBuf wrapStartEndFlags(ByteBuf byteBuf) {
-            return startEndStripDelimiter ?
-                byteBuf : startFlag.writeBytes(byteBuf).writeBytes(endFlag);
-
-        }
     }
 
-    /**
-     * All data to the monitor, is transferred using flagdelimited frames. Each data frame starts and ends with a flag character. All application data is
-     * always located between these flags.
-     *
-     * @author fengbinbin
-     * @version 1.0
-     * @since 2020/12/11 17:06
-     */
     public static class StartEndFlagFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final ByteBuf startFlag;
@@ -161,7 +141,8 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         private ByteBuf wrapStartEndFlags(ByteBuf byteBuf) {
-            return startFlag.writeBytes(byteBuf).writeBytes(endFlag);
+            return Unpooled.wrappedBuffer(startFlag, byteBuf, endFlag);
         }
     }
+
 }

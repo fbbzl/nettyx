@@ -9,7 +9,7 @@ package org.fz.nettyx.function;
  * @since 2021 /5/11 10:23
  */
 @FunctionalInterface
-public interface Action<T> {
+interface Action<T> {
 
     /**
      * Act.

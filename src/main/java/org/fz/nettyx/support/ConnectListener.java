@@ -1,6 +1,4 @@
-package org.fz.nettyx;
-
-import static org.fz.nettyx.Logs.debug;
+package org.fz.nettyx.support;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;

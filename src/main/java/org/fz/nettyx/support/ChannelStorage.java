@@ -1,4 +1,4 @@
-package org.fz.nettyx;
+package org.fz.nettyx.support;
 
 import io.netty.channel.Channel;
 import java.util.Map;

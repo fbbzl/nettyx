@@ -1,7 +1,7 @@
 package org.fz.nettyx.client;
 
 
-import static org.fz.nettyx.Logs.debug;
+import static org.fz.nettyx.support.Logs.debug;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
