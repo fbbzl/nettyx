@@ -1,13 +1,13 @@
-package nettyx;
+package org.fz.nettyx;
 
-import static nettyx.Logs.debug;
+import static org.fz.nettyx.Logs.debug;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import nettyx.function.ChannelFutureAction;
+import org.fz.nettyx.function.ChannelFutureAction;
 
 /**
  * @author fengbinbin
@@ -46,7 +46,7 @@ public class ConnectListener implements ChannelFutureListener {
 
         // done
         if (channelFuture.isDone()) {
-            debug(log, "connect done, state is [{}], address is [{}]", state(channelFuture), channelFuture.channel().remoteAddress());
+            Logs.debug(log, "connect done, state is [{}], address is [{}]", state(channelFuture), channelFuture.channel().remoteAddress());
 
             act(whenDone, channelFuture);
         }

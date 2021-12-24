@@ -1,4 +1,4 @@
-package nettyx.client;
+package org.fz.nettyx.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

@@ -1,4 +1,4 @@
-package nettyx.server;
+package org.fz.nettyx.server;
 
 import lombok.extern.slf4j.Slf4j;
 

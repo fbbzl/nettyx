@@ -1,4 +1,4 @@
-package nettyx.handler;
+package org.fz.nettyx.handler;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;

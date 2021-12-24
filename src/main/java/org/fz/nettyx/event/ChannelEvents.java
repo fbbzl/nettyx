@@ -1,4 +1,4 @@
-package nettyx.event;
+package org.fz.nettyx.event;
 
 import static io.netty.handler.timeout.IdleState.ALL_IDLE;
 import static io.netty.handler.timeout.IdleState.READER_IDLE;

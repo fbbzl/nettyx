@@ -1,4 +1,4 @@
-package nettyx.function;
+package org.fz.nettyx.function;
 
 import io.netty.channel.Channel;
 

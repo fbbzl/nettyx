@@ -1,4 +1,4 @@
-package nettyx.event;
+package org.fz.nettyx.event;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;

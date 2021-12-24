@@ -1,7 +1,7 @@
-package nettyx.client;
+package org.fz.nettyx.client;
 
 
-import static nettyx.Logs.debug;
+import static org.fz.nettyx.Logs.debug;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -10,7 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
-import nettyx.ChannelStorage;
+import org.fz.nettyx.ChannelStorage;
 
 /**
  * The type Multi channel client.

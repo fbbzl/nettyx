@@ -1,4 +1,4 @@
-package nettyx.codec;
+package org.fz.nettyx.codec;
 
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
@@ -9,8 +9,8 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
-import nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameDecoder;
-import nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
+import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameDecoder;
+import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
 
 /**
  * Protocols based on start and end characters can be used
