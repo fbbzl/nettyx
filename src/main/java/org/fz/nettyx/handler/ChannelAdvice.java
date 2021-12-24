@@ -26,6 +26,7 @@ import org.fz.nettyx.function.ChannelConnectAction;
 import org.fz.nettyx.function.ChannelExceptionAction;
 import org.fz.nettyx.function.ChannelHandlerContextAction;
 import org.fz.nettyx.function.ChannelPromiseAction;
+import org.fz.nettyx.function.ChannelReadAction;
 import org.fz.nettyx.function.ChannelWriteAction;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
@@ -37,6 +38,10 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
  */
 
 public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, OutboundAdvice> {
+
+    private static final String
+        READ_IDLE_HANDLER_NAME  = "_readIdle_",
+        WRITE_IDLE_HANDLER_NAME = "_writeIdle_";
 
     public ChannelAdvice(InboundAdvice inboundAdvice) {
         super(inboundAdvice, OutboundAdvice.NONE);
@@ -55,12 +60,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
     @NoArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
-
-        static final  InboundAdvice NONE = new InboundAdvice();
-
-        private static final String
-            READ_IDLE_NAME  = "_readIdle_",
-            WRITE_IDLE_NAME = "_writeIdle_";
+        static final InboundAdvice NONE = new InboundAdvice();
 
         private Channel channel;
 
@@ -71,62 +71,31 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             whenChannelInactive,
             whenWritabilityChanged,
             whenChannelReadComplete,
-            whenReadIdle,
-            whenWriteIdle;
+            whenReadIdle;
 
-        private ChannelExceptionAction whenExceptionCaught;
-
-        /**
-         * used with {@link InboundAdvice#whenReadIdle}
-         */
         private int readIdleSeconds;
-        /**
-         * used with {@link InboundAdvice#whenWriteIdle}
-         */
-        private int writesIdleSeconds;
+        private ChannelReadAction      whenChannelRead;
+        private ChannelExceptionAction whenExceptionCaught;
 
         public InboundAdvice(Channel channel) {
             this.channel = channel;
         }
 
         public InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction act) {
-            this.whenReadIdle    = act;
+            this.whenReadIdle = act;
             this.readIdleSeconds = idleSeconds;
 
-            ChannelPipeline pipeline  = channel.pipeline();
-            EventLoop eventLoop = channel.eventLoop();
+            ChannelPipeline pipeline = channel.pipeline();
+            EventLoop eventLoop      = channel.eventLoop();
 
             IdleStateHandler readIdleHandler  = new IdleStateHandler(this.readIdleSeconds, 0, 0),
-                writeIdleHandler = (IdleStateHandler) pipeline.get(WRITE_IDLE_NAME);
+                             writeIdleHandler = (IdleStateHandler) pipeline.get(WRITE_IDLE_HANDLER_NAME);
 
             // if writeIdleHandler configured, readIdleHandler will set before writeIdleHandler
             if (writeIdleHandler != null) {
-                pipeline.addBefore(eventLoop, WRITE_IDLE_NAME, READ_IDLE_NAME, readIdleHandler);
+                pipeline.addBefore(eventLoop, WRITE_IDLE_HANDLER_NAME, READ_IDLE_HANDLER_NAME, readIdleHandler);
             }
-            else {
-                pipeline.addFirst(eventLoop, READ_IDLE_NAME, readIdleHandler);
-            }
-
-            return this;
-        }
-
-        public InboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction act) {
-            this.whenWriteIdle     = act;
-            this.writesIdleSeconds = idleSeconds;
-
-            ChannelPipeline pipeline  = channel.pipeline();
-            EventLoop       eventLoop = channel.eventLoop();
-
-            IdleStateHandler writeIdleHandler = new IdleStateHandler(0, this.writesIdleSeconds, 0),
-                readIdleHandler  = (IdleStateHandler) pipeline.get(READ_IDLE_NAME);
-
-            // if readIdleHandler configured, writeIdleHandler will set after readIdleHandler
-            if (readIdleHandler != null) {
-                pipeline.addAfter(eventLoop, READ_IDLE_NAME, WRITE_IDLE_NAME, writeIdleHandler);
-            }
-            else {
-                pipeline.addFirst(eventLoop, WRITE_IDLE_NAME, writeIdleHandler);
-            }
+            else pipeline.addFirst(eventLoop, READ_IDLE_HANDLER_NAME, readIdleHandler);
 
             return this;
         }
@@ -144,15 +113,20 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
             debug(log, "channel unregistered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
-
             act(whenChannelUnRegister, ctx);
 
             super.channelUnregistered(ctx);
         }
 
-        /**
-         * do not support channel read advice!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         */
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            debug(log, "channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
+                ctx.channel().localAddress(), msg);
+
+            act(whenChannelRead, ctx, msg);
+
+            super.channelRead(ctx, msg);
+        }
 
         @Override
         public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
@@ -165,7 +139,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            debug(log, "channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
+                ctx.channel().localAddress());
 
             act(whenWritabilityChanged, ctx);
 
@@ -233,31 +208,66 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             }
 
             if (ChannelEvents.isWriteIdle(evt)) {
-                warn(log, "have been in write-idle state for [{}] seconds on [{}]", writesIdleSeconds, ctx.channel().remoteAddress());
+                warn(log, "have been in write-idle state for [{}] seconds on [{}]", this.findWriteIdleSeconds(), ctx.channel().remoteAddress());
 
-                act(whenWriteIdle, ctx);
+                act(this.findWriteIdleAction(), ctx);
             }
 
             super.userEventTriggered(ctx, evt);
         }
 
+        private int findWriteIdleSeconds() {
+            IdleStateHandler idleStateHandler = (IdleStateHandler) this.channel.pipeline().get(WRITE_IDLE_HANDLER_NAME);
+            return (int) idleStateHandler.getWriterIdleTimeInMillis() / 1000;
+        }
+
+        private ChannelHandlerContextAction findWriteIdleAction() {
+            OutboundAdvice outboundAdvice = this.channel.pipeline().get(OutboundAdvice.class);
+            return outboundAdvice == null ? null : outboundAdvice.whenWriteIdle;
+        }
     }
 
-    /**
-     * TODO add log
-     */
     @Slf4j
     @Setter
     @NoArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
-       static final  OutboundAdvice NONE = new OutboundAdvice();
+        static final OutboundAdvice NONE = new OutboundAdvice();
+
+        private Channel channel;
 
         private ChannelBindAction           whenBind;
         private ChannelConnectAction        whenConnect;
         private ChannelPromiseAction        whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction          whenWrite;
+
+        private ChannelHandlerContextAction whenWriteIdle;
+        private int writesIdleSeconds;
+
+        public OutboundAdvice(Channel channel) {
+            this.channel = channel;
+        }
+
+        public OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction act) {
+            this.whenWriteIdle = act;
+            this.writesIdleSeconds = idleSeconds;
+
+            ChannelPipeline pipeline = channel.pipeline();
+            EventLoop eventLoop      = channel.eventLoop();
+
+            IdleStateHandler writeIdleHandler = new IdleStateHandler(0, this.writesIdleSeconds, 0),
+                             readIdleHandler  = (IdleStateHandler) pipeline.get(READ_IDLE_HANDLER_NAME);
+
+            // if readIdleHandler configured, writeIdleHandler will set after readIdleHandler
+            if (readIdleHandler != null) {
+                pipeline.addAfter(eventLoop, READ_IDLE_HANDLER_NAME, WRITE_IDLE_HANDLER_NAME, writeIdleHandler);
+            }
+            else pipeline.addFirst(eventLoop, WRITE_IDLE_HANDLER_NAME, writeIdleHandler);
+
+
+            return this;
+        }
 
         public void whenBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             debug(log, "channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
@@ -342,7 +352,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         }
     }
 
-    static void act(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
+    static void act(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
+        ChannelPromise promise) {
         if (channelConnectAction != null) {
             channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
         }
@@ -360,4 +371,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         }
     }
 
+    static void act(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
+        if (channelReadAction != null) {
+            channelReadAction.act(ctx, msg);
+        }
+    }
 }
