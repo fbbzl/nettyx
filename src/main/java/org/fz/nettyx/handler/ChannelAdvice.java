@@ -265,7 +265,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             }
             else pipeline.addFirst(eventLoop, WRITE_IDLE_HANDLER_NAME, writeIdleHandler);
 
-
             return this;
         }
 
