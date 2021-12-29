@@ -19,7 +19,7 @@
 <dependency>
   <groupId>org.fz</groupId>
   <artifactId>nettyx</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1</version>
 </dependency>
 ```
 ## api
