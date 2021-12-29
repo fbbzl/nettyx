@@ -15,7 +15,7 @@
     <netty-all.version>4.1.72.Final</netty-all.version>
 
     <lombok.version>1.18.22</lombok.version>
-    <log4j-slf4j-series.version>2.16.0</log4j-slf4j-series.version>
+    <log4j-slf4j-series.version>2.17.0</log4j-slf4j-series.version>
     <jul-to-slf4j.version>1.7.32</jul-to-slf4j.version>
   </properties>
 
