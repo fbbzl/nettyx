@@ -16,11 +16,12 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.channel.EventLoop;
 import io.netty.handler.timeout.IdleStateHandler;
 import java.net.SocketAddress;
-import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.event.ChannelEvents;
+import org.fz.nettyx.event.ActionedIdleStateHandler;
 import org.fz.nettyx.function.ChannelBindAction;
 import org.fz.nettyx.function.ChannelConnectAction;
 import org.fz.nettyx.function.ChannelExceptionAction;
@@ -57,10 +58,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
     @Slf4j
     @Setter
-    @NoArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
-        static final InboundAdvice NONE = new InboundAdvice();
+        static final InboundAdvice NONE = new InboundAdvice(null);
 
         private Channel channel;
 
@@ -70,10 +70,13 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             whenChannelActive,
             whenChannelInactive,
             whenWritabilityChanged,
-            whenChannelReadComplete,
-            whenReadIdle;
+            whenChannelReadComplete;
+
+        @Setter(AccessLevel.NONE)
+        private ChannelHandlerContextAction whenReadIdle;
 
         private int readIdleSeconds;
+
         private ChannelReadAction      whenChannelRead;
         private ChannelExceptionAction whenExceptionCaught;
 
@@ -216,23 +219,22 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             super.userEventTriggered(ctx, evt);
         }
 
-        private int findWriteIdleSeconds() {
+        private long findWriteIdleSeconds() {
             IdleStateHandler idleStateHandler = (IdleStateHandler) this.channel.pipeline().get(WRITE_IDLE_HANDLER_NAME);
-            return (int) idleStateHandler.getWriterIdleTimeInMillis() / 1000;
+            return idleStateHandler.getWriterIdleTimeInMillis() / 1000;
         }
 
         private ChannelHandlerContextAction findWriteIdleAction() {
-            OutboundAdvice outboundAdvice = this.channel.pipeline().get(OutboundAdvice.class);
-            return outboundAdvice == null ? null : outboundAdvice.whenWriteIdle;
+            ActionedIdleStateHandler actionedIdleStateHandler = this.channel.pipeline().get(ActionedIdleStateHandler.class);
+            return actionedIdleStateHandler == null ? null : actionedIdleStateHandler.action();
         }
     }
 
     @Slf4j
     @Setter
-    @NoArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
-        static final OutboundAdvice NONE = new OutboundAdvice();
+        static final OutboundAdvice NONE = new OutboundAdvice(null);
 
         private Channel channel;
 
@@ -242,6 +244,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction          whenWrite;
 
+        @Setter(AccessLevel.NONE)
         private ChannelHandlerContextAction whenWriteIdle;
         private int writesIdleSeconds;
 
@@ -256,7 +259,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             ChannelPipeline pipeline = channel.pipeline();
             EventLoop eventLoop      = channel.eventLoop();
 
-            IdleStateHandler writeIdleHandler = new IdleStateHandler(0, this.writesIdleSeconds, 0),
+            IdleStateHandler writeIdleHandler = new ActionedIdleStateHandler(0, this.writesIdleSeconds, 0).action(this.whenWriteIdle),
                              readIdleHandler  = (IdleStateHandler) pipeline.get(READ_IDLE_HANDLER_NAME);
 
             // if readIdleHandler configured, writeIdleHandler will set after readIdleHandler
