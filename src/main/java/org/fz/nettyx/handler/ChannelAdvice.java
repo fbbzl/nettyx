@@ -7,6 +7,7 @@ import static org.fz.nettyx.support.Logs.info;
 import static org.fz.nettyx.support.Logs.warn;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
@@ -54,6 +55,15 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
     public ChannelAdvice(InboundAdvice inboundAdvice, OutboundAdvice outboundAdvice) {
         super(inboundAdvice, outboundAdvice);
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        ChannelHandler last = ctx.pipeline().last();
+        if (last instanceof ChannelAdvice) {
+            super.handlerAdded(ctx);
+        }
+        else throw new UnsupportedOperationException("channel advice can only use as the last-handler of pipeline, keep it being the last-handler of pipeline");
     }
 
     @Slf4j
