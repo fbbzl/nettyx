@@ -14,19 +14,19 @@ import org.fz.nettyx.function.ChannelHandlerContextAction;
 @Getter
 @Setter
 @Accessors(fluent = true, chain = true)
-public class ActionedIdleStateHandler extends IdleStateHandler {
+public class ActionableIdleStateHandler extends IdleStateHandler {
 
     private ChannelHandlerContextAction action;
 
-    public ActionedIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
+    public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
     }
 
-    public ActionedIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+    public ActionableIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
         super(readerIdleTime, writerIdleTime, allIdleTime, unit);
     }
 
-    public ActionedIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+    public ActionableIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
         super(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit);
     }
 }
