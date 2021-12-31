@@ -1,11 +1,6 @@
 package org.fz.nettyx.handler;
 
 
-import static org.fz.nettyx.support.Logs.debug;
-import static org.fz.nettyx.support.Logs.error;
-import static org.fz.nettyx.support.Logs.info;
-import static org.fz.nettyx.support.Logs.warn;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -108,7 +103,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel registered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel registered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenChannelRegister, ctx);
 
@@ -117,7 +112,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel unregistered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel unregistered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenChannelUnRegister, ctx);
 
@@ -126,7 +121,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            debug(log, "channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
+            log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress(), msg);
 
             act(whenChannelRead, ctx, msg);
@@ -136,7 +131,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel read complete, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel read complete, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenChannelReadComplete, ctx);
 
@@ -145,7 +140,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
+            log.debug("channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress());
 
             act(whenWritabilityChanged, ctx);
@@ -161,7 +156,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
          */
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            info(log, "channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
+            log.info("channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
 
             act(whenChannelActive, ctx);
 
@@ -176,7 +171,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
          */
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-            warn(log, "channel in-active event triggered, address is [{}]", ctx.channel().remoteAddress());
+            log.warn("channel in-active event triggered, address is [{}]", ctx.channel().remoteAddress());
 
             act(whenChannelInactive, ctx);
 
@@ -191,7 +186,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
          */
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            error(log, "channel handler exception occurred: ", cause);
+            log.error("channel handler exception occurred: ", cause);
 
             act(whenExceptionCaught, ctx, cause);
 
@@ -208,13 +203,13 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             if (ChannelEvents.isReadIdle(evt)) {
-                warn(log, "have been in read-idle state for [{}] seconds on [{}]", readIdleSeconds, ctx.channel().remoteAddress());
+                log.warn("have been in read-idle state for [{}] seconds on [{}]", readIdleSeconds, ctx.channel().remoteAddress());
 
                 act(this.findReadIdleAction(), ctx);
             }
 
             if (ChannelEvents.isWriteIdle(evt)) {
-                warn(log, "have been in write-idle state for [{}] seconds on [{}]", this.findWriteIdleSeconds(), ctx.channel().remoteAddress());
+                log.warn("have been in write-idle state for [{}] seconds on [{}]", this.findWriteIdleSeconds(), ctx.channel().remoteAddress());
 
                 act(this.findWriteIdleAction(), ctx);
             }
@@ -275,7 +270,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
-            debug(log, "channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
+            log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
 
             act(whenBind, ctx, localAddress, promise);
 
@@ -284,7 +279,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
-            debug(log, "channel connecting, remote-address is [{}], local-address is [{}]", remoteAddress, localAddress);
+            log.debug("channel connecting, remote-address is [{}], local-address is [{}]", remoteAddress, localAddress);
 
             act(whenConnect, ctx, remoteAddress, localAddress, promise);
 
@@ -293,7 +288,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-            debug(log, "channel disconnect, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel disconnect, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenDisconnect, ctx, promise);
 
@@ -302,7 +297,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-            debug(log, "channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenClose, ctx, promise);
 
@@ -311,7 +306,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-            debug(log, "channel deregister, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel deregister, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenDeregister, ctx, promise);
 
@@ -320,7 +315,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void read(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel read, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel read, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenRead, ctx);
 
@@ -329,7 +324,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            debug(log, "channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenWrite, ctx, msg, promise);
 
@@ -338,7 +333,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void flush(ChannelHandlerContext ctx) throws Exception {
-            debug(log, "channel flush, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel flush, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
 
             act(whenFlush, ctx);
 

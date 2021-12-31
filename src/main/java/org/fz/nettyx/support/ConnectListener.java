@@ -44,7 +44,7 @@ public class ConnectListener implements ChannelFutureListener {
 
         // done
         if (channelFuture.isDone()) {
-            Logs.debug(log, "connect done, state is [{}], address is [{}]", state(channelFuture), channelFuture.channel().remoteAddress());
+            log.debug("connect done, state is [{}], address is [{}]", state(channelFuture), channelFuture.channel().remoteAddress());
 
             act(whenDone, channelFuture);
         }

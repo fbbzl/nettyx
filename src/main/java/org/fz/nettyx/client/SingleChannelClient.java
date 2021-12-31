@@ -1,8 +1,6 @@
 package org.fz.nettyx.client;
 
 
-import static org.fz.nettyx.support.Logs.debug;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import java.net.SocketAddress;
@@ -34,13 +32,13 @@ public abstract class SingleChannelClient extends Client {
     public void send(Object message) {
         try {
             if (this.notReady(channel)) {
-                debug(log, "connection have not been initialized, message will be discard: {}", message);
+                log.debug("connection have not been initialized, message will be discard: {}", message);
                 return;
             }
 
             channel.writeAndFlush(message);
 
-            debug(log, "has send message to: [{}]", channel.remoteAddress());
+            log.debug("has send message to: [{}]", channel.remoteAddress());
         } catch (Exception exception) {
             log.error("exception occurred while sending the message", exception);
             this.shutdownGracefully();

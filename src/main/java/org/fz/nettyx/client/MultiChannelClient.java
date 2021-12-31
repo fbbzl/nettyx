@@ -1,8 +1,6 @@
 package org.fz.nettyx.client;
 
 
-import static org.fz.nettyx.support.Logs.debug;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -69,12 +67,12 @@ public abstract class MultiChannelClient<K> extends Client {
             Channel channel = channelStorage.get(channelKey);
 
             if (notReady(channel)) {
-                debug(log, "connection has not been initialized, message will be discard: {}", message);
+                log.debug("connection has not been initialized, message will be discard: {}", message);
                 return;
             }
 
             channel.writeAndFlush(message);
-            debug(log, "has send message to : [{}]", channel.remoteAddress());
+            log.debug("has send message to : [{}]", channel.remoteAddress());
         } catch (Exception exception) {
             log.error("exception occurred while sending the message", exception);
         }
