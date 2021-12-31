@@ -84,7 +84,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         private int readIdleSeconds;
 
-        private ChannelReadAction whenChannelRead;
+        private ChannelReadAction      whenChannelRead;
         private ChannelExceptionAction whenExceptionCaught;
 
         public InboundAdvice(Channel channel) {
@@ -246,11 +246,11 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         private Channel channel;
 
-        private ChannelBindAction    whenBind;
-        private ChannelConnectAction whenConnect;
-        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        private ChannelBindAction           whenBind;
+        private ChannelConnectAction        whenConnect;
+        private ChannelPromiseAction        whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
-        private ChannelWriteAction whenWrite;
+        private ChannelWriteAction          whenWrite;
 
         private int writesIdleSeconds;
 
