@@ -19,23 +19,24 @@
 <dependency>
   <groupId>org.fz</groupId>
   <artifactId>nettyx</artifactId>
-  <version>1.1.6</version>
+  <version>1.1.8</version>
 </dependency>
 ```
 ## api
 ```
-client                              提供一些抽象客户端基础实现
+client                              提供client端基础实现
   ---Client                            顶级Client抽象
   ---MultiChannelClient                多Channel的Client 
-  ---SingleChannelClient               单Channel的Client
+  ---SingleChannelClient               单Channel的Client, 使用key检索对应channel
 codec                               提供了一些基础的编解码器
   ---DelimiterBasedFrameCodec          基于分隔符codec
   ---StartEndFlagFrameCodec            基于起止符codec
   ---StringMessageCodec                字符串Codec
-envet
+envet                                对netty事件提供支持
+  ---ActionableIdleStateHandler        可操作闲置处理器
   ---ChannelEvent                      Channel事件对象, 建议配合Spring容器事件使用
   ---ChannelEvents                     Channel事件对象工具
-function                            包含了充足的函数式接口, 为函数式编程提供支持                         
+function                            包含了充足的函数式接口, 为函数式编程提供支持                     
   ---Action                            
   ---ChannelAction                      
   ---ChannelBindAction
@@ -49,13 +50,12 @@ function                            包含了充足的函数式接口, 为函数
   ---ChannelWriteAction
 handler                             提供了一些基础的channel handler实现
   ---ChannelAdvice                     提供了channel事件谏言  
-  ---ChannelInterceptor                channel拦截器, 适用于协议握手等场景
+  ---ChannelInterceptor                channel拦截器, 适用于通信前的握手动作等前置操作
 server
-  ---Server                         暂未提供server基础实现, 后续更新
-support                             基础工具类
-  ---ChannelStorage                 存储channel, 内部使用KV存储
-  ---ConnectListener                轻度封装后的连接监听器
-  ---Logs                           日志工具
+  ---Server                          提供server端基础实现
+support                              基础工具类
+  ---ChannelStorage                  存储channel, 内部使用KV对存储
+  ---ActionableChannelFutureListener 可操作channel future监听器
 ```
 #### 参与贡献
 
