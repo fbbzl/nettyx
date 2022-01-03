@@ -93,7 +93,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             EventLoop eventLoop      = channel.eventLoop();
 
             IdleStateHandler readIdleHandler  =
-                new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0).action(readIdleAct);
+                new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0).idleAction(readIdleAct);
 
             // read idle handler will always add pipeline first
             pipeline.addFirst(eventLoop, READ_IDLE_HANDLER_NAME, readIdleHandler);
@@ -224,12 +224,12 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findWriteIdleAction() {
             T actionableIdleStateHandler = (T) this.channel.pipeline().get(WRITE_IDLE_HANDLER_NAME);
-            return actionableIdleStateHandler == null ? null : actionableIdleStateHandler.action();
+            return actionableIdleStateHandler == null ? null : actionableIdleStateHandler.idleAction();
         }
 
         private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findReadIdleAction() {
             T actionableIdleStateHandler = (T) this.channel.pipeline().get(READ_IDLE_HANDLER_NAME);
-            return actionableIdleStateHandler == null ? null : actionableIdleStateHandler.action();
+            return actionableIdleStateHandler == null ? null : actionableIdleStateHandler.idleAction();
         }
     }
 
@@ -260,7 +260,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             EventLoop eventLoop      = channel.eventLoop();
 
             IdleStateHandler writeIdleHandler =
-                new ActionableIdleStateHandler(0, this.writesIdleSeconds, 0).action(writeIdleAct);
+                new ActionableIdleStateHandler(0, this.writesIdleSeconds, 0).idleAction(writeIdleAct);
 
             // write idle handler will always add pipeline last
             pipeline.addLast(eventLoop, WRITE_IDLE_HANDLER_NAME, writeIdleHandler);
