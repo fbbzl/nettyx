@@ -16,7 +16,7 @@ import org.fz.nettyx.function.ChannelHandlerContextAction;
 @Accessors(fluent = true, chain = true)
 public class ActionableIdleStateHandler extends IdleStateHandler {
 
-    private ChannelHandlerContextAction action;
+    private ChannelHandlerContextAction idleAction;
 
     public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
