@@ -1,6 +1,7 @@
 package org.fz.nettyx.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -18,8 +19,10 @@ public abstract class Server {
         parentEventLoopGroup = new NioEventLoopGroup(),
         childEventLoopGroup  = new NioEventLoopGroup();
 
-    private final ServerBootstrap serverBootstrap = new ServerBootstrap().group(parentEventLoopGroup, childEventLoopGroup)
-        .channel(NioServerSocketChannel.class);
+    private final ServerBootstrap serverBootstrap =
+        new ServerBootstrap()
+            .group(parentEventLoopGroup, childEventLoopGroup)
+            .channel(NioServerSocketChannel.class);
 
     public EventLoopGroup parentEventLoopGroup() {
         return this.parentEventLoopGroup;
@@ -33,11 +36,16 @@ public abstract class Server {
         return serverBootstrap.clone();
     }
 
-    public abstract void bind(SocketAddress socketAddress) throws Exception;
+    public abstract ChannelFuture bind(SocketAddress socketAddress) throws Exception;
 
     protected void shutdownGracefully() {
         childEventLoopGroup.shutdownGracefully();
         parentEventLoopGroup.shutdownGracefully();
+    }
+
+    protected void syncShutdownGracefully() throws InterruptedException {
+        childEventLoopGroup.shutdownGracefully().sync();
+        parentEventLoopGroup.shutdownGracefully().sync();
     }
 
     public <T> ScheduledFuture<T> schedule(Runnable command, long delay, TimeUnit unit) {
