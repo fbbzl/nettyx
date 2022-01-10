@@ -289,11 +289,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         private int writesIdleSeconds;
 
-        /**
-         * Instantiates a new Outbound advice.
-         *
-         * @param channel the channel
-         */
         public OutboundAdvice(Channel channel) {
             this.channel = channel;
         }
@@ -376,7 +371,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            if (log.isDebugEnabled()) {
+                log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            }
 
             act(whenWrite, ctx, msg, promise);
 
