@@ -124,7 +124,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             ChannelPipeline pipeline = channel.pipeline();
             EventLoop eventLoop      = channel.eventLoop();
 
-            IdleStateHandler readIdleHandler  =
+            IdleStateHandler readIdleHandler =
                 new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0).idleAction(readIdleAct);
 
             // read idle handler will always add pipeline first
