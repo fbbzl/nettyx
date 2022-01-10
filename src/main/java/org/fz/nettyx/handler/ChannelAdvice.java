@@ -183,8 +183,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress(), msg);
+            if (log.isDebugEnabled()) {
+                log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress(), msg);
+            }
 
             act(whenChannelRead, ctx, msg);
 
