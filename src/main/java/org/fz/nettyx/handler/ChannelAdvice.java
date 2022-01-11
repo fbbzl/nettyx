@@ -124,7 +124,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             ChannelPipeline pipeline = channel.pipeline();
             EventLoop eventLoop      = channel.eventLoop();
 
-            IdleStateHandler readIdleHandler  =
+            IdleStateHandler readIdleHandler =
                 new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0).idleAction(readIdleAct);
 
             // read idle handler will always add pipeline first
@@ -183,8 +183,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress(), msg);
+            if (log.isDebugEnabled()) {
+                log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress(), msg);
+            }
 
             act(whenChannelRead, ctx, msg);
 
@@ -288,11 +289,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         private int writesIdleSeconds;
 
-        /**
-         * Instantiates a new Outbound advice.
-         *
-         * @param channel the channel
-         */
         public OutboundAdvice(Channel channel) {
             this.channel = channel;
         }
@@ -375,7 +371,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            if (log.isDebugEnabled()) {
+                log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            }
 
             act(whenWrite, ctx, msg, promise);
 
