@@ -1,8 +1,6 @@
 package org.fz.nettyx.codec;
 
 
-import static io.netty.buffer.Unpooled.copiedBuffer;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -74,15 +72,23 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         private final ByteBuf endFlag;
         private final boolean startEndStripDelimiter;
 
+        static ByteBuf getActualDelimiter(ByteBuf startFlag, ByteBuf endFlag) {
+            return Unpooled.copiedBuffer(endFlag, startFlag);
+        }
+
+        static ByteBuf getActualDelimiter(ByteBuf startEndSameFlag) {
+            return Unpooled.copiedBuffer(startEndSameFlag, startEndSameFlag);
+        }
+
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag) {
-            super(maxFrameLength, true, copiedBuffer(startEndSameFlag));
+            super(maxFrameLength, true, getActualDelimiter(startEndSameFlag));
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
-            super(maxFrameLength, true, copiedBuffer(startFlag), copiedBuffer(endFlag));
+            super(maxFrameLength, true, getActualDelimiter(startFlag, endFlag));
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = startFlag;
@@ -90,14 +96,14 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         public StartEndFlagFrameDecoder(boolean stripDelimiter, ByteBuf startEndSameFlag) {
-            super(DEFAULT_MAX_FRAME_LENGTH, true, copiedBuffer(startEndSameFlag));
+            super(DEFAULT_MAX_FRAME_LENGTH, true, getActualDelimiter(startEndSameFlag));
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
-            super(DEFAULT_MAX_FRAME_LENGTH, true, copiedBuffer(startFlag), copiedBuffer(endFlag));
+            super(DEFAULT_MAX_FRAME_LENGTH, true, getActualDelimiter(startFlag, endFlag));
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = startFlag;
@@ -109,8 +115,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
 
             if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0) {
-                try { return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag, decodedByteBuf, endFlag); }
-                finally { decodedByteBuf.release(); }
+                return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag, decodedByteBuf, endFlag);
             }
 
             return null;
