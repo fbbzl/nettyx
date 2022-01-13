@@ -5,6 +5,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.util.AttributeKey;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,10 @@ public abstract class MultiChannelClient<K> extends Client {
      * Used to store different channels
      */
     protected final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
+
+    public Channel getChannel(K key) {
+        return this.channelStorage.get(key);
+    }
 
     /**
      * Connect.
@@ -54,6 +59,26 @@ public abstract class MultiChannelClient<K> extends Client {
      */
     protected void storeChannel(ChannelFuture cf) {
         this.storeChannel(channelKey(cf), cf.channel());
+    }
+
+    public void closeChannel(K key) {
+        getChannel(key).close();
+    }
+
+    public void closeChannel(K key, ChannelPromise promise) {
+        getChannel(key).close(promise);
+    }
+
+    public void closeChannelGracefully(K key) {
+        if (preCloseGracefully(getChannel(key))) {
+            this.closeChannel(key);
+        }
+    }
+
+    public void closeChannelGracefully(K key, ChannelPromise promise) {
+        if (preCloseGracefully(getChannel(key))) {
+            this.closeChannel(key, promise);
+        }
     }
 
     /**

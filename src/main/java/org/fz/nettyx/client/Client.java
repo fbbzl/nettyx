@@ -79,6 +79,17 @@ public abstract class Client {
         eventLoopGroup.shutdownGracefully();
     }
 
+    public static boolean preCloseGracefully(Channel channel) {
+        return
+            channel != null
+                &&
+                !channel.isActive()
+                &&
+                !channel.isOpen()
+                &&
+                !channel.isWritable();
+    }
+
     /**
      * Schedule scheduled future.
      *
