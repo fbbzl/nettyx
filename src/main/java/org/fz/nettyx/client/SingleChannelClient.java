@@ -3,6 +3,7 @@ package org.fz.nettyx.client;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelPromise;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +21,30 @@ public abstract class SingleChannelClient extends Client {
 
     protected void storeChannel(ChannelFuture cf) {
         this.channel = cf.channel();
+    }
+
+    public Channel getChannel() {
+        return this.channel;
+    }
+
+    public void closeChannel() {
+        this.channel.close();
+    }
+
+    public void closeChannel(ChannelPromise promise) {
+        this.channel.close(promise);
+    }
+
+    public void closeChannelGracefully() {
+        if (preCloseGracefully(channel)) {
+            this.closeChannel();
+        }
+    }
+
+    public void closeChannelGracefully(ChannelPromise promise) {
+        if (preCloseGracefully(channel)) {
+            this.closeChannel(promise);
+        }
     }
 
     /**
