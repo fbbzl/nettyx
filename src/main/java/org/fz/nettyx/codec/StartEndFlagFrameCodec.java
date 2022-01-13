@@ -68,8 +68,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
      */
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
-        private final ByteBuf startFlag;
-        private final ByteBuf endFlag;
+        private final ByteBuf startFlag, endFlag;
         private final boolean startEndStripDelimiter;
 
         static ByteBuf getActualDelimiter(ByteBuf startFlag, ByteBuf endFlag) {
