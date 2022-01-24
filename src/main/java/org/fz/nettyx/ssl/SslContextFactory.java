@@ -18,7 +18,7 @@ import lombok.experimental.UtilityClass;
  * @version 1.0
  * @see SslContextFactory#ONEWAY
  * @see SslContextFactory#TWOWAY
- * @see <a href="https://github.com/ZHI-XINHUA/myNetty/blob/master/src/zxh/netty/ssl/oneway/SecureChatSslContextFactory.java">refer</a>
+ * @see <a href="https://github.com/ZHI-XINHUA/myNetty/tree/master/src/zxh/netty/ssl">refer</a>
  * @since 2022/1/21 14:24
  */
 @UtilityClass
