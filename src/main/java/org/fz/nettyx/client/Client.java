@@ -2,10 +2,7 @@ package org.fz.nettyx.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -23,33 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Client {
 
     /**
-     * The Event loop group.
-     */
-    protected final EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
-
-    /**
-     * The Proto bootstrap.
-     */
-    private final Bootstrap bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class).handler(channelInitializer());
-
-    /**
-     * Channel initializer channel initializer.
-     *
-     * @return the channel initializer
-     */
-    public abstract ChannelInitializer<NioSocketChannel> channelInitializer();
-
-    /**
      * Event loop group event loop group.
      *
      * @return the event loop group
      */
-    public EventLoopGroup eventLoopGroup() {
-        return this.eventLoopGroup;
-    }
+    public abstract EventLoopGroup getEventLoopGroup();
+
+    public abstract Bootstrap getBootstrap();
 
     protected Bootstrap newBootstrap() {
-        return bootstrap.clone();
+        return getBootstrap().clone();
     }
 
     /**
@@ -76,7 +56,7 @@ public abstract class Client {
      * Shutdown gracefully.
      */
     protected void shutdownGracefully() {
-        eventLoopGroup.shutdownGracefully();
+        getEventLoopGroup().shutdownGracefully();
     }
 
     public static boolean preCloseGracefully(Channel channel) {
@@ -99,7 +79,7 @@ public abstract class Client {
      * @return the scheduled future
      */
     public <T> ScheduledFuture<T> schedule(Runnable command, long delay, TimeUnit unit) {
-        return (ScheduledFuture<T>) eventLoopGroup().schedule(command, delay, unit);
+        return (ScheduledFuture<T>) getEventLoopGroup().schedule(command, delay, unit);
     }
 
     /**
@@ -112,7 +92,7 @@ public abstract class Client {
      * @return the scheduled future
      */
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-        return eventLoopGroup().schedule(callable, delay, unit);
+        return getEventLoopGroup().schedule(callable, delay, unit);
     }
 
     /**
@@ -125,7 +105,7 @@ public abstract class Client {
      * @return the scheduled future
      */
     public <T> ScheduledFuture<T> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        return (ScheduledFuture<T>) eventLoopGroup().scheduleAtFixedRate(command, initialDelay, period, unit);
+        return (ScheduledFuture<T>) getEventLoopGroup().scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
     /**
@@ -138,6 +118,6 @@ public abstract class Client {
      * @return the scheduled future
      */
     public <T> ScheduledFuture<T> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return (ScheduledFuture<T>) eventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay, unit);
+        return (ScheduledFuture<T>) getEventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 }
