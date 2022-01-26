@@ -108,7 +108,7 @@ public class SslContextFactory {
             try {
                 return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
             } catch (Exception serverSslContextException) {
-                throw new RuntimeException("init server ssl context failed", serverSslContextException);
+                throw new RuntimeException("init client ssl context failed", serverSslContextException);
             }
         }
 
