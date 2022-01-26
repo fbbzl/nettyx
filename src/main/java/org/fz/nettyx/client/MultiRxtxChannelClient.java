@@ -1,28 +1,24 @@
 package org.fz.nettyx.client;
 
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
-import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.support.ChannelStorage;
 
 /**
- * The type Multi channel client.
- *
- * @param <K> the channel channelKey type
  * @author fengbinbin
- * @version 1.0
- * @since 2021 /5/6 16:58
- */
-@Slf4j
-public abstract class MultiChannelClient<K> extends TcpClient {
+ * @since 2022-01-26 20:26
+ **/
 
-    private final AttributeKey<K> channelKey = AttributeKey.valueOf("$tcp_channel_key$");
+@Slf4j
+public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
+
+    private final AttributeKey<K> channelKey = AttributeKey.valueOf("$rxtx_channel_key$");
 
     /**
      * Used to store different channels
@@ -39,7 +35,7 @@ public abstract class MultiChannelClient<K> extends TcpClient {
      * @param channelKey the channel key
      * @param address the address
      */
-    protected abstract void connect(K channelKey, SocketAddress address);
+    protected abstract void connect(K channelKey, RxtxDeviceAddress address);
 
     /**
      * must store channel after connect success!!
@@ -149,5 +145,4 @@ public abstract class MultiChannelClient<K> extends TcpClient {
     protected K channelKey(Channel channel) {
         return channel.attr(channelKey).get();
     }
-
 }

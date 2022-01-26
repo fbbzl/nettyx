@@ -1,21 +1,18 @@
 package org.fz.nettyx.client;
 
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import java.net.SocketAddress;
+import io.netty.channel.rxtx.RxtxDeviceAddress;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Single channel client
- *
  * @author fengbinbin
- * @version 1.0
- * @since 2021 /5/6 15:22
- */
+ * @since 2022-01-26 20:25
+ **/
+
 @Slf4j
-public abstract class SingleChannelClient extends TcpClient {
+public abstract class SingleRxtxChannelClient extends RxtxClient {
 
     protected Channel channel;
 
@@ -47,12 +44,7 @@ public abstract class SingleChannelClient extends TcpClient {
         }
     }
 
-    /**
-     * Connect.
-     *
-     * @param address the address
-     */
-    public abstract void connect(SocketAddress address);
+    public abstract void connect(RxtxDeviceAddress address);
 
     public void send(Object message) {
         if (this.notReady(channel)) {
@@ -68,4 +60,5 @@ public abstract class SingleChannelClient extends TcpClient {
             log.error("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
         }
     }
+
 }
