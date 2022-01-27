@@ -11,7 +11,7 @@ import io.netty.channel.ChannelPromise;
  * @since 12 /24/2021 3:34 PM
  */
 @FunctionalInterface
-public interface ChannelWriteAction {
+public interface ChannelWriteAction extends Action {
 
     /**
      * Action.

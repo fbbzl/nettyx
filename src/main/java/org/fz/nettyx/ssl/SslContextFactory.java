@@ -97,19 +97,11 @@ public class SslContextFactory {
         private final String protocol;
 
         public SSLContext getServerContext(String path, String pwd) {
-            try {
-                return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
-            } catch (Exception serverSslContextException) {
-                throw new RuntimeException("init server ssl context failed", serverSslContextException);
-            }
+            return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
         public SSLContext getClientContext(String path, String pwd) {
-            try {
-                return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
-            } catch (Exception serverSslContextException) {
-                throw new RuntimeException("init client ssl context failed", serverSslContextException);
-            }
+            return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
         public SSLContext getServerContext(String path, String pwd, String trustPath, String trustPwd) {

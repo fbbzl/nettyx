@@ -10,6 +10,7 @@ import io.netty.channel.Channel;
  * @since 2021 /4/21 14:09
  */
 @FunctionalInterface
-public interface ChannelAction extends Action<Channel> {
+public interface ChannelAction extends Action {
 
+    void act(Channel channel);
 }

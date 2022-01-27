@@ -1,4 +1,5 @@
-package org.fz.nettyx.event;
+package org.fz.nettyx.handler;
+
 
 import io.netty.handler.timeout.IdleStateHandler;
 import java.util.concurrent.TimeUnit;
