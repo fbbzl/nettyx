@@ -9,7 +9,7 @@ import io.netty.channel.ChannelPromise;
  * @since 12/24/2021 3:31 PM
  */
 @FunctionalInterface
-public interface ChannelPromiseAction {
+public interface ChannelPromiseAction extends Action {
 
     void act(ChannelHandlerContext ctx, ChannelPromise promise);
 

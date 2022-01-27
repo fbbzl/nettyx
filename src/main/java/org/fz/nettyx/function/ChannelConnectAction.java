@@ -10,7 +10,7 @@ import java.net.SocketAddress;
  * @since 12/24/2021 3:28 PM
  */
 @FunctionalInterface
-public interface ChannelConnectAction {
+public interface ChannelConnectAction extends Action {
 
     void act(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise);
 
