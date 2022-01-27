@@ -258,7 +258,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
          * @param cause Throwable
          */
         @Override
-        public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             log.error("channel handler exception occurred: ", cause);
 
             if(cause instanceof ReadTimeoutException)    { act(findReadTimeoutAction(), ctx, cause);  }
