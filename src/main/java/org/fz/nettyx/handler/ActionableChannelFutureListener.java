@@ -1,4 +1,4 @@
-package org.fz.nettyx.support;
+package org.fz.nettyx.handler;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
