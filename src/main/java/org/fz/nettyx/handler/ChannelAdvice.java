@@ -266,9 +266,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             if(cause instanceof WriteTimeoutException)   { act(findWriteTimeoutAction(), ctx, cause); }
             else
             if(cause instanceof ClosingChannelException) { ctx.channel().close();                     }
-            else
-            if(whenExceptionCaught != null)              { whenExceptionCaught.act(ctx, cause);       }
-            else super.exceptionCaught(ctx ,cause);
+            else act(whenExceptionCaught, ctx, cause);
         }
 
         private long findWriteIdleSeconds() {
