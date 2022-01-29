@@ -1,18 +1,22 @@
 package org.fz.nettyx.handler;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.handler.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.handler.EscapeCodec.EscapeEncoder;
+import org.fz.nettyx.support.HexBins;
 
 /**
  * @author fengbinbin
@@ -29,6 +33,13 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
         private final EscapeMap escapeMap;
+
+        public ByteBuf test(ByteBuf in) {
+            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
+                in = replace(in, bufEntry.getKey(), bufEntry.getValue());
+            }
+            return in;
+        }
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
@@ -53,24 +64,61 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
+    @NoArgsConstructor
     public static class EscapeMap extends HashMap<ByteBuf, ByteBuf> {
 
-        /**
-         * create single EscapeMap
-         */
-        public static EscapeMap of(byte[] targetBytes, byte[] replacementBytes) {
-            final EscapeMap escapeMap = new EscapeMap();
-            escapeMap.put(Unpooled.wrappedBuffer(targetBytes), Unpooled.wrappedBuffer(replacementBytes));
+        public EscapeMap(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        public static EscapeMap ofEachHex(List<String> target, List<String> replacement) {
+            return ofEachHex(target.toArray(new String[]{}), replacement.toArray(new String[]{}));
+        }
+
+        public static EscapeMap ofEachHex(String[] target, String[] replacement) {
+            checkMapping(target, replacement);
+
+            EscapeMap escapeMap = new EscapeMap();
+            for (int i = 0; i < target.length; i++) {
+                escapeMap.put(Unpooled.wrappedBuffer(HexBins.decode(target[i])), Unpooled.wrappedBuffer(HexBins.decode(replacement[i])));
+            }
+
             return escapeMap;
         }
 
-        /**
-         * create single EscapeMap
-         */
+        public static EscapeMap ofEach(List<ByteBuf> target, List<ByteBuf> replacement) {
+            return ofEach(target.toArray(new ByteBuf[]{}), replacement.toArray(new ByteBuf[]{}));
+        }
+
+        public static EscapeMap ofEach(ByteBuf[] target, ByteBuf[] replacement) {
+            checkMapping(target, replacement);
+
+            EscapeMap escapeMap = new EscapeMap();
+            for (int i = 0; i < target.length; i++) {
+                escapeMap.put(target[i], replacement[i]);
+            }
+
+            return escapeMap;
+        }
+
+        public static EscapeMap ofHex(String targetHex, String replacementHex) {
+            return of(HexBins.decode(targetHex), HexBins.decode(replacementHex));
+        }
+
+        public static EscapeMap of(byte[] targetBytes, byte[] replacementBytes) {
+            return of(Unpooled.wrappedBuffer(targetBytes), Unpooled.wrappedBuffer(replacementBytes));
+        }
+
         public static EscapeMap of(ByteBuf target, ByteBuf replacement) {
-            final EscapeMap escapeMap = new EscapeMap();
+            EscapeMap escapeMap = new EscapeMap();
             escapeMap.put(target, replacement);
             return escapeMap;
+        }
+
+        private static void checkMapping(Object[] target, Object[] replacement) {
+            if (target.length != replacement.length) {
+                throw new IllegalArgumentException("target length and replacement length miss-match");
+            }
         }
     }
 
@@ -101,4 +149,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return replaced;
     }
 
+    /**
+     * 0x7E -> 0x7D, 0x5E 0x7D -> 0x7D, 0x5D
+     */
+    public static void main(String[] args) {
+        byte[] bytes = {-11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 0x7e, 99, 0x7d, 121};
+        final EscapeDecoder escapeDecoder = new EscapeDecoder(EscapeMap.ofEachHex(Arrays.asList("7e", "7d"), Arrays.asList("7d5e", "7d5d")));
+        final ByteBuf test = escapeDecoder.test(Unpooled.wrappedBuffer(bytes));
+        final byte[] bytes1 = ByteBufUtil.getBytes(test);
+
+        System.err.println(Arrays.toString(bytes1));
+    }
 }
