@@ -43,10 +43,10 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, OutboundAdvice> {
 
     private static final String
-        READ_IDLE_HANDLER_NAME  = "_readIdle_",
-        WRITE_IDLE_HANDLER_NAME = "_writeIdle_",
-        READ_TIME_OUT_HANDLER_NAME = "_readTimeout_",
-        WRITE_TIME_OUT_HANDLER_NAME = "_writeTimeout_";
+        READ_IDLE_HANDLER_NAME      = "$_readIdle_$",
+        WRITE_IDLE_HANDLER_NAME     = "$_writeIdle_$",
+        READ_TIME_OUT_HANDLER_NAME  = "$_readTimeout_$",
+        WRITE_TIME_OUT_HANDLER_NAME = "$_writeTimeout_$";
 
     /**
      * Instantiates a new Channel advice.
