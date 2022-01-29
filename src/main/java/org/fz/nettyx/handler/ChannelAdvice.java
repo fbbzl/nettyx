@@ -311,11 +311,11 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         private Channel channel;
 
-        private ChannelBindAction whenBind;
-        private ChannelConnectAction whenConnect;
-        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        private ChannelBindAction           whenBind;
+        private ChannelConnectAction        whenConnect;
+        private ChannelPromiseAction        whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
-        private ChannelWriteAction whenWrite;
+        private ChannelWriteAction          whenWrite;
 
         private int writesIdleSeconds;
         private int writeTimeoutSeconds;
