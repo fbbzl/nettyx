@@ -1,13 +1,11 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -147,17 +145,5 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         return replaced;
-    }
-
-    /**
-     * 0x7E -> 0x7D, 0x5E 0x7D -> 0x7D, 0x5D
-     */
-    public static void main(String[] args) {
-        byte[] bytes = {-11, 22, 33, 44, 55, 66, 77, 88, 99, 111, 0x7e, 99, 0x7d, 121};
-        final EscapeDecoder escapeDecoder = new EscapeDecoder(EscapeMap.ofEachHex(Arrays.asList("7e", "7d"), Arrays.asList("7d5e", "7d5d")));
-        final ByteBuf test = escapeDecoder.test(Unpooled.wrappedBuffer(bytes));
-        final byte[] bytes1 = ByteBufUtil.getBytes(test);
-
-        System.err.println(Arrays.toString(bytes1));
     }
 }
