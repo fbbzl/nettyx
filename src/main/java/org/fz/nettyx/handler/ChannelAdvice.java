@@ -33,8 +33,8 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 
 
 /**
- * The type Channel advice.
- *
+ * The type Channel Event advice, will execute the Action assigned
+ * It is recommended to put it first in the pipeline
  * @author fengbinbin
  * @version 1.0
  * @since 12 /24/2021 3:37 PM
