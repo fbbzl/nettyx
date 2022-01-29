@@ -1,4 +1,4 @@
-package org.fz.nettyx.handler;
+package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -14,8 +14,8 @@ import java.util.Map.Entry;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.handler.EscapeCodec.EscapeDecoder;
-import org.fz.nettyx.handler.EscapeCodec.EscapeEncoder;
+import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
+import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.support.HexBins;
 
 /**
