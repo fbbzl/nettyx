@@ -1,13 +1,11 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -75,6 +73,16 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             super(initialCapacity);
         }
 
+        public EscapeMap mapping(ByteBuf real, ByteBuf replacement) {
+            super.put(real, replacement);
+            return this;
+        }
+
+        public EscapeMap mapping(String real, String replacement) {
+            super.put(Unpooled.wrappedBuffer(HexBins.decode(real)), Unpooled.wrappedBuffer(HexBins.decode(replacement)));
+            return this;
+        }
+
         public static EscapeMap ofEachHex(List<String> target, List<String> replacement) {
             return ofEachHex(target.toArray(new String[]{}), replacement.toArray(new String[]{}));
         }
@@ -119,9 +127,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return escapeMap;
         }
 
-        private static void checkMapping(Object[] target, Object[] replacement) {
-            if (target.length != replacement.length) {
-                throw new IllegalArgumentException("target length and replacement length miss-match");
+        private static void checkMapping(Object[] real, Object[] replacement) {
+            if (real.length != replacement.length) {
+                throw new IllegalArgumentException("The real data must be the same as the number of replacement data");
             }
         }
     }
@@ -130,22 +138,22 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
-        while (msgBuf.readableBytes() > real.readableBytes()) {
-            byte headByte = msgBuf.getByte(readIndex),
-                 tailByte = msgBuf.getByte(readIndex + real.readableBytes() - 1);
-
-            // filter by head byte and tail byte
-            if (headByte == real.getByte(0) && tailByte == real.getByte(real.readableBytes() - 1)) {
+        while (msgBuf.readableBytes() >= real.readableBytes()) {
+            if (hasSimilarBytes(readIndex, msgBuf, real)) {
+                msgBuf.markReaderIndex();
 
                 ByteBuf budget = msgBuf.alloc().buffer(real.readableBytes());
-                msgBuf.getBytes(readIndex, budget);
+                msgBuf.readBytes(budget);
 
                 if (budget.equals(real)) {
-                    msgBuf.readBytes(real.readableBytes());
+                    replacement.markReaderIndex();
                     result.writeBytes(replacement);
+                    replacement.resetReaderIndex();
 
                     readIndex += real.readableBytes();
                 } else {
+                    msgBuf.resetReaderIndex();
+
                     result.writeByte(msgBuf.readByte());
                     readIndex++;
                 }
@@ -163,16 +171,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return result;
     }
 
-    /**
-     * 0x7E -> 0x7D, 0x5E, 0x7D -> 0x7D, 0x5D
-     */
-    public static void main(String[] args) {
-        byte[] bytes = {0x7d, 111, 111, 111, 111, 111, 111, 111, 111, 111, 0x7d,0x5e, 111, 0x7d,0x5d, 111, 111,111,111, 111, 111, 111, 111, 111, 111,111, 111, 111, 111, 111, 111, 111,111, 111, 111, 111, 111, 111, 111,111, 111, 111, 111, 111, 111, 111};
-        System.err.println(Arrays.toString(bytes));
-        final EscapeDecoder escapeDecoder = new EscapeDecoder(EscapeMap.ofEachHex(Arrays.asList("7e", "7d"), Arrays.asList("7d5e", "7d5d")));
-        final ByteBuf test = escapeDecoder.test(Unpooled.wrappedBuffer(bytes));
-        final byte[] bytes1 = ByteBufUtil.getBytes(test);
-
-        System.err.println(Arrays.toString(bytes1));
+    static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf real) {
+        return msgBuf.getByte(index) == real.getByte(0)
+               &&
+               msgBuf.getByte(index + real.readableBytes() - 1) == real.getByte(real.readableBytes() - 1);
     }
 }
