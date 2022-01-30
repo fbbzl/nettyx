@@ -11,7 +11,7 @@ import io.netty.channel.rxtx.RxtxChannelConfig;
  * @author fengbinbin
  * @since 2022-01-26 19:58
  **/
-public abstract class RxtxClient extends Client {
+abstract class RxtxClient extends Client {
 
     /**
      * The Oio Event loop group.
