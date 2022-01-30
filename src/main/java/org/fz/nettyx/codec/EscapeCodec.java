@@ -32,13 +32,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         private final EscapeMap escapeMap;
 
-        public ByteBuf test(ByteBuf in) {
-            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = replace(in, bufEntry.getKey(), bufEntry.getValue());
-            }
-            return in;
-        }
-
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
