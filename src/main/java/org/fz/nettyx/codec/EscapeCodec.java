@@ -23,6 +23,10 @@ import org.fz.nettyx.support.HexBins;
 @Slf4j
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
 
+    public EscapeCodec(EscapeMap escapeMap) {
+        this(new EscapeDecoder(escapeMap), new EscapeEncoder(escapeMap));
+    }
+
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder) {
         super(escapeDecoder, escapeEncoder);
     }
@@ -34,7 +38,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         public ByteBuf test(ByteBuf in) {
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = replace(in, bufEntry.getKey(), bufEntry.getValue());
+                in = replace(in, bufEntry.getValue(), bufEntry.getKey());
             }
             return in;
         }
@@ -42,7 +46,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = replace(in, bufEntry.getKey(), bufEntry.getValue());
+                in = replace(in, bufEntry.getValue(), bufEntry.getKey());
             }
             out.add(in);
         }
@@ -67,6 +71,16 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         public EscapeMap(int initialCapacity) {
             super(initialCapacity);
+        }
+
+        public EscapeMap mapping(ByteBuf real, ByteBuf replacement) {
+            super.put(real, replacement);
+            return this;
+        }
+
+        public EscapeMap mapping(String real, String replacement) {
+            super.put(Unpooled.wrappedBuffer(HexBins.decode(real)), Unpooled.wrappedBuffer(HexBins.decode(replacement)));
+            return this;
         }
 
         public static EscapeMap ofEachHex(List<String> target, List<String> replacement) {
@@ -113,37 +127,53 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return escapeMap;
         }
 
-        private static void checkMapping(Object[] target, Object[] replacement) {
-            if (target.length != replacement.length) {
-                throw new IllegalArgumentException("target length and replacement length miss-match");
+        private static void checkMapping(Object[] real, Object[] replacement) {
+            if (real.length != replacement.length) {
+                throw new IllegalArgumentException("The real data must be the same as the number of replacement data");
             }
         }
     }
 
-    static ByteBuf replace(ByteBuf oriBuf, ByteBuf target, ByteBuf replacement) {
-        final ByteBuf replaced = oriBuf.alloc().buffer();
+    static ByteBuf replace(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement) {
+        final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
-        while (oriBuf.readableBytes() > target.readableBytes()) {
-            ByteBuf budget = Unpooled.buffer(target.readableBytes());
-            oriBuf.getBytes(readIndex, budget);
+        while (msgBuf.readableBytes() >= real.readableBytes()) {
+            if (hasSimilarBytes(readIndex, msgBuf, real)) {
+                msgBuf.markReaderIndex();
 
-            if (budget.equals(target)) {
-                oriBuf.readBytes(target.readableBytes());
-                replaced.writeBytes(replacement);
+                ByteBuf budget = msgBuf.alloc().buffer(real.readableBytes());
+                msgBuf.readBytes(budget);
 
-                readIndex += target.readableBytes();
+                if (budget.equals(real)) {
+                    replacement.markReaderIndex();
+                    result.writeBytes(replacement);
+                    replacement.resetReaderIndex();
+
+                    readIndex += real.readableBytes();
+                } else {
+                    msgBuf.resetReaderIndex();
+
+                    result.writeByte(msgBuf.readByte());
+                    readIndex++;
+                }
             } else {
-                replaced.writeByte(oriBuf.readByte());
+                result.writeByte(msgBuf.readByte());
                 readIndex++;
             }
         }
 
         // deal left
-        if (oriBuf.readableBytes() > 0) {
-            replaced.writeBytes(oriBuf.readBytes(oriBuf.readableBytes()));
+        if (msgBuf.readableBytes() > 0) {
+            result.writeBytes(msgBuf.readBytes(msgBuf.readableBytes()));
         }
 
-        return replaced;
+        return result;
+    }
+
+    static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf real) {
+        return msgBuf.getByte(index) == real.getByte(0)
+               &&
+               msgBuf.getByte(index + real.readableBytes() - 1) == real.getByte(real.readableBytes() - 1);
     }
 }
