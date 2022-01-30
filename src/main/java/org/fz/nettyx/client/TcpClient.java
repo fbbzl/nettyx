@@ -10,7 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
  * @author fengbinbin
  * @since 2022-01-26 20:54
  **/
-public abstract class TcpClient extends Client {
+abstract class TcpClient extends Client {
 
     /**
      * The Event loop group.
