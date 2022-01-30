@@ -1,11 +1,13 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -23,6 +25,10 @@ import org.fz.nettyx.support.HexBins;
 @Slf4j
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
 
+    public EscapeCodec(EscapeMap escapeMap) {
+        this(new EscapeDecoder(escapeMap), new EscapeEncoder(escapeMap));
+    }
+
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder) {
         super(escapeDecoder, escapeEncoder);
     }
@@ -32,10 +38,17 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         private final EscapeMap escapeMap;
 
+        public ByteBuf test(ByteBuf in) {
+            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
+                in = replace(in, bufEntry.getValue(), bufEntry.getKey());
+            }
+            return in;
+        }
+
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = replace(in, bufEntry.getKey(), bufEntry.getValue());
+                in = replace(in, bufEntry.getValue(), bufEntry.getKey());
             }
             out.add(in);
         }
@@ -113,30 +126,53 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    static ByteBuf replace(ByteBuf oriBuf, ByteBuf target, ByteBuf replacement) {
-        final ByteBuf replaced = oriBuf.alloc().buffer();
+    static ByteBuf replace(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement) {
+        final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
-        while (oriBuf.readableBytes() > target.readableBytes()) {
-            ByteBuf budget = oriBuf.alloc().buffer(target.readableBytes());
-            oriBuf.getBytes(readIndex, budget);
+        while (msgBuf.readableBytes() > real.readableBytes()) {
+            byte headByte = msgBuf.getByte(readIndex),
+                 tailByte = msgBuf.getByte(readIndex + real.readableBytes() - 1);
 
-            if (budget.equals(target)) {
-                oriBuf.readBytes(target.readableBytes());
-                replaced.writeBytes(replacement);
+            // filter by head byte and tail byte
+            if (headByte == real.getByte(0) && tailByte == real.getByte(real.readableBytes() - 1)) {
 
-                readIndex += target.readableBytes();
+                ByteBuf budget = msgBuf.alloc().buffer(real.readableBytes());
+                msgBuf.getBytes(readIndex, budget);
+
+                if (budget.equals(real)) {
+                    msgBuf.readBytes(real.readableBytes());
+                    result.writeBytes(replacement);
+
+                    readIndex += real.readableBytes();
+                } else {
+                    result.writeByte(msgBuf.readByte());
+                    readIndex++;
+                }
             } else {
-                replaced.writeByte(oriBuf.readByte());
+                result.writeByte(msgBuf.readByte());
                 readIndex++;
             }
         }
 
         // deal left
-        if (oriBuf.readableBytes() > 0) {
-            replaced.writeBytes(oriBuf.readBytes(oriBuf.readableBytes()));
+        if (msgBuf.readableBytes() > 0) {
+            result.writeBytes(msgBuf.readBytes(msgBuf.readableBytes()));
         }
 
-        return replaced;
+        return result;
+    }
+
+    /**
+     * 0x7E -> 0x7D, 0x5E, 0x7D -> 0x7D, 0x5D
+     */
+    public static void main(String[] args) {
+        byte[] bytes = {0x7d, 111, 111, 111, 111, 111, 111, 111, 111, 111, 0x7d,0x5e, 111, 0x7d,0x5d, 111, 111,111,111, 111, 111, 111, 111, 111, 111,111, 111, 111, 111, 111, 111, 111,111, 111, 111, 111, 111, 111, 111,111, 111, 111, 111, 111, 111, 111};
+        System.err.println(Arrays.toString(bytes));
+        final EscapeDecoder escapeDecoder = new EscapeDecoder(EscapeMap.ofEachHex(Arrays.asList("7e", "7d"), Arrays.asList("7d5e", "7d5d")));
+        final ByteBuf test = escapeDecoder.test(Unpooled.wrappedBuffer(bytes));
+        final byte[] bytes1 = ByteBufUtil.getBytes(test);
+
+        System.err.println(Arrays.toString(bytes1));
     }
 }
