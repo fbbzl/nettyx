@@ -125,7 +125,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         int readIndex = 0;
         while (oriBuf.readableBytes() > target.readableBytes()) {
-            ByteBuf budget = Unpooled.buffer(target.readableBytes());
+            ByteBuf budget = oriBuf.alloc().buffer(target.readableBytes());
             oriBuf.getBytes(readIndex, budget);
 
             if (budget.equals(target)) {
