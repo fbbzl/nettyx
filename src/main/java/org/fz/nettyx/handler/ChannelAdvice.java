@@ -354,8 +354,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         }
 
         public final OutboundAdvice whenOutboundExceptionCaught(ChannelExceptionAction outboundExceptionCaught) {
-            OutBoundExceptionHandler outBoundExceptionHandler = new OutBoundExceptionHandler();
-
+            OutBoundExceptionHandler outBoundExceptionHandler = new OutBoundExceptionHandler(null, null);
+            //xxx weiwancheng
             return null;
 
         }
