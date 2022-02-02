@@ -105,7 +105,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             whenChannelReadComplete;
 
         private ChannelReadAction whenChannelRead;
-        private ChannelExceptionAction whenExceptionCaught;
+        private ChannelExceptionAction whenInboundExceptionCaught;
 
         private int readIdleSeconds;
         private int readTimeoutSeconds;
@@ -142,7 +142,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             EventLoop eventLoop      = channel.eventLoop();
 
             ReadTimeoutHandler readTimeoutHandler =
-                new ActionableReadTimeoutHandler(this.readIdleSeconds).timeoutAction(timeoutAction);
+                new ActionableReadTimeoutHandler(this.readTimeoutSeconds).timeoutAction(timeoutAction);
 
             pipeline.addFirst(eventLoop, READ_TIME_OUT_HANDLER_NAME, readTimeoutHandler);
 
@@ -265,7 +265,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             if(cause instanceof WriteTimeoutException)   { act(findWriteTimeoutAction(), ctx, cause); }
             else
             if(cause instanceof ClosingChannelException) { ctx.channel().close();                     }
-            else act(whenExceptionCaught, ctx, cause);
+            else act(whenInboundExceptionCaught, ctx, cause);
         }
 
         private long findWriteIdleSeconds() {
@@ -319,6 +319,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         private int writesIdleSeconds;
         private int writeTimeoutSeconds;
 
+        private ChannelExceptionAction whenOutboundExceptionCaught;
+
         public OutboundAdvice(Channel channel) {
             this.channel = channel;
         }
@@ -349,6 +351,13 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             pipeline.addFirst(eventLoop, WRITE_TIME_OUT_HANDLER_NAME, writeTimeoutHandler);
 
             return this;
+        }
+
+        public final OutboundAdvice whenOutboundExceptionCaught(ChannelExceptionAction outboundExceptionCaught) {
+            OutBoundExceptionHandler outBoundExceptionHandler = new OutBoundExceptionHandler();
+
+            return null;
+
         }
 
         @Override
