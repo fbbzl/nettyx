@@ -26,6 +26,11 @@ import lombok.RequiredArgsConstructor;
 @SuppressWarnings("unchecked")
 public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
+    /**
+     * interceptor state
+     * true : Means this interceptor no longer intercepts any events
+     * false: Means the specified channel-event will be intercepted
+     */
     private final AtomicBoolean state = new AtomicBoolean(false);
 
     // getter and setter of freeStatus
