@@ -1,11 +1,13 @@
 package org.fz.nettyx.handler;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -22,7 +24,7 @@ import lombok.RequiredArgsConstructor;
  * @since 2021 /4/25 15:46
  */
 @SuppressWarnings("unchecked")
-public abstract class ChannelInterceptor<T> extends ChannelInboundHandlerAdapter {
+public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     private final AtomicBoolean freeStatus = new AtomicBoolean(false);
 
@@ -132,88 +134,137 @@ public abstract class ChannelInterceptor<T> extends ChannelInboundHandlerAdapter
         else this.preExceptionCaught(ctx, cause);
     }
 
-    /**
-     * Channel registered.
-     *
-     * @param ctx the ctx
-     */
+    @Override
+    public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        if (freed()) {
+            super.bind(ctx, localAddress, promise);
+        }
+        else this.preBind(ctx, localAddress, promise);
+    }
+
+    @Override
+    public final void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        if (freed()) {
+            super.connect(ctx, remoteAddress, localAddress, promise);
+        }
+        else this.preConnect(ctx, remoteAddress, localAddress, promise);
+    }
+
+    @Override
+    public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        if (freed()) {
+            super.disconnect(ctx, promise);
+        }
+        else this.preDisconnect(ctx, promise);
+    }
+
+    @Override
+    public final void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        if (freed()) {
+            super.close(ctx, promise);
+        }
+        else this.preClose(ctx, promise);
+    }
+
+    @Override
+    public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        if (freed()) {
+            super.deregister(ctx, promise);
+        }
+        else this.preDeregister(ctx, promise);
+    }
+
+    @Override
+    public final void read(ChannelHandlerContext ctx) throws Exception {
+        if (freed()) {
+            super.read(ctx);
+        }
+        else this.preRead(ctx);
+    }
+
+    @Override
+    public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        if (freed()) {
+            super.write(ctx, msg, promise);
+        }
+        else this.preWrite(ctx, msg, promise);
+    }
+
+    @Override
+    public final void flush(ChannelHandlerContext ctx) throws Exception {
+        if (freed()) {
+            super.flush(ctx);
+        }
+        else this.preFlush(ctx);
+    }
+
+    // all preXxx methods will not intercept the process
     protected void preChannelRegistered(ChannelHandlerContext ctx) throws Exception {
         super.channelRegistered(ctx);
     }
 
-    /**
-     * Channel unregistered.
-     *
-     * @param ctx the ctx
-     */
     protected void preChannelUnregistered(ChannelHandlerContext ctx) throws Exception {
         super.channelUnregistered(ctx);
     }
 
-    /**
-     * Channel active.
-     *
-     * @param ctx the ctx
-     */
     protected void preChannelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
     }
 
-    /**
-     * Channel inactive.
-     *
-     * @param ctx the ctx
-     */
     protected void preChannelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
     }
 
-    /**
-     * Channel read.
-     *
-     * @param ctx the ctx
-     * @param msg the msg
-     */
     protected void preChannelRead(ChannelHandlerContext ctx, T msg) throws Exception {
         super.channelRead(ctx, msg);
     }
 
-    /**
-     * Channel read complete.
-     *
-     * @param ctx the ctx
-     */
     protected void preChannelReadComplete(ChannelHandlerContext ctx) throws Exception {
         super.channelReadComplete(ctx);
     }
 
-    /**
-     * User event triggered.
-     *
-     * @param ctx the ctx
-     * @param evt the evt
-     */
     protected void preUserEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         super.userEventTriggered(ctx, evt);
     }
 
-    /**
-     * Channel writability changed.
-     *
-     * @param ctx the ctx
-     */
     protected void preChannelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         super.channelWritabilityChanged(ctx);
     }
 
-    /**
-     * Exception caught.
-     *
-     * @param ctx the ctx
-     * @param cause the cause
-     */
     protected void preExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
+    }
+
+    public final void preBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        super.bind(ctx, localAddress, promise);
+    }
+
+    public final void preConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        super.connect(ctx, remoteAddress, localAddress, promise);
+    }
+
+    public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        super.disconnect(ctx, promise);
+    }
+
+    public final void preClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        super.close(ctx, promise);
+    }
+
+    public final void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        super.deregister(ctx, promise);
+    }
+
+    public final void preRead(ChannelHandlerContext ctx) throws Exception {
+        super.read(ctx);
+    }
+
+    public final void preWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        super.write(ctx, msg, promise);
+    }
+
+    public final void preFlush(ChannelHandlerContext ctx) throws Exception {
+        super.flush(ctx);
     }
 
     //**********************************           free combined-method start              **************************************//
@@ -263,6 +314,46 @@ public abstract class ChannelInterceptor<T> extends ChannelInboundHandlerAdapter
         this.exceptionCaught(ctx, cause);
     }
 
+    protected void freeAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        this.free();
+        this.bind(ctx, localAddress, promise);
+    }
+    
+    protected void freeAndConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        this.free();
+        this.connect(ctx, remoteAddress, localAddress, promise);
+    }
+
+    protected void freeAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        this.free();
+        this.disconnect(ctx, promise);
+    }
+
+    protected void freeAndClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        this.free();
+        this.close(ctx, promise);
+    }
+
+    protected void freeAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        this.free();
+        this.deregister(ctx, promise);
+    }
+
+    protected void freeAndRead(ChannelHandlerContext ctx) throws Exception {
+        this.free();
+        this.read(ctx);
+    }
+    
+    protected void freeAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        this.free();
+        this.write(ctx, msg, promise);
+    }
+    
+    protected void freeAndFlush(ChannelHandlerContext ctx) throws Exception {
+        this.free();
+        this.flush(ctx);
+    }
+
     //**********************************           free combined-method end             **************************************//
 
     //**********************************           reset combined-method start          **************************************//
@@ -310,6 +401,46 @@ public abstract class ChannelInterceptor<T> extends ChannelInboundHandlerAdapter
     protected void resetAndExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         this.reset();
         this.exceptionCaught(ctx, cause);
+    }
+
+    protected void resetAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        this.reset();
+        this.bind(ctx, localAddress, promise);
+    }
+
+    protected void resetAndConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        this.reset();
+        this.connect(ctx, remoteAddress, localAddress, promise);
+    }
+
+    protected void resetAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        this.reset();
+        this.disconnect(ctx, promise);
+    }
+
+    protected void resetAndClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        this.reset();
+        this.close(ctx, promise);
+    }
+
+    protected void resetAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        this.reset();
+        this.deregister(ctx, promise);
+    }
+
+    protected void resetAndRead(ChannelHandlerContext ctx) throws Exception {
+        this.reset();
+        this.read(ctx);
+    }
+
+    protected void resetAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        this.reset();
+        this.write(ctx, msg, promise);
+    }
+
+    protected void resetAndFlush(ChannelHandlerContext ctx) throws Exception {
+        this.reset();
+        this.flush(ctx);
     }
 
     //**********************************           reset combined-method end           **************************************//
