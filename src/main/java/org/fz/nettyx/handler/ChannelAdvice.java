@@ -353,13 +353,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             return this;
         }
 
-        public final OutboundAdvice whenOutboundExceptionCaught(ChannelExceptionAction outboundExceptionCaught) {
-            OutBoundExceptionHandler outBoundExceptionHandler = new OutBoundExceptionHandler(null, null);
-            //xxx weiwancheng
-            return null;
-
-        }
-
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
