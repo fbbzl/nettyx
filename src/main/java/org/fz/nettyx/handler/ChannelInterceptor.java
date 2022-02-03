@@ -26,14 +26,14 @@ import lombok.RequiredArgsConstructor;
 @SuppressWarnings("unchecked")
 public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
-    private final AtomicBoolean freeStatus = new AtomicBoolean(false);
+    private final AtomicBoolean state = new AtomicBoolean(false);
 
     // getter and setter of freeStatus
     private boolean freed() {
-        return freeStatus.get();
+        return state.get();
     }
     private boolean unfreed() {
-        return !freeStatus.get();
+        return !state.get();
     }
 
     /**
@@ -42,7 +42,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      * @see ChannelInterceptor#reset() use this to recover this handler
      */
     public void free() {
-        this.freeStatus.set(true);
+        this.state.set(true);
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      * @see ChannelInterceptor#free() use method to free
      */
     public void reset() {
-        this.freeStatus.set(false);
+        this.state.set(false);
     }
 
     @Override
