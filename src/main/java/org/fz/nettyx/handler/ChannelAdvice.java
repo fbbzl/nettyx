@@ -76,12 +76,11 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
     }
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
-        ChannelHandler last = ctx.pipeline().last();
-        if (last instanceof ChannelAdvice) {
-            super.handlerAdded(ctx);
+    public void handlerAdded(ChannelHandlerContext ctx) {
+        ChannelHandler first = ctx.pipeline().first();
+        if (first instanceof ChannelAdvice) {
+            throw new UnsupportedOperationException("Don't put channel advice first in the pipeline");
         }
-        else throw new UnsupportedOperationException("channel advice can only use as the last-handler of pipeline, keep it being the last-handler of pipeline");
     }
 
     /**
