@@ -33,7 +33,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      */
     private final AtomicBoolean state = new AtomicBoolean(false);
 
-    // getter and setter of freeStatus
+    // getter and setter of state
     private boolean freed() {
         return state.get();
     }

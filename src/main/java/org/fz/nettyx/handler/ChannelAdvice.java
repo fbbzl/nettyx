@@ -9,7 +9,6 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.CombinedChannelDuplexHandler;
-import io.netty.channel.EventLoop;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -42,50 +41,56 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, OutboundAdvice> {
 
     private static final String
-        READ_IDLE_HANDLER_NAME      = "$_readIdle_$",
-        WRITE_IDLE_HANDLER_NAME     = "$_writeIdle_$",
-        READ_TIME_OUT_HANDLER_NAME  = "$_readTimeout_$",
-        WRITE_TIME_OUT_HANDLER_NAME = "$_writeTimeout_$";
+        READ_IDLE_HANDLER      = "$_readIdle_$",
+        WRITE_IDLE_HANDLER     = "$_writeIdle_$",
+        READ_TIME_OUT_HANDLER  = "$_readTimeout_$",
+        WRITE_TIME_OUT_HANDLER = "$_writeTimeout_$";
 
-    /**
-     * Instantiates a new Channel advice.
-     *
-     * @param inboundAdvice the inbound advice
-     */
     public ChannelAdvice(InboundAdvice inboundAdvice) {
         super(inboundAdvice, OutboundAdvice.NONE);
     }
 
-    /**
-     * Instantiates a new Channel advice.
-     *
-     * @param outboundAdvice the outbound advice
-     */
     public ChannelAdvice(OutboundAdvice outboundAdvice) {
         super(InboundAdvice.NONE, outboundAdvice);
     }
 
-    /**
-     * Instantiates a new Channel advice.
-     *
-     * @param inboundAdvice the inbound advice
-     * @param outboundAdvice the outbound advice
-     */
     public ChannelAdvice(InboundAdvice inboundAdvice, OutboundAdvice outboundAdvice) {
         super(inboundAdvice, outboundAdvice);
     }
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) {
-        ChannelHandler first = ctx.pipeline().first();
-        if (first instanceof ChannelAdvice) {
-            throw new UnsupportedOperationException("Don't put channel advice first in the pipeline");
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        final ChannelPipeline pipeline = ctx.pipeline();
+        final ChannelHandler  first    = pipeline.first();
+
+        if (pipeline.names().size() > 1 && first instanceof ChannelAdvice) {
+            throw new UnsupportedOperationException("do not make channel-advice being the first in the pipeline");
+        }
+
+        this.doInternalSort(pipeline);
+
+        super.handlerAdded(ctx);
+    }
+
+    private void doInternalSort(ChannelPipeline pipeline) {
+        ChannelHandler
+            readTimeout  = pipeline.get(READ_TIME_OUT_HANDLER),
+            writeTimeout = pipeline.get(WRITE_TIME_OUT_HANDLER),
+            readIdle     = pipeline.get(READ_IDLE_HANDLER),
+            writeIdle    = pipeline.get(WRITE_IDLE_HANDLER);
+
+        try { removeIfExist(pipeline, readTimeout);  } finally { pipeline.addFirst(readTimeout); }
+        try { removeIfExist(pipeline, writeTimeout); } finally { pipeline.addLast(writeTimeout); }
+        try { removeIfExist(pipeline, readIdle);     } finally { pipeline.addFirst(readIdle);    }
+        try { removeIfExist(pipeline, writeIdle);    } finally { pipeline.addLast(writeIdle);    }
+    }
+
+    static void removeIfExist(ChannelPipeline pipeline, ChannelHandler handler) {
+        if (handler != null) {
+            pipeline.remove(handler);
         }
     }
 
-    /**
-     * The type Inbound advice.
-     */
     @Slf4j
     @Setter
     @Accessors(chain = true, fluent = true)
@@ -103,7 +108,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             whenWritabilityChanged,
             whenChannelReadComplete;
 
-        private ChannelReadAction whenChannelRead;
+        private ChannelReadAction      whenChannelRead;
         private ChannelExceptionAction whenInboundExceptionCaught;
 
         private int readIdleSeconds;
@@ -113,23 +118,16 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             this.channel = channel;
         }
 
-        /**
-         * When read idle inbound advice.
-         *
-         * @param idleSeconds the idle seconds
-         * @param readIdleAct the read idle act
-         * @return the inbound advice
-         */
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
             this.readIdleSeconds = idleSeconds;
 
             ChannelPipeline pipeline = channel.pipeline();
-            EventLoop eventLoop      = channel.eventLoop();
 
             IdleStateHandler readIdleHandler  =
                 new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0).idleAction(readIdleAct);
 
-            pipeline.addFirst(eventLoop, READ_IDLE_HANDLER_NAME, readIdleHandler);
+            uniqueCheck(pipeline, READ_IDLE_HANDLER);
+            pipeline.addFirst(READ_IDLE_HANDLER, readIdleHandler);
 
             return this;
         }
@@ -138,12 +136,12 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             this.readTimeoutSeconds = timeoutSeconds;
 
             ChannelPipeline pipeline = channel.pipeline();
-            EventLoop eventLoop      = channel.eventLoop();
 
             ReadTimeoutHandler readTimeoutHandler =
                 new ActionableReadTimeoutHandler(this.readTimeoutSeconds).timeoutAction(timeoutAction);
 
-            pipeline.addFirst(eventLoop, READ_TIME_OUT_HANDLER_NAME, readTimeoutHandler);
+            uniqueCheck(pipeline, READ_TIME_OUT_HANDLER);
+            pipeline.addFirst(READ_TIME_OUT_HANDLER, readTimeoutHandler);
 
             return this;
         }
@@ -166,12 +164,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             super.channelUnregistered(ctx);
         }
 
-        /**
-         * channel active action, will run channelActiveAction
-         *
-         * @param ctx ChannelHandlerContext
-         * @throws Exception ex
-         */
         @Override
         public final void channelActive(ChannelHandlerContext ctx) throws Exception {
             log.info("channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
@@ -181,12 +173,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             super.channelActive(ctx);
         }
 
-        /**
-         * channel in-active action, will run channelInactiveAction
-         *
-         * @param ctx ChannelHandlerContext
-         * @throws Exception ex
-         */
         @Override
         public final void channelInactive(ChannelHandlerContext ctx) throws Exception {
             log.warn("channel in-active event triggered, address is [{}]", ctx.channel().remoteAddress());
@@ -215,13 +201,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             super.channelReadComplete(ctx);
         }
 
-        /**
-         * channel event action execution
-         *
-         * @param ctx ChannelHandlerContext
-         * @param evt channel event
-         * @throws Exception ex
-         */
         @Override
         public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             if (ChannelEvents.isReadIdle(evt)) {
@@ -259,47 +238,56 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             log.error("channel handler exception occurred: ", cause);
 
-            if(cause instanceof ReadTimeoutException)    { act(findReadTimeoutAction(), ctx, cause);  }
+            if(cause instanceof ReadTimeoutException)    { act(findReadTimeoutAction(), ctx, cause);            }
             else
-            if(cause instanceof WriteTimeoutException)   { act(findWriteTimeoutAction(), ctx, cause); }
+            if(cause instanceof WriteTimeoutException)   { act(findWriteTimeoutAction(), ctx, cause);           }
             else
-            if(cause instanceof ClosingChannelException) { ctx.channel().close();                     }
+            if(cause instanceof ClosingChannelException) { actAndClose(whenInboundExceptionCaught, ctx, cause); }
             else act(whenInboundExceptionCaught, ctx, cause);
         }
 
         private long findWriteIdleSeconds() {
-            IdleStateHandler idleStateHandler = (IdleStateHandler) this.channel.pipeline().get(WRITE_IDLE_HANDLER_NAME);
+            IdleStateHandler idleStateHandler = (IdleStateHandler) this.channel.pipeline().get(WRITE_IDLE_HANDLER);
             return idleStateHandler.getWriterIdleTimeInMillis() / 1000;
         }
 
         private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findWriteIdleAction() {
-            T actionableHandler = this.findChannelHandler(WRITE_IDLE_HANDLER_NAME);
+            T actionableHandler = this.findChannelHandler(WRITE_IDLE_HANDLER);
             return actionableHandler == null ? null : actionableHandler.idleAction();
         }
 
         private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findReadIdleAction() {
-            T actionableHandler = this.findChannelHandler(READ_IDLE_HANDLER_NAME);
+            T actionableHandler = this.findChannelHandler(READ_IDLE_HANDLER);
             return actionableHandler == null ? null : actionableHandler.idleAction();
         }
 
         private <T extends ActionableReadTimeoutHandler> ChannelExceptionAction findReadTimeoutAction() {
-            T actionableHandler = this.findChannelHandler(READ_TIME_OUT_HANDLER_NAME);
+            T actionableHandler = this.findChannelHandler(READ_TIME_OUT_HANDLER);
             return actionableHandler == null ? null : actionableHandler.timeoutAction();
         }
 
         private <T extends ActionableWriteTimeoutHandler> ChannelExceptionAction findWriteTimeoutAction() {
-            T actionableHandler = this.findChannelHandler(WRITE_TIME_OUT_HANDLER_NAME);
+            T actionableHandler = this.findChannelHandler(WRITE_TIME_OUT_HANDLER);
             return actionableHandler == null ? null : actionableHandler.timeoutAction();
         }
 
         private <T extends ChannelHandler> T findChannelHandler(String handlerName) {
             return (T) this.channel.pipeline().get(handlerName);
         }
+
+        @Override
+        public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+            final ChannelPipeline pipeline = ctx.pipeline();
+            final ChannelHandler  last    = pipeline.last();
+
+            if (pipeline.names().size() > 1 && last instanceof InboundAdvice) {
+                throw new UnsupportedOperationException("do not let inbound-advice being the last-handler in the pipeline, it should always be the first handler");
+            }
+
+            super.handlerAdded(ctx);
+        }
     }
 
-    /**
-     * The type Outbound advice.
-     */
     @Slf4j
     @Setter
     @Accessors(chain = true, fluent = true)
@@ -318,8 +306,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         private int writesIdleSeconds;
         private int writeTimeoutSeconds;
 
-        private ChannelExceptionAction whenOutboundExceptionCaught;
-
         public OutboundAdvice(Channel channel) {
             this.channel = channel;
         }
@@ -328,12 +314,12 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             this.writesIdleSeconds = idleSeconds;
 
             ChannelPipeline pipeline = channel.pipeline();
-            EventLoop eventLoop      = channel.eventLoop();
 
             IdleStateHandler writeIdleHandler =
                 new ActionableIdleStateHandler(0, this.writesIdleSeconds, 0).idleAction(writeIdleAct);
 
-            pipeline.addFirst(eventLoop, WRITE_IDLE_HANDLER_NAME, writeIdleHandler);
+            uniqueCheck(pipeline, WRITE_IDLE_HANDLER);
+            pipeline.addFirst(WRITE_IDLE_HANDLER, writeIdleHandler);
 
             return this;
         }
@@ -342,12 +328,12 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             this.writeTimeoutSeconds = timeoutSeconds;
 
             ChannelPipeline pipeline = channel.pipeline();
-            EventLoop eventLoop      = channel.eventLoop();
 
             WriteTimeoutHandler writeTimeoutHandler =
                 new ActionableWriteTimeoutHandler(this.writeTimeoutSeconds).timeoutAction(timeoutAction);
 
-            pipeline.addFirst(eventLoop, WRITE_TIME_OUT_HANDLER_NAME, writeTimeoutHandler);
+            uniqueCheck(pipeline, WRITE_TIME_OUT_HANDLER);
+            pipeline.addFirst(WRITE_TIME_OUT_HANDLER, writeTimeoutHandler);
 
             return this;
         }
@@ -423,48 +409,59 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
             super.flush(ctx);
         }
+
+        @Override
+        public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+            final ChannelPipeline pipeline = ctx.pipeline();
+            final ChannelHandler  first    = pipeline.first();
+
+            if (pipeline.names().size() > 1 && first instanceof OutboundAdvice) {
+                throw new UnsupportedOperationException("do not let outbound-advice being the first-handler in the pipeline, it should always be the last handler");
+            }
+
+            super.handlerAdded(ctx);
+        }
+
+    }
+
+    static void uniqueCheck(ChannelPipeline pipeline, String handlerName) {
+        final ChannelHandler configured = pipeline.get(handlerName);
+
+        if (configured != null) throw new UnsupportedOperationException("handler named [" + handlerName + "] already defined in pipeline [" + pipeline + "]");
     }
 
     static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
-        if (channelAction != null) {
-            channelAction.act(ctx);
-        }
+        if (channelAction != null) channelAction.act(ctx);
     }
 
     static void act(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
-        if (exceptionAction != null) {
-            exceptionAction.act(ctx, throwable);
-        }
+        if (exceptionAction != null) exceptionAction.act(ctx, throwable);
     }
 
     static void act(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
-        if (channelBindAction != null) {
-            channelBindAction.act(ctx, localAddress, promise);
-        }
+        if (channelBindAction != null) channelBindAction.act(ctx, localAddress, promise);
     }
 
     static void act(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
         ChannelPromise promise) {
-        if (channelConnectAction != null) {
-            channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
-        }
+        if (channelConnectAction != null) channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
     }
 
     static void act(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
-        if (channelPromiseAction != null) {
-            channelPromiseAction.act(ctx, promise);
-        }
+        if (channelPromiseAction != null) channelPromiseAction.act(ctx, promise);
     }
 
     static void act(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-        if (channelWriteAction != null) {
-            channelWriteAction.act(ctx, msg, promise);
-        }
+        if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
     }
 
     static void act(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
-        if (channelReadAction != null) {
-            channelReadAction.act(ctx, msg);
-        }
+        if (channelReadAction != null) channelReadAction.act(ctx, msg);
     }
+
+    static void actAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
+        act(exceptionAction, ctx, cause);
+        ctx.channel().close();
+    }
+
 }
