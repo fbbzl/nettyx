@@ -80,8 +80,11 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             writeIdle    = pipeline.get(WRITE_IDLE_HANDLER);
 
         removeIfExist(pipeline, readTimeout);  pipeline.addFirst(readTimeout);
+
         removeIfExist(pipeline, writeTimeout); pipeline.addLast(writeTimeout);
+
         removeIfExist(pipeline, readIdle);     pipeline.addFirst(readIdle);
+
         removeIfExist(pipeline, writeIdle);    pipeline.addLast(writeIdle);
     }
 
