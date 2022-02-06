@@ -79,19 +79,10 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             readIdle     = pipeline.get(READ_IDLE_HANDLER),
             writeIdle    = pipeline.get(WRITE_IDLE_HANDLER);
 
-        removeIfExist(pipeline, readTimeout);  pipeline.addFirst(readTimeout);
-
-        removeIfExist(pipeline, writeTimeout); pipeline.addLast(writeTimeout);
-
-        removeIfExist(pipeline, readIdle);     pipeline.addFirst(readIdle);
-
-        removeIfExist(pipeline, writeIdle);    pipeline.addLast(writeIdle);
-    }
-
-    static void removeIfExist(ChannelPipeline pipeline, ChannelHandler handler) {
-        if (handler != null) {
-            pipeline.remove(handler);
-        }
+        if (readTimeout  != null) { pipeline.remove(readTimeout);  pipeline.addFirst(readTimeout); }
+        if (writeTimeout != null) { pipeline.remove(writeTimeout); pipeline.addLast(writeTimeout); }
+        if (readIdle     != null) { pipeline.remove(readIdle);     pipeline.addFirst(readIdle);    }
+        if (writeIdle    != null) { pipeline.remove(writeIdle);    pipeline.addLast(writeIdle);    }
     }
 
     @Slf4j
@@ -147,6 +138,11 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             pipeline.addFirst(READ_TIME_OUT_HANDLER, readTimeoutHandler);
 
             return this;
+        }
+
+        @Override
+        public boolean isSharable() {
+            return true;
         }
 
         @Override
@@ -339,6 +335,11 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             pipeline.addFirst(WRITE_TIME_OUT_HANDLER, writeTimeoutHandler);
 
             return this;
+        }
+
+        @Override
+        public boolean isSharable() {
+            return true;
         }
 
         @Override
