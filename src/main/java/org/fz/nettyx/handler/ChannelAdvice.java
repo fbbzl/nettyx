@@ -419,7 +419,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             final ChannelPipeline pipeline = ctx.pipeline();
             final ChannelHandler  first    = pipeline.first();
 
-            if (pipeline.names().size() > 1 && first instanceof OutboundAdvice) {
+            if (pipeline.names().size() > 2 && first instanceof OutboundAdvice) {
                 throw new UnsupportedOperationException("do not let outbound-advice being the first-handler in the pipeline, it should always be the last handler");
             }
 
