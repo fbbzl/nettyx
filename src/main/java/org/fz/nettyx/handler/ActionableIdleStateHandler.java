@@ -19,6 +19,11 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
 
     private ChannelHandlerContextAction idleAction;
 
+    @Override
+    public boolean isSharable() {
+        return true;
+    }
+
     public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
     }
