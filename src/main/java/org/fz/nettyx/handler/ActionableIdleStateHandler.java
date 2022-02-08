@@ -17,7 +17,9 @@ import org.fz.nettyx.function.ChannelHandlerContextAction;
 @Accessors(fluent = true, chain = true)
 public class ActionableIdleStateHandler extends IdleStateHandler {
 
-    private ChannelHandlerContextAction idleAction;
+    private ChannelHandlerContextAction readIdleAction;
+
+    private ChannelHandlerContextAction writeIdleAction;
 
     @Override
     public boolean isSharable() {
