@@ -40,8 +40,7 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
     static final String
         INBOUND_ADVICE    = "$_inboundAdvice_$",
         OUTBOUND_ADVICE   = "$_outboundAdvice_$",
-        READ_IDLE         = "$_readIdle_$",
-        WRITE_IDLE        = "$_writeIdle_$",
+        READ_WRITE_IDLE   = "$_readWriteIdle_$",
         READ_TIME_OUT     = "$_readTimeout_$",
         WRITE_TIME_OUT    = "$_writeTimeout_$",
         INBOUND_EXCEPTION = "$_inboundExceptionHandler_$";
@@ -72,23 +71,21 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
     /**
      * keep channel handler in such order as default:
-     * 0. read Idle
-     * 1. write Idle
-     * 2. inboundAdvice
-     * 3. [business channel-handler...]
-     * 4. outboundAdvice
-     * 5. read-timeout
-     * 6. write-timeout
-     * 7. inboundExceptionHandler
+     * 0. read write Idle
+     * 1. inboundAdvice
+     * 2. [business channel-handler...]
+     * 3. outboundAdvice
+     * 4. read-timeout
+     * 5. write-timeout
+     * 6. inboundExceptionHandler
      *
      * if default order do not satisfy you, please override
      */
     protected void polarize(ChannelPipeline pipeline) {
         ChannelHandler
-            readTimeout  = pipeline.get(READ_TIME_OUT),
-            writeTimeout = pipeline.get(WRITE_TIME_OUT),
-            readIdle     = pipeline.get(READ_IDLE),
-            writeIdle    = pipeline.get(WRITE_IDLE),
+            readTimeout   = pipeline.get(READ_TIME_OUT),
+            writeTimeout  = pipeline.get(WRITE_TIME_OUT),
+            readWriteIdle = pipeline.get(READ_WRITE_IDLE),
             inboundExceptionHandler = ofNullable(pipeline.get(INBOUND_EXCEPTION)).orElseGet(InboundExceptionHandler::new);
 
         // seed position
@@ -96,8 +93,7 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
         if (outbound  != null) { pipeline.addLast(OUTBOUND_ADVICE, outbound); }
 
         // witch depends on inbound advice
-        if (readIdle  != null) { pipeline.remove(readIdle);  pipeline.addBefore(INBOUND_ADVICE, READ_IDLE,  readIdle);  }
-        if (writeIdle != null) { pipeline.remove(writeIdle); pipeline.addBefore(INBOUND_ADVICE, WRITE_IDLE, writeIdle); }
+        if (readWriteIdle  != null) { pipeline.remove(readWriteIdle);  pipeline.addBefore(INBOUND_ADVICE, READ_WRITE_IDLE,  readWriteIdle);  }
 
         pipeline.addLast(INBOUND_EXCEPTION, inboundExceptionHandler);
 
@@ -149,11 +145,19 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
             ChannelPipeline pipeline = channel.pipeline();
 
-            IdleStateHandler readIdleHandler  =
-                new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0).idleAction(readIdleAct);
+            ActionableIdleStateHandler idleStateHandler = (ActionableIdleStateHandler) pipeline.get(READ_WRITE_IDLE);
 
-            uniqueCheck(pipeline, READ_IDLE);
-            pipeline.addFirst(READ_IDLE, readIdleHandler);
+            if (idleStateHandler == null) {
+                pipeline.addFirst(READ_WRITE_IDLE, new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0)
+                    .readIdleAction(readIdleAct));
+            }
+            else
+            {
+                int writerIdleSeconds = (int) idleStateHandler.getWriterIdleTimeInMillis() / 1000;
+                ChannelHandlerContextAction writeIdleAction  = idleStateHandler.writeIdleAction();
+                pipeline.replace(READ_WRITE_IDLE, READ_WRITE_IDLE, new ActionableIdleStateHandler(this.readIdleSeconds, writerIdleSeconds, 0)
+                    .readIdleAction(readIdleAct).writeIdleAction(writeIdleAction));
+            }
 
             return this;
         }
@@ -273,22 +277,22 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
         }
 
         private long findWriteIdleSeconds() {
-            IdleStateHandler idleStateHandler = (IdleStateHandler) this.channel.pipeline().get(WRITE_IDLE);
+            IdleStateHandler idleStateHandler = this.getIdleStateHandler();
             return idleStateHandler.getWriterIdleTimeInMillis() / 1000;
         }
 
         private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findWriteIdleAction() {
-            T actionableHandler = this.findChannelHandler(WRITE_IDLE);
-            return actionableHandler == null ? null : actionableHandler.idleAction();
+            T actionable = this.getIdleStateHandler();
+            return actionable == null ? null : actionable.writeIdleAction();
         }
 
         private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findReadIdleAction() {
-            T actionableHandler = this.findChannelHandler(READ_IDLE);
-            return actionableHandler == null ? null : actionableHandler.idleAction();
+            T actionable = this.getIdleStateHandler();
+            return actionable == null ? null : actionable.readIdleAction();
         }
 
-        private <T extends ChannelHandler> T findChannelHandler(String handlerName) {
-            return (T) this.channel.pipeline().get(handlerName);
+        private <T extends IdleStateHandler> T getIdleStateHandler() {
+            return (T) this.channel.pipeline().get(READ_WRITE_IDLE);
         }
     }
 
@@ -305,7 +309,7 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction whenWrite;
 
-        private int writesIdleSeconds;
+        private int writeIdleSeconds;
         private int writeTimeoutSeconds;
 
         public OutboundAdvice(Channel channel) {
@@ -313,15 +317,23 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
         }
 
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
-            this.writesIdleSeconds = idleSeconds;
+            this.writeIdleSeconds = idleSeconds;
 
             ChannelPipeline pipeline = channel.pipeline();
 
-            IdleStateHandler writeIdleHandler =
-                new ActionableIdleStateHandler(0, this.writesIdleSeconds, 0).idleAction(writeIdleAct);
+            ActionableIdleStateHandler idleStateHandler = (ActionableIdleStateHandler) pipeline.get(READ_WRITE_IDLE);
 
-            uniqueCheck(pipeline, WRITE_IDLE);
-            pipeline.addFirst(WRITE_IDLE, writeIdleHandler);
+            if (idleStateHandler == null) {
+                pipeline.addFirst(READ_WRITE_IDLE, new ActionableIdleStateHandler(0, this.writeIdleSeconds, 0)
+                    .writeIdleAction(writeIdleAct));
+            }
+            else
+            {
+                int readIdleSeconds = (int) idleStateHandler.getReaderIdleTimeInMillis() / 1000;
+                ChannelHandlerContextAction readIdleAction  = idleStateHandler.readIdleAction();
+                pipeline.replace(READ_WRITE_IDLE, READ_WRITE_IDLE, new ActionableIdleStateHandler(readIdleSeconds, this.writeIdleSeconds, 0)
+                    .writeIdleAction(writeIdleAct).readIdleAction(readIdleAction));
+            }
 
             return this;
         }
