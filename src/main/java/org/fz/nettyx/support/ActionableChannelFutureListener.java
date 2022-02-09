@@ -30,29 +30,21 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
     public void operationComplete(ChannelFuture channelFuture) {
         // success
         if (channelFuture.isSuccess()) {
-            log.info("connect success, remote address is [{}]", channelFuture.channel().remoteAddress());
-
             act(whenSuccess, channelFuture);
         }
 
         // failed
         if (!channelFuture.isSuccess()) {
-            log.warn("connect failed, {}", channelFuture.cause().getMessage());
-
             act(whenFailure, channelFuture);
         }
 
         // done
         if (channelFuture.isDone()) {
-            log.debug("connect done, state is [{}], address is [{}]", state(channelFuture), channelFuture.channel().remoteAddress());
-
             act(whenDone, channelFuture);
         }
 
         // canceled
         if (channelFuture.isCancelled()) {
-            log.info("connect cancelled, address is [{}]", channelFuture.channel().remoteAddress());
-
             act(whenCancel, channelFuture);
         }
     }
