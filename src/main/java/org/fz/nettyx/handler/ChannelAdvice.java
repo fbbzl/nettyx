@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.event.ChannelEvents;
 import org.fz.nettyx.function.ChannelBindAction;
 import org.fz.nettyx.function.ChannelConnectAction;
 import org.fz.nettyx.function.ChannelExceptionAction;
@@ -26,6 +25,8 @@ import org.fz.nettyx.function.ChannelHandlerContextAction;
 import org.fz.nettyx.function.ChannelPromiseAction;
 import org.fz.nettyx.function.ChannelReadAction;
 import org.fz.nettyx.function.ChannelWriteAction;
+import org.fz.nettyx.handler.ExceptionHandler.InboundExceptionHandler;
+import org.fz.nettyx.handler.ExceptionHandler.OutboundExceptionHandler;
 
 /**
  * The type Channel Event advice, will execute the Action assigned
@@ -38,12 +39,13 @@ import org.fz.nettyx.function.ChannelWriteAction;
 public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
     static final String
-        INBOUND_ADVICE    = "$_inboundAdvice_$",
-        OUTBOUND_ADVICE   = "$_outboundAdvice_$",
-        READ_WRITE_IDLE   = "$_readWriteIdle_$",
-        READ_TIME_OUT     = "$_readTimeout_$",
-        WRITE_TIME_OUT    = "$_writeTimeout_$",
-        INBOUND_EXCEPTION = "$_inboundExceptionHandler_$";
+        INBOUND_ADVICE     = "$_inboundAdvice_$",
+        OUTBOUND_ADVICE    = "$_outboundAdvice_$",
+        READ_WRITE_IDLE    = "$_readWriteIdle_$",
+        READ_TIME_OUT      = "$_readTimeout_$",
+        WRITE_TIME_OUT     = "$_writeTimeout_$",
+        INBOUND_EXCEPTION  = "$_inboundExceptionHandler_$",
+        OUTBOUND_EXCEPTION = "$_outboundExceptionHandler_$";
 
     private InboundAdvice inbound;
     private OutboundAdvice outbound;
@@ -71,13 +73,14 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
     /**
      * keep channel handler in such order as default:
-     * 0. read write Idle
+     * 0. outboundExceptionHandler
      * 1. inboundAdvice
-     * 2. [business channel-handler...]
-     * 3. outboundAdvice
-     * 4. read-timeout
-     * 5. write-timeout
-     * 6. inboundExceptionHandler
+     * 2. read-timeout
+     * 3. read write Idle
+     * 4. [business channel-handler...]
+     * 5. outboundAdvice
+     * 6. write-timeout
+     * 7. inboundExceptionHandler
      *
      * if default order do not satisfy you, please override
      */
@@ -86,19 +89,21 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
             readTimeout   = pipeline.get(READ_TIME_OUT),
             writeTimeout  = pipeline.get(WRITE_TIME_OUT),
             readWriteIdle = pipeline.get(READ_WRITE_IDLE),
-            inboundExceptionHandler = ofNullable(pipeline.get(INBOUND_EXCEPTION)).orElseGet(InboundExceptionHandler::new);
+            inboundExceptionHandler = ofNullable(pipeline.get(INBOUND_EXCEPTION)).orElseGet(InboundExceptionHandler::new),
+            outboundExceptionHandler = ofNullable(pipeline.get(INBOUND_EXCEPTION)).orElseGet(OutboundExceptionHandler::new);
 
         // seed position
         if (inbound   != null) { pipeline.addFirst(INBOUND_ADVICE, inbound);  }
         if (outbound  != null) { pipeline.addLast(OUTBOUND_ADVICE, outbound); }
 
         // witch depends on inbound advice
-        if (readWriteIdle  != null) { pipeline.remove(readWriteIdle);  pipeline.addBefore(INBOUND_ADVICE, READ_WRITE_IDLE,  readWriteIdle);  }
+        if (readWriteIdle  != null) { pipeline.remove(readWriteIdle);  pipeline.addAfter(INBOUND_ADVICE, READ_WRITE_IDLE,  readWriteIdle);  }
 
         pipeline.addLast(INBOUND_EXCEPTION, inboundExceptionHandler);
+        pipeline.addFirst(INBOUND_EXCEPTION, outboundExceptionHandler);
 
         // witch depends on inbound exception handler
-        if (readTimeout  != null) { pipeline.remove(readTimeout);  pipeline.addBefore(INBOUND_EXCEPTION, READ_TIME_OUT,  readTimeout);  }
+        if (readTimeout  != null) { pipeline.remove(readTimeout);  pipeline.addAfter(INBOUND_ADVICE, READ_TIME_OUT,  readTimeout);      }
         if (writeTimeout != null) { pipeline.remove(writeTimeout); pipeline.addBefore(INBOUND_EXCEPTION, WRITE_TIME_OUT, writeTimeout); }
     }
 
@@ -250,23 +255,6 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
         }
 
         @Override
-        public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-            if (ChannelEvents.isReadIdle(evt)) {
-                log.warn("have been in read-idle state for [{}] seconds on [{}]", readIdleSeconds, ctx.channel().remoteAddress());
-
-                act(this.findReadIdleAction(), ctx);
-            }
-
-            if (ChannelEvents.isWriteIdle(evt)) {
-                log.warn("have been in write-idle state for [{}] seconds on [{}]", this.findWriteIdleSeconds(), ctx.channel().remoteAddress());
-
-                act(this.findWriteIdleAction(), ctx);
-            }
-
-            super.userEventTriggered(ctx, evt);
-        }
-
-        @Override
         public final void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress());
@@ -274,21 +262,6 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
             act(whenWritabilityChanged, ctx);
 
             super.channelWritabilityChanged(ctx);
-        }
-
-        private long findWriteIdleSeconds() {
-            IdleStateHandler idleStateHandler = this.getIdleStateHandler();
-            return idleStateHandler.getWriterIdleTimeInMillis() / 1000;
-        }
-
-        private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findWriteIdleAction() {
-            T actionable = this.getIdleStateHandler();
-            return actionable == null ? null : actionable.writeIdleAction();
-        }
-
-        private <T extends ActionableIdleStateHandler> ChannelHandlerContextAction findReadIdleAction() {
-            T actionable = this.getIdleStateHandler();
-            return actionable == null ? null : actionable.readIdleAction();
         }
 
         private <T extends IdleStateHandler> T getIdleStateHandler() {
@@ -348,6 +321,19 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
             uniqueCheck(pipeline, WRITE_TIME_OUT);
             pipeline.addFirst(WRITE_TIME_OUT, writeTimeoutHandler);
+
+            return this;
+        }
+
+        public final OutboundAdvice whenExceptionCaught(ChannelExceptionAction exceptionAction) {
+            ChannelPipeline pipeline = channel.pipeline();
+
+            OutboundExceptionHandler outboundExceptionHandler = pipeline.get(OutboundExceptionHandler.class);
+
+            if (outboundExceptionHandler == null) {
+                this.channel.pipeline().addLast(new OutboundExceptionHandler().whenExceptionCaught(exceptionAction));
+            }
+            else outboundExceptionHandler.whenExceptionCaught(exceptionAction);
 
             return this;
         }
