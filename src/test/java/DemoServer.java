@@ -1,3 +1,5 @@
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -9,6 +11,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
+import org.fz.nettyx.codec.StringMessageCodec;
 import org.fz.nettyx.server.Server;
 
 /**
@@ -28,10 +31,11 @@ public class DemoServer extends Server {
             protected void initChannel(NioServerSocketChannel ch) {
                 ch.pipeline()
                     .addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS))
+                    .addLast(new StringMessageCodec(UTF_8))
                     .addLast(new ChannelInboundHandlerAdapter() {
                         @Override
                         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                            System.err.println(msg);
+
                             super.channelRead(ctx, msg);
                         }
 
