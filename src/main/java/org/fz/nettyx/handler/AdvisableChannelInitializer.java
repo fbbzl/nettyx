@@ -1,20 +1,17 @@
 package org.fz.nettyx.handler;
 
-
-import static java.util.Optional.ofNullable;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
-import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import java.net.SocketAddress;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -29,95 +26,95 @@ import org.fz.nettyx.handler.ExceptionHandler.InboundExceptionHandler;
 import org.fz.nettyx.handler.ExceptionHandler.OutboundExceptionHandler;
 
 /**
- * The type Channel Event advice, will execute the Action assigned
- *
  * @author fengbinbin
- * @since 2022-01-27 18:07
+ * @version 1.0
+ * @since 2/10/2022 1:24 PM
  */
-@AllArgsConstructor
-@SuppressWarnings("unchecked")
-public class ChannelAdvice extends ChannelInboundHandlerAdapter {
+
+@Getter
+public abstract class AdvisableChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
     static final String
-        INBOUND_ADVICE     = "$_inboundAdvice_$",
-        OUTBOUND_ADVICE    = "$_outboundAdvice_$",
-        READ_WRITE_IDLE    = "$_readWriteIdle_$",
-        READ_TIME_OUT      = "$_readTimeout_$",
-        WRITE_TIME_OUT     = "$_writeTimeout_$",
-        INBOUND_EXCEPTION  = "$_inboundExceptionHandler_$",
+        INBOUND_ADVICE = "$_inboundAdvice_$",
+        OUTBOUND_ADVICE = "$_outboundAdvice_$",
+        READ_IDLE = "$_readIdle_$",
+        WRITE_IDLE = "$_writeIdle_$",
+        READ_TIME_OUT = "$_readTimeout_$",
+        WRITE_TIME_OUT = "$_writeTimeout_$",
+        INBOUND_EXCEPTION = "$_inboundExceptionHandler_$",
         OUTBOUND_EXCEPTION = "$_outboundExceptionHandler_$";
 
-    private InboundAdvice inbound;
-    private OutboundAdvice outbound;
+    private final InboundAdvice inboundAdvice;
+    private final OutboundAdvice outboundAdvice;
+    private final InboundExceptionHandler inboundExceptionHandler = new InboundExceptionHandler();
+    private final OutboundExceptionHandler outboundExceptionHandler = new OutboundExceptionHandler();
 
-    public ChannelAdvice(InboundAdvice inboundAdvice) {
+    private ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
+    private ReadTimeoutHandler readTimeoutHandler;
+    private WriteTimeoutHandler writeTimeoutHandler;
+
+    protected AdvisableChannelInitializer(InboundAdvice inboundAdvice) {
         this(inboundAdvice, null);
     }
 
-    public ChannelAdvice(OutboundAdvice outboundAdvice) {
+    protected AdvisableChannelInitializer(OutboundAdvice outboundAdvice) {
         this(null, outboundAdvice);
     }
 
-    @Override
-    public void handlerAdded(ChannelHandlerContext ctx) {
-        ChannelPipeline pipeline = ctx.pipeline();
+    protected AdvisableChannelInitializer(InboundAdvice inboundAdvice, OutboundAdvice outboundAdvice) {
+        this.inboundAdvice = inboundAdvice;
+        this.outboundAdvice = outboundAdvice;
 
-        this.checkInterceptor(pipeline);
-
-        this.checkPosition(pipeline);
-
-        this.polarize(pipeline);
-
-        pipeline.remove(ChannelAdvice.class);
+        this.initInternalHandlers();
     }
 
-    /**
-     * keep channel handler in such order as default:
-     * 0. outboundExceptionHandler
-     * 1. inboundAdvice
-     * 2. read-timeout
-     * 3. read write Idle
-     * 4. [business channel-handler...]
-     * 5. outboundAdvice
-     * 6. write-timeout
-     * 7. inboundExceptionHandler
-     *
-     * if default order do not satisfy you, please override
-     */
-    protected void polarize(ChannelPipeline pipeline) {
-        ChannelHandler
-            readTimeout   = pipeline.get(READ_TIME_OUT),
-            writeTimeout  = pipeline.get(WRITE_TIME_OUT),
-            readWriteIdle = pipeline.get(READ_WRITE_IDLE),
-            inboundExceptionHandler = ofNullable(pipeline.get(INBOUND_EXCEPTION)).orElseGet(InboundExceptionHandler::new),
-            outboundExceptionHandler = ofNullable(pipeline.get(INBOUND_EXCEPTION)).orElseGet(OutboundExceptionHandler::new);
+    private void initInternalHandlers() {
+        // init create after null check
+        if (inboundAdvice != null) {
+            this.readIdleStateHandler = inboundAdvice.readIdleStateHandler();
+            this.readTimeoutHandler = inboundAdvice.readTimeoutHandler();
+            this.inboundExceptionHandler.whenExceptionCaught(inboundAdvice.whenExceptionCaught());
+        }
 
-        // seed position
-        if (inbound   != null) { pipeline.addFirst(INBOUND_ADVICE, inbound);  }
-        if (outbound  != null) { pipeline.addLast(OUTBOUND_ADVICE, outbound); }
-
-        // witch depends on inbound advice
-        if (readWriteIdle  != null) { pipeline.remove(readWriteIdle);  pipeline.addAfter(INBOUND_ADVICE, READ_WRITE_IDLE,  readWriteIdle);  }
-
-        pipeline.addLast(INBOUND_EXCEPTION, inboundExceptionHandler);
-        pipeline.addFirst(INBOUND_EXCEPTION, outboundExceptionHandler);
-
-        // witch depends on inbound exception handler
-        if (readTimeout  != null) { pipeline.remove(readTimeout);  pipeline.addAfter(INBOUND_ADVICE, READ_TIME_OUT,  readTimeout);      }
-        if (writeTimeout != null) { pipeline.remove(writeTimeout); pipeline.addBefore(INBOUND_EXCEPTION, WRITE_TIME_OUT, writeTimeout); }
-    }
-
-    private void checkPosition(ChannelPipeline pipeline) {
-        if (pipeline.names().size() > 2 && pipeline.first() instanceof ChannelAdvice) {
-            throw new UnsupportedOperationException("do not make channel-advice being the first in the pipeline");
+        if (outboundAdvice != null) {
+            this.writeIdleStateHandler = outboundAdvice.writeIdleStateHandler();
+            this.writeTimeoutHandler = outboundAdvice.writeTimeoutHandler();
+            this.outboundExceptionHandler.whenExceptionCaught(outboundAdvice.whenExceptionCaught());
         }
     }
 
-    private void checkInterceptor(ChannelPipeline pipeline) {
-        ChannelInterceptor<?> channelInterceptor = pipeline.get(ChannelInterceptor.class);
+    /**
+     * add custom handlers
+     *
+     * @param channel current channel
+     */
+    protected abstract void addHandlers(C channel);
 
-        if (channelInterceptor != null) {
-            throw new UnsupportedOperationException("channel-advice can not use with any channel-interceptor");
+    /**
+     * keep channel handler in such order as default : 0. outboundExceptionHandler 1. read-Idle 2. read-timeout 3. inboundAdvice 4. [business channel-handlers]
+     * 5. outboundAdvice 6. write-timeout 7. write-Idle 8. inboundExceptionHandler
+     *
+     * if default order do not satisfy you, please override
+     */
+    @Override
+    protected void initChannel(C channel) {
+        ChannelPipeline pipeline = channel.pipeline();
+        addNonNull(pipeline, OUTBOUND_EXCEPTION, outboundExceptionHandler);
+        addNonNull(pipeline, READ_IDLE, readIdleStateHandler);
+        addNonNull(pipeline, READ_TIME_OUT, readTimeoutHandler);
+        addNonNull(pipeline, INBOUND_ADVICE, inboundAdvice);
+
+        this.addHandlers(channel);
+
+        addNonNull(pipeline, OUTBOUND_ADVICE, outboundAdvice);
+        addNonNull(pipeline, WRITE_TIME_OUT, writeTimeoutHandler);
+        addNonNull(pipeline, WRITE_IDLE, writeIdleStateHandler);
+        addNonNull(pipeline, INBOUND_EXCEPTION, inboundExceptionHandler);
+    }
+
+    private void addNonNull(ChannelPipeline pipeline, String name, ChannelHandler channelHandler) {
+        if (channelHandler != null) {
+            pipeline.addLast(name, channelHandler);
         }
     }
 
@@ -125,8 +122,6 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
     @Setter
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
-
-        private Channel channel;
 
         private ChannelHandlerContextAction
             whenChannelRegister,
@@ -138,59 +133,22 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
         private ChannelReadAction whenChannelRead;
 
-        private int readIdleSeconds;
-        private int readTimeoutSeconds;
-
-        public InboundAdvice(Channel channel) {
-            this.channel = channel;
-        }
+        @Getter
+        private ChannelExceptionAction whenExceptionCaught;
+        @Getter
+        private ActionableIdleStateHandler readIdleStateHandler;
+        @Getter
+        private ActionableReadTimeoutHandler readTimeoutHandler;
 
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
-            this.readIdleSeconds = idleSeconds;
-
-            ChannelPipeline pipeline = channel.pipeline();
-
-            ActionableIdleStateHandler idleStateHandler = (ActionableIdleStateHandler) pipeline.get(READ_WRITE_IDLE);
-
-            if (idleStateHandler == null) {
-                pipeline.addFirst(READ_WRITE_IDLE, new ActionableIdleStateHandler(this.readIdleSeconds, 0, 0)
-                    .readIdleAction(readIdleAct));
-            }
-            else
-            {
-                int writerIdleSeconds = (int) idleStateHandler.getWriterIdleTimeInMillis() / 1000;
-                ChannelHandlerContextAction writeIdleAction  = idleStateHandler.writeIdleAction();
-                pipeline.replace(READ_WRITE_IDLE, READ_WRITE_IDLE, new ActionableIdleStateHandler(this.readIdleSeconds, writerIdleSeconds, 0)
-                    .readIdleAction(readIdleAct).writeIdleAction(writeIdleAction));
-            }
-
+            this.readIdleStateHandler = ActionableIdleStateHandler.newReadIdle(idleSeconds, readIdleAct);
             return this;
         }
 
         public final InboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.readTimeoutSeconds = timeoutSeconds;
-
-            ChannelPipeline pipeline = channel.pipeline();
-
-            ReadTimeoutHandler readTimeoutHandler =
-                new ActionableReadTimeoutHandler(this.readTimeoutSeconds).timeoutAction(timeoutAction);
-
-            uniqueCheck(pipeline, READ_TIME_OUT);
-            pipeline.addFirst(READ_TIME_OUT, readTimeoutHandler);
-
-            return this;
-        }
-
-        public final InboundAdvice whenExceptionCaught(ChannelExceptionAction exceptionAction) {
-            ChannelPipeline pipeline = channel.pipeline();
-
-            InboundExceptionHandler inboundExceptionHandler = pipeline.get(InboundExceptionHandler.class);
-
-            if (inboundExceptionHandler == null) {
-                this.channel.pipeline().addLast(new InboundExceptionHandler().whenExceptionCaught(exceptionAction));
-            }
-            else inboundExceptionHandler.whenExceptionCaught(exceptionAction);
-
+            this.readTimeoutHandler =
+                new ActionableReadTimeoutHandler(timeoutSeconds)
+                    .timeoutAction(timeoutAction);
             return this;
         }
 
@@ -263,10 +221,6 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
             super.channelWritabilityChanged(ctx);
         }
-
-        private <T extends IdleStateHandler> T getIdleStateHandler() {
-            return (T) this.channel.pipeline().get(READ_WRITE_IDLE);
-        }
     }
 
     @Slf4j
@@ -274,67 +228,27 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
-        private Channel channel;
-
         private ChannelBindAction whenBind;
         private ChannelConnectAction whenConnect;
         private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction whenWrite;
 
-        private int writeIdleSeconds;
-        private int writeTimeoutSeconds;
-
-        public OutboundAdvice(Channel channel) {
-            this.channel = channel;
-        }
+        @Getter
+        private ChannelExceptionAction whenExceptionCaught;
+        @Getter
+        private ActionableIdleStateHandler writeIdleStateHandler;
+        @Getter
+        private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
-            this.writeIdleSeconds = idleSeconds;
-
-            ChannelPipeline pipeline = channel.pipeline();
-
-            ActionableIdleStateHandler idleStateHandler = (ActionableIdleStateHandler) pipeline.get(READ_WRITE_IDLE);
-
-            if (idleStateHandler == null) {
-                pipeline.addFirst(READ_WRITE_IDLE, new ActionableIdleStateHandler(0, this.writeIdleSeconds, 0)
-                    .writeIdleAction(writeIdleAct));
-            }
-            else
-            {
-                int readIdleSeconds = (int) idleStateHandler.getReaderIdleTimeInMillis() / 1000;
-                ChannelHandlerContextAction readIdleAction  = idleStateHandler.readIdleAction();
-                pipeline.replace(READ_WRITE_IDLE, READ_WRITE_IDLE, new ActionableIdleStateHandler(readIdleSeconds, this.writeIdleSeconds, 0)
-                    .writeIdleAction(writeIdleAct).readIdleAction(readIdleAction));
-            }
-
+            this.writeIdleStateHandler = ActionableIdleStateHandler.newWriteIdle(idleSeconds, writeIdleAct);
             return this;
         }
 
         public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.writeTimeoutSeconds = timeoutSeconds;
-
-            ChannelPipeline pipeline = channel.pipeline();
-
-            WriteTimeoutHandler writeTimeoutHandler =
-                new ActionableWriteTimeoutHandler(this.writeTimeoutSeconds).timeoutAction(timeoutAction);
-
-            uniqueCheck(pipeline, WRITE_TIME_OUT);
-            pipeline.addFirst(WRITE_TIME_OUT, writeTimeoutHandler);
-
-            return this;
-        }
-
-        public final OutboundAdvice whenExceptionCaught(ChannelExceptionAction exceptionAction) {
-            ChannelPipeline pipeline = channel.pipeline();
-
-            OutboundExceptionHandler outboundExceptionHandler = pipeline.get(OutboundExceptionHandler.class);
-
-            if (outboundExceptionHandler == null) {
-                this.channel.pipeline().addLast(new OutboundExceptionHandler().whenExceptionCaught(exceptionAction));
-            }
-            else outboundExceptionHandler.whenExceptionCaught(exceptionAction);
-
+            this.writeTimeoutHandler =
+                new ActionableWriteTimeoutHandler(timeoutSeconds).timeoutAction(timeoutAction);
             return this;
         }
 
@@ -390,7 +304,8 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
         @Override
         public final void read(ChannelHandlerContext ctx) throws Exception {
-            log.debug("channel read during writing, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
+            log.debug("channel read during writing, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
+                ctx.channel().localAddress());
 
             act(whenRead, ctx);
 
@@ -414,38 +329,42 @@ public class ChannelAdvice extends ChannelInboundHandlerAdapter {
 
             super.flush(ctx);
         }
-
-    }
-
-    static void uniqueCheck(ChannelPipeline pipeline, String handlerName) {
-        final ChannelHandler configured = pipeline.get(handlerName);
-
-        if (configured != null) throw new UnsupportedOperationException("handler named [" + handlerName + "] already defined in pipeline [" + pipeline + "]");
     }
 
     static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
-        if (channelAction != null) channelAction.act(ctx);
+        if (channelAction != null) {
+            channelAction.act(ctx);
+        }
     }
 
     static void act(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
-        if (channelBindAction != null) channelBindAction.act(ctx, localAddress, promise);
+        if (channelBindAction != null) {
+            channelBindAction.act(ctx, localAddress, promise);
+        }
     }
 
     static void act(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
         ChannelPromise promise) {
-        if (channelConnectAction != null) channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
+        if (channelConnectAction != null) {
+            channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
+        }
     }
 
     static void act(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
-        if (channelPromiseAction != null) channelPromiseAction.act(ctx, promise);
+        if (channelPromiseAction != null) {
+            channelPromiseAction.act(ctx, promise);
+        }
     }
 
     static void act(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-        if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
+        if (channelWriteAction != null) {
+            channelWriteAction.act(ctx, msg, promise);
+        }
     }
 
     static void act(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
-        if (channelReadAction != null) channelReadAction.act(ctx, msg);
+        if (channelReadAction != null) {
+            channelReadAction.act(ctx, msg);
+        }
     }
-
 }

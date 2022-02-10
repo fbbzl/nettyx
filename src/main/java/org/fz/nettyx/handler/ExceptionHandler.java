@@ -1,8 +1,9 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.handler.ChannelAdvice.READ_TIME_OUT;
-import static org.fz.nettyx.handler.ChannelAdvice.WRITE_TIME_OUT;
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
 
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -15,7 +16,6 @@ import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.exception.ClosingChannelException;
 import org.fz.nettyx.function.ChannelExceptionAction;
-import org.fz.nettyx.support.ActionableChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -69,17 +69,6 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
         private <T extends ChannelHandler> T findChannelHandler(ChannelHandlerContext ctx, String handlerName) {
             return (T) ctx.pipeline().get(handlerName);
         }
-
-        static void act(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
-            if (exceptionAction != null) {
-                exceptionAction.act(ctx, throwable);
-            }
-        }
-
-        static void actAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
-            act(exceptionAction, ctx, cause);
-            ctx.channel().close();
-        }
     }
 
     @Slf4j
@@ -101,12 +90,6 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
         public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             promise.addListener(failureListener(ctx, this.whenExceptionCaught));
             super.bind(ctx, localAddress, promise);
-        }
-
-        @Override
-        public void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
-            promise.addListener(failureListener(ctx, this.whenExceptionCaught));
-            super.connect(ctx, remoteAddress, localAddress, promise);
         }
 
         @Override
@@ -133,18 +116,33 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             super.write(ctx, msg, promise);
         }
 
-        static ActionableChannelFutureListener writeFailureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught, Object msg) {
-            return new ActionableChannelFutureListener().whenFailure(cf -> {
-                log.error("exception occur while writing, message is [" + msg + "]", cf.cause());
-                whenExceptionCaught.act(ctx, cf.cause());
-            });
+        static ChannelFutureListener writeFailureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught, Object msg) {
+            return cf -> {
+                if (!cf.isSuccess()) {
+                    log.error("exception occur while writing, message is [" + msg + "]", cf.cause());
+                    act(whenExceptionCaught, ctx, cf.cause());
+                }
+            };
         }
 
-        static ActionableChannelFutureListener failureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught) {
-            return new ActionableChannelFutureListener().whenFailure(cf -> {
-                log.error(cf.cause().getMessage());
-                whenExceptionCaught.act(ctx, cf.cause());
-            });
+        static ChannelFutureListener failureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught) {
+            return cf -> {
+                if (!cf.isSuccess()) {
+                    log.error(cf.cause().getMessage());
+                    act(whenExceptionCaught, ctx, cf.cause());
+                }
+            };
         }
+    }
+
+    static void act(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
+        if (exceptionAction != null) {
+            exceptionAction.act(ctx, throwable);
+        }
+    }
+
+    static void actAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
+        act(exceptionAction, ctx, cause);
+        ctx.channel().close();
     }
 }

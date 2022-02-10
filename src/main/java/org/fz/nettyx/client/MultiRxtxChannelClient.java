@@ -1,5 +1,6 @@
 package org.fz.nettyx.client;
 
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -9,6 +10,7 @@ import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.support.ChannelStorage;
+
 
 /**
  * @author fengbinbin
@@ -66,13 +68,13 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (preCloseGracefully(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key);
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (preCloseGracefully(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key, promise);
         }
     }

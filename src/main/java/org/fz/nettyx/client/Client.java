@@ -19,11 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("unchecked")
 public abstract class Client {
 
-    /**
-     * Event loop group event loop group.
-     *
-     * @return the event loop group
-     */
     public abstract EventLoopGroup getEventLoopGroup();
 
     public abstract Bootstrap getBootstrap();
@@ -32,34 +27,19 @@ public abstract class Client {
         return getBootstrap().clone();
     }
 
-    /**
-     * Available boolean.
-     *
-     * @param channel the channel
-     * @return the boolean
-     */
     public boolean ready(Channel channel) {
         return channel != null && channel.isActive();
     }
 
-    /**
-     * Unavailable boolean
-     *
-     * @param channel the channel
-     * @return the boolean
-     */
     public boolean notReady(Channel channel) {
         return !ready(channel);
     }
 
-    /**
-     * Shutdown gracefully.
-     */
     protected void shutdownGracefully() {
         getEventLoopGroup().shutdownGracefully();
     }
 
-    public static boolean preCloseGracefully(Channel channel) {
+    public static boolean gracefullyCloseable(Channel channel) {
         return
             channel != null
                 &&

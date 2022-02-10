@@ -1,6 +1,5 @@
 package org.fz.nettyx.handler;
 
-
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
