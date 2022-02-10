@@ -36,13 +36,13 @@ public abstract class SingleChannelClient extends TcpClient {
     }
 
     public void closeChannelGracefully() {
-        if (preCloseGracefully(channel)) {
+        if (gracefullyCloseable(channel)) {
             this.closeChannel();
         }
     }
 
     public void closeChannelGracefully(ChannelPromise promise) {
-        if (preCloseGracefully(channel)) {
+        if (gracefullyCloseable(channel)) {
             this.closeChannel(promise);
         }
     }

@@ -1,6 +1,5 @@
 package org.fz.nettyx.handler;
 
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -27,6 +26,18 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
     public long getReaderIdleSeconds() { return super.getReaderIdleTimeInMillis() / 1000; }
     public long getWriterIdleSeconds() { return super.getWriterIdleTimeInMillis() / 1000; }
     public long getAllIdleSeconds()    { return super.getAllIdleTimeInMillis()    / 1000; }
+
+    public static ActionableIdleStateHandler newReadIdle(int seconds, ChannelHandlerContextAction idleAction) {
+        return new ActionableIdleStateHandler(seconds, 0, 0).readIdleAction(idleAction);
+    }
+
+    public static ActionableIdleStateHandler newWriteIdle(int seconds, ChannelHandlerContextAction idleAction) {
+        return new ActionableIdleStateHandler(0, seconds, 0).writeIdleAction(idleAction);
+    }
+
+    public static ActionableIdleStateHandler newAllIdle(int seconds, ChannelHandlerContextAction idleAction) {
+        return new ActionableIdleStateHandler(0, 0, seconds).allIdleAction(idleAction);
+    }
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {

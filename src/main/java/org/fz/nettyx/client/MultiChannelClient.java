@@ -1,6 +1,5 @@
 package org.fz.nettyx.client;
 
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -70,13 +69,13 @@ public abstract class MultiChannelClient<K> extends TcpClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (preCloseGracefully(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key);
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (preCloseGracefully(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key, promise);
         }
     }
