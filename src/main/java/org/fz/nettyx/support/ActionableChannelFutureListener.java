@@ -30,29 +30,21 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
     public void operationComplete(ChannelFuture channelFuture) {
         // success
         if (channelFuture.isSuccess()) {
-            log.info("channelFuture success, remote address is [{}]", channelFuture.channel().remoteAddress());
-
             act(whenSuccess, channelFuture);
         }
         else
         // failed
         if (!channelFuture.isSuccess()) {
-            log.warn("channelFuture failed, {}", channelFuture.cause().getMessage());
-
             act(whenFailure, channelFuture);
         }
 
         // done
         if (channelFuture.isDone()) {
-            log.debug("channelFuture done, state is [{}], address is [{}]", state(channelFuture), channelFuture.channel().remoteAddress());
-
             act(whenDone, channelFuture);
         }
         else
         // canceled
         if (channelFuture.isCancelled()) {
-            log.info("channelFuture cancelled, address is [{}]", channelFuture.channel().remoteAddress());
-
             act(whenCancel, channelFuture);
         }
     }
@@ -63,10 +55,6 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
         if (channelFutureAction != null) {
             channelFutureAction.act(channelFuture);
         }
-    }
-
-    private String state(ChannelFuture channelFuture) {
-        return channelFuture.isSuccess() ? "success" : "failed";
     }
 
     //********************************************      private end      ***************************************************//
