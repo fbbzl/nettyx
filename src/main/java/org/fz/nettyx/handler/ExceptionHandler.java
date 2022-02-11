@@ -13,6 +13,10 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
 import java.net.SocketAddress;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.exception.ClosingChannelException;
 import org.fz.nettyx.function.ChannelExceptionAction;
@@ -29,15 +33,18 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
     }
 
     @Slf4j
-    @SuppressWarnings("unchecked")
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class InboundExceptionHandler extends ChannelInboundHandlerAdapter {
 
-        private ChannelExceptionAction whenExceptionCaught;
-
-        public InboundExceptionHandler whenExceptionCaught(ChannelExceptionAction whenExceptionCaught) {
-            this.whenExceptionCaught = whenExceptionCaught;
-            return this;
+        @Override
+        public boolean isSharable() {
+            return true;
         }
+
+        @Setter
+        @Accessors(chain = true, fluent = true)
+        private ChannelExceptionAction whenExceptionCaught;
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -51,11 +58,6 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             else act(whenExceptionCaught, ctx, cause);
         }
 
-        @Override
-        public boolean isSharable() {
-            return true;
-        }
-
         private <T extends ActionableReadTimeoutHandler> ChannelExceptionAction findReadTimeoutAction(ChannelHandlerContext ctx) {
             T actionableHandler = this.findChannelHandler(ctx, READ_TIME_OUT);
             return actionableHandler == null ? null : actionableHandler.timeoutAction();
@@ -66,25 +68,25 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             return actionableHandler == null ? null : actionableHandler.timeoutAction();
         }
 
+        @SuppressWarnings("unchecked")
         private <T extends ChannelHandler> T findChannelHandler(ChannelHandlerContext ctx, String handlerName) {
             return (T) ctx.pipeline().get(handlerName);
         }
     }
 
     @Slf4j
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class OutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
-
-        private ChannelExceptionAction whenExceptionCaught;
-
-        public OutboundExceptionHandler whenExceptionCaught(ChannelExceptionAction whenExceptionCaught) {
-            this.whenExceptionCaught = whenExceptionCaught;
-            return this;
-        }
 
         @Override
         public boolean isSharable() {
             return true;
         }
+
+        @Setter
+        @Accessors(chain = true, fluent = true)
+        private ChannelExceptionAction whenExceptionCaught;
 
         @Override
         public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {

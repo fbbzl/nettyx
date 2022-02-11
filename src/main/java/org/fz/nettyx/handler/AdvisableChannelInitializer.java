@@ -35,23 +35,22 @@ import org.fz.nettyx.handler.ExceptionHandler.OutboundExceptionHandler;
 public abstract class AdvisableChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
     static final String
-        INBOUND_ADVICE = "$_inboundAdvice_$",
-        OUTBOUND_ADVICE = "$_outboundAdvice_$",
-        READ_IDLE = "$_readIdle_$",
-        WRITE_IDLE = "$_writeIdle_$",
-        READ_TIME_OUT = "$_readTimeout_$",
-        WRITE_TIME_OUT = "$_writeTimeout_$",
-        INBOUND_EXCEPTION = "$_inboundExceptionHandler_$",
+        INBOUND_ADVICE     = "$_inboundAdvice_$",
+        OUTBOUND_ADVICE    = "$_outboundAdvice_$",
+        READ_IDLE          = "$_readIdle_$",
+        WRITE_IDLE         = "$_writeIdle_$",
+        READ_TIME_OUT      = "$_readTimeout_$",
+        WRITE_TIME_OUT     = "$_writeTimeout_$",
+        INBOUND_EXCEPTION  = "$_inboundExceptionHandler_$",
         OUTBOUND_EXCEPTION = "$_outboundExceptionHandler_$";
 
-    private final InboundAdvice inboundAdvice;
+    private final InboundAdvice  inboundAdvice;
     private final OutboundAdvice outboundAdvice;
-    private final InboundExceptionHandler inboundExceptionHandler = new InboundExceptionHandler();
+    private final InboundExceptionHandler inboundExceptionHandler  = new InboundExceptionHandler();
     private final OutboundExceptionHandler outboundExceptionHandler = new OutboundExceptionHandler();
-
     private ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
-    private ReadTimeoutHandler readTimeoutHandler;
-    private WriteTimeoutHandler writeTimeoutHandler;
+    private       ReadTimeoutHandler         readTimeoutHandler;
+    private       WriteTimeoutHandler        writeTimeoutHandler;
 
     protected AdvisableChannelInitializer(InboundAdvice inboundAdvice) {
         this(inboundAdvice, null);
@@ -62,7 +61,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     }
 
     protected AdvisableChannelInitializer(InboundAdvice inboundAdvice, OutboundAdvice outboundAdvice) {
-        this.inboundAdvice = inboundAdvice;
+        this.inboundAdvice  = inboundAdvice;
         this.outboundAdvice = outboundAdvice;
 
         this.initInternalHandlers();
@@ -72,13 +71,13 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         // init create after null check
         if (inboundAdvice != null) {
             this.readIdleStateHandler = inboundAdvice.readIdleStateHandler();
-            this.readTimeoutHandler = inboundAdvice.readTimeoutHandler();
+            this.readTimeoutHandler   = inboundAdvice.readTimeoutHandler();
             this.inboundExceptionHandler.whenExceptionCaught(inboundAdvice.whenExceptionCaught());
         }
 
         if (outboundAdvice != null) {
             this.writeIdleStateHandler = outboundAdvice.writeIdleStateHandler();
-            this.writeTimeoutHandler = outboundAdvice.writeTimeoutHandler();
+            this.writeTimeoutHandler   = outboundAdvice.writeTimeoutHandler();
             this.outboundExceptionHandler.whenExceptionCaught(outboundAdvice.whenExceptionCaught());
         }
     }
@@ -91,53 +90,65 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     protected abstract void addHandlers(C channel);
 
     /**
-     * keep channel handler in such order as default : 0. outboundExceptionHandler 1. read-Idle 2. read-timeout 3. inboundAdvice 4. [business channel-handlers]
-     * 5. outboundAdvice 6. write-timeout 7. write-Idle 8. inboundExceptionHandler
+     * keep channel handler in such order as default :
+     *
+     * 1. outboundExceptionHandler
+     * 2. read-Idle
+     * 3. read-timeout
+     * 4. inboundAdvice
+     *
+     * 5. [business channel-handlers]
+     *
+     * 6. outboundAdvice
+     * 7. write-timeout
+     * 8. write-Idle
+     * 9. inboundExceptionHandler
      *
      * if default order do not satisfy you, please override
      */
     @Override
     protected void initChannel(C channel) {
         ChannelPipeline pipeline = channel.pipeline();
-        addNonNull(pipeline, OUTBOUND_EXCEPTION, outboundExceptionHandler);
-        addNonNull(pipeline, READ_IDLE, readIdleStateHandler);
-        addNonNull(pipeline, READ_TIME_OUT, readTimeoutHandler);
-        addNonNull(pipeline, INBOUND_ADVICE, inboundAdvice);
 
+        addNonNullLast(pipeline, OUTBOUND_EXCEPTION, outboundExceptionHandler);
+        addNonNullLast(pipeline, READ_IDLE,          readIdleStateHandler);
+        addNonNullLast(pipeline, READ_TIME_OUT,      readTimeoutHandler);
+        addNonNullLast(pipeline, INBOUND_ADVICE,     inboundAdvice);
         this.addHandlers(channel);
-
-        addNonNull(pipeline, OUTBOUND_ADVICE, outboundAdvice);
-        addNonNull(pipeline, WRITE_TIME_OUT, writeTimeoutHandler);
-        addNonNull(pipeline, WRITE_IDLE, writeIdleStateHandler);
-        addNonNull(pipeline, INBOUND_EXCEPTION, inboundExceptionHandler);
+        addNonNullLast(pipeline, OUTBOUND_ADVICE,    outboundAdvice);
+        addNonNullLast(pipeline, WRITE_TIME_OUT,     writeTimeoutHandler);
+        addNonNullLast(pipeline, WRITE_IDLE,         writeIdleStateHandler);
+        addNonNullLast(pipeline, INBOUND_EXCEPTION,  inboundExceptionHandler);
     }
 
-    private void addNonNull(ChannelPipeline pipeline, String name, ChannelHandler channelHandler) {
-        if (channelHandler != null) {
-            pipeline.addLast(name, channelHandler);
-        }
+    static void addNonNullFirst(ChannelPipeline pipeline, String name, ChannelHandler channelHandler) {
+        if (channelHandler != null) pipeline.addFirst(name, channelHandler);
+    }
+    static void addNonNullLast(ChannelPipeline pipeline, String name, ChannelHandler channelHandler) {
+        if (channelHandler != null) pipeline.addLast(name, channelHandler);
+    }
+    static void addNonNullBefore(ChannelPipeline pipeline, String targetName, String name, ChannelHandler channelHandler) {
+        if (channelHandler != null) pipeline.addBefore(targetName, name, channelHandler);
+    }
+    static void addNonNullAfter(ChannelPipeline pipeline, String targetName, String name, ChannelHandler channelHandler) {
+        if (channelHandler != null) pipeline.addAfter(targetName, name, channelHandler);
     }
 
     @Slf4j
     @Setter
+    @Getter
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private ChannelHandlerContextAction
-            whenChannelRegister,
-            whenChannelUnRegister,
-            whenChannelActive,
-            whenChannelInactive,
-            whenWritabilityChanged,
-            whenChannelReadComplete;
-
+        private ChannelHandlerContextAction whenChannelRegister,
+                                             whenChannelUnRegister,
+                                             whenChannelActive,
+                                             whenChannelInactive,
+                                             whenWritabilityChanged,
+                                             whenChannelReadComplete;
         private ChannelReadAction whenChannelRead;
-
-        @Getter
         private ChannelExceptionAction whenExceptionCaught;
-        @Getter
         private ActionableIdleStateHandler readIdleStateHandler;
-        @Getter
         private ActionableReadTimeoutHandler readTimeoutHandler;
 
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
@@ -160,36 +171,28 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         @Override
         public final void channelRegistered(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel registered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenChannelRegister, ctx);
-
             super.channelRegistered(ctx);
         }
 
         @Override
         public final void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel unregistered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenChannelUnRegister, ctx);
-
             super.channelUnregistered(ctx);
         }
 
         @Override
         public final void channelActive(ChannelHandlerContext ctx) throws Exception {
             log.info("channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
-
             act(whenChannelActive, ctx);
-
             super.channelActive(ctx);
         }
 
         @Override
         public final void channelInactive(ChannelHandlerContext ctx) throws Exception {
             log.warn("channel in-active event triggered, address is [{}]", ctx.channel().remoteAddress());
-
             act(whenChannelInactive, ctx);
-
             super.channelInactive(ctx);
         }
 
@@ -197,18 +200,14 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         public final void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress(), msg);
-
             act(whenChannelRead, ctx, msg);
-
             super.channelRead(ctx, msg);
         }
 
         @Override
         public final void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel read complete, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenChannelReadComplete, ctx);
-
             super.channelReadComplete(ctx);
         }
 
@@ -216,29 +215,24 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         public final void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress());
-
             act(whenWritabilityChanged, ctx);
-
             super.channelWritabilityChanged(ctx);
         }
     }
 
     @Slf4j
     @Setter
+    @Getter
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
         private ChannelBindAction whenBind;
         private ChannelConnectAction whenConnect;
         private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
-        private ChannelHandlerContextAction whenRead, whenFlush;
+        private ChannelHandlerContextAction   whenRead, whenFlush;
         private ChannelWriteAction whenWrite;
-
-        @Getter
-        private ChannelExceptionAction whenExceptionCaught;
-        @Getter
+        private ChannelExceptionAction        whenExceptionCaught;
         private ActionableIdleStateHandler writeIdleStateHandler;
-        @Getter
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
@@ -247,8 +241,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         }
 
         public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.writeTimeoutHandler =
-                new ActionableWriteTimeoutHandler(timeoutSeconds).timeoutAction(timeoutAction);
+            this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds).timeoutAction(timeoutAction);
             return this;
         }
 
@@ -260,45 +253,35 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
-
             act(whenBind, ctx, localAddress, promise);
-
             super.bind(ctx, localAddress, promise);
         }
 
         @Override
         public final void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             log.debug("channel connecting, remote-address is [{}], local-address is [{}]", remoteAddress, localAddress);
-
             act(whenConnect, ctx, remoteAddress, localAddress, promise);
-
             super.connect(ctx, remoteAddress, localAddress, promise);
         }
 
         @Override
         public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel disconnect, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenDisconnect, ctx, promise);
-
             super.disconnect(ctx, promise);
         }
 
         @Override
         public final void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenClose, ctx, promise);
-
             super.close(ctx, promise);
         }
 
         @Override
         public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel deregister, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenDeregister, ctx, promise);
-
             super.deregister(ctx, promise);
         }
 
@@ -306,27 +289,21 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         public final void read(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel read during writing, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress());
-
             act(whenRead, ctx);
-
             super.read(ctx);
         }
 
         @Override
         public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenWrite, ctx, msg, promise);
-
             super.write(ctx, msg, promise);
         }
 
         @Override
         public final void flush(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel flush, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-
             act(whenFlush, ctx);
-
             super.flush(ctx);
         }
     }
