@@ -23,6 +23,11 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
 
     private ChannelHandlerContextAction readIdleAction, writeIdleAction, allIdleAction;
 
+    @Override
+    public boolean isSharable() {
+        return true;
+    }
+
     public long getReaderIdleSeconds() { return super.getReaderIdleTimeInMillis() / 1000; }
     public long getWriterIdleSeconds() { return super.getWriterIdleTimeInMillis() / 1000; }
     public long getAllIdleSeconds()    { return super.getAllIdleTimeInMillis()    / 1000; }
@@ -61,11 +66,6 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
 
     static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
         if (channelAction != null) channelAction.act(ctx);
-    }
-
-    @Override
-    public boolean isSharable() {
-        return true;
     }
 
     public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {

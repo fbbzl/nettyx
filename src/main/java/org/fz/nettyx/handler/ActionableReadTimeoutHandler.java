@@ -20,16 +20,16 @@ public class ActionableReadTimeoutHandler extends ReadTimeoutHandler {
 
     private ChannelExceptionAction timeoutAction;
 
-    @Override
-    public boolean isSharable() {
-        return true;
-    }
-
     public ActionableReadTimeoutHandler(int timeoutSeconds) {
         super(timeoutSeconds);
     }
 
     public ActionableReadTimeoutHandler(long timeout, TimeUnit unit) {
         super(timeout, unit);
+    }
+
+    @Override
+    public boolean isSharable() {
+        return true;
     }
 }

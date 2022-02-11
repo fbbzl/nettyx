@@ -20,11 +20,6 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
 
     private ChannelExceptionAction timeoutAction;
 
-    @Override
-    public boolean isSharable() {
-        return true;
-    }
-
     public ActionableWriteTimeoutHandler(int timeoutSeconds) {
         super(timeoutSeconds);
     }
@@ -32,4 +27,10 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
     public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit) {
         super(timeout, unit);
     }
+
+    @Override
+    public boolean isSharable() {
+        return true;
+    }
+
 }
