@@ -1,10 +1,11 @@
-package org.fz.nettyx.client;
+package org.fz.nettyx.client.rxtx;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxChannelConfig;
+import org.fz.nettyx.client.Client;
 
 /**
  * @author fengbinbin

@@ -1,4 +1,4 @@
-package org.fz.nettyx.client;
+package org.fz.nettyx.client.tcp;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -8,6 +8,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.AttributeKey;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.client.Client;
 import org.fz.nettyx.support.ChannelStorage;
 
 /**
@@ -69,13 +70,13 @@ public abstract class MultiChannelClient<K> extends TcpClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (gracefullyCloseable(getChannel(key))) {
+        if (Client.gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key);
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (gracefullyCloseable(getChannel(key))) {
+        if (Client.gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key, promise);
         }
     }

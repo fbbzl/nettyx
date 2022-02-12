@@ -1,9 +1,10 @@
-package org.fz.nettyx.client;
+package org.fz.nettyx.client.tcp;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.fz.nettyx.client.Client;
 
 /**
  * @author fengbinbin

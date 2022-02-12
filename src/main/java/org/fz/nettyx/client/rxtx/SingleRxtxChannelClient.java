@@ -1,4 +1,4 @@
-package org.fz.nettyx.client;
+package org.fz.nettyx.client.rxtx;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

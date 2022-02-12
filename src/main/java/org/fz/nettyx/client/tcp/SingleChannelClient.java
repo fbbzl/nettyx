@@ -1,4 +1,4 @@
-package org.fz.nettyx.client;
+package org.fz.nettyx.client.tcp;
 
 
 import io.netty.channel.Channel;
@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.client.Client;
 
 /**
  * Single channel client
@@ -36,13 +37,13 @@ public abstract class SingleChannelClient extends TcpClient {
     }
 
     public void closeChannelGracefully() {
-        if (gracefullyCloseable(channel)) {
+        if (Client.gracefullyCloseable(channel)) {
             this.closeChannel();
         }
     }
 
     public void closeChannelGracefully(ChannelPromise promise) {
-        if (gracefullyCloseable(channel)) {
+        if (Client.gracefullyCloseable(channel)) {
             this.closeChannel(promise);
         }
     }
