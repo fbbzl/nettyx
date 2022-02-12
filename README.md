@@ -62,9 +62,9 @@ handler                             提供了一些基础的channel handler实�
   ---ActionableWriteTimeoutHandler     可操作写超时处理器
   ---AdvisableChannelInitializer       channel建言初始化器
   ---ExceptionHandler                  异常处理器
-  ---ChannelAdvice                     提供了channel事件谏言  
   ---ChannelInterceptor                channel拦截器, 适用于通信前的握手动作等前置操作
-  ---UserEventHandler                   用户事件触发器
+  ---MessageDispatcher                 消息分发器
+  ---UserEventHandler                  用户事件触发器
 server
   ---Server                          提供server端基础实现
 ssl
