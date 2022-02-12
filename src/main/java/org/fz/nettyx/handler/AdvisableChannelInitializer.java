@@ -140,15 +140,15 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private ChannelHandlerContextAction whenChannelRegister,
+        private ChannelHandlerContextAction  whenChannelRegister,
                                              whenChannelUnRegister,
                                              whenChannelActive,
                                              whenChannelInactive,
                                              whenWritabilityChanged,
                                              whenChannelReadComplete;
-        private ChannelReadAction whenChannelRead;
-        private ChannelExceptionAction whenExceptionCaught;
-        private ActionableIdleStateHandler readIdleStateHandler;
+        private ChannelReadAction            whenChannelRead;
+        private ChannelExceptionAction       whenExceptionCaught;
+        private ActionableIdleStateHandler   readIdleStateHandler;
         private ActionableReadTimeoutHandler readTimeoutHandler;
 
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
