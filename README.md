@@ -37,7 +37,7 @@ client                              提供client端基础实现
 codec                               提供了一些基础的编解码器
   ---DelimiterBasedFrameCodec          基于分隔符codec
   ---EscapeCodec                       协议敏感字替换
-  ---StartEndFlagFrameCodec            基于起止符codec
+  ---StartEndFlagFrameCodec            起止符codec
   ---StringMessageCodec                字符串Codec
 envet                                对netty事件提供支持
   ---ChannelEvent                      Channel事件对象, 建议配合Spring容器事件使用
