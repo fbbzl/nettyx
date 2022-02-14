@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.client.Client;
 
 /**
  * Single channel client
@@ -37,13 +36,13 @@ public abstract class SingleChannelClient extends TcpClient {
     }
 
     public void closeChannelGracefully() {
-        if (Client.gracefullyCloseable(channel)) {
+        if (gracefullyCloseable(channel)) {
             this.closeChannel();
         }
     }
 
     public void closeChannelGracefully(ChannelPromise promise) {
-        if (Client.gracefullyCloseable(channel)) {
+        if (gracefullyCloseable(channel)) {
             this.closeChannel(promise);
         }
     }
@@ -56,8 +55,8 @@ public abstract class SingleChannelClient extends TcpClient {
     public abstract void connect(SocketAddress address);
 
     public void send(Object message) {
-        if (this.notReady(channel)) {
-            log.debug("connection have not been initialized, message will be discard: {}", message);
+        if (this.inActive(channel)) {
+            log.debug("channel not in active status, message will be discard: {}", message);
             return;
         }
 

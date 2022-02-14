@@ -47,17 +47,17 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
     public abstract void connect(RxtxDeviceAddress address);
 
     public void send(Object message) {
-        if (this.notReady(channel)) {
-            log.debug("connection have not been initialized, message will be discard: {}", message);
+        if (this.inActive(channel)) {
+            log.debug("comm channel not in active status, message will be discard: {}", message);
             return;
         }
 
         try {
             channel.writeAndFlush(message);
 
-            log.debug("has send message to: [{}]", channel.remoteAddress());
+            log.debug("has send message to comm-port: [{}]", channel.remoteAddress());
         } catch (Exception exception) {
-            log.error("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
+            log.error("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
         }
     }
 

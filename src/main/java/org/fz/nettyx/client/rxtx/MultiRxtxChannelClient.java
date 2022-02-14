@@ -1,6 +1,5 @@
 package org.fz.nettyx.client.rxtx;
 
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -88,16 +87,16 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     public void send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
-        if (notReady(channel)) {
-            log.debug("connection has not been initialized, message will be discard: {}", message);
+        if (inActive(channel)) {
+            log.debug("comm channel not in active status, message will be discard: {}", message);
             return;
         }
 
         try {
             channel.writeAndFlush(message);
-            log.debug("has send message to : [{}]", channel.remoteAddress());
+            log.debug("has send message to comm-port: [{}]", channel.remoteAddress());
         } catch (Exception exception) {
-            log.error("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
+            log.error("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
         }
     }
 

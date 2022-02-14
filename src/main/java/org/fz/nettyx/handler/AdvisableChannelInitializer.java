@@ -48,7 +48,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     private final OutboundAdvice outboundAdvice;
     private final InboundExceptionHandler inboundExceptionHandler  = new InboundExceptionHandler();
     private final OutboundExceptionHandler outboundExceptionHandler = new OutboundExceptionHandler();
-    private ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
+    private       ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
     private       ReadTimeoutHandler         readTimeoutHandler;
     private       WriteTimeoutHandler        writeTimeoutHandler;
 
@@ -140,26 +140,24 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private ChannelHandlerContextAction  whenChannelRegister,
+        private ChannelHandlerContextAction whenChannelRegister,
                                              whenChannelUnRegister,
                                              whenChannelActive,
                                              whenChannelInactive,
                                              whenWritabilityChanged,
                                              whenChannelReadComplete;
-        private ChannelReadAction            whenChannelRead;
-        private ChannelExceptionAction       whenExceptionCaught;
+        private ChannelReadAction whenChannelRead;
+        private ChannelExceptionAction whenExceptionCaught;
         private ActionableIdleStateHandler   readIdleStateHandler;
         private ActionableReadTimeoutHandler readTimeoutHandler;
 
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
-            this.readIdleStateHandler = ActionableIdleStateHandler.newReadIdle(idleSeconds, readIdleAct);
+            this.readIdleStateHandler = ActionableIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
             return this;
         }
 
         public final InboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.readTimeoutHandler =
-                new ActionableReadTimeoutHandler(timeoutSeconds)
-                    .timeoutAction(timeoutAction);
+            this.readTimeoutHandler = new ActionableReadTimeoutHandler(timeoutSeconds, timeoutAction);
             return this;
         }
 
@@ -232,16 +230,16 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         private ChannelHandlerContextAction   whenRead, whenFlush;
         private ChannelWriteAction whenWrite;
         private ChannelExceptionAction        whenExceptionCaught;
-        private ActionableIdleStateHandler writeIdleStateHandler;
+        private ActionableIdleStateHandler    writeIdleStateHandler;
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
-            this.writeIdleStateHandler = ActionableIdleStateHandler.newWriteIdle(idleSeconds, writeIdleAct);
+            this.writeIdleStateHandler = ActionableIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
             return this;
         }
 
         public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds).timeoutAction(timeoutAction);
+            this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds, timeoutAction);
             return this;
         }
 

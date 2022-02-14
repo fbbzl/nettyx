@@ -8,7 +8,6 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.AttributeKey;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.client.Client;
 import org.fz.nettyx.support.ChannelStorage;
 
 /**
@@ -70,13 +69,13 @@ public abstract class MultiChannelClient<K> extends TcpClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (Client.gracefullyCloseable(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key);
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Client.gracefullyCloseable(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.closeChannel(key, promise);
         }
     }
@@ -90,8 +89,8 @@ public abstract class MultiChannelClient<K> extends TcpClient {
     public void send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
-        if (notReady(channel)) {
-            log.debug("connection has not been initialized, message will be discard: {}", message);
+        if (inActive(channel)) {
+            log.debug("channel not in active status, message will be discard: {}", message);
             return;
         }
 

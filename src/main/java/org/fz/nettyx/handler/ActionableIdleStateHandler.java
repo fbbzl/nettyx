@@ -32,32 +32,32 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
     public long getWriterIdleSeconds() { return super.getWriterIdleTimeInMillis() / 1000; }
     public long getAllIdleSeconds()    { return super.getAllIdleTimeInMillis()    / 1000; }
 
-    public static ActionableIdleStateHandler newReadIdle(int seconds, ChannelHandlerContextAction idleAction) {
+    public static ActionableIdleStateHandler newReadIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
         return new ActionableIdleStateHandler(seconds, 0, 0).readIdleAction(idleAction);
     }
 
-    public static ActionableIdleStateHandler newWriteIdle(int seconds, ChannelHandlerContextAction idleAction) {
+    public static ActionableIdleStateHandler newWriteIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
         return new ActionableIdleStateHandler(0, seconds, 0).writeIdleAction(idleAction);
     }
 
-    public static ActionableIdleStateHandler newAllIdle(int seconds, ChannelHandlerContextAction idleAction) {
+    public static ActionableIdleStateHandler newAllIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
         return new ActionableIdleStateHandler(0, 0, seconds).allIdleAction(idleAction);
     }
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (ChannelEvents.isReadIdle(evt)) {
-            log.warn("have been in read-idle state for [{}] seconds on address: [{}]", getReaderIdleSeconds(), ctx.channel().remoteAddress());
+            log.warn("have been in read-idle state for [{}] seconds on [{}]", getReaderIdleSeconds(), ctx.channel().remoteAddress());
             act(readIdleAction, ctx);
         }
         else
         if (ChannelEvents.isWriteIdle(evt)) {
-            log.warn("have been in write-idle state for [{}] seconds on address: [{}]", getWriterIdleSeconds(), ctx.channel().remoteAddress());
+            log.warn("have been in write-idle state for [{}] seconds on [{}]", getWriterIdleSeconds(), ctx.channel().remoteAddress());
             act(this.writeIdleAction(), ctx);
         }
         else
         if (ChannelEvents.isAllIdle(evt)) {
-            log.warn("have been in all-idle state for [{}] seconds on address: [{}]", getAllIdleSeconds(), ctx.channel().remoteAddress());
+            log.warn("have been in all-idle state for [{}] seconds on [{}]", getAllIdleSeconds(), ctx.channel().remoteAddress());
             act(this.writeIdleAction(), ctx);
         }
 

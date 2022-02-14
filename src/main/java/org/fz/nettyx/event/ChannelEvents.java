@@ -6,8 +6,7 @@ import static io.netty.handler.timeout.IdleState.WRITER_IDLE;
 
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
 /**
  * Channel Event tool
@@ -17,8 +16,8 @@ import lombok.NoArgsConstructor;
  * @since 2021/5/13 9:10
  */
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ChannelEvents {
+@UtilityClass
+public class ChannelEvents {
 
     public static boolean isReadIdle(Object evt) {
         return isAssignedState(evt, READER_IDLE);
@@ -32,12 +31,35 @@ public final class ChannelEvents {
         return isAssignedState(evt, ALL_IDLE);
     }
 
-    public static boolean isAssignedState(Object evt, IdleState state) {
-        if (evt instanceof IdleStateEvent) {
-            IdleStateEvent event = (IdleStateEvent) evt;
-            return event.state() == state;
-        }
-        return false;
+    public static boolean isReadIdle(IdleStateEvent evt) {
+        return isAssignedState(evt, READER_IDLE);
+    }
+
+    public static boolean isWriteIdle(IdleStateEvent evt) {
+        return isAssignedState(evt, WRITER_IDLE);
+    }
+
+    public static boolean isAllIdle(IdleStateEvent evt) {
+        return isAssignedState(evt, ALL_IDLE);
+    }
+
+    public static boolean isReadIdle(IdleState state) {
+        return state == READER_IDLE;
+    }
+
+    public static boolean isWriteIdle(IdleState state) {
+        return state == WRITER_IDLE;
+    }
+
+    public static boolean isAllIdle(IdleState state) {
+        return state == ALL_IDLE;
+    }
+
+    public static boolean isAssignedState(Object obj, IdleState state) {
+        if (obj instanceof IdleStateEvent) return ((IdleStateEvent) obj).state() == state;
+        else
+        if (obj instanceof IdleState)      return obj == state;
+        else                               return false;
     }
 
 }
