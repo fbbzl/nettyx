@@ -33,7 +33,7 @@ public abstract class Client {
     protected boolean writable(Channel channel)   { return channel != null && channel.isWritable();   }
 
     protected boolean unRegister(Channel channel) { return !register(channel); }
-    protected boolean unOpen(Channel channel)    { return !open(channel);     }
+    protected boolean unOpen(Channel channel)     { return !open(channel);     }
     protected boolean unWritable(Channel channel) { return !writable(channel); }
     protected boolean inActive(Channel channel)   { return !active(channel);   }
 
