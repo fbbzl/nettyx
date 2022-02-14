@@ -49,10 +49,10 @@ public class SslContextFactory {
         public SSLContext getServerContext(String path, char[] pwd) {
             try (InputStream in = new FileInputStream(path)) {
 
-                KeyStore keyStore = KeyStore.getInstance("JKS");
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
 
-                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 keyManagerFactory.init(keyStore, pwd);
 
                 SSLContext serverSslContext = SSLContext.getInstance(protocol);
@@ -75,10 +75,10 @@ public class SslContextFactory {
          */
         public SSLContext getClientContext(String path, char[] pwd) {
             try (InputStream in = new FileInputStream(path)) {
-                KeyStore keyStore = KeyStore.getInstance("JKS");
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
 
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(keyStore);
 
                 SSLContext clientSslContext = SSLContext.getInstance(protocol);
@@ -136,16 +136,16 @@ public class SslContextFactory {
                 InputStream in      = new FileInputStream(path);
                 InputStream trustIn = new FileInputStream(trustPath)) {
 
-                KeyStore keyStore = KeyStore.getInstance("JKS");
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
 
-                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 keyManagerFactory.init(keyStore, pwd);
 
-                KeyStore trustKeyStore = KeyStore.getInstance("JKS");
+                KeyStore trustKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 trustKeyStore.load(trustIn, trustPwd);
 
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustKeyStore);
 
                 SSLContext sslContext = SSLContext.getInstance(protocol);
