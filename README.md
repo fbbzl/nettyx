@@ -44,7 +44,7 @@ envet                                对netty事件提供支持
   ---ChannelEvents                     Channel事件对象工具
 exception                           异常扩展
   ---ClosingChannelException           配合channel advice, 可以通过抛出该异常子类来关闭channel
-function                            包含了充足的函数式接口, 为函数式编程提供支持                     
+function                            包含了充足的函数式接口, 为nettyx函数式编程提供支持                     
   ---Action                            
   ---ChannelAction                      
   ---ChannelBindAction
