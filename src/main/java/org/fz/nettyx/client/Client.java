@@ -27,12 +27,12 @@ public abstract class Client {
         return getBootstrap().clone();
     }
 
-    public boolean ready(Channel channel) {
+    public boolean active(Channel channel) {
         return channel != null && channel.isActive();
     }
 
-    public boolean notReady(Channel channel) {
-        return !ready(channel);
+    public boolean inActive(Channel channel) {
+        return !active(channel);
     }
 
     protected void shutdownGracefully() {
