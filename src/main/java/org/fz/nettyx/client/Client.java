@@ -27,18 +27,19 @@ public abstract class Client {
         return getBootstrap().clone();
     }
 
-    public boolean active(Channel channel) {
-        return channel != null && channel.isActive();
-    }
+    protected boolean register(Channel channel)   { return channel != null && channel.isRegistered(); }
+    protected boolean open(Channel channel)       { return channel != null && channel.isOpen();       }
+    protected boolean active(Channel channel)     { return channel != null && channel.isActive();     }
+    protected boolean writable(Channel channel)   { return channel != null && channel.isWritable();   }
 
-    public boolean inActive(Channel channel) {
-        return !active(channel);
-    }
+    protected boolean unRegister(Channel channel) { return !register(channel); }
+    protected boolean unOpen(Channel channel)     { return !open(channel);     }
+    protected boolean unWritable(Channel channel) { return !writable(channel); }
+    protected boolean inActive(Channel channel)   { return !active(channel);   }
 
     protected void shutdownGracefully() {
         getEventLoopGroup().shutdownGracefully();
     }
-
     public static boolean gracefullyCloseable(Channel channel) {
         return
             channel != null
