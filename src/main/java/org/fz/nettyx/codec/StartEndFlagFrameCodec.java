@@ -71,23 +71,15 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         private final ByteBuf startFlag, endFlag;
         private final boolean startEndStripDelimiter;
 
-        static ByteBuf getActualDelimiter(ByteBuf startFlag, ByteBuf endFlag) {
-            return Unpooled.copiedBuffer(endFlag, startFlag);
-        }
-
-        static ByteBuf getActualDelimiter(ByteBuf startEndSameFlag) {
-            return Unpooled.copiedBuffer(startEndSameFlag, startEndSameFlag);
-        }
-
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag) {
-            super(maxFrameLength, true, getActualDelimiter(startEndSameFlag));
+            super(maxFrameLength, true, startEndSameFlag);
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
-            super(maxFrameLength, true, getActualDelimiter(startFlag, endFlag));
+            super(maxFrameLength, true, startFlag, endFlag);
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = startFlag;
@@ -95,14 +87,14 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         public StartEndFlagFrameDecoder(boolean stripDelimiter, ByteBuf startEndSameFlag) {
-            super(DEFAULT_MAX_FRAME_LENGTH, true, getActualDelimiter(startEndSameFlag));
+            super(DEFAULT_MAX_FRAME_LENGTH, true, startEndSameFlag);
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
-            super(DEFAULT_MAX_FRAME_LENGTH, true, getActualDelimiter(startFlag, endFlag));
+            super(DEFAULT_MAX_FRAME_LENGTH, true, startFlag, endFlag);
 
             this.startEndStripDelimiter = stripDelimiter;
             this.startFlag = startFlag;
