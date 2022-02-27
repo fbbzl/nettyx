@@ -21,21 +21,31 @@ import org.fz.nettyx.function.ChannelExceptionAction;
 public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
 
     private final ChannelExceptionAction timeoutAction;
+    private final boolean fireNext;
 
     public ActionableWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-        super(timeoutSeconds);
-        this.timeoutAction = timeoutAction;
+        this(timeoutSeconds, timeoutAction, true);
     }
 
     public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction) {
+        this(timeout, unit, timeoutAction, true);
+    }
+
+    public ActionableWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction, boolean fireNext) {
+        this(timeoutSeconds, TimeUnit.SECONDS, timeoutAction, fireNext);
+    }
+
+    public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
+        this.fireNext = fireNext;
     }
 
     @Override
     protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
         timeoutAction.act(ctx, WriteTimeoutException.INSTANCE);
-        super.writeTimedOut(ctx);
+
+        if (fireNext) super.writeTimedOut(ctx);
     }
 
     @Override

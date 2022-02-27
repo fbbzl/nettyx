@@ -22,6 +22,7 @@ import org.fz.nettyx.function.ChannelHandlerContextAction;
 public class ActionableIdleStateHandler extends IdleStateHandler {
 
     private ChannelHandlerContextAction readIdleAction, writeIdleAction, allIdleAction;
+    private final boolean fireNext;
 
     @Override
     public boolean isSharable() {
@@ -61,7 +62,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
             act(this.writeIdleAction(), ctx);
         }
 
-        super.channelIdle(ctx, evt);
+        if (fireNext) super.channelIdle(ctx, evt);
     }
 
     static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
@@ -69,14 +70,28 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
     }
 
     public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
-        super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
+        this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, true);
     }
 
     public ActionableIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
-        super(readerIdleTime, writerIdleTime, allIdleTime, unit);
+        this(false, readerIdleTime, writerIdleTime, allIdleTime, unit, true);
+    }
+
+    public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds, boolean fireNext) {
+        this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, TimeUnit.SECONDS, fireNext);
+    }
+
+    public ActionableIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
+        this(false, readerIdleTime, writerIdleTime, allIdleTime, unit, fireNext);
     }
 
     public ActionableIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
-        super(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit);
+        this(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit, true);
     }
+
+    public ActionableIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
+        super(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit);
+        this.fireNext = fireNext;
+    }
+
 }
