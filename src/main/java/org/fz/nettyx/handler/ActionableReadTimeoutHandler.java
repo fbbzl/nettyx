@@ -21,21 +21,31 @@ import org.fz.nettyx.function.ChannelExceptionAction;
 public class ActionableReadTimeoutHandler extends ReadTimeoutHandler {
 
     private final ChannelExceptionAction timeoutAction;
+    private final boolean fireNext;
 
     public ActionableReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-        super(timeoutSeconds);
-        this.timeoutAction = timeoutAction;
+        this(timeoutSeconds, timeoutAction, true);
     }
 
     public ActionableReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction) {
+        this(timeout, unit, timeoutAction, true);
+    }
+
+    public ActionableReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction, boolean fireNext) {
+        this(timeoutSeconds, TimeUnit.SECONDS, timeoutAction, fireNext);
+    }
+
+    public ActionableReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
+        this.fireNext = fireNext;
     }
 
     @Override
     protected void readTimedOut(ChannelHandlerContext ctx) throws Exception {
         this.timeoutAction.act(ctx, ReadTimeoutException.INSTANCE);
-        super.readTimedOut(ctx);
+
+        if (fireNext) super.readTimedOut(ctx);
     }
 
     @Override
