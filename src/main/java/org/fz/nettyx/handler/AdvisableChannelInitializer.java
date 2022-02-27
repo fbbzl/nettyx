@@ -211,8 +211,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
 
         @Override
         public final void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-            log.debug("channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress());
+            log.debug("channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
             act(whenWritabilityChanged, ctx);
             super.channelWritabilityChanged(ctx);
         }
@@ -224,11 +223,11 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
-        private ChannelBindAction whenBind;
-        private ChannelConnectAction whenConnect;
-        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        private ChannelBindAction             whenBind;
+        private ChannelConnectAction          whenConnect;
+        private ChannelPromiseAction          whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction   whenRead, whenFlush;
-        private ChannelWriteAction whenWrite;
+        private ChannelWriteAction            whenWrite;
         private ChannelExceptionAction        whenExceptionCaught;
         private ActionableIdleStateHandler    writeIdleStateHandler;
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
