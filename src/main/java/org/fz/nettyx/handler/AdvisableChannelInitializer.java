@@ -46,8 +46,8 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
 
     private final InboundAdvice  inboundAdvice;
     private final OutboundAdvice outboundAdvice;
-    private final InboundExceptionHandler inboundExceptionHandler  = new InboundExceptionHandler();
-    private final OutboundExceptionHandler outboundExceptionHandler = new OutboundExceptionHandler();
+    private final InboundExceptionHandler    inboundExceptionHandler  = new InboundExceptionHandler();
+    private final OutboundExceptionHandler   outboundExceptionHandler = new OutboundExceptionHandler();
     private       ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
     private       ReadTimeoutHandler         readTimeoutHandler;
     private       WriteTimeoutHandler        writeTimeoutHandler;
