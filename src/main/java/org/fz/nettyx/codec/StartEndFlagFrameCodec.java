@@ -104,11 +104,6 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            super.channelRead(ctx, msg);
-        }
-
-        @Override
         public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
 
@@ -141,11 +136,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
 
         @Override
         public void encode(ChannelHandlerContext ctx, ByteBuf applicationDataBytes, ByteBuf byteBuf) {
-            byteBuf.writeBytes(wrapStartEndFlags(applicationDataBytes));
-        }
-
-        private ByteBuf wrapStartEndFlags(ByteBuf byteBuf) {
-            return Unpooled.wrappedBuffer(startFlag.duplicate(), byteBuf, endFlag.duplicate());
+            byteBuf.writeBytes(Unpooled.wrappedBuffer(startFlag.duplicate(), byteBuf, endFlag.duplicate()));
         }
     }
 
