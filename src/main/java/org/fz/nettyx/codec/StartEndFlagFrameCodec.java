@@ -63,13 +63,15 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         super(decoder, encoder);
     }
 
-    /**
-     * decoder
-     */
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
         private final ByteBuf startFlag, endFlag;
         private final boolean startEndStripDelimiter;
+
+        @Override
+        public final boolean isSharable() {
+            return false;
+        }
 
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag) {
             super(maxFrameLength, true, startEndSameFlag);
@@ -102,24 +104,31 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            super.channelRead(ctx, msg);
+        }
+
+        @Override
         public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
 
             if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0) {
-                return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag, decodedByteBuf, endFlag);
+                return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag.duplicate(), decodedByteBuf, endFlag.duplicate());
             }
 
             return null;
         }
     }
 
-    /**
-     * encoder
-     */
     public static class StartEndFlagFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final ByteBuf startFlag;
         private final ByteBuf endFlag;
+
+        @Override
+        public final boolean isSharable() {
+            return false;
+        }
 
         public StartEndFlagFrameEncoder(ByteBuf startEndSameFlag) {
             this.startFlag = this.endFlag = startEndSameFlag;
@@ -136,7 +145,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         private ByteBuf wrapStartEndFlags(ByteBuf byteBuf) {
-            return Unpooled.wrappedBuffer(startFlag, byteBuf, endFlag);
+            return Unpooled.wrappedBuffer(startFlag.duplicate(), byteBuf, endFlag.duplicate());
         }
     }
 
