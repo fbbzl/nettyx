@@ -2,8 +2,10 @@ package org.fz.nettyx.client.tcp;
 
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultChannelPromise;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2021 /5/6 15:22
  */
 @Slf4j
-public abstract class SingleChannelClient extends TcpClient {
+public abstract class SingleTcpChannelClient extends TcpClient {
 
     protected Channel channel;
 
@@ -54,18 +56,17 @@ public abstract class SingleChannelClient extends TcpClient {
      */
     public abstract void connect(SocketAddress address);
 
-    public void send(Object message) {
+    public ChannelPromise send(Object message) {
         if (this.inActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
-            return;
+
+            return new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
         }
 
         try {
-            channel.writeAndFlush(message);
-
-            log.debug("has send message to: [{}]", channel.remoteAddress());
+            return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
-            log.error("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
+            throw new ChannelException("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
         }
     }
 }

@@ -2,9 +2,11 @@ package org.fz.nettyx.client.rxtx;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
@@ -84,19 +86,18 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * @param channelKey the channel channelKey
      * @param message the message
      */
-    public void send(K channelKey, Object message) {
+    public ChannelPromise send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
         if (inActive(channel)) {
             log.debug("comm channel not in active status, message will be discard: {}", message);
-            return;
+            return new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
         }
 
         try {
-            channel.writeAndFlush(message);
-            log.debug("has send message to comm-port: [{}]", channel.remoteAddress());
+            return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
-            log.error("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
+            throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
         }
     }
 
