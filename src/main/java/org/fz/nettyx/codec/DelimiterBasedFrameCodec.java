@@ -35,7 +35,7 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
         }
 
         private ByteBuf appendDelimiter(ByteBuf byteBuf) {
-            return Unpooled.wrappedBuffer(byteBuf, delimiter);
+            return Unpooled.wrappedBuffer(byteBuf, delimiter.duplicate());
         }
     }
 }
