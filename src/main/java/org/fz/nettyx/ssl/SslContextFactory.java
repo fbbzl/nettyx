@@ -60,7 +60,7 @@ public class SslContextFactory {
 
                 return serverSslContext;
             } catch (Exception serverSslCtxInitException) {
-                throw new RuntimeException("init server ssl context error, path is [" + path + "]", serverSslCtxInitException);
+                throw new SecurityException("init server ssl context error, path is [" + path + "]", serverSslCtxInitException);
             }
         }
 
@@ -86,7 +86,7 @@ public class SslContextFactory {
 
                 return clientSslContext;
             } catch (Exception clientSslCtxInitException) {
-                throw new RuntimeException("init client ssl context error, path is [" + path + "]", clientSslCtxInitException);
+                throw new SecurityException("init client ssl context error, path is [" + path + "]", clientSslCtxInitException);
             }
         }
     }
@@ -108,7 +108,7 @@ public class SslContextFactory {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
             } catch (Exception serverSslContextException) {
-                throw new RuntimeException("init server ssl context failed", serverSslContextException);
+                throw new SecurityException("init server ssl context failed", serverSslContextException);
             }
         }
 
@@ -116,7 +116,7 @@ public class SslContextFactory {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
             } catch (Exception clientSslContextException) {
-                throw new RuntimeException("init client ssl context failed", clientSslContextException);
+                throw new SecurityException("init client ssl context failed", clientSslContextException);
             }
         }
 
@@ -153,7 +153,7 @@ public class SslContextFactory {
 
                 return sslContext;
             } catch (Exception sslContextInitException) {
-                throw new RuntimeException(sslContextInitException);
+                throw new SecurityException(sslContextInitException);
             }
         }
     }
