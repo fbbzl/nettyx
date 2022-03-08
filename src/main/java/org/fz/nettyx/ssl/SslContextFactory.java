@@ -10,6 +10,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -158,4 +159,83 @@ public class SslContextFactory {
         }
     }
 
+    /**
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022/1/21 16:09
+     */
+
+    @Setter
+    public static class Ssl {
+
+        private static final int DEFAULT_HANDSHAKE_TIMEOUT_SECONDS = 5;
+
+        /**
+         * if enable ssl
+         */
+        private boolean enable;
+
+        /**
+         * key store path
+         */
+        private String path;
+
+        /**
+         * key store password
+         */
+        private String password;
+
+        /**
+         * trust path
+         */
+        private Trust trust;
+
+        /**
+         * Handshake Timeout Seconds
+         */
+        private int handshakeTimeoutSeconds = DEFAULT_HANDSHAKE_TIMEOUT_SECONDS;
+
+        public boolean enable() {
+            return enable;
+        }
+
+        public String path() {
+            return path;
+        }
+
+        public String pwd() {
+            return password;
+        }
+
+        public Trust trust() {
+            return trust;
+        }
+
+        public int handshakeTimeoutSeconds() {
+            return handshakeTimeoutSeconds;
+        }
+
+        @Setter
+        public static class Trust {
+
+            /**
+             * key file path
+             */
+            private String path;
+
+            /**
+             * key password
+             */
+            private String password;
+
+            public String path() {
+                return path;
+            }
+
+            public String pwd() {
+                return password;
+            }
+
+        }
+    }
 }
