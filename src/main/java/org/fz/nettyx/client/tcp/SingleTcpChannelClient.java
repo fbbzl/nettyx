@@ -59,8 +59,7 @@ public abstract class SingleTcpChannelClient extends TcpClient {
     public ChannelPromise send(Object message) {
         if (this.inActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
-
-            return new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
+            return channel == null ? null : new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
         }
 
         try {

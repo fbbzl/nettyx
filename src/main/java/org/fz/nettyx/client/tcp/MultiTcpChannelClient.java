@@ -93,7 +93,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
 
         if (inActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
-            return new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
+            return channel == null ? null : new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
         }
 
         try {
