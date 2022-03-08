@@ -10,7 +10,7 @@ import io.netty.channel.DefaultChannelPromise;
 import io.netty.util.AttributeKey;
 import java.net.SocketAddress;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.support.ChannelStorage;
+import org.fz.nettyx.ChannelStorage;
 
 /**
  * The type Multi channel client.

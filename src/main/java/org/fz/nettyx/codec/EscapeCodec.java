@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
-import org.fz.nettyx.support.HexBins;
+import org.fz.nettyx.HexBins;
 
 /**
  * @author fengbinbin
