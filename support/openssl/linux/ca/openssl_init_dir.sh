@@ -6,16 +6,29 @@
 #                                                                                #
 ##################################################################################
 
+openssl_ca=/etc/pki/CA
+
+#dir for openssl
+# issued certificate
+mkdir -p ${openssl_ca}/certs
+# ca new certificate
+mkdir -p ${openssl_ca}/newcerts
+# private key
+mkdir -p ${openssl_ca}/private
+# revoked certificate
+mkdir -p ${openssl_ca}/crl
+# penSSl defined issued certificate db
+touch ${openssl_ca}/index.txt
+# certificate serial number
+echo 01 > ${openssl_ca}/serial
+
+#dir for s5
 openssl_dir=/usr/local/gdi/s5/openssl
 
-openssl_cnf=/etc/pki/CA/openssl_s5.cnf
+root_dir=${openssl_dir}/root
+client_dir=${openssl_dir}/client
+server_dir=${openssl_dir}/server
 
-server_key=${openssl_dir}/server/s5_server.key
-server_csr=${openssl_dir}/server/s5_server.csr
-
-key_pass=123456
-key_length=2048
-
-openssl genrsa -des3 -passout pass:${key_pass} -out ${server_key} ${key_length}
-
-openssl req -new -key ${server_key} -out ${server_csr} -config ${openssl_cnf}
+mkdir -p ${root_dir}
+mkdir -p ${client_dir}
+mkdir -p ${server_dir}

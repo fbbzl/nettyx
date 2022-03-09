@@ -14,7 +14,7 @@ Refers:
 execute the command with the following steps:
 
 OpenSslConf:
-   1. find / -name openssl.cnf OR use cnf/openssl.cnf as template
+   1. find / -name openssl.cnf OR use cnf/openssl_s5.cnf as template
    2. config this openssl.cnf by business
 
 Ca:
