@@ -50,6 +50,8 @@ public class OpenSslContextFactory {
     @Setter
     public static class OpenSsl {
 
+        private static final int DEFAULT_HANDSHAKE_TIMEOUT_SECONDS = 5;
+
         private boolean enable;
 
         private String cert;
@@ -57,6 +59,8 @@ public class OpenSslContextFactory {
         private String key;
 
         private String root;
+
+        private int handshakeTimeoutSeconds = DEFAULT_HANDSHAKE_TIMEOUT_SECONDS;
 
         public boolean enable() {
             return enable;
@@ -72,6 +76,10 @@ public class OpenSslContextFactory {
 
         public String root() {
             return root;
+        }
+
+        public int handshakeTimeoutSeconds() {
+            return handshakeTimeoutSeconds;
         }
     }
 }
