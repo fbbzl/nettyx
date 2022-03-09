@@ -1,15 +1,17 @@
 ##################################################################################
 #                                                                                #
-# author: 503280366                                                              #
+# author: fbb                                                                    #
 # since: 2022/3/07                                                               #
 # convert to pkcs8                                                               #
 #                                                                                #
 ##################################################################################
 
-openssl_dir=/usr/local/gdi/s5/openssl
+app_name=xxx
+app=/usr/local/app/${app_name}
+app_openssl_dir=${app}/openssl
 
-client_key=${openssl_dir}/client/s5_client.key
+server_key=${app_openssl_dir}/server/${app_name}_server.key
 
-client_pkcs8_key=${openssl_dir}/client/s5_pkcs8_rsa_client.key
+server_pkcs8_key=${app_openssl_dir}/server/${app_name}_pkcs8_rsa_server.key
 
-openssl pkcs8 -topk8 -in ${client_key} -out ${client_pkcs8_key} -nocrypt
+openssl pkcs8 -topk8 -in ${server_key} -out ${server_pkcs8_key} -nocrypt

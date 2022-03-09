@@ -1,18 +1,21 @@
 ##################################################################################
 #                                                                                #
-# author: 503280366                                                              #
+# author: fbb                                                                    #
 # since: 2022/3/07                                                               #
 # the script of init the openssl ca root                                         #
 #                                                                                #
 ##################################################################################
 
-openssl_dir=/usr/local/gdi/s5/openssl
+os_openssl_ca=/etc/pki/CA
+os_openssl_ca_cnf=${os_openssl_ca}/openssl.cnf
 
-openssl_cnf=/etc/pki/CA/openssl_s5.cnf
+app_name=xxx
+app=/usr/local/app/${app_name}
+app_openssl_dir=${app}/openssl
 
-ca_root_key=${openssl_dir}/root/ca_root.key
-ca_root_crt=${openssl_dir}/root/ca_root.crt
+ca_root_key=${app_openssl_dir}/root/ca_root.key
+ca_root_crt=${app_openssl_dir}/root/ca_root.crt
 #20 years
 valid_days=7300
 
-openssl req -new -x509 -keyout ${ca_root_key} -out ${ca_root_crt} -config ${openssl_cnf} -days ${valid_days}
+openssl req -new -x509 -keyout ${ca_root_key} -out ${ca_root_crt} -config ${os_openssl_ca_cnf} -days ${valid_days}
