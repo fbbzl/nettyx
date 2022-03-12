@@ -16,14 +16,24 @@ public abstract class RxtxClient extends Client {
     /**
      * The Oio Event loop group.
      */
-    protected final EventLoopGroup eventLoopGroup = new OioEventLoopGroup();
+    protected final EventLoopGroup eventLoopGroup;
 
-    private final Bootstrap bootstrap = new Bootstrap()
-        .group(eventLoopGroup).channelFactory(() -> {
-            RxtxChannel rxtxChannel = new RxtxChannel();
-            this.rxtxConfig(rxtxChannel.config());
-            return rxtxChannel;
-        });
+    private final Bootstrap bootstrap;
+
+    protected RxtxClient() {
+        this.eventLoopGroup = this.rxtxEventLoopGroup();
+
+        this.bootstrap = new Bootstrap()
+            .group(eventLoopGroup).channelFactory(() -> {
+                RxtxChannel rxtxChannel = new RxtxChannel();
+                this.rxtxConfig(rxtxChannel.config());
+                return rxtxChannel;
+            });
+    }
+
+    protected EventLoopGroup rxtxEventLoopGroup() {
+        return new OioEventLoopGroup();
+    }
 
     protected abstract void rxtxConfig(RxtxChannelConfig rxtxChannel);
 

@@ -12,9 +12,19 @@ import org.fz.nettyx.client.Client;
  **/
 public abstract class TcpClient extends Client {
 
-    protected final EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+    protected final EventLoopGroup eventLoopGroup;
 
-    private final Bootstrap bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+    private final Bootstrap bootstrap;
+
+    protected TcpClient() {
+        this.eventLoopGroup = eventLoopGroup();
+
+        this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+    }
+
+    protected EventLoopGroup eventLoopGroup() {
+        return new NioEventLoopGroup();
+    }
 
     @Override
     public EventLoopGroup getEventLoopGroup() {
