@@ -16,19 +16,34 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class Server {
 
     private final EventLoopGroup
-        parentEventLoopGroup = new NioEventLoopGroup(),
-        childEventLoopGroup  = new NioEventLoopGroup();
+        parentEventLoopGroup,
+        childEventLoopGroup;
 
-    private final ServerBootstrap serverBootstrap =
-        new ServerBootstrap()
-            .group(parentEventLoopGroup, childEventLoopGroup)
-            .channel(NioServerSocketChannel.class);
+    private final ServerBootstrap serverBootstrap;
 
-    public EventLoopGroup parentEventLoopGroup() {
+    protected Server() {
+        this.childEventLoopGroup = childEventLoopGroup();
+        this.parentEventLoopGroup = parentEventLoopGroup();
+
+        this.serverBootstrap =
+            new ServerBootstrap()
+                .group(parentEventLoopGroup, childEventLoopGroup)
+                .channel(NioServerSocketChannel.class);
+    }
+
+    protected EventLoopGroup parentEventLoopGroup() {
+        return new NioEventLoopGroup();
+    }
+
+    protected EventLoopGroup childEventLoopGroup() {
+        return new NioEventLoopGroup();
+    }
+
+    public EventLoopGroup getParentEventLoopGroup() {
         return this.parentEventLoopGroup;
     }
 
-    public EventLoopGroup childEventLoopGroup() {
+    public EventLoopGroup getChildEventLoopGroup() {
         return this.childEventLoopGroup;
     }
 
@@ -49,19 +64,19 @@ public abstract class Server {
     }
 
     public <T> ScheduledFuture<T> schedule(Runnable command, long delay, TimeUnit unit) {
-        return (ScheduledFuture<T>) parentEventLoopGroup().schedule(command, delay, unit);
+        return (ScheduledFuture<T>) getParentEventLoopGroup().schedule(command, delay, unit);
     }
 
     public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-        return parentEventLoopGroup().schedule(callable, delay, unit);
+        return getParentEventLoopGroup().schedule(callable, delay, unit);
     }
 
     public <T> ScheduledFuture<T> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        return (ScheduledFuture<T>) parentEventLoopGroup().scheduleAtFixedRate(command, initialDelay, period, unit);
+        return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
     public <T> ScheduledFuture<T> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return (ScheduledFuture<T>) parentEventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay, unit);
+        return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
 }
