@@ -11,7 +11,7 @@ work_dir=.
 
 #move cnf-temp to target
 mkdir -p ${os_openssl_ca}
-mv -f ${work_dir}/cnf/openssl.cnf ${os_openssl_ca}/
+cp -f ${work_dir}/cnf/openssl.cnf ${os_openssl_ca}/
 
 #init openssl env-dir
 sh ${work_dir}/openssl_init_dir.sh
