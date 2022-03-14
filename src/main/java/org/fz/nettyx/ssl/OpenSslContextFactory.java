@@ -27,16 +27,16 @@ public class OpenSslContextFactory {
 
     public static SslContext getServerSslContext(String certChainPath, String keyPath, String rootPath) throws SSLException {
         File certChainFile = new File(certChainPath),
-            keyFile = new File(keyPath),
-            rootFile = new File(rootPath);
+             keyFile       = new File(keyPath),
+             rootFile      = new File(rootPath);
 
         return SslContextBuilder.forServer(certChainFile, keyFile).trustManager(rootFile).clientAuth(ClientAuth.REQUIRE).build();
     }
 
     public static SslContext getClientSslContext(String certChainPath, String keyPath, String rootPath) throws SSLException {
         File certChainFile = new File(certChainPath),
-            keyFile = new File(keyPath),
-            rootFile = new File(rootPath);
+             keyFile       = new File(keyPath),
+             rootFile      = new File(rootPath);
 
         return SslContextBuilder.forClient().keyManager(certChainFile, keyFile).trustManager(rootFile).build();
     }
