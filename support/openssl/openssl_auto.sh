@@ -14,9 +14,9 @@ mkdir -p ${os_openssl_ca}
 cp -f ${work_dir}/cnf/openssl.cnf ${os_openssl_ca}/
 
 #init openssl env-dir
-echo '###########################################'
-echo '# Initializing OpenSSL Workin Directories #'
-echo '###########################################'
+echo '############################################'
+echo '# Initializing OpenSSL Working Directories #'
+echo '############################################'
 sh ${work_dir}/openssl_init_dir.sh
 
 #init ca
