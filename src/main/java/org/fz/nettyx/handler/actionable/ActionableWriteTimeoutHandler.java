@@ -1,4 +1,4 @@
-package org.fz.nettyx.handler;
+package org.fz.nettyx.handler.actionable;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.WriteTimeoutException;
