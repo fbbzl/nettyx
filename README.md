@@ -32,8 +32,8 @@ client                              提供client端基础实现
      ---SingleRxtxChannelClient        单channel串口通信
   ---tcp                            tcp封装
      ---TcpClient                      tcp通信顶级父类
-     ---MultiChannelClient             多Channel的Client, 使用key检索对应channel
-     ---SingleChannelClient            单Channel的Client
+     ---MultiTcpChannelClient          多Channel的Client, 使用key检索对应channel
+     ---SingleTcpChannelClient         单Channel的Client
 codec                               提供了一些基础的编解码器
   ---DelimiterBasedFrameCodec          基于分隔符codec
   ---EscapeCodec                       协议敏感字替换
