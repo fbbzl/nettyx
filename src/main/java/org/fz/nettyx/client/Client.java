@@ -10,6 +10,46 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * The generic NioTcpClient.
+ * you may use like the following code:
+ *
+ *     public void connect(SocketAddress address) {
+ *         log.info("connecting to [{}]...", address);
+ *
+ *         ChannelFutureListener connectListener = new ActionableChannelFutureListener()
+ *             .whenSuccess(connectSuccessAction(address))
+ *             .whenFailure(connectFailureAction(address));
+ *
+ *         super.newBootstrap()
+ *             .handler(channelInitializer())
+ *             .connect(address)
+ *             .addListeners(connectListener);
+ *     }
+ *
+ *     private ChannelInitializer<NioSocketChannel> channelInitializer() {
+ *         InboundAdvice inboundAdvice = new InboundAdvice()
+ *             .whenChannelActive(channelActiveAction())
+ *             .whenChannelInactive(channelInactiveAction())
+ *             .whenChannelRead(channelReadAction())
+ *             .whenReadIdle(net.readIdleSeconds(), readIdleAction());
+ *
+ *         return new AdvisableChannelInitializer<NioSocketChannel>(inboundAdvice) {
+ *             @Override
+ *             protected void addHandlers(NioSocketChannel channel) {
+ *                 channel.pipeline()
+ *                     // in  out
+ *                     // ▼   ▲  remove start and end flag
+ *                     .addLast(new StartEndFlagFrameCodec(BytesKit.le.fromByteValue((byte) 0x7e)))
+ *                     // ▼   ▲  deal control character and recover application data
+ *                     .addLast(new BitResetRecoverCodec())
+ *                     // ▼   ▲  do check sum
+ *                     .addLast(new CheckSumCodec())
+ *                     // ▼   ▲  object serialization
+ *                     .addLast(new DatexRecordCodec())
+ *                     // ▼   ●  do dispatch
+ *                     .addLast(messageDispatcher);
+ *             }
+ *         };
+ *     }
  *
  * @author fengbinbin
  * @version 1.0
