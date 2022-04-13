@@ -15,6 +15,28 @@ import lombok.experimental.UtilityClass;
 
 /**
  * SSL context factory, provide one-way/two-way
+ * you may use like the following code:
+ *     private SslHandler newSslHandler(SocketAddress remoteAddress) {
+ *         if (ssl.enable() && notDevMock(remoteAddress)) {
+ *             SSLEngine sslEngine = SslContextFactory.TWOWAY.getServerContext(ssl.path(), ssl.pwd()).createSSLEngine();
+ *             sslEngine.setUseClientMode(true);
+ *
+ *             SslHandler sslHandler = new SslHandler(sslEngine);
+ *             sslHandler.setHandshakeTimeout(ssl.handshakeTimeoutSeconds(), TimeUnit.SECONDS);
+ *
+ *             GenericFutureListener<Promise<Channel>> handshakeListener =
+ *                 future -> {
+ *                     if (future.isSuccess())  log.info("ssl handshake success, remote address is [{}]", remoteAddress);
+ *                     if (!future.isSuccess()) log.error("ssl handshake failure, remote address is [{}]", remoteAddress, future.cause());
+ *                 };
+ *
+ *             sslHandler.handshakeFuture().addListener(handshakeListener);
+ *             return sslHandler;
+ *         }
+ *         else return null;
+ *     }
+ *
+ *
  * @author fengbinbin
  * @version 1.0
  * @see SslContextFactory#ONEWAY

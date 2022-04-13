@@ -24,6 +24,9 @@ import org.fz.nettyx.function.ChannelReadAction;
 import org.fz.nettyx.function.ChannelWriteAction;
 import org.fz.nettyx.handler.ExceptionHandler.InboundExceptionHandler;
 import org.fz.nettyx.handler.ExceptionHandler.OutboundExceptionHandler;
+import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
+import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
+import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
 
 /**
  * @author fengbinbin
@@ -48,7 +51,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     private final OutboundAdvice outboundAdvice;
     private final InboundExceptionHandler    inboundExceptionHandler  = new InboundExceptionHandler();
     private final OutboundExceptionHandler   outboundExceptionHandler = new OutboundExceptionHandler();
-    private       ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
+    private ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
     private       ReadTimeoutHandler         readTimeoutHandler;
     private       WriteTimeoutHandler        writeTimeoutHandler;
 

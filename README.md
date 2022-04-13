@@ -57,9 +57,10 @@ function                            包含了充足的函数式接口, 为nettyx
   ---ChannelReadAction
   ---ChannelWriteAction
 handler                             提供了一些基础的channel handler实现
-  ---ActionableIdleStateHandler        可操作闲置处理器
-  ---ActionableReadTimeoutHandler      可操作读取超时处理器
-  ---ActionableWriteTimeoutHandler     可操作写超时处理器
+  actionable
+     ---ActionableIdleStateHandler     可操作闲置处理器
+     ---ActionableReadTimeoutHandler   可操作读取超时处理器
+     ---ActionableWriteTimeoutHandler  可操作写超时处理器
   ---AdvisableChannelInitializer       channel建言初始化器
   ---ExceptionHandler                  异常处理器
   ---ChannelInterceptor                channel拦截器, 适用于通信前的握手动作等前置操作
