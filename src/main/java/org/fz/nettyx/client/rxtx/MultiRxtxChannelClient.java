@@ -69,15 +69,11 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (gracefullyCloseable(getChannel(key))) {
-            this.closeChannel(key);
-        }
+        if (gracefullyCloseable(getChannel(key))) this.closeChannel(key);
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (gracefullyCloseable(getChannel(key))) {
-            this.closeChannel(key, promise);
-        }
+        if (gracefullyCloseable(getChannel(key))) this.closeChannel(key, promise);
     }
 
     /**
