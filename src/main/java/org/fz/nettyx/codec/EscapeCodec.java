@@ -62,17 +62,24 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     @NoArgsConstructor
     public static class EscapeMap extends HashMap<ByteBuf, ByteBuf> {
 
+        /**
+         * init with assigned capacity
+         */
         public EscapeMap(int initialCapacity) {
             super(initialCapacity);
         }
 
+        /**
+         * @param real you really wanted data
+         * @param replacement the replacement data
+         */
         public EscapeMap mapping(ByteBuf real, ByteBuf replacement) {
             super.put(real, replacement);
             return this;
         }
 
-        public EscapeMap mapping(String real, String replacement) {
-            super.put(Unpooled.wrappedBuffer(HexBins.decode(real)), Unpooled.wrappedBuffer(HexBins.decode(replacement)));
+        public EscapeMap mapping(String realHex, String replacementHex) {
+            super.put(Unpooled.wrappedBuffer(HexBins.decode(realHex)), Unpooled.wrappedBuffer(HexBins.decode(replacementHex)));
             return this;
         }
 

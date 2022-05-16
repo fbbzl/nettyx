@@ -107,9 +107,8 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
 
-            if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0) {
+            if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0)
                 return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag.duplicate(), decodedByteBuf, endFlag.duplicate());
-            }
 
             return null;
         }
