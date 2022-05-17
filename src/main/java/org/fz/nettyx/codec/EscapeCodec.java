@@ -41,6 +41,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
                 in = doEscape(in, bufEntry.getValue(), bufEntry.getKey());
             }
+
             out.add(in);
         }
     }
@@ -55,6 +56,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
                 msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue());
             }
+
             out.writeBytes(msg);
         }
     }
@@ -128,9 +130,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         private static void checkMapping(Object[] real, Object[] replacement) {
-            if (real.length != replacement.length) {
-                throw new IllegalArgumentException("The real data must be the same as the number of replacement data");
-            }
+            if (real.length != replacement.length) throw new IllegalArgumentException("The real data must be the same as the number of replacement data");
         }
     }
 
