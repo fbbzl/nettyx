@@ -35,15 +35,11 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
     }
 
     public void closeChannelGracefully() {
-        if (gracefullyCloseable(channel)) {
-            this.closeChannel();
-        }
+        if (gracefullyCloseable(channel)) this.closeChannel();
     }
 
     public void closeChannelGracefully(ChannelPromise promise) {
-        if (gracefullyCloseable(channel)) {
-            this.closeChannel(promise);
-        }
+        if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
 
     public abstract void connect(RxtxDeviceAddress address);
