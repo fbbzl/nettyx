@@ -39,7 +39,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = replace(in, bufEntry.getValue(), bufEntry.getKey());
+                in = doEscape(in, bufEntry.getValue(), bufEntry.getKey());
             }
             out.add(in);
         }
@@ -53,7 +53,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                msg = replace(msg, bufEntry.getKey(), bufEntry.getValue());
+                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue());
             }
             out.writeBytes(msg);
         }
@@ -134,7 +134,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    static ByteBuf replace(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement) {
+    static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement) {
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
