@@ -54,10 +54,19 @@ public class OpenSslContextFactory {
 
         private boolean enable;
 
+        /**
+         * certificate path
+         */
         private String cert;
 
+        /**
+         * jks file
+         */
         private String key;
 
+        /**
+         * root certificate path
+         */
         private String root;
 
         private int handshakeTimeoutSeconds = DEFAULT_HANDSHAKE_TIMEOUT_SECONDS;
