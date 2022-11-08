@@ -22,7 +22,7 @@ public abstract class TcpClient extends Client {
         this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
     }
 
-    protected EventLoopGroup eventLoopGroup() {
+    public EventLoopGroup eventLoopGroup() {
         return new NioEventLoopGroup();
     }
 

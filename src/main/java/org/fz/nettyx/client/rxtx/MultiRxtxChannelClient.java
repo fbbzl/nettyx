@@ -18,6 +18,7 @@ import org.fz.nettyx.ChannelStorage;
  * @since 2022-01-26 20:26
  **/
 
+@SuppressWarnings("deprecation")
 @Slf4j
 public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
 

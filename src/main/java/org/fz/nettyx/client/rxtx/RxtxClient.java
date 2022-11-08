@@ -6,8 +6,6 @@ import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxChannelConfig;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -18,6 +16,7 @@ import org.fz.nettyx.client.Client;
  * @author fengbinbin
  * @since 2022-01-26 19:58
  */
+@SuppressWarnings({"deprecation", "unchecked"})
 public abstract class RxtxClient extends Client {
 
   /** The Oio Event loop group. */
@@ -58,8 +57,7 @@ public abstract class RxtxClient extends Client {
   }
 
   protected int scheduledCorePoolSize() {
-    // default is 2
-    return 2;
+    return Runtime.getRuntime().availableProcessors();
   }
 
   /**
