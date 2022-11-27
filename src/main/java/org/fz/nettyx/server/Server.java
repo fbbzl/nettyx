@@ -51,7 +51,7 @@ public abstract class Server {
         return serverBootstrap.clone();
     }
 
-    public abstract ChannelFuture bind(SocketAddress socketAddress) throws Exception;
+    public abstract ChannelFuture bind(SocketAddress socketAddress);
 
     protected void shutdownGracefully() {
         childEventLoopGroup.shutdownGracefully();
