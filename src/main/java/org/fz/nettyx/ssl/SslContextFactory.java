@@ -17,7 +17,7 @@ import lombok.experimental.UtilityClass;
  * SSL context factory, provide one-way/two-way
  * you may use like the following code:
  *     private SslHandler newSslHandler(SocketAddress remoteAddress) {
- *         if (ssl.enable() && notDevMock(remoteAddress)) {
+ *         if (ssl.enable()) {
  *             SSLEngine sslEngine = SslContextFactory.TWOWAY.getServerContext(ssl.path(), ssl.pwd()).createSSLEngine();
  *             sslEngine.setUseClientMode(true);
  *
