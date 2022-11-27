@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
  **/
 
 @Slf4j
+@SuppressWarnings("deprecation")
 public abstract class SingleRxtxChannelClient extends RxtxClient {
 
     protected Channel channel;
