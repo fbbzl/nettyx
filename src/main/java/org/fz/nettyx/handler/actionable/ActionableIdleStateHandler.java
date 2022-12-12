@@ -69,6 +69,8 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
         if (channelAction != null) channelAction.act(ctx);
     }
 
+    //********************************************        constructor start          **********************************************//
+
     public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, true);
     }
@@ -93,5 +95,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
         super(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit);
         this.fireNext = fireNext;
     }
+
+    //********************************************        constructor end          **********************************************//
 
 }

@@ -66,7 +66,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
         private final ByteBuf startFlag, endFlag;
-        private final boolean startEndStripDelimiter;
+        private final boolean stripStartEndDelimiter;
 
         @Override
         public final boolean isSharable() {
@@ -76,14 +76,14 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag) {
             super(maxFrameLength, true, startEndSameFlag);
 
-            this.startEndStripDelimiter = stripDelimiter;
+            this.stripStartEndDelimiter = stripDelimiter;
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
             super(maxFrameLength, true, startFlag, endFlag);
 
-            this.startEndStripDelimiter = stripDelimiter;
+            this.stripStartEndDelimiter = stripDelimiter;
             this.startFlag = startFlag;
             this.endFlag = endFlag;
         }
@@ -91,14 +91,14 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         public StartEndFlagFrameDecoder(boolean stripDelimiter, ByteBuf startEndSameFlag) {
             super(DEFAULT_MAX_FRAME_LENGTH, true, startEndSameFlag);
 
-            this.startEndStripDelimiter = stripDelimiter;
+            this.stripStartEndDelimiter = stripDelimiter;
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
             super(DEFAULT_MAX_FRAME_LENGTH, true, startFlag, endFlag);
 
-            this.startEndStripDelimiter = stripDelimiter;
+            this.stripStartEndDelimiter = stripDelimiter;
             this.startFlag = startFlag;
             this.endFlag = endFlag;
         }
@@ -108,7 +108,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
 
             if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0)
-                return startEndStripDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag.duplicate(), decodedByteBuf, endFlag.duplicate());
+                return stripStartEndDelimiter ? decodedByteBuf : Unpooled.wrappedBuffer(startFlag.duplicate(), decodedByteBuf, endFlag.duplicate());
 
             return null;
         }
