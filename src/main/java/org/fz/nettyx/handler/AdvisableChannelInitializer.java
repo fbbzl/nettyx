@@ -92,6 +92,12 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      */
     protected abstract void addHandlers(C channel);
 
+    @Override
+    protected void initChannel(C channel) {
+        // if default channel-handler order do not satisfy you, please override this method
+        this.addDefaultOrderedHandlers(channel);
+    }
+
     /**
      * keep channel handler in such order as default :
      *
@@ -107,10 +113,8 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * 8. write-Idle
      * 9. inboundExceptionHandler
      *
-     * if default order do not satisfy you, please override
      */
-    @Override
-    protected void initChannel(C channel) {
+    void addDefaultOrderedHandlers(C channel) {
         ChannelPipeline pipeline = channel.pipeline();
 
         addNonNullLast(pipeline, OUTBOUND_EXCEPTION, outboundExceptionHandler);
