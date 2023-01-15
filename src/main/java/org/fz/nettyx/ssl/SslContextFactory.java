@@ -5,6 +5,8 @@ import static lombok.AccessLevel.PACKAGE;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -70,7 +72,7 @@ public class SslContextFactory {
          * @param pwd the pwd witch be used to generate the keystore
          */
         public SSLContext getServerContext(String path, char[] pwd) {
-            try (InputStream in = new FileInputStream(path)) {
+            try (InputStream in = Files.newInputStream(Paths.get(path))) {
 
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
@@ -97,7 +99,7 @@ public class SslContextFactory {
          * @param pwd the pwd witch be used to generate the keystore
          */
         public SSLContext getClientContext(String path, char[] pwd) {
-            try (InputStream in = new FileInputStream(path)) {
+            try (InputStream in = Files.newInputStream(Paths.get(path))) {
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
 
@@ -156,8 +158,8 @@ public class SslContextFactory {
          */
         public SSLContext getContext(String path, char[] pwd, String trustPath, char[] trustPwd) {
             try (
-                InputStream in      = new FileInputStream(path);
-                InputStream trustIn = new FileInputStream(trustPath)) {
+                InputStream in      = Files.newInputStream(Paths.get(path));
+                InputStream trustIn = Files.newInputStream(Paths.get(trustPath))) {
 
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
