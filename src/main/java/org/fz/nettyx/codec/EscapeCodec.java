@@ -1,12 +1,12 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -142,6 +142,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     public static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
+        if (containsInvalidByteBuf(msgBuf, target, replacement)) return msgBuf;
+        if (excludes.length != 0 && Arrays.binarySearch(excludes, target) != -1) {
+            log.warn("It is not recommended to exclude target [{}], This will cause the escape to fail", target);
+        }
+
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
@@ -168,7 +173,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             }
         }
 
-        // deal left
+        // write the left buffer
         if (msgBuf.readableBytes() > 0) {
             result.writeBytes(msgBuf.readBytes(msgBuf.readableBytes()));
         }
@@ -176,7 +181,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return result;
     }
 
-    static boolean containExclude(int index, ByteBuf msgBuf, ByteBuf... excludes) {
+    private static boolean containExclude(int index, ByteBuf msgBuf, ByteBuf... excludes) {
         if (excludes.length == 0) {
             return false;
         }
@@ -195,7 +200,20 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return true;
     }
 
-    static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf target) {
+    private static boolean invalidByteBuf(ByteBuf buffer) {
+        return buffer == null || buffer.readableBytes() == 0;
+    }
+
+    private static boolean containsInvalidByteBuf(ByteBuf... buffer) {
+        for (ByteBuf byteBuf : buffer) {
+            if (invalidByteBuf(byteBuf)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf target) {
         return msgBuf.getByte(index) == target.getByte(0)
                &&
                msgBuf.getByte(index + target.readableBytes() - 1) == target.getByte(target.readableBytes() - 1);
