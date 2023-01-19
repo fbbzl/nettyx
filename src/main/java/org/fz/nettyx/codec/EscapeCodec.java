@@ -1,6 +1,7 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
@@ -78,11 +79,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         /**
-         * @param real you really wanted data
+         * @param target the data to be replaced
          * @param replacement the replacement data
          */
-        public EscapeMap mapping(ByteBuf real, ByteBuf replacement) {
-            super.put(real, replacement);
+        public EscapeMap mapping(ByteBuf target, ByteBuf replacement) {
+            super.put(target, replacement);
             return this;
         }
 
@@ -135,26 +136,26 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return escapeMap;
         }
 
-        private static void checkMapping(Object[] real, Object[] replacement) {
-            if (real.length != replacement.length) throw new IllegalArgumentException("The real data must be the same as the number of replacement data");
+        private static void checkMapping(Object[] target, Object[] replacement) {
+            if (target.length != replacement.length) throw new IllegalArgumentException("The target data must be the same as the number of replacement data");
         }
     }
 
-    static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement) {
+    public static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
-        while (msgBuf.readableBytes() >= real.readableBytes()) {
-            if (hasSimilarBytes(readIndex, msgBuf, real)) {
+        while (msgBuf.readableBytes() >= target.readableBytes()) {
+            if (hasSimilarBytes(readIndex, msgBuf, target)) {
                 msgBuf.markReaderIndex();
 
-                ByteBuf budget = msgBuf.alloc().buffer(real.readableBytes());
+                ByteBuf budget = msgBuf.alloc().buffer(target.readableBytes());
                 msgBuf.readBytes(budget);
 
-                if (budget.equals(real)) {
+                if (budget.equals(target) && !containExclude(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
-                    readIndex += real.readableBytes();
+                    readIndex += target.readableBytes();
                 } else {
                     msgBuf.resetReaderIndex();
 
@@ -175,9 +176,28 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return result;
     }
 
-    static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf real) {
-        return msgBuf.getByte(index) == real.getByte(0)
+    static boolean containExclude(int index, ByteBuf msgBuf, ByteBuf... excludes) {
+        if (excludes.length == 0) {
+            return false;
+        }
+
+        for (ByteBuf exclude : excludes) {
+            for (int i = 0; i < exclude.readableBytes(); i++) {
+                try {
+                    if (msgBuf.getByte(index + i) != exclude.getByte(i)) {
+                        return false;
+                    }
+                } catch (IndexOutOfBoundsException indexOutOfBounds) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf target) {
+        return msgBuf.getByte(index) == target.getByte(0)
                &&
-               msgBuf.getByte(index + real.readableBytes() - 1) == real.getByte(real.readableBytes() - 1);
+               msgBuf.getByte(index + target.readableBytes() - 1) == target.getByte(target.readableBytes() - 1);
     }
 }
