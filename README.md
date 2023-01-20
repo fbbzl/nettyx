@@ -6,7 +6,7 @@
 #### 安装教程
 1. 安装极其简单, 先添加gitee库
 ```xml
-  <repositories>
+<repositories>
   <repository>
     <id>fz</id>
     <url>https://gitee.com/fbb9290/maven-repository/raw/master</url>
