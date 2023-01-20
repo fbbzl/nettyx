@@ -150,18 +150,20 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
+        ByteBuf budgetBuffer = msgBuf.alloc().buffer(target.readableBytes());
         while (msgBuf.readableBytes() >= target.readableBytes()) {
             if (hasSimilarBytes(readIndex, msgBuf, target)) {
+                // prepare for reset
                 msgBuf.markReaderIndex();
 
-                ByteBuf budget = msgBuf.alloc().buffer(target.readableBytes());
-                msgBuf.readBytes(budget);
+                msgBuf.readBytes(budgetBuffer.clear());
 
-                if (budget.equals(target) && !containExclude(readIndex, msgBuf, excludes)) {
+                if (budgetBuffer.equals(target) && !containExclude(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
                     readIndex += target.readableBytes();
                 } else {
+                    // if not equals, will reset the read index
                     msgBuf.resetReaderIndex();
 
                     result.writeByte(msgBuf.readByte());
