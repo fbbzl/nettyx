@@ -9,91 +9,101 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HexBins {
 
-    private static final int BASE_LENGTH = 128;
     private static final int LOOKUP_LENGTH = 16;
-    private static final byte[] hexNumberTable = new byte[BASE_LENGTH];
-    private static final char[] lookUpHexAlphabet = new char[LOOKUP_LENGTH];
+    private static final char[] LOOK_UP_HEX_ALPHABET = new char[LOOKUP_LENGTH];
 
     static {
-        for (int i = 0; i < BASE_LENGTH; i++) {
-            hexNumberTable[i] = -1;
-        }
-        for (int i = '9'; i >= '0'; i--) {
-            hexNumberTable[i] = (byte) (i - '0');
-        }
-        for (int i = 'F'; i >= 'A'; i--) {
-            hexNumberTable[i] = (byte) (i - 'A' + 10);
-        }
-        for (int i = 'f'; i >= 'a'; i--) {
-            hexNumberTable[i] = (byte) (i - 'a' + 10);
-        }
-
         for (int i = 0; i < 10; i++) {
-            lookUpHexAlphabet[i] = (char) ('0' + i);
+            LOOK_UP_HEX_ALPHABET[i] = (char) ('0' + i);
         }
         for (int i = 10; i <= 15; i++) {
-            lookUpHexAlphabet[i] = (char) ('A' + i - 10);
+            LOOK_UP_HEX_ALPHABET[i] = (char) ('A' + i - 10);
         }
+    }
+
+    public String toBinary(String hex) {
+        if (hex == null || hex.length() % 2 != 0) {
+            return null;
+        }
+        StringBuilder bString = new StringBuilder();
+        String tmp;
+        for (int i = 0; i < hex.length(); i++) {
+            tmp = "0000" + Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 1), 16));
+            bString.append(tmp.substring(tmp.length() - 4));
+        }
+
+        return bString.toString();
+    }
+
+    public String fromBinary(String binaryString) {
+        if (binaryString == null || ("").equals(binaryString) || binaryString.length() % 8 != 0) {
+            return null;
+        }
+        StringBuilder tmp = new StringBuilder();
+        int iTmp;
+        for (int i = 0; i < binaryString.length(); i += 4) {
+            iTmp = 0;
+            for (int j = 0; j < 4; j++) {
+                iTmp += Integer.parseInt(binaryString.substring(i + j, i + j + 1)) << (4 - j - 1);
+            }
+            tmp.append(Integer.toHexString(iTmp));
+        }
+        return tmp.toString();
     }
 
     /**
      * Encode a byte array to hex string
      *
-     * @param binaryData array of byte to encode
+     * @param bytes array of byte to encode
      * @return return encoded string
      */
-    public static String encode(byte[] binaryData) {
-        if (binaryData == null) {
+    public static String encode(byte... bytes) {
+        if (bytes == null) {
             return null;
         }
-        int lengthData = binaryData.length;
+        int lengthData = bytes.length;
         int lengthEncode = lengthData * 2;
         char[] encodedData = new char[lengthEncode];
         int temp;
         for (int i = 0; i < lengthData; i++) {
-            temp = binaryData[i];
+            temp = bytes[i];
             if (temp < 0) {
                 temp += 256;
             }
-            encodedData[i * 2] = lookUpHexAlphabet[temp >> 4];
-            encodedData[i * 2 + 1] = lookUpHexAlphabet[temp & 0xf];
+            encodedData[i * 2] = LOOK_UP_HEX_ALPHABET[temp >> 4];
+            encodedData[i * 2 + 1] = LOOK_UP_HEX_ALPHABET[temp & 0xf];
         }
         return new String(encodedData);
+    }
+
+    public static byte toByte(String hex) {
+        return (byte) Integer.parseInt(hex, 16);
     }
 
     /**
      * Decode hex string to a byte array
      *
-     * @param encoded encoded string
+     * @param hex hex string
      * @return return array of byte to encode
      */
-    public static byte[] decode(String encoded) {
-        if (encoded == null) {
-            return new byte[0];
+    public static byte[] decode(String hex) {
+        int hexLen = hex.length();
+        byte[] result;
+        if (hexLen % 2 == 1) {
+            //odd
+            hexLen++;
+            result = new byte[(hexLen / 2)];
+            hex = "0" + hex;
+        } else {
+            //even
+            result = new byte[(hexLen / 2)];
         }
-        int lengthData = encoded.length();
-        if (lengthData % 2 != 0) {
-            return new byte[0];
+        int j = 0;
+        for (int i = 0; i < hexLen; i += 2) {
+            result[j] = toByte(hex.substring(i, i + 2));
+            j++;
         }
 
-        char[] binaryData = encoded.toCharArray();
-        int lengthDecode = lengthData / 2;
-        byte[] decodedData = new byte[lengthDecode];
-        byte temp1, temp2;
-        char tempChar;
-        for (int i = 0; i < lengthDecode; i++) {
-            tempChar = binaryData[i * 2];
-            temp1 = (tempChar < BASE_LENGTH) ? hexNumberTable[tempChar] : -1;
-            if (temp1 == -1) {
-                return new byte[0];
-            }
-            tempChar = binaryData[i * 2 + 1];
-            temp2 = (tempChar < BASE_LENGTH) ? hexNumberTable[tempChar] : -1;
-            if (temp2 == -1) {
-                return new byte[0];
-            }
-            decodedData[i] = (byte) ((temp1 << 4) | temp2);
-        }
-        return decodedData;
+        return result;
     }
 }
