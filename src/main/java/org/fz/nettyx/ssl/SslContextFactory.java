@@ -3,7 +3,6 @@ package org.fz.nettyx.ssl;
 
 import static lombok.AccessLevel.PACKAGE;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
