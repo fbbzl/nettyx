@@ -156,7 +156,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 // prepare for reset
                 msgBuf.markReaderIndex();
 
-                msgBuf.readBytes(budgetBuffer.clear());
+                msgBuf.readBytes(budgetBuffer);
 
                 if (budgetBuffer.equals(target) && !containExclude(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
@@ -169,6 +169,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     result.writeByte(msgBuf.readByte());
                     readIndex++;
                 }
+
+                budgetBuffer.clear();
             } else {
                 result.writeByte(msgBuf.readByte());
                 readIndex++;
