@@ -89,90 +89,90 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             super(initialCapacity);
         }
 
-        public static EscapeMap mapEachHex(List<String> targets, List<String> replacements) {
-            return mapEachHex(targets.toArray(new String[]{}), replacements.toArray(new String[]{}));
+        public static EscapeMap mapEachHex(List<String> reals, List<String> replacements) {
+            return mapEachHex(reals.toArray(new String[]{}), replacements.toArray(new String[]{}));
         }
 
         /**
-         * Escape bytebuffer as needed, and specify target and replacement in order
-         * @param targets The number and order of target buffers that need to be escaped should be the same as that of replacements
-         * @param replacements The number and order of replacement buffers should be the same as those of targets
+         * Escape bytebuffer as needed, and specify real data and replacement in order
+         * @param reals The number and order of real buffers that need to be escaped should be the same as that of replacements
+         * @param replacements The number and order of replacement buffers should be the same as those of reals
          * @return Buffer after escaped
          */
-        public static EscapeMap mapEachHex(String[] targets, String[] replacements) {
-            ByteBuf[] targetBuffers      = Stream.of(targets).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
+        public static EscapeMap mapEachHex(String[] reals, String[] replacements) {
+            ByteBuf[] realBuffers      = Stream.of(reals).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
                       replacementBuffers = Stream.of(replacements).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
 
-            return mapEach(targetBuffers, replacementBuffers);
+            return mapEach(realBuffers, replacementBuffers);
         }
 
-        public static EscapeMap mapEachBytes(List<byte[]> targets, List<byte[]> replacements) {
-            return mapEachBytes(targets.toArray(new byte[][]{}), replacements.toArray(new byte[][]{}));
+        public static EscapeMap mapEachBytes(List<byte[]> reals, List<byte[]> replacements) {
+            return mapEachBytes(reals.toArray(new byte[][]{}), replacements.toArray(new byte[][]{}));
         }
 
-        public static EscapeMap mapEachBytes(byte[][] targets, byte[][] replacements) {
-            ByteBuf[] targetBuffers      = Stream.of(targets).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
+        public static EscapeMap mapEachBytes(byte[][] reals, byte[][] replacements) {
+            ByteBuf[] realBuffers      = Stream.of(reals).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
                       replacementBuffers = Stream.of(replacements).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
 
-            return mapEach(targetBuffers, replacementBuffers);
+            return mapEach(realBuffers, replacementBuffers);
         }
 
-        public static EscapeMap mapEach(List<ByteBuf> targets, List<ByteBuf> replacements) {
-            return mapEach(targets.toArray(new ByteBuf[]{}), replacements.toArray(new ByteBuf[]{}));
+        public static EscapeMap mapEach(List<ByteBuf> reals, List<ByteBuf> replacements) {
+            return mapEach(reals.toArray(new ByteBuf[]{}), replacements.toArray(new ByteBuf[]{}));
         }
 
-        public static EscapeMap mapEach(ByteBuf[] targets, ByteBuf[] replacements) {
-            checkMapping(targets, replacements);
+        public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
+            checkMapping(reals, replacements);
 
-            EscapeMap escapeMap = new EscapeMap(targets.length);
-            for (int i = 0; i < targets.length; i++) {
-                escapeMap.put(targets[i], replacements[i]);
+            EscapeMap escapeMap = new EscapeMap(reals.length);
+            for (int i = 0; i < reals.length; i++) {
+                escapeMap.put(reals[i], replacements[i]);
             }
-            escapeMap.setExcludeMap(targets, replacements);
+            escapeMap.setExcludeMap(reals, replacements);
 
             return escapeMap;
         }
 
-        public static EscapeMap mapHex(String targetHex, String replacementHex) {
-            return map(HexBins.decode(targetHex), HexBins.decode(replacementHex));
+        public static EscapeMap mapHex(String realHex, String replacementHex) {
+            return map(HexBins.decode(realHex), HexBins.decode(replacementHex));
         }
 
-        public static EscapeMap map(byte[] targetBytes, byte[] replacementBytes) {
-            return map(Unpooled.wrappedBuffer(targetBytes), Unpooled.wrappedBuffer(replacementBytes));
+        public static EscapeMap map(byte[] realBytes, byte[] replacementBytes) {
+            return map(Unpooled.wrappedBuffer(realBytes), Unpooled.wrappedBuffer(replacementBytes));
         }
 
-        public static EscapeMap map(ByteBuf target, ByteBuf replacement) {
+        public static EscapeMap map(ByteBuf real, ByteBuf replacement) {
             EscapeMap escapeMap = new EscapeMap(1);
-            escapeMap.put(target, replacement);
+            escapeMap.put(real, replacement);
 
-            escapeMap.setExcludeMap(new ByteBuf[]{target}, new ByteBuf[]{replacement});
+            escapeMap.setExcludeMap(new ByteBuf[]{real}, new ByteBuf[]{replacement});
             return escapeMap;
         }
 
-        private static void checkMapping(Object[] target, Object[] replacement) {
-            if (target.length != replacement.length) throw new IllegalArgumentException("The target data must be the same as the number of replacement data");
+        private static void checkMapping(Object[] real, Object[] replacement) {
+            if (real.length != replacement.length) throw new IllegalArgumentException("The real data must be the same as the number of replacement data");
         }
 
-        public ByteBuf[] getExcludes(ByteBuf target) {
-            return getExcludeMap().getOrDefault(target, EMPTY_BUFFER_ARRAY);
+        public ByteBuf[] getExcludes(ByteBuf real) {
+            return getExcludeMap().getOrDefault(real, EMPTY_BUFFER_ARRAY);
         }
 
-        public void setExcludeMap(ByteBuf[] targets, ByteBuf[] replacements) {
-            for (int i = 0; i < targets.length; i++) {
+        public void setExcludeMap(ByteBuf[] reals, ByteBuf[] replacements) {
+            for (int i = 0; i < reals.length; i++) {
                 List<ByteBuf> excludes = new ArrayList<>(4);
                 for (int j = 0; j < replacements.length; j++) {
-                    if (i > j && contains(replacements[j], targets[i])) {
+                    if (i > j && contains(replacements[j], reals[i])) {
                         excludes.add(replacements[j]);
                     }
                 }
-                this.excludeMap.put(targets[i], excludes.toArray(new ByteBuf[]{}));
+                this.excludeMap.put(reals[i], excludes.toArray(new ByteBuf[]{}));
             }
         }
 
-        private boolean contains(ByteBuf target, ByteBuf part) {
-            ByteBuf buf = target.alloc().buffer(part.readableBytes());
-            for (int i = 0; i < target.readableBytes(); i++) {
-                target.getBytes(i, buf);
+        private boolean contains(ByteBuf real, ByteBuf part) {
+            ByteBuf buf = real.alloc().buffer(part.readableBytes());
+            for (int i = 0; i < real.readableBytes(); i++) {
+                real.getBytes(i, buf);
                 if (buf.equals(part)) {
                     return true;
                 }
@@ -182,27 +182,27 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    public static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
-        if (containsInvalidByteBuf(msgBuf, target, replacement)) return msgBuf;
-        if (excludes.length != 0 && Arrays.binarySearch(excludes, target) != -1) {
-            log.warn("It is not recommended to exclude target [{}], This will cause the escape to fail", target);
+    public static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement, ByteBuf... excludes) {
+        if (containsInvalidByteBuf(msgBuf, real, replacement)) return msgBuf;
+        if (excludes.length != 0 && Arrays.binarySearch(excludes, real) != -1) {
+            log.warn("It is not recommended to exclude real [{}], This will cause the escape to fail", real);
         }
 
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
-        ByteBuf budgetBuffer = msgBuf.alloc().buffer(target.readableBytes());
-        while (msgBuf.readableBytes() >= target.readableBytes()) {
-            if (hasSimilarBytes(readIndex, msgBuf, target)) {
+        ByteBuf budgetBuffer = msgBuf.alloc().buffer(real.readableBytes());
+        while (msgBuf.readableBytes() >= real.readableBytes()) {
+            if (hasSimilarBytes(readIndex, msgBuf, real)) {
                 // prepare for reset
                 msgBuf.markReaderIndex();
 
                 msgBuf.readBytes(budgetBuffer);
 
-                if (budgetBuffer.equals(target) && !equalsAny(readIndex, msgBuf, excludes)) {
+                if (budgetBuffer.equals(real) && !equalsAny(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
-                    readIndex += target.readableBytes();
+                    readIndex += real.readableBytes();
                 } else {
                     // if not equals, will reset the read index
                     msgBuf.resetReaderIndex();
