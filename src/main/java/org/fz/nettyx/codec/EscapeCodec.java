@@ -77,6 +77,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     @EqualsAndHashCode(callSuper = false)
     public static class EscapeMap extends HashMap<ByteBuf, ByteBuf> {
 
+        private static final ByteBuf[] EMPTY_BUFFER_ARRAY = new ByteBuf[0];
+
         @Getter
         private final Map<ByteBuf, ByteBuf[]> excludeMap = new HashMap<>(4);
 
@@ -142,6 +144,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         public static EscapeMap map(ByteBuf target, ByteBuf replacement) {
             EscapeMap escapeMap = new EscapeMap(1);
             escapeMap.put(target, replacement);
+
+            escapeMap.setExcludeMap(new ByteBuf[]{target}, new ByteBuf[]{replacement});
             return escapeMap;
         }
 
@@ -150,7 +154,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         public ByteBuf[] getExcludes(ByteBuf target) {
-            return getExcludeMap().get(target);
+            return getExcludeMap().getOrDefault(target, EMPTY_BUFFER_ARRAY);
         }
 
         public void setExcludeMap(ByteBuf[] targets, ByteBuf[] replacements) {
