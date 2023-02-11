@@ -249,8 +249,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return buffer == null || buffer.readableBytes() == 0;
     }
 
-    private static boolean containsInvalidByteBuf(ByteBuf... buffer) {
-        for (ByteBuf byteBuf : buffer) {
+    private static boolean containsInvalidByteBuf(ByteBuf... buffers) {
+        for (ByteBuf byteBuf : buffers) {
             if (invalidByteBuf(byteBuf)) {
                 return true;
             }
