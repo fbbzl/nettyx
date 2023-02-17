@@ -9,6 +9,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
 import io.netty.util.AttributeKey;
 import java.net.SocketAddress;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.ChannelStorage;
 
@@ -48,7 +49,13 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * @param key the channelKey
      * @param channel the channel
      */
+    @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
+        Channel oldChannel = channelStorage.get(key);
+        if (active(oldChannel)) {
+            oldChannel.close().sync();
+            channelStorage.remove(key);
+        }
         channelStorage.store(key, channel);
         log.info("has stored channel [{}]", channel);
     }
