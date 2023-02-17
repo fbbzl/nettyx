@@ -9,6 +9,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.ChannelStorage;
 
@@ -45,9 +46,15 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * must store channel after connect success!!
      *
      * @param key the channelKey
-     * @param channel the channel
+     * @param channel the channeliopuj
      */
+    @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
+        Channel oldChannel = channelStorage.get(key);
+        if (active(oldChannel)) {
+            oldChannel.close().sync();
+            channelStorage.remove(key);
+        }
         channelStorage.store(key, channel);
         log.info("has stored channel [{}]", channel);
     }

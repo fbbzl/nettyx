@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -19,7 +20,11 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
 
     protected Channel channel;
 
+    @SneakyThrows
     protected void storeChannel(ChannelFuture cf) {
+        if (active(channel)) {
+            channel.close().sync();
+        }
         this.channel = cf.channel();
     }
 
