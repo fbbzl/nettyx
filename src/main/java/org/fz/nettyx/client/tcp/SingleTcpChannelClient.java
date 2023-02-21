@@ -22,14 +22,17 @@ public abstract class SingleTcpChannelClient extends TcpClient {
 
     protected Channel channel;
 
-    @SneakyThrows
     protected void storeChannel(ChannelFuture cf) {
+        storeChannel(cf.channel());
+    }
+
+    @SneakyThrows
+    protected void storeChannel(Channel channel) {
         if (active(channel)) {
             channel.close().sync();
         }
-        this.channel = cf.channel();
+        this.channel = channel;
     }
-
     public Channel getChannel() {
         return this.channel;
     }
