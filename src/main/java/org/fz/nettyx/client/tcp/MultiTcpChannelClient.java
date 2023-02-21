@@ -43,6 +43,10 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      */
     protected abstract void connect(K channelKey, SocketAddress address);
 
+    protected void storeChannel(K channelKey, ChannelFuture future) {
+        storeChannel(channelKey, future.channel());
+    }
+
     /**
      * must store channel after connect success!!
      *

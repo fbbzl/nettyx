@@ -42,6 +42,10 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      */
     protected abstract void connect(K channelKey, RxtxDeviceAddress address);
 
+    protected void storeChannel(K channelKey, ChannelFuture future) {
+        storeChannel(channelKey, future.channel());
+    }
+
     /**
      * must store channel after connect success!!
      *
