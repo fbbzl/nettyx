@@ -67,12 +67,12 @@ public abstract class Client {
         return getBootstrap().clone();
     }
 
-    protected boolean register(Channel channel)   { return channel != null && channel.isRegistered(); }
+    protected boolean registered(Channel channel)   { return channel != null && channel.isRegistered(); }
     protected boolean open(Channel channel)       { return channel != null && channel.isOpen();       }
     protected boolean active(Channel channel)     { return channel != null && channel.isActive();     }
     protected boolean writable(Channel channel)   { return channel != null && channel.isWritable();   }
 
-    protected boolean unRegister(Channel channel) { return !register(channel); }
+    protected boolean unRegistered(Channel channel) { return !registered(channel); }
     protected boolean unOpen(Channel channel)     { return !open(channel);     }
     protected boolean unWritable(Channel channel) { return !writable(channel); }
     protected boolean inActive(Channel channel)   { return !active(channel);   }
