@@ -28,8 +28,8 @@ public abstract class SingleTcpChannelClient extends TcpClient {
 
     @SneakyThrows
     protected void storeChannel(Channel channel) {
-        if (active(channel)) {
-            channel.close().sync();
+        if (active(this.channel)) {
+            this.channel.close().sync();
         }
         this.channel = channel;
     }
