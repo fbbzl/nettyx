@@ -11,6 +11,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2021/5/13 9:10
+ */
 @Slf4j
 @SuppressWarnings("unchecked")
 public abstract class Server {
