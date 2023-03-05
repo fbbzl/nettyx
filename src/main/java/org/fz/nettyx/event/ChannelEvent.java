@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * wrap channel event to ChannelEvent, keep channel event could propagate in ApplicationContext and the others
- *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2021/5/13 9:10
  * @param <T> the type parameter
  */
 @Getter
