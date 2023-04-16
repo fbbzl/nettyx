@@ -1,8 +1,8 @@
 package org.fz.nettyx.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -76,6 +76,14 @@ public abstract class Client {
     protected boolean unOpen(Channel channel)     { return !open(channel);     }
     protected boolean unWritable(Channel channel) { return !writable(channel); }
     protected boolean inActive(Channel channel)   { return !active(channel);   }
+
+    protected ChannelPromise failurePromise(Channel channel) {
+        return failurePromise(channel, "channel failure promise occur, channel: [" + channel + "]");
+    }
+
+    protected ChannelPromise failurePromise(Channel channel, String message) {
+        return channel == null ? null : new DefaultChannelPromise(channel).setFailure(new ChannelException(message));
+    }
 
     protected void shutdownGracefully() {
         getEventLoopGroup().shutdownGracefully();
