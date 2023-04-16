@@ -1,14 +1,10 @@
 package org.fz.nettyx.client.rxtx;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.DefaultChannelPromise;
+import io.netty.channel.*;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
+import io.netty.util.ReferenceCountUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.ChannelStorage;
@@ -99,11 +95,17 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
 
         if (inActive(channel)) {
             log.debug("comm channel not in active status, message will be discard: {}", message);
-            return channel == null ? null : new DefaultChannelPromise(channel).setFailure(new ChannelException("channel: [" + channel + "] is not usable"));
+            ReferenceCountUtil.safeRelease(message);
+            return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
         }
 
         try {
-            return (ChannelPromise) channel.writeAndFlush(message);
+            if (unWritable(channel)) {
+                log.debug("comm channel [{}] is not writable, channel key [{}]", channel, channelKey);
+                ReferenceCountUtil.safeRelease(message);
+                return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
+            }
+            else return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
         }
