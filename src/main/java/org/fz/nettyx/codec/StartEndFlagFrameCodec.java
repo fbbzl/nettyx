@@ -24,7 +24,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
     /**
      * the default frame size is 1mb
      */
-    private static final int DEFAULT_MAX_FRAME_LENGTH = 1024 * 1024;
+    private static final int DEFAULT_MAX_FRAME_LENGTH = 2 * 1024;
 
     public StartEndFlagFrameCodec(int maxFrameLength, ByteBuf startFlag, ByteBuf endFlag) {
         super(new StartEndFlagFrameDecoder(maxFrameLength, true, startFlag, endFlag), new StartEndFlagFrameEncoder(startFlag, endFlag));
