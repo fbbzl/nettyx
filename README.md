@@ -65,6 +65,7 @@ handler                             提供了一些基础的channel handler实�
   ---ChannelInterceptor                channel拦截器, 适用于通信前的握手动作等前置操作
   ---ExceptionHandler                  异常处理器
   ---HeartBeater                       tcp心跳器
+  ---LoggerHandler                     出入站消息日志
 server
   ---Server                          提供server端基础实现
 ssl
