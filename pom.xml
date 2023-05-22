@@ -1,69 +1,93 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.fz</groupId>
-  <artifactId>nettyx</artifactId>
-  <version>1.2</version>
+    <groupId>org.fz</groupId>
+    <artifactId>nettyx</artifactId>
+    <version>1.2</version>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
 
-    <netty-all.version>4.1.75.Final</netty-all.version>
+        <netty-all.version>4.1.86.Final</netty-all.version>
 
-    <lombok.version>1.18.22</lombok.version>
-    <log4j-slf4j-series.version>2.17.1</log4j-slf4j-series.version>
-    <jul-to-slf4j.version>1.7.36</jul-to-slf4j.version>
-  </properties>
+        <lombok.version>1.18.22</lombok.version>
 
-  <dependencies>
+        <log4j-slf4j-series.version>2.17.1</log4j-slf4j-series.version>
 
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-all</artifactId>
-      <version>${netty-all.version}</version>
-    </dependency>
+        <jul-to-slf4j.version>1.7.36</jul-to-slf4j.version>
 
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-    </dependency>
+        <jSerialComm.version>2.9.3</jSerialComm.version>
 
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
-      <version>${log4j-slf4j-series.version}</version>
-    </dependency>
+        <netty-transport-jserialcomm.version>1.0.0</netty-transport-jserialcomm.version>
+    </properties>
 
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j-slf4j-series.version}</version>
-    </dependency>
+    <dependencies>
 
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-jul</artifactId>
-      <version>${log4j-slf4j-series.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty-all.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>${jul-to-slf4j.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
 
-  </dependencies>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>${log4j-slf4j-series.version}</version>
+        </dependency>
 
-  <distributionManagement>
-    <repository>
-      <id>gitee</id>
-      <url>file:${user.home}/.m2/distribute</url>
-    </repository>
-  </distributionManagement>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j-slf4j-series.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jul</artifactId>
+            <version>${log4j-slf4j-series.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${jul-to-slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>se.koc</groupId>
+            <artifactId>netty-transport-jserialcomm</artifactId>
+            <version>${netty-transport-jserialcomm.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fazecast</groupId>
+                    <artifactId>jSerialComm</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>${jSerialComm.version}</version>
+        </dependency>
+    </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>gitee</id>
+            <url>file:${user.home}/.m2/distribute</url>
+        </repository>
+    </distributionManagement>
+
 </project>

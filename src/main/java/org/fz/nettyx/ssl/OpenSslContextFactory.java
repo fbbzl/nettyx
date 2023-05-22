@@ -3,12 +3,13 @@ package org.fz.nettyx.ssl;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import lombok.Setter;
+import lombok.experimental.UtilityClass;
+
+import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
-import javax.net.ssl.SSLException;
-import lombok.Setter;
-import lombok.experimental.UtilityClass;
 
 /**
  * you may use like the following code:
@@ -33,12 +34,12 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class OpenSslContextFactory {
 
-    public static SslContext getServerSslContext(OpenSsl openSsl) throws SSLException {
-        return getServerSslContext(openSsl.cert(), openSsl.key(), openSsl.root());
+    public static SslContext getServerSslContext(OpenSslConfig openSslConfig) throws SSLException {
+        return getServerSslContext(openSslConfig.cert(), openSslConfig.key(), openSslConfig.root());
     }
 
-    public static SslContext getClientSslContext(OpenSsl openSsl) throws SSLException {
-        return getClientSslContext(openSsl.cert(), openSsl.key(), openSsl.root());
+    public static SslContext getClientSslContext(OpenSslConfig openSslConfig) throws SSLException {
+        return getClientSslContext(openSslConfig.cert(), openSslConfig.key(), openSslConfig.root());
     }
 
     public static SslContext getServerSslContext(String certChainPath, String keyPath, String rootPath) throws SSLException {
@@ -127,10 +128,13 @@ public class OpenSslContextFactory {
      * @since 3/8/2022 12:59 PM
      */
     @Setter
-    public static class OpenSsl {
+    public static class OpenSslConfig {
 
         private static final int DEFAULT_HANDSHAKE_TIMEOUT_SECONDS = 5;
 
+        /**
+         * if enable the openssl
+         */
         private boolean enable;
 
         /**
@@ -148,6 +152,9 @@ public class OpenSslContextFactory {
          */
         private String root;
 
+        /**
+         * handshake timeout seconds
+         */
         private int handshakeTimeoutSeconds = DEFAULT_HANDSHAKE_TIMEOUT_SECONDS;
 
         public boolean enable() {
