@@ -19,7 +19,14 @@ import java.util.function.Function;
 
 public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.InboundLogger, LoggerHandler.OutboundLogger> {
 
+    /**
+     * default log type
+     * it will log the message in hex type
+     */
     private static final Function<Object, String> TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg);
+    /**
+     * it will log the message by using {@link Object#toString}
+     */
     private static final Function<Object, String> TO_STRING = Objects::toString;
 
     public LoggerHandler(String topic) {
