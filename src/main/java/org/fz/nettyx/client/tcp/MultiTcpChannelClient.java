@@ -36,9 +36,9 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * Connect.
      *
      * @param channelKey the channel key
-     * @param address the address
+     * @param address    the address
      */
-    protected abstract void connect(K channelKey, SocketAddress address);
+    protected abstract ChannelFuture connect(K channelKey, SocketAddress address) throws Exception;
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
@@ -47,7 +47,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
     /**
      * must store channel after connect success!!
      *
-     * @param key the channelKey
+     * @param key     the channelKey
      * @param channel the channel
      */
     @SneakyThrows
@@ -90,7 +90,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * Send.
      *
      * @param channelKey the channel channelKey
-     * @param message the message
+     * @param message    the message
      */
     public ChannelPromise send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
@@ -106,8 +106,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
                 log.debug("channel [{}] is not writable, channel key [{}]", channel, channelKey);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "channel: [" + channel + "] is not writable");
-            }
-            else return (ChannelPromise) channel.writeAndFlush(message);
+            } else return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
         }

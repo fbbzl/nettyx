@@ -52,7 +52,7 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
         if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
 
-    public abstract void connect(RxtxDeviceAddress address);
+    public abstract ChannelFuture connect(RxtxDeviceAddress address) throws Exception;
 
     public ChannelPromise send(Object message) {
         if (this.inActive(channel)) {
@@ -66,8 +66,7 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
                 log.debug("comm channel [{}] is not writable", channel);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
-            }
-            else return (ChannelPromise) channel.writeAndFlush(message);
+            } else return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
         }
