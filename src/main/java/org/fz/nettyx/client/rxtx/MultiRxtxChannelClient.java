@@ -34,9 +34,9 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * Connect.
      *
      * @param channelKey the channel key
-     * @param address the address
+     * @param address    the address
      */
-    protected abstract void connect(K channelKey, RxtxDeviceAddress address);
+    protected abstract ChannelFuture connect(K channelKey, RxtxDeviceAddress address) throws Exception;
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
@@ -45,7 +45,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     /**
      * must store channel after connect success!!
      *
-     * @param key the channelKey
+     * @param key     the channelKey
      * @param channel the channeliopuj
      */
     @SneakyThrows
@@ -88,7 +88,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * Send.
      *
      * @param channelKey the channel channelKey
-     * @param message the message
+     * @param message    the message
      */
     public ChannelPromise send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
@@ -104,8 +104,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
                 log.debug("comm channel [{}] is not writable, channel key [{}]", channel, channelKey);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
-            }
-            else return (ChannelPromise) channel.writeAndFlush(message);
+            } else return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
         }

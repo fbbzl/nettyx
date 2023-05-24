@@ -34,6 +34,7 @@ public abstract class SingleTcpChannelClient extends TcpClient {
         }
         this.channel = channel;
     }
+
     public Channel getChannel() {
         return this.channel;
     }
@@ -59,7 +60,7 @@ public abstract class SingleTcpChannelClient extends TcpClient {
      *
      * @param address the address
      */
-    public abstract void connect(SocketAddress address);
+    public abstract ChannelFuture connect(SocketAddress address) throws Exception;
 
     public ChannelPromise send(Object message) {
         if (this.inActive(channel)) {
@@ -73,8 +74,7 @@ public abstract class SingleTcpChannelClient extends TcpClient {
                 log.debug("channel [{}] is not writable", channel);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "channel: [" + channel + "] is not writable");
-            }
-            else return (ChannelPromise) channel.writeAndFlush(message);
+            } else return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
         }
