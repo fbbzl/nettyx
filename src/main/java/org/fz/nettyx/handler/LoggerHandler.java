@@ -64,9 +64,10 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            Channel channel = ctx.channel();
-            System.err.println("收到: "+messageFormatter.apply(msg));
-            logger.info("channel [{}] received from [{}], message is: [{}]", channel, channel.remoteAddress(), messageFormatter.apply(msg));
+            if (logger.isInfoEnabled()) {
+                Channel channel = ctx.channel();
+                logger.info("channel [{}] received from [{}], message is: [{}]", channel, channel.remoteAddress(), messageFormatter.apply(msg));
+            }
             super.channelRead(ctx, msg);
         }
     }
