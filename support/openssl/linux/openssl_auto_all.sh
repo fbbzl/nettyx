@@ -6,12 +6,14 @@
 #                                                                                #
 ##################################################################################
 
-os_openssl_ca=/etc/pki/CA
+sh ./openssl_env.sh
+
 work_dir=.
 
 #copy cnf-temp to target
-mkdir -p ${os_openssl_ca}
-cp -f ${work_dir}/cnf/openssl.cnf ${os_openssl_ca}/
+# shellcheck disable=SC2154
+mkdir -p "${os_openssl_ca}"
+cp -f ${work_dir}/cnf/openssl.cnf "${os_openssl_ca}"/
 
 #init openssl env-dir
 echo '############################################'
