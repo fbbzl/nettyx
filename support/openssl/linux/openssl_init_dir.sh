@@ -1,6 +1,6 @@
 ##################################################################################
 #                                                                                #
-# author: fbb                                                                    #
+# author: fengbinbin                                                             #
 # since: 2022/3/07                                                               #
 # generate key for server                                                        #
 #                                                                                #
@@ -23,8 +23,8 @@ touch ${os_openssl_ca}/index.txt
 echo 01 > ${os_openssl_ca}/serial
 
 #dir for app
-app_name=xxx
-app=/usr/local/app/${app_name}
+app_name=youappname
+app=/usr/local/gdi/${app_name}
 app_openssl_dir=${app}/openssl
 
 root_dir=${app_openssl_dir}/root
