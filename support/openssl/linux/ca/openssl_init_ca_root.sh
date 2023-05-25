@@ -6,6 +6,7 @@
 #                                                                                #
 ##################################################################################
 
+# shellcheck disable=SC2154
 ca_root_key=${ca_root_dir}/ca_root.key
 ca_root_crt=${ca_root_dir}/ca_root.crt
 #100 years

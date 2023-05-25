@@ -6,6 +6,7 @@
 #                                                                                #
 ##################################################################################
 
+# shellcheck disable=SC2154
 client_key=${client_dir}/${app_name}_client.key
 client_csr=${client_dir}/${app_name}_client.csr
 
