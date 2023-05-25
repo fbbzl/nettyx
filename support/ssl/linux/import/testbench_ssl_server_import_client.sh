@@ -5,18 +5,12 @@
 #                                                                                #                                  #
 ##################################################################################
 
-project=fz
-keysize=2048
-validity=3650
-keyalg=RSA
-keypass=dfjhg45
-keystore_path=/usr/ssl/client/${project}.jks
-storepass=dfjhg45
-cer_path=/usr/ssl/client/${project}.cer
+app_name=youappname
+app=/usr/local/gdi/${app_name}
 
-#genarate client RSA keypair and key-store
-#the key-store is use to store the cer of the server
-keytool -genkey -alias smcc -keysize ${keysize} -validity ${validity} -keyalg ${keyalg} -dname "CN=localhost" -keypass ${keypass} -storepass ${storepass} -keystore ${keystore_path}
+importing_key_alias=smcc
+client_cer_path=${app}/ssl/client/s5_client.cer
+server_keystore_path=${app}/ssl/server/s5_server.jks
+server_keystore_pass=asdfgh
 
-#generate client self-signature cer
-keytool -export -alias smcc -keystore ${keystore_path} -storepass ${storepass} -file ${cer_path}
+keytool -import -trustcacerts -alias ${importing_key_alias} -file ${client_cer_path} -storepass ${server_keystore_pass} -keystore ${server_keystore_path}

@@ -5,9 +5,12 @@
 #                                                                                #                                  #
 ##################################################################################
 
-project=fz
-client_cer_path=/usr/ssl/client/${project}.cer
-server_keystore_path=/usr/ssl/server/${project}.jks
-server_keystore_pass=dfjhg45
+app_name=youappname
+app=/usr/local/gdi/${app_name}
 
-keytool -import -trustcacerts -alias smcc -file ${client_cer_path} -storepass ${server_keystore_pass} -keystore ${server_keystore_path}
+importing_key_alias=securechat
+server_cer_path=${app}/ssl/server/sChat.cer
+client_keystore_path=${app}/ssl/client/s5_client.jks
+client_keystore_pass=asdfgh
+
+keytool -import -trustcacerts -alias ${importing_key_alias} -file ${server_cer_path} -storepass ${client_keystore_pass} -keystore ${client_keystore_path}

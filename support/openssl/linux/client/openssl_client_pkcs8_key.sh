@@ -1,13 +1,13 @@
 ##################################################################################
 #                                                                                #
-# author: fbb                                                                    #
+# author: fengbinbin                                                             #
 # since: 2022/3/07                                                               #
 # convert to pkcs8                                                               #
 #                                                                                #
 ##################################################################################
 
-app_name=xxx
-app=/usr/local/app/${app_name}
+app_name=youappname
+app=/usr/local/gdi/${app_name}
 app_openssl_dir=${app}/openssl
 
 client_key=${app_openssl_dir}/client/${app_name}_client.key

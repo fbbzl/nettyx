@@ -1,6 +1,6 @@
 ##################################################################################
 #                                                                                #
-# author: fbb                                                                    #
+# author: fengbinbin                                                             #
 # since: 2022/3/07                                                               #
 # all run in auto                                                                #
 #                                                                                #
@@ -9,7 +9,7 @@
 os_openssl_ca=/etc/pki/CA
 work_dir=.
 
-#move cnf-temp to target
+#copy cnf-temp to target
 mkdir -p ${os_openssl_ca}
 cp -f ${work_dir}/cnf/openssl.cnf ${os_openssl_ca}/
 
@@ -25,6 +25,7 @@ echo '# Initializing CA ROOT #'
 echo '########################'
 sh ${work_dir}/ca/openssl_init_ca_root.sh
 
+#init server
 echo '#######################'
 echo '# Initializing Server #'
 echo '#######################'
@@ -32,6 +33,7 @@ sh ${work_dir}/server/openssl_server_init.sh
 sh ${work_dir}/server/openssl_server_do_sign.sh
 sh ${work_dir}/server/openssl_server_pkcs8_key.sh
 
+#init client
 echo '#######################'
 echo '# Initializing Client #'
 echo '#######################'
