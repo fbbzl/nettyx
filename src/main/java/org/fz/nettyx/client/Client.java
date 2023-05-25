@@ -1,8 +1,11 @@
 package org.fz.nettyx.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
-
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultChannelPromise;
+import io.netty.channel.EventLoopGroup;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -67,15 +70,15 @@ public abstract class Client {
         return getBootstrap().clone();
     }
 
-    protected boolean registered(Channel channel)   { return channel != null && channel.isRegistered(); }
+    protected boolean registered(Channel channel) { return channel != null && channel.isRegistered(); }
     protected boolean open(Channel channel)       { return channel != null && channel.isOpen();       }
     protected boolean active(Channel channel)     { return channel != null && channel.isActive();     }
     protected boolean writable(Channel channel)   { return channel != null && channel.isWritable();   }
 
     protected boolean unRegistered(Channel channel) { return !registered(channel); }
-    protected boolean unOpen(Channel channel)     { return !open(channel);     }
-    protected boolean unWritable(Channel channel) { return !writable(channel); }
-    protected boolean inActive(Channel channel)   { return !active(channel);   }
+    protected boolean unOpen(Channel channel)       { return !open(channel);       }
+    protected boolean unWritable(Channel channel)   { return !writable(channel);   }
+    protected boolean inActive(Channel channel)     { return !active(channel);     }
 
     protected ChannelPromise failurePromise(Channel channel) {
         return failurePromise(channel, "channel failure promise occur, channel: [" + channel + "]");
