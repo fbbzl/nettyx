@@ -6,24 +6,25 @@
 #                                                                                #
 ##################################################################################
 
-Refers:
-  script refer: https://my.oschina.net/u/176493/blog/688541
-  openssl command refer : https://www.cnblogs.com/aixiaoxiaoyu/p/8650180.html
+参考文献:
+  脚本参考连接: https://my.oschina.net/u/176493/blog/688541
+  openssl指令参考连接: https://www.cnblogs.com/aixiaoxiaoyu/p/8650180.html
 
 ******************************************************************************
 
-Hi, Bro, just execute openssl_auto_all, and then type the information that openssl wanted, finally you'll got
-the following files:
+第一步 编辑openssl_env.sh文件, 根据自身业务需要覆盖其中的变量值, 如jar路径, 证书存放路径等等
+第二步 执行openssl_auto.sh脚本, 然后根据控制台的提示输入openssl所需要的信息, 你会得到如下的文件
+
 
 CA ROOT:
-
 
 
 Client:
 
 
-
 Server:
 
+以上文件是在你实现openssl所必需的
 
-The above files are required before you implement openssl
+
+

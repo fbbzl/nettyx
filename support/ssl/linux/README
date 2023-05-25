@@ -1,7 +1,0 @@
-must execute the following command
-
-1. init/ssl_init_client.sh
-2. init/ssl_init_server.sh
-3. import/ssl_client_import_server.sh
-4. import/testbench_ssl_server_import_client.sh
-5. import/testbench_ssl_client_import_server.sh

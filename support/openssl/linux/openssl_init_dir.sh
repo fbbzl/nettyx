@@ -6,31 +6,21 @@
 #                                                                                #
 ##################################################################################
 
-os_openssl_ca=/etc/pki/CA
-
 #dir for openssl
 # issued certificate
-mkdir -p ${os_openssl_ca}/certs
+# shellcheck disable=SC2154
+mkdir -p "${os_openssl_ca}"/certs
 # ca new certificate
-mkdir -p ${os_openssl_ca}/newcerts
+mkdir -p "${os_openssl_ca}"/newcerts
 # private key
-mkdir -p ${os_openssl_ca}/private
+mkdir -p "${os_openssl_ca}"/private
 # revoked certificate
-mkdir -p ${os_openssl_ca}/crl
+mkdir -p "${os_openssl_ca}"/crl
 # penSSl defined issued certificate db
-touch ${os_openssl_ca}/index.txt
+touch "${os_openssl_ca}"/index.txt
 # certificate serial number
-echo 01 > ${os_openssl_ca}/serial
+echo 01 > "${os_openssl_ca}"/serial
 
-#dir for app
-app_name=youappname
-app=/usr/local/yourapplocation/${app_name}
-app_openssl_dir=${app}/openssl
-
-root_dir=${app_openssl_dir}/root
-client_dir=${app_openssl_dir}/client
-server_dir=${app_openssl_dir}/server
-
-mkdir -p ${root_dir}
-mkdir -p ${client_dir}
-mkdir -p ${server_dir}
+mkdir -p "${ca_root_dir}"
+mkdir -p "${client_dir}"
+mkdir -p "${server_dir}"
