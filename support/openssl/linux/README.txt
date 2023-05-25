@@ -16,14 +16,20 @@ Hi, Bro, just execute openssl_auto_all, and then type the information that opens
 the following files:
 
 CA ROOT:
-
-
+ca_root.key
+ca_root.crt
 
 Client:
-
-
+youappname_client.csr
+youappname_client.crt
+youappname_client.key
+youappname_pkcs8_rsa_client.key
 
 Server:
+youappname_server.csr
+youappname_server.crt
+youappname_server.key
+youappname_pkcs8_rsa_server.key
 
 
 The above files are required before you implement openssl

@@ -17,12 +17,20 @@
 
 
 CA ROOT:
-
+ca_root.key
+ca_root.crt
 
 Client:
-
+youappname_client.csr
+youappname_client.crt
+youappname_client.key
+youappname_pkcs8_rsa_client.key
 
 Server:
+youappname_server.csr
+youappname_server.crt
+youappname_server.key
+youappname_pkcs8_rsa_server.key
 
 以上文件是在你实现openssl所必需的
 
