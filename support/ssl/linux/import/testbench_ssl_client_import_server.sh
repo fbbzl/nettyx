@@ -6,7 +6,7 @@
 ##################################################################################
 
 app_name=youappname
-app=/usr/local/gdi/${app_name}
+app=/usr/local/yourapplocation/${app_name}
 
 importing_key_alias=testbench
 server_cer_path=${app}/ssl/server/s5_server.cer

@@ -6,7 +6,7 @@
 ##################################################################################
 
 app_name=youappname
-app=/usr/local/gdi/${app_name}
+app=/usr/local/yourapplocation/${app_name}
 
 key_alias=securechat
 server_path=${app}/ssl/server

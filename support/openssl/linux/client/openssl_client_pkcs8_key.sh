@@ -7,7 +7,7 @@
 ##################################################################################
 
 app_name=youappname
-app=/usr/local/gdi/${app_name}
+app=/usr/local/yourapplocation/${app_name}
 app_openssl_dir=${app}/openssl
 
 client_key=${app_openssl_dir}/client/${app_name}_client.key

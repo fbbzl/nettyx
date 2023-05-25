@@ -6,7 +6,7 @@
 ##################################################################################
 
 app_name=youappname
-app=/usr/local/gdi/${app_name}
+app=/usr/local/yourapplocation/${app_name}
 
 importing_key_alias=smcc
 client_cer_path=${app}/ssl/client/s5_client.cer
