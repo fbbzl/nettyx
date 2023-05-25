@@ -10,7 +10,7 @@ os_openssl_ca=/etc/pki/CA
 os_openssl_cnf=${os_openssl_ca}/openssl.cnf
 
 app_name=youappname
-app=/usr/local/gdi/${app_name}
+app=/usr/local/yourapplocation/${app_name}
 app_openssl_dir=${app}/openssl
 
 server_key=${app_openssl_dir}/server/${app_name}_server.key

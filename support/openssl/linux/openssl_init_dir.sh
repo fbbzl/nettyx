@@ -24,7 +24,7 @@ echo 01 > ${os_openssl_ca}/serial
 
 #dir for app
 app_name=youappname
-app=/usr/local/gdi/${app_name}
+app=/usr/local/yourapplocation/${app_name}
 app_openssl_dir=${app}/openssl
 
 root_dir=${app_openssl_dir}/root
