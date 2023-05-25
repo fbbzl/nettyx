@@ -6,6 +6,7 @@
 #                                                                                #
 ##################################################################################
 
+# shellcheck disable=SC2154
 server_key=${app_openssl_dir}/server/${app_name}_server.key
 server_csr=${app_openssl_dir}/server/${app_name}_server.csr
 
