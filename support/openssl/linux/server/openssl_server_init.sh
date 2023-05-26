@@ -18,4 +18,4 @@ valid_days=36500
 openssl genrsa -des3 -passout pass:${key_pass} -out "${server_key}" ${key_length}
 
 # shellcheck disable=SC2154
-openssl req -new -key "${server_key}" -out "${server_csr}" -config "${os_openssl_cnf}" -days ${valid_days}
+openssl req -new -key "${server_key}" -out "${server_csr}" -config "${os_openssl_ca_cnf}" -days ${valid_days}
