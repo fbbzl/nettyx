@@ -12,6 +12,11 @@ import io.netty.channel.ChannelFuture;
 @FunctionalInterface
 public interface ChannelFutureAction extends Action {
 
+    /**
+     * Act.
+     *
+     * @param channelFuture the channel future
+     */
     void act(ChannelFuture channelFuture);
     
 }

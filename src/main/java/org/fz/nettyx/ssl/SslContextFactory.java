@@ -1,54 +1,60 @@
 package org.fz.nettyx.ssl;
 
 
-import static lombok.AccessLevel.PACKAGE;
-
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyStore;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+
+import static lombok.AccessLevel.PACKAGE;
+
 /**
  * SSL context factory, provide one-way/two-way
  * you may use like the following code:
- *     private SslHandler newSslHandler(SocketAddress remoteAddress) {
- *         if (ssl.enable()) {
- *             SSLEngine sslEngine = SslContextFactory.TWOWAY.getServerContext(ssl.path(), ssl.pwd()).createSSLEngine();
- *             sslEngine.setUseClientMode(true);
- *
- *             SslHandler sslHandler = new SslHandler(sslEngine);
- *             sslHandler.setHandshakeTimeout(ssl.handshakeTimeoutSeconds(), TimeUnit.SECONDS);
- *
- *             GenericFutureListener<Promise<Channel>> handshakeListener =
- *                 future -> {
- *                     if (future.isSuccess())  log.info("ssl handshake success, remote address is [{}]", remoteAddress);
- *                     if (!future.isSuccess()) log.error("ssl handshake failure, remote address is [{}]", remoteAddress, future.cause());
- *                 };
- *
- *             sslHandler.handshakeFuture().addListener(handshakeListener);
- *             return sslHandler;
- *         }
- *         else return null;
- *     }
- *
+ * private SslHandler newSslHandler(SocketAddress remoteAddress) {
+ * if (ssl.enable()) {
+ * SSLEngine sslEngine = SslContextFactory.TWOWAY.getServerContext(ssl.path(), ssl.pwd()).createSSLEngine();
+ * sslEngine.setUseClientMode(true);
+ * <p>
+ * SslHandler sslHandler = new SslHandler(sslEngine);
+ * sslHandler.setHandshakeTimeout(ssl.handshakeTimeoutSeconds(), TimeUnit.SECONDS);
+ * <p>
+ * GenericFutureListener<Promise<Channel>> handshakeListener =
+ * future -> {
+ * if (future.isSuccess())  log.info("ssl handshake success, remote address is [{}]", remoteAddress);
+ * if (!future.isSuccess()) log.error("ssl handshake failure, remote address is [{}]", remoteAddress, future.cause());
+ * };
+ * <p>
+ * sslHandler.handshakeFuture().addListener(handshakeListener);
+ * return sslHandler;
+ * }
+ * else return null;
+ * }
  *
  * @author fengbinbin
  * @version 1.0
- * @see SslContextFactory#ONEWAY
- * @see SslContextFactory#TWOWAY
+ * @see SslContextFactory#ONEWAY SslContextFactory#ONEWAY
+ * @see SslContextFactory#TWOWAY SslContextFactory#TWOWAY
  * @see <a href="https://github.com/ZHI-XINHUA/myNetty/tree/master/src/zxh/netty/ssl">refer</a>
- * @since 2022/1/21 14:24
+ * @since 2022 /1/21 14:24
  */
 @UtilityClass
 public class SslContextFactory {
 
+    /**
+     * The constant ONEWAY.
+     */
     public static final OneWay ONEWAY;
+    /**
+     * The constant TWOWAY.
+     */
     public static final TwoWay TWOWAY;
 
     static {
@@ -56,19 +62,32 @@ public class SslContextFactory {
         TWOWAY = new TwoWay("TLS");
     }
 
+    /**
+     * The type One way.
+     */
     @RequiredArgsConstructor(access = PACKAGE)
     public static class OneWay {
 
         private final String protocol;
 
+        /**
+         * Gets server context.
+         *
+         * @param path the path
+         * @param pwd  the pwd
+         * @return the server context
+         */
         public SSLContext getServerContext(String path, String pwd) {
             // here will be no string constant pool security issues
             return getServerContext(path, pwd.toCharArray());
         }
 
         /**
+         * Gets server context.
+         *
          * @param path the key file path
-         * @param pwd the pwd witch be used to generate the keystore
+         * @param pwd  the pwd witch be used to generate the keystore
+         * @return the server context
          */
         public SSLContext getServerContext(String path, char[] pwd) {
             try (InputStream in = Files.newInputStream(Paths.get(path))) {
@@ -88,14 +107,24 @@ public class SslContextFactory {
             }
         }
 
+        /**
+         * Gets client context.
+         *
+         * @param path the path
+         * @param pwd  the pwd
+         * @return the client context
+         */
         public SSLContext getClientContext(String path, String pwd) {
             // here will be no string constant pool security issues
             return getClientContext(path, pwd.toCharArray());
         }
 
         /**
+         * Gets client context.
+         *
          * @param path the key file path
-         * @param pwd the pwd witch be used to generate the keystore
+         * @param pwd  the pwd witch be used to generate the keystore
+         * @return the client context
          */
         public SSLContext getClientContext(String path, char[] pwd) {
             try (InputStream in = Files.newInputStream(Paths.get(path))) {
@@ -115,19 +144,45 @@ public class SslContextFactory {
         }
     }
 
+    /**
+     * The type Two way.
+     */
     @RequiredArgsConstructor(access = PACKAGE)
     public static class TwoWay {
 
         private final String protocol;
 
+        /**
+         * Gets server context.
+         *
+         * @param path the path
+         * @param pwd  the pwd
+         * @return the server context
+         */
         public SSLContext getServerContext(String path, String pwd) {
             return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
+        /**
+         * Gets client context.
+         *
+         * @param path the path
+         * @param pwd  the pwd
+         * @return the client context
+         */
         public SSLContext getClientContext(String path, String pwd) {
             return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
+        /**
+         * Gets server context.
+         *
+         * @param path      the path
+         * @param pwd       the pwd
+         * @param trustPath the trust path
+         * @param trustPwd  the trust pwd
+         * @return the server context
+         */
         public SSLContext getServerContext(String path, String pwd, String trustPath, String trustPwd) {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
@@ -136,6 +191,15 @@ public class SslContextFactory {
             }
         }
 
+        /**
+         * Gets client context.
+         *
+         * @param path      the path
+         * @param pwd       the pwd
+         * @param trustPath the trust path
+         * @param trustPwd  the trust pwd
+         * @return the client context
+         */
         public SSLContext getClientContext(String path, String pwd, String trustPath, String trustPwd) {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
@@ -144,16 +208,36 @@ public class SslContextFactory {
             }
         }
 
+        /**
+         * Gets context.
+         *
+         * @param path the path
+         * @param pwd  the pwd
+         * @return the context
+         */
         SSLContext getContext(String path, String pwd) {
             return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
+        /**
+         * Gets context.
+         *
+         * @param path the path
+         * @param pwd  the pwd
+         * @return the context
+         */
         SSLContext getContext(String path, char[] pwd) {
             return getContext(path, pwd, path, pwd);
         }
 
         /**
          * two-way type server/client context is the same
+         *
+         * @param path      the path
+         * @param pwd       the pwd
+         * @param trustPath the trust path
+         * @param trustPwd  the trust pwd
+         * @return the context
          */
         public SSLContext getContext(String path, char[] pwd, String trustPath, char[] trustPwd) {
             try (
@@ -183,11 +267,12 @@ public class SslContextFactory {
     }
 
     /**
+     * The type Ssl.
+     *
      * @author fengbinbin
      * @version 1.0
-     * @since 2022/1/21 16:09
+     * @since 2022 /1/21 16:09
      */
-
     @Setter
     public static class Ssl {
 
@@ -218,26 +303,54 @@ public class SslContextFactory {
          */
         private int handshakeTimeoutSeconds = DEFAULT_HANDSHAKE_TIMEOUT_SECONDS;
 
+        /**
+         * Enable boolean.
+         *
+         * @return the boolean
+         */
         public boolean enable() {
             return enable;
         }
 
+        /**
+         * Path string.
+         *
+         * @return the string
+         */
         public String path() {
             return path;
         }
 
+        /**
+         * Pwd string.
+         *
+         * @return the string
+         */
         public String pwd() {
             return password;
         }
 
+        /**
+         * Trust trust.
+         *
+         * @return the trust
+         */
         public Trust trust() {
             return trust;
         }
 
+        /**
+         * Handshake timeout seconds int.
+         *
+         * @return the int
+         */
         public int handshakeTimeoutSeconds() {
             return handshakeTimeoutSeconds;
         }
 
+        /**
+         * The type Trust.
+         */
         @Setter
         public static class Trust {
 
@@ -251,10 +364,20 @@ public class SslContextFactory {
              */
             private String password;
 
+            /**
+             * Path string.
+             *
+             * @return the string
+             */
             public String path() {
                 return path;
             }
 
+            /**
+             * Pwd string.
+             *
+             * @return the string
+             */
             public String pwd() {
                 return password;
             }

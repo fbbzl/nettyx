@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.function.ChannelFutureAction;
 
 /**
+ * The type Actionable channel future listener.
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2021/2/4 17:48
+ * @since 2021 /2/4 17:48
  */
 @Slf4j
 @Setter

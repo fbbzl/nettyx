@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 /**
+ * used to escape messages
  * @author fengbinbin
  * @since 2022-01-27 18:07
  **/

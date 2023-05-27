@@ -1,51 +1,65 @@
 package org.fz.nettyx.handler;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.function.ChannelBindAction;
-import org.fz.nettyx.function.ChannelConnectAction;
-import org.fz.nettyx.function.ChannelExceptionAction;
-import org.fz.nettyx.function.ChannelHandlerContextAction;
-import org.fz.nettyx.function.ChannelPromiseAction;
-import org.fz.nettyx.function.ChannelReadAction;
-import org.fz.nettyx.function.ChannelWriteAction;
+import org.fz.nettyx.function.*;
 import org.fz.nettyx.handler.ExceptionHandler.InboundExceptionHandler;
 import org.fz.nettyx.handler.ExceptionHandler.OutboundExceptionHandler;
 import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
 import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
 import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
 
+import java.net.SocketAddress;
+
 /**
+ * The type Advisable channel initializer.
+ *
+ * @param <C> the type parameter
  * @author fengbinbin
  * @version 1.0
- * @since 2/10/2022 1:24 PM
+ * @since 2 /10/2022 1:24 PM
  */
-
 @Getter
 public abstract class AdvisableChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
+    /**
+     * The Inbound advice.
+     */
     static final String
         INBOUND_ADVICE     = "$_inboundAdvice_$",
-        OUTBOUND_ADVICE    = "$_outboundAdvice_$",
-        READ_IDLE          = "$_readIdle_$",
-        WRITE_IDLE         = "$_writeIdle_$",
-        READ_TIME_OUT      = "$_readTimeout_$",
-        WRITE_TIME_OUT     = "$_writeTimeout_$",
-        INBOUND_EXCEPTION  = "$_inboundExceptionHandler_$",
-        OUTBOUND_EXCEPTION = "$_outboundExceptionHandler_$";
+    /**
+     * The Outbound advice.
+     */
+    OUTBOUND_ADVICE    = "$_outboundAdvice_$",
+    /**
+     * The Read idle.
+     */
+    READ_IDLE          = "$_readIdle_$",
+    /**
+     * The Write idle.
+     */
+    WRITE_IDLE         = "$_writeIdle_$",
+    /**
+     * The Read time out.
+     */
+    READ_TIME_OUT      = "$_readTimeout_$",
+    /**
+     * The Write time out.
+     */
+    WRITE_TIME_OUT     = "$_writeTimeout_$",
+    /**
+     * The Inbound exception.
+     */
+    INBOUND_EXCEPTION  = "$_inboundExceptionHandler_$",
+    /**
+     * The Outbound exception.
+     */
+    OUTBOUND_EXCEPTION = "$_outboundExceptionHandler_$";
 
     private final InboundAdvice  inboundAdvice;
     private final OutboundAdvice outboundAdvice;
@@ -55,14 +69,30 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
     private       ReadTimeoutHandler         readTimeoutHandler;
     private       WriteTimeoutHandler        writeTimeoutHandler;
 
+    /**
+     * Instantiates a new Advisable channel initializer.
+     *
+     * @param inboundAdvice the inbound advice
+     */
     protected AdvisableChannelInitializer(InboundAdvice inboundAdvice) {
         this(inboundAdvice, null);
     }
 
+    /**
+     * Instantiates a new Advisable channel initializer.
+     *
+     * @param outboundAdvice the outbound advice
+     */
     protected AdvisableChannelInitializer(OutboundAdvice outboundAdvice) {
         this(null, outboundAdvice);
     }
 
+    /**
+     * Instantiates a new Advisable channel initializer.
+     *
+     * @param inboundAdvice  the inbound advice
+     * @param outboundAdvice the outbound advice
+     */
     protected AdvisableChannelInitializer(InboundAdvice inboundAdvice, OutboundAdvice outboundAdvice) {
         this.inboundAdvice  = inboundAdvice;
         this.outboundAdvice = outboundAdvice;
@@ -100,19 +130,20 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
 
     /**
      * keep channel handler in such order as default :
-     *
+     * <p>
      * 1. outboundExceptionHandler
      * 2. read-Idle
      * 3. read-timeout
      * 4. inboundAdvice
-     *
+     * <p>
      * 5. [business channel-handlers]
-     *
+     * <p>
      * 6. outboundAdvice
      * 7. write-timeout
      * 8. write-Idle
      * 9. inboundExceptionHandler
      *
+     * @param channel the channel
      */
     void addDefaultOrderedHandlers(C channel) {
         ChannelPipeline pipeline = channel.pipeline();
@@ -128,19 +159,55 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         addNonNullLast(pipeline, INBOUND_EXCEPTION,  inboundExceptionHandler);
     }
 
+    /**
+     * Add non null first.
+     *
+     * @param pipeline       the pipeline
+     * @param name           the name
+     * @param channelHandler the channel handler
+     */
     static void addNonNullFirst(ChannelPipeline pipeline, String name, ChannelHandler channelHandler) {
         if (channelHandler != null) pipeline.addFirst(name, channelHandler);
     }
+
+    /**
+     * Add non null last.
+     *
+     * @param pipeline       the pipeline
+     * @param name           the name
+     * @param channelHandler the channel handler
+     */
     static void addNonNullLast(ChannelPipeline pipeline, String name, ChannelHandler channelHandler) {
         if (channelHandler != null) pipeline.addLast(name, channelHandler);
     }
+
+    /**
+     * Add non null before.
+     *
+     * @param pipeline       the pipeline
+     * @param targetName     the target name
+     * @param name           the name
+     * @param channelHandler the channel handler
+     */
     static void addNonNullBefore(ChannelPipeline pipeline, String targetName, String name, ChannelHandler channelHandler) {
         if (channelHandler != null) pipeline.addBefore(targetName, name, channelHandler);
     }
+
+    /**
+     * Add non null after.
+     *
+     * @param pipeline       the pipeline
+     * @param targetName     the target name
+     * @param name           the name
+     * @param channelHandler the channel handler
+     */
     static void addNonNullAfter(ChannelPipeline pipeline, String targetName, String name, ChannelHandler channelHandler) {
         if (channelHandler != null) pipeline.addAfter(targetName, name, channelHandler);
     }
 
+    /**
+     * The type Inbound advice.
+     */
     @Slf4j
     @Setter
     @Getter
@@ -158,11 +225,25 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         private ActionableIdleStateHandler   readIdleStateHandler;
         private ActionableReadTimeoutHandler readTimeoutHandler;
 
+        /**
+         * When read idle inbound advice.
+         *
+         * @param idleSeconds the idle seconds
+         * @param readIdleAct the read idle act
+         * @return the inbound advice
+         */
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
             this.readIdleStateHandler = ActionableIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
             return this;
         }
 
+        /**
+         * When read timeout inbound advice.
+         *
+         * @param timeoutSeconds the timeout seconds
+         * @param timeoutAction  the timeout action
+         * @return the inbound advice
+         */
         public final InboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
             this.readTimeoutHandler = new ActionableReadTimeoutHandler(timeoutSeconds, timeoutAction);
             return this;
@@ -224,6 +305,9 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         }
     }
 
+    /**
+     * The type Outbound advice.
+     */
     @Slf4j
     @Setter
     @Getter
@@ -239,11 +323,25 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         private ActionableIdleStateHandler    writeIdleStateHandler;
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
+        /**
+         * When write idle outbound advice.
+         *
+         * @param idleSeconds  the idle seconds
+         * @param writeIdleAct the write idle act
+         * @return the outbound advice
+         */
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
             this.writeIdleStateHandler = ActionableIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
             return this;
         }
 
+        /**
+         * When write timeout outbound advice.
+         *
+         * @param timeoutSeconds the timeout seconds
+         * @param timeoutAction  the timeout action
+         * @return the outbound advice
+         */
         public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
             this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds, timeoutAction);
             return this;
@@ -312,18 +410,41 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param channelAction the channel action
+     * @param ctx           the ctx
+     */
     static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
         if (channelAction != null) {
             channelAction.act(ctx);
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param channelBindAction the channel bind action
+     * @param ctx               the ctx
+     * @param localAddress      the local address
+     * @param promise           the promise
+     */
     static void act(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
         if (channelBindAction != null) {
             channelBindAction.act(ctx, localAddress, promise);
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param channelConnectAction the channel connect action
+     * @param ctx                  the ctx
+     * @param remoteAddress        the remote address
+     * @param localAddress         the local address
+     * @param promise              the promise
+     */
     static void act(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
         ChannelPromise promise) {
         if (channelConnectAction != null) {
@@ -331,18 +452,40 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param channelPromiseAction the channel promise action
+     * @param ctx                  the ctx
+     * @param promise              the promise
+     */
     static void act(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
         if (channelPromiseAction != null) {
             channelPromiseAction.act(ctx, promise);
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param channelWriteAction the channel write action
+     * @param ctx                the ctx
+     * @param msg                the msg
+     * @param promise            the promise
+     */
     static void act(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
         if (channelWriteAction != null) {
             channelWriteAction.act(ctx, msg, promise);
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param channelReadAction the channel read action
+     * @param ctx               the ctx
+     * @param msg               the msg
+     */
     static void act(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
         if (channelReadAction != null) {
             channelReadAction.act(ctx, msg);

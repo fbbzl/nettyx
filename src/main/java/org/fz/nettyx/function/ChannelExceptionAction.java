@@ -15,7 +15,7 @@ public interface ChannelExceptionAction extends Action {
     /**
      * Act.
      *
-     * @param t the t
+     * @param t         the t
      * @param throwable the throwable
      */
     void act(ChannelHandlerContext t, Throwable throwable);

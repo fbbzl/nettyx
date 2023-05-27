@@ -11,7 +11,7 @@ import org.fz.nettyx.ChannelStorage;
 import java.net.SocketAddress;
 
 /**
- * The type Multi channel client.
+ * The type Multi channel client. use channel key to retrieve and use channels
  *
  * @param <K> the channel channelKey type
  * @author fengbinbin
