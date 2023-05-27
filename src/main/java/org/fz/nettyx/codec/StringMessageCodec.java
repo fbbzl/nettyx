@@ -4,12 +4,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import io.netty.util.ReferenceCountUtil;
-import java.nio.charset.Charset;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.Charset;
+import java.util.List;
+
 /**
+ * basic string codec
  * @author fengbinbin
  * @version 1.0
  * @since 2021/4/9 16:35

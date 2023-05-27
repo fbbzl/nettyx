@@ -11,6 +11,7 @@ import org.fz.nettyx.ChannelStorage;
 
 
 /**
+ * A multi-channel client that uses channel-key to retrieve and manipulate the specified channel
  * @author fengbinbin
  * @since 2022-01-26 20:26
  **/

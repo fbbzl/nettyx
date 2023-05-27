@@ -1,18 +1,8 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
-import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
-
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.CombinedChannelDuplexHandler;
+import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
-import java.net.SocketAddress;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,17 +13,33 @@ import org.fz.nettyx.function.ChannelExceptionAction;
 import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
 import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
 
+import java.net.SocketAddress;
+
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
+
 /**
+ * The type Exception handler.
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2/9/2022 1:18 PM
+ * @since 2 /9/2022 1:18 PM
  */
 public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHandler.InboundExceptionHandler, ExceptionHandler.OutboundExceptionHandler> {
 
+    /**
+     * Instantiates a new Exception handler.
+     *
+     * @param inboundHandler  the inbound handler
+     * @param outboundHandler the outbound handler
+     */
     public ExceptionHandler(InboundExceptionHandler inboundHandler, OutboundExceptionHandler outboundHandler) {
         super(inboundHandler, outboundHandler);
     }
 
+    /**
+     * The type Inbound exception handler.
+     */
     @Slf4j
     @NoArgsConstructor
     @AllArgsConstructor
@@ -76,6 +82,9 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
         }
     }
 
+    /**
+     * The type Outbound exception handler.
+     */
     @Slf4j
     @NoArgsConstructor
     @AllArgsConstructor
@@ -120,6 +129,14 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             super.write(ctx, msg, promise);
         }
 
+        /**
+         * Write failure listener channel future listener.
+         *
+         * @param ctx                 the ctx
+         * @param whenExceptionCaught the when exception caught
+         * @param msg                 the msg
+         * @return the channel future listener
+         */
         static ChannelFutureListener writeFailureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught, Object msg) {
             return cf -> {
                 if (!cf.isSuccess()) {
@@ -129,6 +146,13 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             };
         }
 
+        /**
+         * Failure listener channel future listener.
+         *
+         * @param ctx                 the ctx
+         * @param whenExceptionCaught the when exception caught
+         * @return the channel future listener
+         */
         static ChannelFutureListener failureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught) {
             return cf -> {
                 if (!cf.isSuccess()) {
@@ -139,12 +163,26 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
         }
     }
 
+    /**
+     * Act.
+     *
+     * @param exceptionAction the exception action
+     * @param ctx             the ctx
+     * @param throwable       the throwable
+     */
     static void act(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
         if (exceptionAction != null) {
             exceptionAction.act(ctx, throwable);
         }
     }
 
+    /**
+     * Act and close.
+     *
+     * @param exceptionAction the exception action
+     * @param ctx             the ctx
+     * @param cause           the cause
+     */
     static void actAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
         act(exceptionAction, ctx, cause);
         ctx.channel().close();

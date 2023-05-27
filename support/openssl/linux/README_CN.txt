@@ -13,8 +13,9 @@
 ******************************************************************************
 
 第一步 编辑openssl_env.sh文件, 根据自身业务需要覆盖其中的变量值, 如jar路径, 证书存放路径等等
-第二步 执行openssl_auto.sh脚本, 然后根据控制台的提示输入openssl所需要的信息, 你会得到如下的文件
-
+第二步 将nettyx-support-openssl目录复制到服务器上
+第三步 安装openssl, 如未安装, 可以使用yum install openssl进行安装
+第三步 执行openssl_auto.sh脚本, 然后根据控制台的提示输入openssl所需要的信息, 你会得到如下的文件
 
 CA ROOT:
 ca_root.key

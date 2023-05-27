@@ -21,12 +21,25 @@ import java.net.SocketAddress;
 @Slf4j
 public abstract class SingleTcpChannelClient extends TcpClient {
 
+    /**
+     * The Channel.
+     */
     protected Channel channel;
 
+    /**
+     * Store channel.
+     *
+     * @param cf the cf
+     */
     protected void storeChannel(ChannelFuture cf) {
         storeChannel(cf.channel());
     }
 
+    /**
+     * Store channel.
+     *
+     * @param channel the channel
+     */
     @SneakyThrows
     protected void storeChannel(Channel channel) {
         if (active(this.channel)) {
@@ -35,22 +48,43 @@ public abstract class SingleTcpChannelClient extends TcpClient {
         this.channel = channel;
     }
 
+    /**
+     * Gets channel.
+     *
+     * @return the channel
+     */
     public Channel getChannel() {
         return this.channel;
     }
 
+    /**
+     * Close channel.
+     */
     public void closeChannel() {
         this.channel.close();
     }
 
+    /**
+     * Close channel.
+     *
+     * @param promise the promise
+     */
     public void closeChannel(ChannelPromise promise) {
         this.channel.close(promise);
     }
 
+    /**
+     * Close channel gracefully.
+     */
     public void closeChannelGracefully() {
         if (gracefullyCloseable(channel)) this.closeChannel();
     }
 
+    /**
+     * Close channel gracefully.
+     *
+     * @param promise the promise
+     */
     public void closeChannelGracefully(ChannelPromise promise) {
         if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
@@ -59,9 +93,17 @@ public abstract class SingleTcpChannelClient extends TcpClient {
      * Connect.
      *
      * @param address the address
+     * @return the channel future
+     * @throws Exception the exception
      */
     public abstract ChannelFuture connect(SocketAddress address) throws Exception;
 
+    /**
+     * Send channel promise.
+     *
+     * @param message the message
+     * @return the channel promise
+     */
     public ChannelPromise send(Object message) {
         if (this.inActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);

@@ -1,18 +1,19 @@
 package org.fz.nettyx.client.jsc;
 
-import static java.util.stream.Collectors.toList;
-
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.ReferenceCountUtil;
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.client.Client;
 import org.fz.nettyx.exception.NoSuchPortException;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * comm util from the following url
@@ -20,27 +21,52 @@ import org.fz.nettyx.exception.NoSuchPortException;
  *
  * @author fengbinbin
  * @version 1.0
- * @since 2023/5/15
+ * @since 2023 /5/15
  */
 @Slf4j
 public class JSerialCommClient extends Client {
 
+    /**
+     * the interval serialPort impl
+     */
     private SerialPort serialPort;
 
+    /**
+     * jsc client do not support, netty is not used internally
+     */
     @Override
     public final EventLoopGroup getEventLoopGroup() {
         throw new UnsupportedOperationException("jsc do not support this method");
     }
 
+    /**
+     * jsc client do not support, netty is not used internally
+     */
     @Override
     public final Bootstrap getBootstrap() {
         throw new UnsupportedOperationException("jsc do not support this method");
     }
 
+    /**
+     * Find the serial port available on the current machine
+     *
+     * @return the list
+     */
     public static List<String> find() {
         return Stream.of(SerialPort.getCommPorts()).map(SerialPort::getSystemPortName).distinct().collect(toList());
     }
 
+    /**
+     * Open j serial comm client.
+     *
+     * @param portName  the port name
+     * @param baudRate  the baud rate
+     * @param dataBit   the data bit
+     * @param stopBit   the stop bit
+     * @param parityBit the parity bit
+     * @return the j serial comm client
+     * @throws NoSuchPortException the no such port exception
+     */
     public JSerialCommClient open(String portName,
                                   int baudRate,
                                   int dataBit,
@@ -49,6 +75,19 @@ public class JSerialCommClient extends Client {
         return open(portName, baudRate, SerialPort.FLOW_CONTROL_DISABLED, dataBit, stopBit, parityBit);
     }
 
+
+    /**
+     * Open j serial comm client.
+     *
+     * @param portName  the port name
+     * @param baudRate  the baud rate
+     * @param flowCtrl  the flow ctrl
+     * @param dataBit   the data bit
+     * @param stopBit   the stop bit
+     * @param parityBit the parity bit
+     * @return the j serial comm client
+     * @throws NoSuchPortException the no such port exception
+     */
     public JSerialCommClient open(String portName,
                                   int baudRate,
                                   int flowCtrl,
@@ -58,6 +97,8 @@ public class JSerialCommClient extends Client {
         if (!find().contains(portName)) throw new NoSuchPortException(portName);
 
         SerialPort sp = SerialPort.getCommPort(portName);
+
+        // when re-open serial port, it will change the baud rate
         if (sp.isOpen()) {
             sp.setBaudRate(baudRate);
             return this;
@@ -78,22 +119,50 @@ public class JSerialCommClient extends Client {
         return this;
     }
 
+    /**
+     * Send sync.
+     *
+     * @param msgBuf the msg buf
+     * @apiNote when you send message under higher baud-rate, and then you always lose bytes, please try this method
+     */
     public synchronized void sendSync(ByteBuf msgBuf) {
         this.send(msgBuf);
     }
 
+    /**
+     * Send sync and release.
+     * when you send message under higher baud-rate, and then you always lose bytes, please try this method
+     * @param msgBuf the msg buf
+     * @apiNote when you send message under higher baud-rate, and then you always lose bytes, please try this method
+     */
     public synchronized void sendSyncAndRelease(ByteBuf msgBuf) {
         this.sendAndRelease(msgBuf);
     }
 
+    /**
+     * Send sync.
+     *
+     * @param content the content
+     * @apiNote when you send message under higher baud-rate, and then you always lose bytes, please try this method
+     */
     public synchronized void sendSync(byte[] content) {
         this.send(content);
     }
 
+    /**
+     * Send.
+     *
+     * @param msgBuf the msg buf
+     */
     public void send(ByteBuf msgBuf) {
         this.send(ByteBufUtil.getBytes(msgBuf));
     }
 
+    /**
+     * Send and release.
+     *
+     * @param msgBuf the msg buf
+     */
     public void sendAndRelease(ByteBuf msgBuf) {
         try {
             this.send(ByteBufUtil.getBytes(msgBuf));
@@ -102,10 +171,21 @@ public class JSerialCommClient extends Client {
         }
     }
 
+    /**
+     * Send.
+     *
+     * @param content the content
+     */
     public void send(byte[] content) {
         if (serialPort != null && serialPort.isOpen()) serialPort.writeBytes(content, content.length);
     }
 
+    /**
+     * Read byte [ ].
+     * Usually need to specify the frame segmentation, somewhat akin to Netty DelimiterBasedFrameCodec
+     * @return the byte [ ]
+     * @throws InterruptedException the interrupted exception
+     */
     public byte[] read() throws InterruptedException {
         byte[] recvData = null;
         if (serialPort == null || !serialPort.isOpen()) {
@@ -127,6 +207,9 @@ public class JSerialCommClient extends Client {
         return recvData;
     }
 
+    /**
+     * Close.
+     */
     public void close() {
         if (serialPort != null && serialPort.isOpen()) {
             log.info("close serial port {}", serialPort.getSystemPortName());

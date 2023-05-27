@@ -10,6 +10,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
 
 /**
+ * Extensions to netty's Delimiter Based Frame Decoder
  * @author fengbinbin
  * @version 1.0
  * @since 2021/9/2 9:17

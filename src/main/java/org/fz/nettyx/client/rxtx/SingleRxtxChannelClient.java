@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * single channel rxtx client
  * @author fengbinbin
  * @since 2022-01-26 20:25
  **/

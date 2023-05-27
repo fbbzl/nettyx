@@ -3,9 +3,11 @@ package org.fz.nettyx;
 import lombok.experimental.UtilityClass;
 
 /**
+ * The type Hex bins.
+ *
  * @author fengbinbin
- * @since 2022-01-29 21:07
- **/
+ * @since 2022 -01-29 21:07
+ */
 @UtilityClass
 public class HexBins {
 
@@ -21,6 +23,12 @@ public class HexBins {
         }
     }
 
+    /**
+     * To binary string.
+     *
+     * @param hex the hex
+     * @return the string
+     */
     public String toBinary(String hex) {
         if (hex == null || hex.length() % 2 != 0) {
             return null;
@@ -35,6 +43,12 @@ public class HexBins {
         return bString.toString();
     }
 
+    /**
+     * From binary string.
+     *
+     * @param binaryString the binary string
+     * @return the string
+     */
     public String fromBinary(String binaryString) {
         if (binaryString == null || ("").equals(binaryString) || binaryString.length() % 8 != 0) {
             return null;
@@ -76,6 +90,12 @@ public class HexBins {
         return new String(encodedData);
     }
 
+    /**
+     * To byte byte.
+     *
+     * @param hex the hex
+     * @return the byte
+     */
     public static byte toByte(String hex) {
         return (byte) Integer.parseInt(hex, 16);
     }

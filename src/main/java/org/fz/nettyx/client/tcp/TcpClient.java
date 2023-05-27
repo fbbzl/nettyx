@@ -7,6 +7,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.client.Client;
 
 /**
+ * basic tcp client
  * @author fengbinbin
  * @since 2022-01-26 20:54
  **/

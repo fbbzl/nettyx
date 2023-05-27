@@ -16,8 +16,8 @@ public interface ChannelWriteAction extends Action {
     /**
      * Action.
      *
-     * @param ctx the ctx
-     * @param msg the msg
+     * @param ctx     the ctx
+     * @param msg     the msg
      * @param promise the promise
      */
     void act(ChannelHandlerContext ctx, Object msg, ChannelPromise promise);

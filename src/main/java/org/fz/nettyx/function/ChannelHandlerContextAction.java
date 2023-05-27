@@ -12,5 +12,10 @@ import io.netty.channel.ChannelHandlerContext;
 @FunctionalInterface
 public interface ChannelHandlerContextAction extends Action {
 
+    /**
+     * Act.
+     *
+     * @param ctx the ctx
+     */
     void act(ChannelHandlerContext ctx);
 }
