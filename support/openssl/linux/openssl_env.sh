@@ -20,10 +20,17 @@ export app_openssl_dir=${app}/openssl
 export ca_root_dir=${app_openssl_dir}/root
 export ca_root_key=${ca_root_dir}/ca_root.key
 export ca_root_crt=${ca_root_dir}/ca_root.crt
+export root_key_valid_days=36500
 
 #specifies the openssl client file generation location
 export client_dir=${app_openssl_dir}/client
+export client_key_pass=Aqqaazz123!@@
+export client_key_length=2048
+export client_key_valid_days=36500
 
 #specifies the openssl server file generation location
 export server_dir=${app_openssl_dir}/server
+export server_key_pass=Aqqaazz123!@@
+export server_key_length=2048
+export server_key_valid_days=36500
 
