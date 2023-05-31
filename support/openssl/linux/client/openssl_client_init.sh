@@ -10,12 +10,7 @@
 client_key=${client_dir}/${app_name}_client.key
 client_csr=${client_dir}/${app_name}_client.csr
 
-key_pass=Aqqaazz123!@@
-key_length=2048
-#100 years
-valid_days=36500
-
-openssl genrsa -des3 -passout pass:${key_pass} -out "${client_key}" ${key_length}
+openssl genrsa -des3 -passout pass:"${client_key_pass}" -out "${client_key}" "${client_key_length}"
 
 # shellcheck disable=SC2154
-openssl req -new -key "${client_key}" -out "${client_csr}" -config "${os_openssl_ca_cnf}" -days ${valid_days}
+openssl req -new -key "${client_key}" -out "${client_csr}" -config "${os_openssl_ca_cnf}" -days "${client_key_valid_days}"
