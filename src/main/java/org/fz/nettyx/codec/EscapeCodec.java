@@ -21,22 +21,34 @@ import java.util.stream.Stream;
 
 /**
  * used to escape messages
+ *
  * @author fengbinbin
- * @since 2022-01-27 18:07
- **/
+ * @since 2022 -01-27 18:07
+ */
 @Slf4j
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
 
+    /**
+     * Instantiates a new Escape codec.
+     *
+     * @param escapeMap the escape map
+     */
     public EscapeCodec(EscapeMap escapeMap) {
         this(new EscapeDecoder(escapeMap), new EscapeEncoder(escapeMap));
     }
 
+    /**
+     * Instantiates a new Escape codec.
+     *
+     * @param escapeDecoder the escape decoder
+     * @param escapeEncoder the escape encoder
+     */
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder) {
         super(escapeDecoder, escapeEncoder);
     }
 
     /**
-     *  using {@link EscapeMap} to deal message
+     * using {@link EscapeMap} to deal message
      */
     @RequiredArgsConstructor
     public static class EscapeDecoder extends ByteToMessageDecoder {
@@ -71,6 +83,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
+    /**
+     * The type Escape map.
+     */
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = false)
     public static class EscapeMap extends HashMap<ByteBuf, ByteBuf> {
@@ -87,13 +102,21 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             super(initialCapacity);
         }
 
+        /**
+         * Map each hex escape map.
+         *
+         * @param targets      the targets
+         * @param replacements the replacements
+         * @return the escape map
+         */
         public static EscapeMap mapEachHex(List<String> targets, List<String> replacements) {
             return mapEachHex(targets.toArray(new String[]{}), replacements.toArray(new String[]{}));
         }
 
         /**
          * Escape bytebuffer as needed, and specify target data and replacement in order
-         * @param targetHexes The number and order of target buffers that need to be escaped should be the same as that of replacements
+         *
+         * @param targetHexes  The number and order of target buffers that need to be escaped should be the same as that of replacements
          * @param replacements The number and order of replacement buffers should be the same as those of targets
          * @return Buffer after escaped
          */
@@ -104,10 +127,24 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return mapEach(targetBuffers, replacementBuffers);
         }
 
+        /**
+         * Map each bytes escape map.
+         *
+         * @param targets      the targets
+         * @param replacements the replacements
+         * @return the escape map
+         */
         public static EscapeMap mapEachBytes(List<byte[]> targets, List<byte[]> replacements) {
             return mapEachBytes(targets.toArray(new byte[][]{}), replacements.toArray(new byte[][]{}));
         }
 
+        /**
+         * Map each bytes escape map.
+         *
+         * @param targets      the targets
+         * @param replacements the replacements
+         * @return the escape map
+         */
         public static EscapeMap mapEachBytes(byte[][] targets, byte[][] replacements) {
             ByteBuf[] targetBuffers      = Stream.of(targets).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
                       replacementBuffers = Stream.of(replacements).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
@@ -115,10 +152,24 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return mapEach(targetBuffers, replacementBuffers);
         }
 
+        /**
+         * Map each escape map.
+         *
+         * @param targets      the targets
+         * @param replacements the replacements
+         * @return the escape map
+         */
         public static EscapeMap mapEach(List<ByteBuf> targets, List<ByteBuf> replacements) {
             return mapEach(targets.toArray(new ByteBuf[]{}), replacements.toArray(new ByteBuf[]{}));
         }
 
+        /**
+         * Map each escape map.
+         *
+         * @param targets      the targets
+         * @param replacements the replacements
+         * @return the escape map
+         */
         public static EscapeMap mapEach(ByteBuf[] targets, ByteBuf[] replacements) {
             checkMapping(targets, replacements);
 
@@ -131,14 +182,35 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return escapeMap;
         }
 
+        /**
+         * Map hex escape map.
+         *
+         * @param targetHex      the target hex
+         * @param replacementHex the replacement hex
+         * @return the escape map
+         */
         public static EscapeMap mapHex(String targetHex, String replacementHex) {
             return map(HexBins.decode(targetHex), HexBins.decode(replacementHex));
         }
 
+        /**
+         * Map escape map.
+         *
+         * @param targetBytes      the target bytes
+         * @param replacementBytes the replacement bytes
+         * @return the escape map
+         */
         public static EscapeMap map(byte[] targetBytes, byte[] replacementBytes) {
             return map(Unpooled.wrappedBuffer(targetBytes), Unpooled.wrappedBuffer(replacementBytes));
         }
 
+        /**
+         * Map escape map.
+         *
+         * @param target      the target
+         * @param replacement the replacement
+         * @return the escape map
+         */
         public static EscapeMap map(ByteBuf target, ByteBuf replacement) {
             EscapeMap escapeMap = new EscapeMap(1);
             escapeMap.put(target, replacement);
@@ -151,10 +223,22 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             if (target.length != replacement.length) throw new IllegalArgumentException("The target data must be the same as the number of replacement data");
         }
 
+        /**
+         * Get excludes byte buf [ ].
+         *
+         * @param target the target
+         * @return the byte buf [ ]
+         */
         public ByteBuf[] getExcludes(ByteBuf target) {
             return getExcludeMap().getOrDefault(target, EMPTY_BUFFER_ARRAY);
         }
 
+        /**
+         * Sets exclude map.
+         *
+         * @param targets      the targets
+         * @param replacements the replacements
+         */
         public void setExcludeMap(ByteBuf[] targets, ByteBuf[] replacements) {
             for (int i = 0; i < targets.length; i++) {
                 List<ByteBuf> excludes = new ArrayList<>(4);
@@ -180,6 +264,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
+    /**
+     * Do escape byte buf.
+     *
+     * @param msgBuf      the msg buf
+     * @param target      the target
+     * @param replacement the replacement
+     * @param excludes    the excludes
+     * @return the byte buf
+     */
     public static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
         if (containsInvalidByteBuf(msgBuf, target, replacement)) return msgBuf;
         if (excludes.length != 0 && Arrays.binarySearch(excludes, target) != -1) {
@@ -256,6 +349,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return false;
     }
 
+    /**
+     * check if it has the same header-byte and tail-byte
+     * @param msgBuf reading message buffer
+     * @param target the target
+     */
     private static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf target) {
         return msgBuf.getByte(index) == target.getByte(0)
                &&

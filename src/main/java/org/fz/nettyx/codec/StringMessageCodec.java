@@ -12,11 +12,11 @@ import java.util.List;
 
 /**
  * basic string codec
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2021/4/9 16:35
+ * @since 2021 /4/9 16:35
  */
-
 @Slf4j
 @RequiredArgsConstructor
 public class StringMessageCodec extends ByteToMessageCodec<String> {

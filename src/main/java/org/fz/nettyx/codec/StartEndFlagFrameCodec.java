@@ -16,8 +16,8 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
  *
  * @author fengbinbin
  * @version 1.0
- * @since 2021/1/20 15:13
  * @apiNote The [strip] option is not provided and always strip the head and tail flag
+ * @since 2021 /1/20 15:13
  */
 @Slf4j
 public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEndFlagFrameDecoder, StartEndFlagFrameEncoder> {
@@ -27,26 +27,59 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
      */
     private static final int DEFAULT_MAX_FRAME_LENGTH = 2 * 1024;
 
+    /**
+     * Instantiates a new Start end flag frame codec.
+     *
+     * @param maxFrameLength the max frame length
+     * @param startFlag      the start flag
+     * @param endFlag        the end flag
+     */
     public StartEndFlagFrameCodec(int maxFrameLength, ByteBuf startFlag, ByteBuf endFlag) {
         super(new StartEndFlagFrameDecoder(maxFrameLength, startFlag, endFlag), new StartEndFlagFrameEncoder(startFlag, endFlag));
     }
 
+    /**
+     * Instantiates a new Start end flag frame codec.
+     *
+     * @param maxFrameLength   the max frame length
+     * @param startEndSameFlag the start end same flag
+     */
     public StartEndFlagFrameCodec(int maxFrameLength, ByteBuf startEndSameFlag) {
         super(new StartEndFlagFrameDecoder(maxFrameLength, startEndSameFlag), new StartEndFlagFrameEncoder(startEndSameFlag));
     }
 
+    /**
+     * Instantiates a new Start end flag frame codec.
+     *
+     * @param startEndSameFlag the start end same flag
+     */
     public StartEndFlagFrameCodec(ByteBuf startEndSameFlag) {
         super(new StartEndFlagFrameDecoder(startEndSameFlag), new StartEndFlagFrameEncoder(startEndSameFlag));
     }
 
+    /**
+     * Instantiates a new Start end flag frame codec.
+     *
+     * @param startFlag the start flag
+     * @param endFlag   the end flag
+     */
     public StartEndFlagFrameCodec(ByteBuf startFlag, ByteBuf endFlag) {
         super(new StartEndFlagFrameDecoder(startFlag, endFlag), new StartEndFlagFrameEncoder(startFlag, endFlag));
     }
 
+    /**
+     * Instantiates a new Start end flag frame codec.
+     *
+     * @param decoder the decoder
+     * @param encoder the encoder
+     */
     public StartEndFlagFrameCodec(StartEndFlagFrameDecoder decoder, StartEndFlagFrameEncoder encoder) {
         super(decoder, encoder);
     }
 
+    /**
+     * The type Start end flag frame decoder.
+     */
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
         @Override
@@ -54,18 +87,42 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             return false;
         }
 
+        /**
+         * Instantiates a new Start end flag frame decoder.
+         *
+         * @param maxFrameLength   the max frame length
+         * @param startEndSameFlag the start end same flag
+         */
         public StartEndFlagFrameDecoder(int maxFrameLength, ByteBuf startEndSameFlag) {
             super(maxFrameLength, true, startEndSameFlag);
         }
 
+        /**
+         * Instantiates a new Start end flag frame decoder.
+         *
+         * @param maxFrameLength the max frame length
+         * @param startFlag      the start flag
+         * @param endFlag        the end flag
+         */
         public StartEndFlagFrameDecoder(int maxFrameLength, ByteBuf startFlag, ByteBuf endFlag) {
             super(maxFrameLength, true, startFlag, endFlag);
         }
 
+        /**
+         * Instantiates a new Start end flag frame decoder.
+         *
+         * @param startEndSameFlag the start end same flag
+         */
         public StartEndFlagFrameDecoder(ByteBuf startEndSameFlag) {
             super(DEFAULT_MAX_FRAME_LENGTH, true, startEndSameFlag);
         }
 
+        /**
+         * Instantiates a new Start end flag frame decoder.
+         *
+         * @param startFlag the start flag
+         * @param endFlag   the end flag
+         */
         public StartEndFlagFrameDecoder(ByteBuf startFlag, ByteBuf endFlag) {
             super(DEFAULT_MAX_FRAME_LENGTH, true, startFlag, endFlag);
         }
@@ -80,6 +137,9 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
     }
 
+    /**
+     * The type Start end flag frame encoder.
+     */
     public static class StartEndFlagFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final ByteBuf startFlag;
@@ -90,10 +150,21 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             return false;
         }
 
+        /**
+         * Instantiates a new Start end flag frame encoder.
+         *
+         * @param startEndSameFlag the start end same flag
+         */
         public StartEndFlagFrameEncoder(ByteBuf startEndSameFlag) {
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
+        /**
+         * Instantiates a new Start end flag frame encoder.
+         *
+         * @param startFlag the start flag
+         * @param endFlag   the end flag
+         */
         public StartEndFlagFrameEncoder(ByteBuf startFlag, ByteBuf endFlag) {
             this.startFlag = startFlag;
             this.endFlag = endFlag;
