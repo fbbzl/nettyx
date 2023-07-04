@@ -36,7 +36,6 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
         // failed
         if (!channelFuture.isSuccess()) act(whenFailure, channelFuture);
 
-
         // done
         if (channelFuture.isDone()) act(whenDone, channelFuture);
         else
