@@ -9,7 +9,6 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * channel interceptor
@@ -28,14 +27,14 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      * true : Means this interceptor no longer intercepts any events
      * false: Means the specified channel-event will be intercepted
      */
-    private final AtomicBoolean state = new AtomicBoolean(false);
+    private volatile boolean state = false;
 
     // getter and setter of state
-    private boolean freed() {
-        return state.get();
+    private boolean isFreed() {
+        return state;
     }
-    private boolean unfreed() {
-        return !state.get();
+    private boolean isNotFreed() {
+        return !state;
     }
 
     /**
@@ -44,7 +43,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      * @see ChannelInterceptor#reset() ChannelInterceptor#reset()ChannelInterceptor#reset()use this to recover this handler
      */
     public void free() {
-        this.state.set(true);
+        this.state = true;
     }
 
     /**
@@ -53,12 +52,12 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      * @see ChannelInterceptor#free() ChannelInterceptor#free()ChannelInterceptor#free()use method to free
      */
     public void reset() {
-        this.state.set(false);
+        this.state = false;
     }
 
     @Override
     public final void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelRegistered(ctx);
         }
         else this.preChannelRegistered(ctx);
@@ -66,7 +65,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelUnregistered(ctx);
         }
         else this.preChannelUnregistered(ctx);
@@ -74,7 +73,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void channelActive(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelActive(ctx);
         }
         else this.preChannelActive(ctx);
@@ -82,7 +81,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelInactive(ctx);
         }
         else this.preChannelInactive(ctx);
@@ -90,7 +89,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelRead(ctx, msg);
             return;
         }
@@ -106,7 +105,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelReadComplete(ctx);
         }
         else this.preChannelReadComplete(ctx);
@@ -114,7 +113,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.userEventTriggered(ctx, evt);
         }
         else this.preUserEventTriggered(ctx, evt);
@@ -122,7 +121,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.channelWritabilityChanged(ctx);
         }
         else this.preChannelWritabilityChanged(ctx);
@@ -130,7 +129,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.exceptionCaught(ctx, cause);
         }
         else this.preExceptionCaught(ctx, cause);
@@ -138,7 +137,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.bind(ctx, localAddress, promise);
         }
         else this.preBind(ctx, localAddress, promise);
@@ -146,7 +145,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.connect(ctx, remoteAddress, localAddress, promise);
         }
         else this.preConnect(ctx, remoteAddress, localAddress, promise);
@@ -154,7 +153,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.disconnect(ctx, promise);
         }
         else this.preDisconnect(ctx, promise);
@@ -162,7 +161,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.close(ctx, promise);
         }
         else this.preClose(ctx, promise);
@@ -170,7 +169,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.deregister(ctx, promise);
         }
         else this.preDeregister(ctx, promise);
@@ -178,7 +177,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void read(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.read(ctx);
         }
         else this.preRead(ctx);
@@ -186,7 +185,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.write(ctx, msg, promise);
         }
         else this.preWrite(ctx, msg, promise);
@@ -194,7 +193,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
 
     @Override
     public final void flush(ChannelHandlerContext ctx) throws Exception {
-        if (freed()) {
+        if (isFreed()) {
             super.flush(ctx);
         }
         else this.preFlush(ctx);
@@ -865,7 +864,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
          * @param pipeline pipeline
          */
         public static void freeAll(ChannelPipeline pipeline) {
-            getInterceptors(pipeline).stream().filter(ChannelInterceptor::unfreed).forEach(ChannelInterceptor::free);
+            getInterceptors(pipeline).stream().filter(ChannelInterceptor::isNotFreed).forEach(ChannelInterceptor::free);
         }
 
         /**
@@ -892,7 +891,7 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
          * @param pipeline pipeline
          */
         public static void resetAll(ChannelPipeline pipeline) {
-            getInterceptors(pipeline).stream().filter(ChannelInterceptor::freed).forEach(ChannelInterceptor::reset);
+            getInterceptors(pipeline).stream().filter(ChannelInterceptor::isFreed).forEach(ChannelInterceptor::reset);
         }
     }
 }
