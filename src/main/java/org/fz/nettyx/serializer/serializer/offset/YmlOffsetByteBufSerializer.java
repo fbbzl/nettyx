@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
  * @author fengbinbin
  * @since 2022-01-02 09:52
  **/
-public class XmlOffsetByteBufSerializer implements OffsetByteBufSerializer {
+public class YmlOffsetByteBufSerializer implements OffsetByteBufSerializer {
 
     @Override
     public <T> Class<T> getDomainType() {
