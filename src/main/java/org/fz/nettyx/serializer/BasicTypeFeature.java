@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class BasicTypeFeature {
 
     static final Map<Class<? extends Basic<?>>, BasicTypeFeature> BASIC_FEATURE_CACHE = new ConcurrentHashMap<>(8);
-    static final Map<Class<?>, BasicTypeFeature> STRUCT_FEATURE_CACHE = new ConcurrentHashMap<>(32);
+    static final Map<Class<?>, BasicTypeFeature> STRUCT_FEATURE_CACHE = new ConcurrentHashMap<>(64);
 
     /**
      * byte size
