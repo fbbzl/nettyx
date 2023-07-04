@@ -15,10 +15,10 @@ import java.util.Arrays;
  * @version 1.0
  * @since 2021/10/20 16:27
  */
-public class DemoMain {
+public class SerializerDemoMain {
 
     public static void main(String[] args) {
-        // these bytes may from nio, netty, inputstream, outputstream.....
+        // these bytes may from nio, netty, input-stream, output-stream.....
         byte[] bytes = {12, -11, -45, -123, -67, -57, -90, -99, -11, -22, -78, -90, -45, -33, -67, -56, -67, -77, -7, -55, -66, -45, -77, -77, -45, -55, -62,
             -90, -45, -3, -111, -77, -55, -52, -56, -77, -45, -54, -45, -52, -23, -44, -35, -11, -78, -51, -112, -42, -22, -45, -33, -52, -45, -99, -33, -11, -66,
             -6, -78, -1, 48, 111, 12};
