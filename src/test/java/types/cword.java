@@ -11,9 +11,8 @@ import java.nio.ByteOrder;
  * @since 2021-10-19 19:46
  **/
 public class cword extends Basic<Integer> {
-
-    public static cword of(Integer value) {
-        return new cword().setValue(value);
+    public cword(Integer value) {
+        super(value);
     }
 
     @Override
