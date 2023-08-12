@@ -1,4 +1,4 @@
-package org.fz.nettyx.client.rxtx;
+package org.fz.nettyx.endpoint.client.rxtx;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
