@@ -1,5 +1,6 @@
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Getter;
 import org.fz.nettyx.serializer.annotation.FieldHandler;
 import org.fz.nettyx.serializer.annotation.Length;
 import org.fz.nettyx.serializer.annotation.Struct;
@@ -32,15 +33,15 @@ public class SerializerDemoMain {
         bill.setBid("9527");
 
         final User user = new User();
-        user.setUid(clong.of(2));
-        user.setUname(cchar.of(1));
+        user.setUid(new clong(2));
+        user.setUname(new cchar(1));
         user.setIsMarried(cboolean.TRUE);
-        user.setSex(cbyte.of(1));
-        user.setAddress(cdword.of(1L));
-        user.setPlatformId(cshort.of(1));
-        user.setDescription(cword.of(123));
+        user.setSex(new cbyte(1));
+        user.setAddress(new cdword(1L));
+        user.setPlatformId(new cshort(1));
+        user.setDescription(new cword(123));
         user.setBill(bill);
-        user.setLoginNames(new cdword[]{cdword.of(122L)});
+        user.setLoginNames(new cdword[]{new cdword(122L)});
 
         final byte[] userWriteBytes = TypedByteBufSerializer.writeBytes(user);
 
@@ -60,6 +61,7 @@ public class SerializerDemoMain {
         }
     }
 
+    @Getter
     @Struct
     public static class Bill {
 
@@ -75,16 +77,8 @@ public class SerializerDemoMain {
                 '}';
         }
 
-        public cboolean getIsSuccess() {
-            return isSuccess;
-        }
-
         public void setIsSuccess(cboolean isSuccess) {
             this.isSuccess = isSuccess;
-        }
-
-        public String getBid() {
-            return bid;
         }
 
         public void setBid(String bid) {
@@ -92,6 +86,7 @@ public class SerializerDemoMain {
         }
     }
 
+    @Getter
     @Struct
     public static class User {
 
@@ -106,72 +101,36 @@ public class SerializerDemoMain {
         @Length(2)
         private cdword[] loginNames;
 
-        public clong getUid() {
-            return uid;
-        }
-
         public void setUid(clong uid) {
             this.uid = uid;
-        }
-
-        public cchar getUname() {
-            return uname;
         }
 
         public void setUname(cchar uname) {
             this.uname = uname;
         }
 
-        public cboolean getIsMarried() {
-            return isMarried;
-        }
-
         public void setIsMarried(cboolean isMarried) {
             this.isMarried = isMarried;
-        }
-
-        public cbyte getSex() {
-            return sex;
         }
 
         public void setSex(cbyte sex) {
             this.sex = sex;
         }
 
-        public cdword getAddress() {
-            return address;
-        }
-
         public void setAddress(cdword address) {
             this.address = address;
-        }
-
-        public cshort getPlatformId() {
-            return platformId;
         }
 
         public void setPlatformId(cshort platformId) {
             this.platformId = platformId;
         }
 
-        public cword getDescription() {
-            return description;
-        }
-
         public void setDescription(cword description) {
             this.description = description;
         }
 
-        public Bill getBill() {
-            return bill;
-        }
-
         public void setBill(Bill bill) {
             this.bill = bill;
-        }
-
-        public cdword[] getLoginNames() {
-            return loginNames;
         }
 
         public void setLoginNames(cdword[] loginNames) {

@@ -16,12 +16,12 @@ public class cboolean extends Basic<Short> {
     public static final cboolean TRUE, FALSE;
 
     static {
-        TRUE = cboolean.of((short)1);
-        FALSE = cboolean.of((short) 0);
+        TRUE = new cboolean((short) 1);
+        FALSE = new cboolean((short) 0);
     }
 
-    public static cboolean of(Short value) {
-        return new cboolean().setValue(value);
+    public cboolean(Short value) {
+        super(value);
     }
 
     @Override

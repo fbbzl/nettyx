@@ -12,8 +12,8 @@ import java.nio.ByteOrder;
  **/
 public class clong extends Basic<Integer> {
 
-    public static clong of(Integer value) {
-        return new clong().setValue(value);
+    public clong(Integer value) {
+        super(value);
     }
 
     @Override

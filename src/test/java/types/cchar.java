@@ -12,12 +12,12 @@ import java.nio.ByteOrder;
  **/
 public class cchar extends Basic<Byte> {
 
-    public static cchar of(int value) {
-        return of((byte) value);
+    public cchar(Byte value) {
+        super(value);
     }
 
-    public static cchar of(byte value) {
-        return new cchar().setValue(value);
+    public cchar(int value) {
+        super((byte) value);
     }
 
     @Override

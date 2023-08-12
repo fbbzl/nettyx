@@ -12,12 +12,12 @@ import java.nio.ByteOrder;
  **/
 public class cbyte extends Basic<Short> {
 
-    public static cbyte of(int value) {
-        return of((short) value);
+    public cbyte(Short value) {
+        super(value);
     }
 
-    public static cbyte of(short value) {
-        return new cbyte().setValue(value);
+    public cbyte(int value) {
+        super((short) value);
     }
 
     @Override

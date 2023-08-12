@@ -12,12 +12,12 @@ import java.nio.ByteOrder;
  **/
 public class cshort extends Basic<Short> {
 
-    public static cshort of(int value) {
-        return of((short) value);
+    public cshort(Short value) {
+        super(value);
     }
 
-    public static cshort of(short value) {
-        return new cshort().setValue(value);
+    public cshort(int value) {
+        super((short) value);
     }
 
     @Override

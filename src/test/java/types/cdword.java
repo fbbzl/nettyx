@@ -12,8 +12,8 @@ import java.nio.ByteOrder;
  **/
 public class cdword extends Basic<Long> {
 
-    public static cdword of(long value) {
-        return new cdword().setValue(value);
+    public cdword(Long value) {
+        super(value);
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.serializer.type;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Getter;
 
 import java.nio.ByteOrder;
 
@@ -18,6 +19,11 @@ public abstract class Basic<V> {
 
     private ByteBuf buf;
 
+    /**
+     * -- GETTER --
+     * Gets value.
+     */
+    @Getter
     private V value;
 
     /**
@@ -66,13 +72,12 @@ public abstract class Basic<V> {
         return buf;
     }
 
-    /**
-     * Gets value.
-     *
-     * @return the value
-     */
-    public V getValue() {
-        return value;
+    protected Basic(V value) {
+        this.setValue(value);
+    }
+
+    protected Basic(ByteBuf buf) {
+        this.setByteBuf(buf);
     }
 
     public <B extends Basic<?>> B setByteBuf(ByteBuf buf) {
