@@ -1,4 +1,4 @@
-package org.fz.nettyx.client.jsc;
+package org.fz.nettyx.endpoint.client.jsc;
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.bootstrap.Bootstrap;
@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.client.Client;
+import org.fz.nettyx.endpoint.client.Client;
 import org.fz.nettyx.exception.NoSuchPortException;
 
 import java.util.List;

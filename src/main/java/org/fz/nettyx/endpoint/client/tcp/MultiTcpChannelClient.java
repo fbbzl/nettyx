@@ -1,26 +1,28 @@
-package org.fz.nettyx.client.rxtx;
+package org.fz.nettyx.endpoint.client.tcp;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.ChannelStorage;
+import org.fz.nettyx.endpoint.client.Client;
+import org.fz.nettyx.util.ChannelStorage;
 
+import java.net.SocketAddress;
 
 /**
- * A multi-channel client that uses channel-key to retrieve and manipulate the specified channel
+ * The type Multi channel client. use channel key to retrieve and use channels
+ *
+ * @param <K> the channel channelKey type
  * @author fengbinbin
- * @since 2022-01-26 20:26
- **/
-
-@SuppressWarnings("deprecation")
+ * @version 1.0
+ * @since 2021 /5/6 16:58
+ */
 @Slf4j
-public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
+public abstract class MultiTcpChannelClient<K> extends TcpClient {
 
-    private final AttributeKey<K> channelKey = AttributeKey.valueOf("$rxtx_channel_key$");
+    private final AttributeKey<K> channelKey = AttributeKey.valueOf("$tcp_channel_key$");
 
     /**
      * Used to store different channels
@@ -37,7 +39,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * @param channelKey the channel key
      * @param address    the address
      */
-    protected abstract ChannelFuture connect(K channelKey, RxtxDeviceAddress address) throws Exception;
+    protected abstract ChannelFuture connect(K channelKey, SocketAddress address) throws Exception;
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
@@ -47,7 +49,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * must store channel after connect success!!
      *
      * @param key     the channelKey
-     * @param channel the channeliopuj
+     * @param channel the channel
      */
     @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
@@ -78,11 +80,11 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (gracefullyCloseable(getChannel(key))) this.closeChannel(key);
+        if (Client.gracefullyCloseable(getChannel(key))) this.closeChannel(key);
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (gracefullyCloseable(getChannel(key))) this.closeChannel(key, promise);
+        if (Client.gracefullyCloseable(getChannel(key))) this.closeChannel(key, promise);
     }
 
     /**
@@ -95,19 +97,19 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
         Channel channel = channelStorage.get(channelKey);
 
         if (inActive(channel)) {
-            log.debug("comm channel not in active status, message will be discard: {}", message);
+            log.debug("channel not in active status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
-            return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
+            return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
         try {
             if (unWritable(channel)) {
-                log.debug("comm channel [{}] is not writable, channel key [{}]", channel, channelKey);
+                log.debug("channel [{}] is not writable, channel key [{}]", channel, channelKey);
                 ReferenceCountUtil.safeRelease(message);
-                return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
+                return failurePromise(channel, "channel: [" + channel + "] is not writable");
             } else return (ChannelPromise) channel.writeAndFlush(message);
         } catch (Exception exception) {
-            throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is [" + channel.remoteAddress() + "]", exception);
+            throw new ChannelException("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
         }
     }
 
@@ -157,4 +159,5 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     protected K channelKey(Channel channel) {
         return channel.attr(channelKey).get();
     }
+
 }

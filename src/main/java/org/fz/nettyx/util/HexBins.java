@@ -1,4 +1,4 @@
-package org.fz.nettyx;
+package org.fz.nettyx.util;
 
 import lombok.experimental.UtilityClass;
 

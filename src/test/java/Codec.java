@@ -4,8 +4,8 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.client.tcp.SingleTcpChannelClient;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
+import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
 import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 

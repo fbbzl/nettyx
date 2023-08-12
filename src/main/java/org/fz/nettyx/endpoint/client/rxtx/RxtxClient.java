@@ -1,11 +1,11 @@
-package org.fz.nettyx.client.rxtx;
+package org.fz.nettyx.endpoint.client.rxtx;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxChannelConfig;
-import org.fz.nettyx.client.Client;
+import org.fz.nettyx.endpoint.client.Client;
 
 import java.util.concurrent.*;
 
