@@ -1,13 +1,13 @@
-package org.fz.nettyx.serializer.serializer.offset;
+package org.fz.nettyx.serializer.offset;
 
 import io.netty.buffer.ByteBuf;
 
 /**
- * 基于注解的序列化器, 返回值为指定的对象
+ * 返回通用对象, 不支持自定义, 可能会使用map
  * @author fengbinbin
- * @since 2022-01-02 09:53
+ * @since 2022-01-02 09:52
  **/
-public class AnnotatedOffsetByteBufSerializer implements OffsetByteBufSerializer {
+public class YmlOffsetByteBufSerializer implements OffsetByteBufSerializer {
 
     @Override
     public <T> Class<T> getDomainType() {

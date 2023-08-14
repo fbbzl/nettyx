@@ -2,7 +2,7 @@ package types;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.serializer.type.Basic;
+import org.fz.nettyx.serializer.typed.Basic;
 
 import java.nio.ByteOrder;
 

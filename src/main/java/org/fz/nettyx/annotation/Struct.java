@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.annotation;
+package org.fz.nettyx.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

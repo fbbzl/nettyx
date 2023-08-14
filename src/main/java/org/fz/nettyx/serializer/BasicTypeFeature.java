@@ -1,6 +1,6 @@
 package org.fz.nettyx.serializer;
 
-import org.fz.nettyx.serializer.serializer.type.Basic;
+import org.fz.nettyx.serializer.typed.Basic;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

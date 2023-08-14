@@ -1,16 +1,16 @@
-package org.fz.nettyx.serializer.serializer.type;
+package org.fz.nettyx.serializer.typed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import org.fz.nettyx.annotation.FieldHandler;
+import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.handler.ByteBufHandler;
+import org.fz.nettyx.handler.ReadHandler;
+import org.fz.nettyx.handler.WriteHandler;
+import org.fz.nettyx.serializer.ByteBufSerializer;
 import org.fz.nettyx.serializer.Serializers;
-import org.fz.nettyx.serializer.annotation.FieldHandler;
-import org.fz.nettyx.serializer.exception.SerializeException;
-import org.fz.nettyx.serializer.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.handler.ByteBufHandler;
-import org.fz.nettyx.serializer.handler.ReadHandler;
-import org.fz.nettyx.serializer.handler.WriteHandler;
-import org.fz.nettyx.serializer.serializer.ByteBufSerializer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

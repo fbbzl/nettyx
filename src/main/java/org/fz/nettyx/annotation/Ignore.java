@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.annotation;
+package org.fz.nettyx.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -7,15 +7,13 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * array field must use this to assign array length!!!
- *
+ * if use this annotation, will skip the bytes allocation
  * @author fengbinbin
- * @since 2021-10-20 08:18
- **/
-
+ * @version 1.0
+ * @since 2021/1/20 11:04
+ */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface Length {
+public @interface Ignore {
 
-    int value();
 }

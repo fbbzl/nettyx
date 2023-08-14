@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.exception;
+package org.fz.nettyx.exception;
 
 /**
  * @author fengbinbin

@@ -1,6 +1,6 @@
-package org.fz.nettyx.serializer.serializer.offset;
+package org.fz.nettyx.serializer.offset;
 
-import org.fz.nettyx.serializer.serializer.ByteBufSerializer;
+import org.fz.nettyx.serializer.ByteBufSerializer;
 
 /**
  * @author fengbinbin
