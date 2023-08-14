@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.serializer.type;
+package org.fz.nettyx.serializer.typed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

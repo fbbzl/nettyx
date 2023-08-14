@@ -1,6 +1,6 @@
-package org.fz.nettyx.serializer.annotation;
+package org.fz.nettyx.annotation;
 
-import org.fz.nettyx.serializer.handler.ByteBufHandler;
+import org.fz.nettyx.handler.ByteBufHandler;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

@@ -1,11 +1,11 @@
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
-import org.fz.nettyx.serializer.annotation.FieldHandler;
-import org.fz.nettyx.serializer.annotation.Length;
-import org.fz.nettyx.serializer.annotation.Struct;
-import org.fz.nettyx.serializer.handler.ReadWriteHandler;
-import org.fz.nettyx.serializer.serializer.type.TypedByteBufSerializer;
+import org.fz.nettyx.annotation.FieldHandler;
+import org.fz.nettyx.annotation.Length;
+import org.fz.nettyx.annotation.Struct;
+import org.fz.nettyx.handler.ReadWriteHandler;
+import org.fz.nettyx.serializer.typed.TypedByteBufSerializer;
 import types.*;
 
 import java.lang.reflect.Field;

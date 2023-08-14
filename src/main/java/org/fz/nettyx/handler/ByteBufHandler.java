@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.handler;
+package org.fz.nettyx.handler;
 
 /**
  * target handler

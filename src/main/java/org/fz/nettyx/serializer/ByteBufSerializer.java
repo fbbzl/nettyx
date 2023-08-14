@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.serializer;
+package org.fz.nettyx.serializer;
 
 import io.netty.buffer.ByteBuf;
 

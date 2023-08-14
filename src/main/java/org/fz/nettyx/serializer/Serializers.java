@@ -1,13 +1,13 @@
 package org.fz.nettyx.serializer;
 
 import io.netty.util.internal.shaded.org.jctools.util.UnsafeAccess;
-import org.fz.nettyx.serializer.annotation.FieldHandler;
-import org.fz.nettyx.serializer.annotation.Ignore;
-import org.fz.nettyx.serializer.annotation.Length;
-import org.fz.nettyx.serializer.annotation.Struct;
-import org.fz.nettyx.serializer.exception.SerializeException;
-import org.fz.nettyx.serializer.serializer.type.Basic;
-import org.fz.nettyx.serializer.serializer.type.TypedByteBufSerializer;
+import org.fz.nettyx.annotation.FieldHandler;
+import org.fz.nettyx.annotation.Ignore;
+import org.fz.nettyx.annotation.Length;
+import org.fz.nettyx.annotation.Struct;
+import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.serializer.typed.Basic;
+import org.fz.nettyx.serializer.typed.TypedByteBufSerializer;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
@@ -21,10 +21,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.handler.ByteBufHandler.isReadHandler;
+import static org.fz.nettyx.handler.ByteBufHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.BasicTypeFeature.BASIC_FEATURE_CACHE;
 import static org.fz.nettyx.serializer.BasicTypeFeature.STRUCT_FEATURE_CACHE;
-import static org.fz.nettyx.serializer.handler.ByteBufHandler.isReadHandler;
-import static org.fz.nettyx.serializer.handler.ByteBufHandler.isWriteHandler;
 
 
 /**
@@ -166,6 +166,7 @@ public final class Serializers {
     }
 
     public static <T> int structSize(T object) {
+        if (object == null) throw new IllegalArgumentException("can not read struct size by null value");
         return structSize(object.getClass());
     }
     public static int structSize(Field field) { return structSize(field.getType()); }

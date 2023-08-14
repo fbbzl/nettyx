@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.annotation.offset;
+package org.fz.nettyx.annotation.offset;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
