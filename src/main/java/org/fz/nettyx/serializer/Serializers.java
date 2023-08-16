@@ -23,8 +23,8 @@ import java.util.function.Predicate;
 import static java.util.stream.Collectors.toList;
 import static org.fz.nettyx.handler.ByteBufHandler.isReadHandler;
 import static org.fz.nettyx.handler.ByteBufHandler.isWriteHandler;
-import static org.fz.nettyx.serializer.BasicTypeFeature.BASIC_FEATURE_CACHE;
-import static org.fz.nettyx.serializer.BasicTypeFeature.STRUCT_FEATURE_CACHE;
+import static org.fz.nettyx.serializer.typed.Basic.BasicTypeFeature.BASIC_FEATURE_CACHE;
+import static org.fz.nettyx.serializer.typed.Basic.BasicTypeFeature.STRUCT_FEATURE_CACHE;
 
 
 /**
@@ -161,7 +161,7 @@ public final class Serializers {
         return basicSize((Class<? extends Basic<?>>) field.getType());
     }
     public static <B extends Basic<?>> int basicSize(Class<B> clazz) {
-        Function<Class<?>, BasicTypeFeature> newFeature = key -> new BasicTypeFeature((newInstance(clazz)).size());
+        Function<Class<?>, Basic.BasicTypeFeature> newFeature = key -> new Basic.BasicTypeFeature((newInstance(clazz)).size());
         return BASIC_FEATURE_CACHE.computeIfAbsent(clazz, newFeature).getSize();
     }
 
@@ -171,7 +171,7 @@ public final class Serializers {
     }
     public static int structSize(Field field) { return structSize(field.getType()); }
     public static int structSize(Class<?> clazz) {
-        Function<Class<?>, BasicTypeFeature> newFeature = key -> {
+        Function<Class<?>, Basic.BasicTypeFeature> newFeature = key -> {
             int size = 0;
             for (Field field : getInstantiateFields(clazz)) {
                 if (isBasic(field))  { size += basicSize(field);  }
@@ -180,7 +180,7 @@ public final class Serializers {
                 else
                 if (isArray(field))  { size += arraySize(field);  }
             }
-            return new BasicTypeFeature(size);
+            return new Basic.BasicTypeFeature(size);
         };
 
         return STRUCT_FEATURE_CACHE.computeIfAbsent(clazz, newFeature).getSize();

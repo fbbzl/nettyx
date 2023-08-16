@@ -15,6 +15,11 @@
 ```
 ## api
 ```
+annotation
+  ---FieldHandler                     在序列化字段时，可以指定字段序列化/反序列化逻辑
+  ---Ignore                           序列化时忽略此字段
+  ---Length                           在序列化/反序列化时，数组类型的字段必须使用此注释来指定长度
+  ---Struct                           在序列化中，需要对域类型进行注释，就像JPA中的@Entity一样
 endpoint
   client                              提供client端基础实现
     ---Client                            顶级Client抽象  
@@ -65,13 +70,17 @@ handler                             提供了一些基础的channel handler实�
 listener
   ---ActionableChannelFutureListener   可操作channel future监听器
 serializer                             序列化工具
-  ---annotation
-  ---exception
-  ---handler
-  ---serializer
-  ---BasicTypeFeature.java
-  ---Serializers.java
+  ---offset
+    ---AnnotatedOffsetByteBufSerializer   基于注释的序列化器
+    ---OffsetByteBufSerializer            基于偏移量的序列化器
+    ---YmlOffsetByteBufSerializer         基于yml配置文件的序列化器
+  ---typed
+    ---Basic                              序列化时的基类型by type
+    ---TypedByteBufSerializer             基于类型的序列化器
+  ---ByteBufSerializer                    序列化/反序列化顶级抽象
+  ---Serializers.java                     通用序列化工具
 ssl
+  ---OpenSslContextFactory           openssl工厂
   ---SslContextFactory               ssl context工厂
 util                              基础工具类
   ---ChannelStorage                  存储channel, 内部使用KV对存储
