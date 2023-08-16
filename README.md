@@ -15,6 +15,11 @@ As of August 12, 2023, the latest version is [2.0.1 RELEASE]
 ```
 ## api
 ```
+annotation
+  ---FieldHandler                     When serializing fields, you can specify field serialization/deserialization logic
+  ---Ignore                           ignore this field when serializing
+  ---Length                           When serialized/deserialized, fields of array type must use this annotation to specify the length
+  ---Struct                           In serialization, the domain type needs to be annotated, something like @Entity in JPA
 endpoint
   client                              Provide client side basic implementation
     ---Client                            Top-level client abstraction  
@@ -65,13 +70,17 @@ handler                             Provided some basic channel handler implemen
 listener
   ---ActionableChannelFutureListener   Actionable channel future listener
 serializer                             Serialization tool
-  ---annotation
-  ---exception
-  ---handler
-  ---serializer
-  ---BasicTypeFeature.java
-  ---Serializers.java
+  ---offset
+    ---AnnotatedOffsetByteBufSerializer   annotation based serializer
+    ---OffsetByteBufSerializer            offset based serializer
+    ---YmlOffsetByteBufSerializer         serializer based on yml profile
+  ---typed
+    ---Basic                              base type when serialized deserialized by type
+    ---TypedByteBufSerializer             type based serializer
+  ---ByteBufSerializer                    serialize deserialize top level abstractions
+  ---Serializers.java                     universal serialization tool
 ssl
+  ---OpenSslContextFactory           OpenSSL context factory
   ---SslContextFactory               SSL context factory
 util                              Basic tool class
   ---ChannelStorage                  Storage channel, internally using KV pairs for storage
