@@ -28,7 +28,7 @@ public class cdword extends Basic<Long> {
 
     @Override
     protected ByteBuf toByteBuf(Long value) {
-        return Unpooled.buffer(size()).writeLongLE(value);
+        return Unpooled.buffer(size()).writeIntLE(value.intValue());
     }
 
     @Override

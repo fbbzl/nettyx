@@ -27,7 +27,7 @@ public class cword extends Basic<Integer> {
 
     @Override
     protected ByteBuf toByteBuf(Integer value) {
-        return Unpooled.buffer(size()).writeIntLE(value);
+        return Unpooled.buffer(size()).writeShortLE(value);
     }
 
     @Override

@@ -32,7 +32,8 @@ public class cbyte extends Basic<Short> {
 
     @Override
     protected ByteBuf toByteBuf(Short value) {
-        return Unpooled.buffer(size()).writeShortLE(value);
+        ByteBuf byteBuf = Unpooled.buffer(size()).writeByte(value);
+        return byteBuf;
     }
 
     @Override

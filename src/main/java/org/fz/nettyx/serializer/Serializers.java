@@ -17,15 +17,14 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 import static org.fz.nettyx.handler.ByteBufHandler.isReadHandler;
 import static org.fz.nettyx.handler.ByteBufHandler.isWriteHandler;
-import static org.fz.nettyx.serializer.typed.Basic.BasicTypeFeature.BASIC_FEATURE_CACHE;
-import static org.fz.nettyx.serializer.typed.Basic.BasicTypeFeature.STRUCT_FEATURE_CACHE;
-
 
 /**
  * the util for {@link TypedByteBufSerializer}
@@ -139,12 +138,14 @@ public final class Serializers {
     }
 
     public static int getLength(Field arrayField) {
-        Length length = arrayField.getAnnotation(Length.class);
-        if (length == null) {
-            throw new SerializeException("read array [" + arrayField + "] error, must use @" + Length.class.getSimpleName() + " to assign array arrayLength");
-        }
+        Function<Field, Integer> newArrayLengthCache = fieldKey -> {
+            Length length = fieldKey.getAnnotation(Length.class);
 
-        return length.value();
+            if (length == null) throw new SerializeException("read array [" + arrayField + "] error, must use @" + Length.class.getSimpleName() + " to assign array arrayLength");
+
+            return length.value();
+        };
+        return ARRAY_LENGTH_CACHE.computeIfAbsent(arrayField, newArrayLengthCache);
     }
 
     public static int sizeOf(Field field) {
@@ -161,8 +162,8 @@ public final class Serializers {
         return basicSize((Class<? extends Basic<?>>) field.getType());
     }
     public static <B extends Basic<?>> int basicSize(Class<B> clazz) {
-        Function<Class<?>, Basic.BasicTypeFeature> newFeature = key -> new Basic.BasicTypeFeature((newInstance(clazz)).size());
-        return BASIC_FEATURE_CACHE.computeIfAbsent(clazz, newFeature).getSize();
+        Function<Class<?>, Integer> newFeature = classKey -> (newInstance(clazz)).size();
+        return BASIC_SIZE_CACHE.computeIfAbsent(clazz, newFeature);
     }
 
     public static <T> int structSize(T object) {
@@ -171,7 +172,7 @@ public final class Serializers {
     }
     public static int structSize(Field field) { return structSize(field.getType()); }
     public static int structSize(Class<?> clazz) {
-        Function<Class<?>, Basic.BasicTypeFeature> newFeature = key -> {
+        Function<Class<?>, Integer> newFeature = key -> {
             int size = 0;
             for (Field field : getInstantiateFields(clazz)) {
                 if (isBasic(field))  { size += basicSize(field);  }
@@ -180,19 +181,19 @@ public final class Serializers {
                 else
                 if (isArray(field))  { size += arraySize(field);  }
             }
-            return new Basic.BasicTypeFeature(size);
+            return size;
         };
 
-        return STRUCT_FEATURE_CACHE.computeIfAbsent(clazz, newFeature).getSize();
+        return STRUCT_SIZE_CACHE.computeIfAbsent(clazz, newFeature);
     }
 
     public static int arraySize(Field arrayField) {
         final Class<?> elementType = arrayField.getType().getComponentType();
 
         int elementSize = 0;
-        if (isBasic(elementType))  { elementSize = basicSize((Class<? extends Basic<?>>) elementType);  }
+        if (isBasic(elementType))  { elementSize = basicSize((Class<? extends Basic<?>>) elementType); }
         else
-        if (isStruct(elementType)) { elementSize = structSize(elementType);                             }
+        if (isStruct(elementType)) { elementSize = structSize(elementType);                            }
 
         return getLength(arrayField) * elementSize;
     }
@@ -248,4 +249,9 @@ public final class Serializers {
     }
 
     //******************************************      public end       ***********************************************//
+
+    private static final Map<Class<? extends Basic<?>>, Integer> BASIC_SIZE_CACHE = new ConcurrentHashMap<>(8);
+    private static final Map<Class<?>, Integer> STRUCT_SIZE_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Field, Integer> FIELD_SIZE_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Field, Integer> ARRAY_LENGTH_CACHE = new ConcurrentHashMap<>(64);
 }
