@@ -6,11 +6,11 @@ Based on [netty4.1.90. Final], ultra-lightweight packaging has been carried out,
 #### Installation Tutorial
 1. Add Maven Dependency：
 ```xml
-As of August 12, 2023, the latest version is [2.0.1 RELEASE]
+As of August 19, 2023, the latest version is [2.0.1 RELEASE]
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.1-RELEASE</version>
+    <version>2.0.2-RELEASE</version>
 </dependency>
 ```
 ## api
