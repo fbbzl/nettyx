@@ -6,11 +6,11 @@
 #### 安装教程
 1. 在项目添加以下依赖包：
 ```xml
-截止2023/8/12为止, 最新版本为[2.0.1-RELEASE]
+截止2023/8/19为止, 最新版本为[2.0.1-RELEASE]
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.1-RELEASE</version>
+    <version>2.0.2-RELEASE</version>
 </dependency>
 ```
 ## api
