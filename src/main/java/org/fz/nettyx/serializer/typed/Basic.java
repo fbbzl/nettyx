@@ -5,8 +5,6 @@ import io.netty.buffer.Unpooled;
 import lombok.Getter;
 
 import java.nio.ByteOrder;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -94,27 +92,4 @@ public abstract class Basic<V> {
         return (B) this;
     }
 
-    /**
-     * @author fengbinbin
-     * @since 2022-01-01 09:07
-     **/
-    @Getter
-    public static class BasicTypeFeature {
-
-        public static final Map<Class<? extends Basic<?>>, BasicTypeFeature> BASIC_FEATURE_CACHE = new ConcurrentHashMap<>(8);
-        public static final Map<Class<?>, BasicTypeFeature> STRUCT_FEATURE_CACHE = new ConcurrentHashMap<>(64);
-
-        /**
-         * byte size
-         */
-        private int size;
-
-        public BasicTypeFeature(int size) {
-            this.size = size;
-        }
-
-        public void setSize(int size) {
-            this.size = size;
-        }
-    }
 }

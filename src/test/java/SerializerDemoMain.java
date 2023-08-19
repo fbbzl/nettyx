@@ -11,6 +11,8 @@ import types.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
+import static org.fz.nettyx.serializer.Serializers.structSize;
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -29,22 +31,23 @@ public class SerializerDemoMain {
 
         // test write
         Bill bill = new Bill();
-        bill.setIsSuccess(cboolean.TRUE);
+        bill.setIsSuccess(cboolean.newTrue());
         bill.setBid("9527");
 
         final User user = new User();
         user.setUid(new clong(2));
         user.setUname(new cchar(1));
-        user.setIsMarried(cboolean.TRUE);
+        user.setIsMarried(cboolean.newTrue());
         user.setSex(new cbyte(1));
         user.setAddress(new cdword(1L));
         user.setPlatformId(new cshort(1));
         user.setDescription(new cword(123));
         user.setBill(bill);
-        user.setLoginNames(new cdword[]{new cdword(122L)});
+        user.setLoginNames(new cdword[]{new cdword(192L)});
 
         final byte[] userWriteBytes = TypedByteBufSerializer.writeBytes(user);
-
+        System.err.println(userWriteBytes.length);
+        System.err.println(structSize(User.class));
         System.err.println("Write data: " + Arrays.toString(userWriteBytes));
     }
 
@@ -67,7 +70,7 @@ public class SerializerDemoMain {
 
         @FieldHandler(InnerEntityHandler.class)
         private String bid;
-        private cboolean isSuccess;
+        private cboolean isSuccess;//2
 
         @Override
         public String toString() {
@@ -90,16 +93,16 @@ public class SerializerDemoMain {
     @Struct
     public static class User {
 
-        private clong uid;
-        private cchar uname;
-        private cboolean isMarried;
-        private cbyte sex;
-        private cdword address;
-        private cshort platformId;
-        private cword description;
-        private Bill bill;
+        private clong uid;//4
+        private cchar uname;//1
+        private cboolean isMarried;//2
+        private cbyte sex;//1
+        private cdword address;//4
+        private cshort platformId;//2
+        private cword description;//2
+        private Bill bill;//2
         @Length(2)
-        private cdword[] loginNames;
+        private cdword[] loginNames;// 26
 
         public void setUid(clong uid) {
             this.uid = uid;

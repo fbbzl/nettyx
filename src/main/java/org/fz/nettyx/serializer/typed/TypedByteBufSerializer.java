@@ -16,9 +16,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.util.stream.Stream;
 
 import static org.fz.nettyx.serializer.Serializers.*;
 
@@ -28,7 +28,7 @@ import static org.fz.nettyx.serializer.Serializers.*;
  *
  * @author fengbinbin
  * @version 1.0
- * @since 2021/10/22 13:18
+ * @since 2021 /10/22 13:18
  */
 @SuppressWarnings("unchecked")
 public final class TypedByteBufSerializer implements ByteBufSerializer {
@@ -225,18 +225,20 @@ public final class TypedByteBufSerializer implements ByteBufSerializer {
 
     private void writeArray(Field arrayField) {
         Object[] arrayValue = getFieldValue(arrayField);
+        int declaredLength = getLength(arrayField);
 
         if (arrayValue == null) {
             this.byteBuf.writeBytes(new byte[arraySize(arrayField)]);
             return;
         }
-
+        // array element type
         Class<?> elementType = arrayField.getType().getComponentType();
 
-        if (isBasic(elementType)) {
-            fromBasicArray((Basic<?>[]) arrayValue);
-        }
-        else fromStructArray(arrayValue);
+        if (declaredLength < arrayValue.length) throw new IllegalArgumentException("[" + arrayField + "] array length exceed the assigned array length");
+        if (declaredLength > arrayValue.length) arrayValue = fillArray(arrayValue, elementType, declaredLength);
+
+        if (isBasic(elementType)) fromBasicArray((Basic<?>[]) arrayValue, basicSize((Class<Basic<?>>)elementType));
+        else                      fromStructArray(arrayValue, structSize(elementType));
     }
 
     private void writeHandled(Field handledField) {
@@ -244,12 +246,18 @@ public final class TypedByteBufSerializer implements ByteBufSerializer {
         ((WriteHandler) newInstance(handlerClass)).doWrite(this, handledField, getFieldValue(handledField), byteBuf);
     }
 
-    private void fromBasicArray(Basic<?>[] basicArray) {
-        Stream.of(basicArray).map(Basic::getByteBuf).forEach(this.byteBuf::writeBytes);
+    private void fromBasicArray(Basic<?>[] basicArray, int elementSize) {
+        for (Basic<?> basic : basicArray) {
+            if (basic == null) this.byteBuf.writeBytes(new byte[elementSize]);
+            else               this.byteBuf.writeBytes(basic.getByteBuf());
+        }
     }
 
-    private void fromStructArray(Object[] structArray) {
-        Stream.of(structArray).map(TypedByteBufSerializer::write).forEach(this.byteBuf::writeBytes);
+    private void fromStructArray(Object[] structArray, int elementSize) {
+        for (Object struct : structArray) {
+            if (struct == null) this.byteBuf.writeBytes(new byte[elementSize]);
+             else               this.byteBuf.writeBytes(TypedByteBufSerializer.write(struct));
+        }
     }
 
     public <V> V getFieldValue(Field field) {
@@ -272,6 +280,12 @@ public final class TypedByteBufSerializer implements ByteBufSerializer {
     @Override
     public ByteBuf getByteBuf() {
         return this.byteBuf;
+    }
+
+    public Object[] fillArray(Object[] arrayValue, Class<?> elementType, int length) {
+        Object[] filledArray = (Object[]) Array.newInstance(elementType, length);
+        System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
+        return filledArray;
     }
 
 }

@@ -12,12 +12,12 @@ import java.nio.ByteOrder;
  **/
 public class cboolean extends Basic<Short> {
 
-    // define const boolean
-    public static final cboolean TRUE, FALSE;
+    public static cboolean newTrue() {
+        return new cboolean((short) 1);
+    }
 
-    static {
-        TRUE = new cboolean((short) 1);
-        FALSE = new cboolean((short) 0);
+    public static cboolean newFalse() {
+        return new cboolean((short) 0);
     }
 
     public cboolean(Short value) {
