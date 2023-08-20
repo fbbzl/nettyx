@@ -6,11 +6,11 @@ Based on [netty4.1.90. Final], ultra-lightweight packaging has been carried out,
 #### Installation Tutorial
 1. Add Maven Dependency：
 ```xml
-As of August 19, 2023, the latest version is [2.0.1 RELEASE]
+
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.2-RELEASE</version>
+    <version>2.0.4-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -38,7 +38,7 @@ endpoint
 codec                               Provided some basic codecs
   ---DelimiterBasedFrameCodec          Based on the delimiter codec
   ---EscapeCodec                       Protocol sensitive word replacement, such as escape
-  ---StartEndFlagFrameCodec            Start Stop Codec
+  ---StartEndFlagFrameCodec            Start End Flag Codec, use to decoe message based on start and end flag
   ---StringMessageCodec                String Codec
 envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
@@ -67,13 +67,13 @@ handler                             Provided some basic channel handler implemen
   ---ExceptionHandler                  exception handler
   ---HeartBeater                       TCP heartbeat device
   ---LoggerHandler                     Entry and exit message log
+  ---MessageStealer                    use to discard message
+  ---ReadHandler                       use to extends read bytebuf 
+  ---ReadWriteHandler                  use to extends read-write bytebuf 
+  ---WriteHandler                      use to extends write bytebuf 
 listener
   ---ActionableChannelFutureListener   Actionable channel future listener
 serializer                             Serialization tool
-  ---offset
-    ---AnnotatedOffsetByteBufSerializer   annotation based serializer
-    ---OffsetByteBufSerializer            offset based serializer
-    ---YmlOffsetByteBufSerializer         serializer based on yml profile
   ---typed
     ---Basic                              base type when serialized deserialized by type
     ---TypedByteBufSerializer             type based serializer

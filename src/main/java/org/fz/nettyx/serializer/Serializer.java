@@ -8,7 +8,7 @@ import io.netty.buffer.ByteBuf;
  * @author fengbinbin
  * @since 2022 -01-02 10:15
  */
-public interface ByteBufSerializer {
+public interface Serializer {
 
     /**
      * Gets domain type.
