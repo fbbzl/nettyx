@@ -7,7 +7,7 @@ import org.fz.nettyx.annotation.Length;
 import org.fz.nettyx.annotation.Struct;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.serializer.typed.Basic;
-import org.fz.nettyx.serializer.typed.TypedByteBufSerializer;
+import org.fz.nettyx.serializer.typed.TypedSerializer;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
@@ -27,7 +27,7 @@ import static org.fz.nettyx.handler.ByteBufHandler.isReadHandler;
 import static org.fz.nettyx.handler.ByteBufHandler.isWriteHandler;
 
 /**
- * the util for {@link TypedByteBufSerializer}
+ * the util for {@link TypedSerializer}
  *
  * @author fengbinbin
  * @since 2021-10-20 20:13
@@ -138,14 +138,14 @@ public final class Serializers {
     }
 
     public static int getLength(Field arrayField) {
-        Function<Field, Integer> newArrayLengthCache = fieldKey -> {
+        Function<Field, Integer> cacheArrayLength = fieldKey -> {
             Length length = fieldKey.getAnnotation(Length.class);
 
             if (length == null) throw new SerializeException("read array [" + arrayField + "] error, must use @" + Length.class.getSimpleName() + " to assign array arrayLength");
 
             return length.value();
         };
-        return ARRAY_LENGTH_CACHE.computeIfAbsent(arrayField, newArrayLengthCache);
+        return ARRAY_LENGTH_CACHE.computeIfAbsent(arrayField, cacheArrayLength);
     }
 
     public static int sizeOf(Field field) {
@@ -156,23 +156,24 @@ public final class Serializers {
     }
 
     public static <B extends Basic<?>> int basicSize(B basic) {
+        if (basic == null) throw new IllegalArgumentException("can not read basic size by null");
         return basicSize(basic.getClass());
     }
     public static int basicSize(Field field) {
         return basicSize((Class<? extends Basic<?>>) field.getType());
     }
     public static <B extends Basic<?>> int basicSize(Class<B> clazz) {
-        Function<Class<?>, Integer> newFeature = classKey -> (newInstance(clazz)).size();
-        return BASIC_SIZE_CACHE.computeIfAbsent(clazz, newFeature);
+        Function<Class<?>, Integer> cacheBasicFeature = classKey -> (newInstance(clazz)).size();
+        return BASIC_SIZE_CACHE.computeIfAbsent(clazz, cacheBasicFeature);
     }
 
     public static <T> int structSize(T object) {
-        if (object == null) throw new IllegalArgumentException("can not read struct size by null value");
+        if (object == null) throw new IllegalArgumentException("can not read struct size by null");
         return structSize(object.getClass());
     }
     public static int structSize(Field field) { return structSize(field.getType()); }
     public static int structSize(Class<?> clazz) {
-        Function<Class<?>, Integer> newFeature = key -> {
+        Function<Class<?>, Integer> cacheStructSize = key -> {
             int size = 0;
             for (Field field : getInstantiateFields(clazz)) {
                 if (isBasic(field))  { size += basicSize(field);  }
@@ -184,7 +185,7 @@ public final class Serializers {
             return size;
         };
 
-        return STRUCT_SIZE_CACHE.computeIfAbsent(clazz, newFeature);
+        return STRUCT_SIZE_CACHE.computeIfAbsent(clazz, cacheStructSize);
     }
 
     public static int arraySize(Field arrayField) {
@@ -196,6 +197,21 @@ public final class Serializers {
         if (isStruct(elementType)) { elementSize = structSize(elementType);                            }
 
         return getLength(arrayField) * elementSize;
+    }
+
+
+    /**
+     * Fill array object [ ].
+     *
+     * @param arrayValue  the array value
+     * @param elementType the element type
+     * @param length      the length
+     * @return the object [ ]
+     */
+    public static Object[] fillArray(Object[] arrayValue, Class<?> elementType, int length) {
+        Object[] filledArray = (Object[]) Array.newInstance(elementType, length);
+        System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
+        return filledArray;
     }
 
     public static <T> boolean isBasic(T object) {

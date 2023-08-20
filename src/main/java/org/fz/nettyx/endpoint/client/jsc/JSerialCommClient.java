@@ -3,9 +3,7 @@ package org.fz.nettyx.endpoint.client.jsc;
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.EventLoopGroup;
-import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.Client;
 import org.fz.nettyx.exception.NoSuchPortException;
@@ -125,18 +123,24 @@ public class JSerialCommClient extends Client {
      * @param msgBuf the msg buf
      * @apiNote when you send message under higher baud-rate, and then you always lose bytes, please try this method
      */
-    public synchronized void sendSync(ByteBuf msgBuf) {
-        this.send(msgBuf);
+    public void sendSync(ByteBuf msgBuf) {
+        byte[] bytes = new byte[msgBuf.readableBytes()];
+        msgBuf.readBytes(bytes);
+
+        synchronized (this) {
+            this.send(bytes);
+        }
     }
 
     /**
-     * Send sync and release.
-     * when you send message under higher baud-rate, and then you always lose bytes, please try this method
+     * Send.
+     *
      * @param msgBuf the msg buf
-     * @apiNote when you send message under higher baud-rate, and then you always lose bytes, please try this method
      */
-    public synchronized void sendSyncAndRelease(ByteBuf msgBuf) {
-        this.sendAndRelease(msgBuf);
+    public void send(ByteBuf msgBuf) {
+        byte[] bytes = new byte[msgBuf.readableBytes()];
+        msgBuf.readBytes(bytes);
+        this.send(bytes);
     }
 
     /**
@@ -147,28 +151,6 @@ public class JSerialCommClient extends Client {
      */
     public synchronized void sendSync(byte[] content) {
         this.send(content);
-    }
-
-    /**
-     * Send.
-     *
-     * @param msgBuf the msg buf
-     */
-    public void send(ByteBuf msgBuf) {
-        this.send(ByteBufUtil.getBytes(msgBuf));
-    }
-
-    /**
-     * Send and release.
-     *
-     * @param msgBuf the msg buf
-     */
-    public void sendAndRelease(ByteBuf msgBuf) {
-        try {
-            this.send(ByteBufUtil.getBytes(msgBuf));
-        } finally {
-            ReferenceCountUtil.safeRelease(msgBuf);
-        }
     }
 
     /**
@@ -201,7 +183,7 @@ public class JSerialCommClient extends Client {
             }
             // To read data from the serial port, you must sleep after the serial port is opened and between two readings,
             // otherwise the program will not perceive that there is data in the input stream
-            Thread.sleep(10);
+            Thread.sleep(1);
         }
 
         return recvData;

@@ -6,11 +6,11 @@
 #### 安装教程
 1. 在项目添加以下依赖包：
 ```xml
-截止2023/8/19为止, 最新版本为[2.0.1-RELEASE]
+
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.2-RELEASE</version>
+    <version>2.0.4-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -67,13 +67,13 @@ handler                             提供了一些基础的channel handler实�
   ---ExceptionHandler                  异常处理器
   ---HeartBeater                       tcp心跳器
   ---LoggerHandler                     出入站消息日志
+  ---MessageStealer                    用来忽略一些消息
+  ---ReadHandler                       用来扩展字段的读序列化逻辑
+  ---ReadWriteHandler                  用来扩展字段的读写序列化逻辑
+  ---WriteHandler                      用来扩展字段的写序列化逻辑
 listener
   ---ActionableChannelFutureListener   可操作channel future监听器
 serializer                             序列化工具
-  ---offset
-    ---AnnotatedOffsetByteBufSerializer   基于注释的序列化器
-    ---OffsetByteBufSerializer            基于偏移量的序列化器
-    ---YmlOffsetByteBufSerializer         基于yml配置文件的序列化器
   ---typed
     ---Basic                              序列化时的基类型by type
     ---TypedByteBufSerializer             基于类型的序列化器

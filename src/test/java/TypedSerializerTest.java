@@ -4,8 +4,8 @@ import lombok.Getter;
 import org.fz.nettyx.annotation.FieldHandler;
 import org.fz.nettyx.annotation.Length;
 import org.fz.nettyx.annotation.Struct;
-import org.fz.nettyx.handler.ReadWriteHandler;
-import org.fz.nettyx.serializer.typed.TypedByteBufSerializer;
+import org.fz.nettyx.serializer.ReadWriteHandler;
+import org.fz.nettyx.serializer.typed.TypedSerializer;
 import types.*;
 
 import java.lang.reflect.Field;
@@ -18,7 +18,7 @@ import static org.fz.nettyx.serializer.Serializers.structSize;
  * @version 1.0
  * @since 2021/10/20 16:27
  */
-public class SerializerDemoMain {
+public class TypedSerializerTest {
 
     public static void main(String[] args) {
         // these bytes may from nio, netty, input-stream, output-stream.....
@@ -26,7 +26,7 @@ public class SerializerDemoMain {
             -90, -45, -3, -111, -77, -55, -52, -56, -77, -45, -54, -45, -52, -23, -44, -35, -11, -78, -51, -112, -42, -22, -45, -33, -52, -45, -99, -33, -11, -66,
             -6, -78, -1, 48, 111, 12};
 
-        User demo = TypedByteBufSerializer.read(Unpooled.wrappedBuffer(bytes), User.class);
+        User demo = TypedSerializer.read(Unpooled.wrappedBuffer(bytes), User.class);
         System.err.println("Read data: " + demo);
 
         // test write
@@ -45,21 +45,21 @@ public class SerializerDemoMain {
         user.setBill(bill);
         user.setLoginNames(new cdword[]{new cdword(192L)});
 
-        final byte[] userWriteBytes = TypedByteBufSerializer.writeBytes(user);
+        final byte[] userWriteBytes = TypedSerializer.writeBytes(user);
         System.err.println(userWriteBytes.length);
         System.err.println(structSize(User.class));
         System.err.println("Write data: " + Arrays.toString(userWriteBytes));
     }
 
-    public static class InnerEntityHandler implements ReadWriteHandler {
+    public static class InnerEntityHandler implements ReadWriteHandler<TypedSerializer> {
 
         @Override
-        public String doRead(TypedByteBufSerializer serializer, Field field) {
+        public String doRead(TypedSerializer serializer, Field field) {
             return "■■■■■■this value may from DB or the other way■■■■■";
         }
 
         @Override
-        public void doWrite(TypedByteBufSerializer serializer, Field field, Object value, ByteBuf add) {
+        public void doWrite(TypedSerializer serializer, Field field, Object value, ByteBuf add) {
             add.writeBytes(new byte[]{99, 99, 99, 99, 99});
         }
     }
