@@ -4,6 +4,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
 import org.fz.nettyx.handler.AdvisableChannelInitializer;
@@ -40,7 +41,8 @@ public class Codec {
                     channel.pipeline()
                             // in  out
                             // ▼   ▲  remove start and end flag
-                            .addLast(new StartEndFlagFrameCodec.StartEndFlagFrameDecoder(Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
+                            .addLast(new StartEndFlagFrameCodec(false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
+                            .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("5566", "7783")))
                             // ▼   ▲  deal control character and recover application data
                             .addLast(new LoggerHandler.InboundLogger(log));
                 }

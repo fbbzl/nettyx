@@ -1,6 +1,6 @@
-package org.fz.nettyx.handler;
+package org.fz.nettyx.serializer;
 
-import org.fz.nettyx.serializer.Serializer;
+import org.fz.nettyx.handler.ByteBufHandler;
 
 import java.lang.reflect.Field;
 

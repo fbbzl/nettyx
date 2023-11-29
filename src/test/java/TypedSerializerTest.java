@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.fz.nettyx.annotation.FieldHandler;
 import org.fz.nettyx.annotation.Length;
 import org.fz.nettyx.annotation.Struct;
-import org.fz.nettyx.handler.ReadWriteHandler;
+import org.fz.nettyx.serializer.ReadWriteHandler;
 import org.fz.nettyx.serializer.typed.TypedSerializer;
 import types.*;
 

@@ -1,6 +1,4 @@
-package org.fz.nettyx.handler;
-
-import org.fz.nettyx.serializer.Serializer;
+package org.fz.nettyx.serializer;
 
 /**
  * @author fengbinbin
