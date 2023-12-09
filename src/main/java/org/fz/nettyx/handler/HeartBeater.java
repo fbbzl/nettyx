@@ -47,7 +47,7 @@ public class HeartBeater {
             ctx.channel().remoteAddress(),
             getReaderIdleSeconds());
 
-        act(readIdleHeartBeatAction, ctx);
+        invokeAction(readIdleHeartBeatAction, ctx);
       }
       super.channelIdle(ctx, evt);
     }
@@ -78,7 +78,7 @@ public class HeartBeater {
             "start outbound heartbeat on address [{}], next round will after [{}] seconds",
             ctx.channel().remoteAddress(),
             getWriterIdleSeconds());
-        act(writeIdleHeartBeatAction, ctx);
+        invokeAction(writeIdleHeartBeatAction, ctx);
       }
       super.channelIdle(ctx, evt);
     }
@@ -90,7 +90,7 @@ public class HeartBeater {
    * @param channelAction the channel action
    * @param ctx           the ctx
    */
-  static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
+  static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
     if (channelAction != null) {
       channelAction.act(ctx);
     }

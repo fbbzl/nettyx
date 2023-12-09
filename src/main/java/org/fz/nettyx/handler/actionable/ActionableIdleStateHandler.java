@@ -90,17 +90,17 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (ChannelEvents.isReadIdle(evt)) {
             log.warn("have been in read-idle state for [{}] seconds on [{}]", getReaderIdleSeconds(), ctx.channel().remoteAddress());
-            act(readIdleAction, ctx);
+            invokeAction(readIdleAction, ctx);
         }
         else
         if (ChannelEvents.isWriteIdle(evt)) {
             log.warn("have been in write-idle state for [{}] seconds on [{}]", getWriterIdleSeconds(), ctx.channel().remoteAddress());
-            act(this.writeIdleAction(), ctx);
+            invokeAction(this.writeIdleAction(), ctx);
         }
         else
         if (ChannelEvents.isAllIdle(evt)) {
             log.warn("have been in all-idle state for [{}] seconds on [{}]", getAllIdleSeconds(), ctx.channel().remoteAddress());
-            act(this.writeIdleAction(), ctx);
+            invokeAction(this.writeIdleAction(), ctx);
         }
 
         if (fireNext) super.channelIdle(ctx, evt);
@@ -112,7 +112,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param channelAction the channel action
      * @param ctx           the ctx
      */
-    static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
+    static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
         if (channelAction != null) channelAction.act(ctx);
     }
 
