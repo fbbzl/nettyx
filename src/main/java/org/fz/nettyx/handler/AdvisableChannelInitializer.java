@@ -229,7 +229,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
          * When read idle inbound advice.
          *
          * @param idleSeconds the idle seconds
-         * @param readIdleAct the read idle act
+         * @param readIdleAct the read idle invokeAction
          * @return the inbound advice
          */
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
@@ -257,28 +257,28 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         @Override
         public final void channelRegistered(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel registered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenChannelRegister, ctx);
+            invokeAction(whenChannelRegister, ctx);
             super.channelRegistered(ctx);
         }
 
         @Override
         public final void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel unregistered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenChannelUnRegister, ctx);
+            invokeAction(whenChannelUnRegister, ctx);
             super.channelUnregistered(ctx);
         }
 
         @Override
         public final void channelActive(ChannelHandlerContext ctx) throws Exception {
             log.info("channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
-            act(whenChannelActive, ctx);
+            invokeAction(whenChannelActive, ctx);
             super.channelActive(ctx);
         }
 
         @Override
         public final void channelInactive(ChannelHandlerContext ctx) throws Exception {
             log.warn("channel in-active event triggered, address is [{}]", ctx.channel().remoteAddress());
-            act(whenChannelInactive, ctx);
+            invokeAction(whenChannelInactive, ctx);
             super.channelInactive(ctx);
         }
 
@@ -286,21 +286,21 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         public final void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress(), msg);
-            act(whenChannelRead, ctx, msg);
+            invokeAction(whenChannelRead, ctx, msg);
             super.channelRead(ctx, msg);
         }
 
         @Override
         public final void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel read complete, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenChannelReadComplete, ctx);
+            invokeAction(whenChannelReadComplete, ctx);
             super.channelReadComplete(ctx);
         }
 
         @Override
         public final void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel writability changed, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenWritabilityChanged, ctx);
+            invokeAction(whenWritabilityChanged, ctx);
             super.channelWritabilityChanged(ctx);
         }
     }
@@ -327,7 +327,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
          * When write idle outbound advice.
          *
          * @param idleSeconds  the idle seconds
-         * @param writeIdleAct the write idle act
+         * @param writeIdleAct the write idle invokeAction
          * @return the outbound advice
          */
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
@@ -355,35 +355,35 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), localAddress);
-            act(whenBind, ctx, localAddress, promise);
+            invokeAction(whenBind, ctx, localAddress, promise);
             super.bind(ctx, localAddress, promise);
         }
 
         @Override
         public final void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             log.debug("channel connecting, remote-address is [{}], local-address is [{}]", remoteAddress, localAddress);
-            act(whenConnect, ctx, remoteAddress, localAddress, promise);
+            invokeAction(whenConnect, ctx, remoteAddress, localAddress, promise);
             super.connect(ctx, remoteAddress, localAddress, promise);
         }
 
         @Override
         public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel disconnect, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenDisconnect, ctx, promise);
+            invokeAction(whenDisconnect, ctx, promise);
             super.disconnect(ctx, promise);
         }
 
         @Override
         public final void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenClose, ctx, promise);
+            invokeAction(whenClose, ctx, promise);
             super.close(ctx, promise);
         }
 
         @Override
         public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel deregister, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenDeregister, ctx, promise);
+            invokeAction(whenDeregister, ctx, promise);
             super.deregister(ctx, promise);
         }
 
@@ -391,21 +391,21 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
         public final void read(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel read during writing, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                 ctx.channel().localAddress());
-            act(whenRead, ctx);
+            invokeAction(whenRead, ctx);
             super.read(ctx);
         }
 
         @Override
         public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenWrite, ctx, msg, promise);
+            invokeAction(whenWrite, ctx, msg, promise);
             super.write(ctx, msg, promise);
         }
 
         @Override
         public final void flush(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel flush, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(), ctx.channel().localAddress());
-            act(whenFlush, ctx);
+            invokeAction(whenFlush, ctx);
             super.flush(ctx);
         }
     }
@@ -416,7 +416,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * @param channelAction the channel action
      * @param ctx           the ctx
      */
-    static void act(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
+    static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
         if (channelAction != null) {
             channelAction.act(ctx);
         }
@@ -430,7 +430,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * @param localAddress      the local address
      * @param promise           the promise
      */
-    static void act(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
+    static void invokeAction(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
         if (channelBindAction != null) {
             channelBindAction.act(ctx, localAddress, promise);
         }
@@ -445,8 +445,8 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * @param localAddress         the local address
      * @param promise              the promise
      */
-    static void act(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
-        ChannelPromise promise) {
+    static void invokeAction(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
+                             ChannelPromise promise) {
         if (channelConnectAction != null) {
             channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
         }
@@ -459,7 +459,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * @param ctx                  the ctx
      * @param promise              the promise
      */
-    static void act(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
+    static void invokeAction(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
         if (channelPromiseAction != null) {
             channelPromiseAction.act(ctx, promise);
         }
@@ -473,7 +473,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * @param msg                the msg
      * @param promise            the promise
      */
-    static void act(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
+    static void invokeAction(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
         if (channelWriteAction != null) {
             channelWriteAction.act(ctx, msg, promise);
         }
@@ -486,7 +486,7 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
      * @param ctx               the ctx
      * @param msg               the msg
      */
-    static void act(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
+    static void invokeAction(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
         if (channelReadAction != null) {
             channelReadAction.act(ctx, msg);
         }

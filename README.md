@@ -45,8 +45,7 @@ envet                                Provide support for netty events
   ---ChannelEvents                     Channel Event Object Tool
 exception                           Abnormal extension
   ---ClosingChannelException           In conjunction with channel advice, the channel can be closed by throwing the abnormal subclass
-function                            Contains sufficient functional interfaces to support nettyx functional programming                     
-  ---Action                            
+function                            Contains sufficient functional interfaces to support nettyx functional programming                                             
   ---ChannelAction                      
   ---ChannelBindAction
   ---ChannelConnectAction

@@ -10,7 +10,7 @@ import io.netty.channel.ChannelFuture;
  * @since 2021 /4/21 14:27
  */
 @FunctionalInterface
-public interface ChannelFutureAction extends Action {
+public interface ChannelFutureAction {
 
     /**
      * Act.
