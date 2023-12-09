@@ -58,12 +58,12 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             log.error("channel handler exception occurred: ", cause);
 
-            if (cause instanceof ReadTimeoutException)    { act(findReadTimeoutAction(ctx), ctx, cause);  }
+            if (cause instanceof ReadTimeoutException)    { invokeAction(findReadTimeoutAction(ctx), ctx, cause);  }
             else
-            if (cause instanceof WriteTimeoutException)   { act(findWriteTimeoutAction(ctx), ctx, cause); }
+            if (cause instanceof WriteTimeoutException)   { invokeAction(findWriteTimeoutAction(ctx), ctx, cause); }
             else
-            if (cause instanceof ClosingChannelException) { actAndClose(whenExceptionCaught, ctx, cause); }
-            else act(whenExceptionCaught, ctx, cause);
+            if (cause instanceof ClosingChannelException) { invokeActionAndClose(whenExceptionCaught, ctx, cause); }
+            else invokeAction(whenExceptionCaught, ctx, cause);
         }
 
         private <T extends ActionableReadTimeoutHandler> ChannelExceptionAction findReadTimeoutAction(ChannelHandlerContext ctx) {
@@ -141,7 +141,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             return cf -> {
                 if (!cf.isSuccess()) {
                     log.error("exception occur while writing, message is [" + msg + "]", cf.cause());
-                    act(whenExceptionCaught, ctx, cf.cause());
+                    invokeAction(whenExceptionCaught, ctx, cf.cause());
                 }
             };
         }
@@ -157,7 +157,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             return cf -> {
                 if (!cf.isSuccess()) {
                     log.error(cf.cause().getMessage());
-                    act(whenExceptionCaught, ctx, cf.cause());
+                    invokeAction(whenExceptionCaught, ctx, cf.cause());
                 }
             };
         }
@@ -170,7 +170,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
      * @param ctx             the ctx
      * @param throwable       the throwable
      */
-    static void act(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
+    static void invokeAction(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
         if (exceptionAction != null) {
             exceptionAction.act(ctx, throwable);
         }
@@ -183,8 +183,8 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
      * @param ctx             the ctx
      * @param cause           the cause
      */
-    static void actAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
-        act(exceptionAction, ctx, cause);
+    static void invokeActionAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
+        invokeAction(exceptionAction, ctx, cause);
         ctx.channel().close();
     }
 }
