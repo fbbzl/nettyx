@@ -13,7 +13,7 @@ import java.net.SocketAddress;
  * @since 12 /24/2021 3:28 PM
  */
 @FunctionalInterface
-public interface ChannelConnectAction extends Action {
+public interface ChannelConnectAction {
 
     /**
      * Act.

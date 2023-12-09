@@ -10,7 +10,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @since 12 /24/2021 3:19 PM
  */
 @FunctionalInterface
-public interface ChannelReadAction extends Action {
+public interface ChannelReadAction {
 
     /**
      * Act.
