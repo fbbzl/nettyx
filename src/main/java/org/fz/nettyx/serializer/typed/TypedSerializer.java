@@ -360,7 +360,7 @@ public final class TypedSerializer implements Serializer {
      */
     public static void writeArray(Field arrayField, Object domain, ByteBuf byteBuf) {
         Object[] arrayValue = Serializers.readField(domain, arrayField);
-        int declaredLength = getLength(arrayField);
+        int declaredLength = getArrayLength(arrayField);
 
         if (arrayValue == null) {
             byteBuf.writeBytes(new byte[arraySize(arrayField)]);

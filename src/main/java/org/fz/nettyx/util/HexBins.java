@@ -50,7 +50,7 @@ public class HexBins {
      * @return the string
      */
     public String fromBinary(String binaryString) {
-        if (binaryString == null || ("").equals(binaryString) || binaryString.length() % 8 != 0) {
+        if (binaryString == null || binaryString.isEmpty() || binaryString.length() % 8 != 0) {
             return null;
         }
         StringBuilder tmp = new StringBuilder();
