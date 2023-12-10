@@ -94,10 +94,8 @@ public final class Serializers {
     }
 
     public static <T extends Basic<?>> T createBasic(Class<T> basicType) {
-        if (isBasic(basicType)) {
-            return newInstance(basicType);
-        }
-        else throw new UnsupportedOperationException("can not create instance of type [" + basicType + "], its not Basic type");
+        if (isBasic(basicType)) return newInstance(basicType);
+        else                    throw new UnsupportedOperationException("can not create instance of type [" + basicType + "], its not Basic type");
     }
 
     public static <T> T createStruct(Field objectField) {
@@ -105,14 +103,12 @@ public final class Serializers {
     }
 
     public static <T> T createStruct(Class<T> objectType) {
-        if (isStruct(objectType)) {
-            return newInstance(objectType);
-        }
-        else throw new UnsupportedOperationException("can not create instance of type [" + objectType + "], its not Object type");
+        if (isStruct(objectType)) return newInstance(objectType);
+        else                      throw new UnsupportedOperationException("can not create instance of type [" + objectType + "], its not Object type");
     }
 
     public static <T> T[] createArray(Field arrayField) {
-        return (T[]) Array.newInstance(arrayField.getType().getComponentType(), getLength(arrayField));
+        return (T[]) Array.newInstance(arrayField.getType().getComponentType(), getArrayLength(arrayField));
     }
 
     public static <T> T newInstance(Class<T> clazz) {
@@ -137,7 +133,7 @@ public final class Serializers {
         }
     }
 
-    public static int getLength(Field arrayField) {
+    public static int getArrayLength(Field arrayField) {
         Function<Field, Integer> cacheArrayLength = fieldKey -> {
             Length length = fieldKey.getAnnotation(Length.class);
 
@@ -196,7 +192,7 @@ public final class Serializers {
         else
         if (isStruct(elementType)) { elementSize = structSize(elementType);                            }
 
-        return getLength(arrayField) * elementSize;
+        return getArrayLength(arrayField) * elementSize;
     }
 
 
@@ -267,7 +263,6 @@ public final class Serializers {
     //******************************************      public end       ***********************************************//
 
     private static final Map<Class<? extends Basic<?>>, Integer> BASIC_SIZE_CACHE = new ConcurrentHashMap<>(8);
-    private static final Map<Class<?>, Integer> STRUCT_SIZE_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Field, Integer> FIELD_SIZE_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Field, Integer> ARRAY_LENGTH_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Class<?>, Integer> STRUCT_SIZE_CACHE = new ConcurrentHashMap<>(256);
+    private static final Map<Field, Integer> ARRAY_LENGTH_CACHE = new ConcurrentHashMap<>(256);
 }
