@@ -84,63 +84,81 @@ public class ChannelStorage<K> {
      * @param key the key
      * @return the channel
      */
-    public Channel get(K key) { return channelMap.get(key); }
+    public Channel get(K key) {
+        return channelMap.get(key);
+    }
 
     /**
      * Is all active boolean.
      *
      * @return the boolean
      */
-    public boolean        isAllActive()       { return isAll(Channel::isActive);       }
+    public boolean isAllActive() {
+        return isAll(Channel::isActive);
+    }
 
     /**
      * Is all writable boolean.
      *
      * @return the boolean
      */
-    public boolean        isAllWritable()     { return isAll(Channel::isWritable);     }
+    public boolean isAllWritable() {
+        return isAll(Channel::isWritable);
+    }
 
     /**
      * Is all registered boolean.
      *
      * @return the boolean
      */
-    public boolean        isAllRegistered()   { return isAll(Channel::isRegistered);   }
+    public boolean isAllRegistered() {
+        return isAll(Channel::isRegistered);
+    }
 
     /**
      * Is all open boolean.
      *
      * @return the boolean
      */
-    public boolean        isAllOpen()         { return isAll(Channel::isOpen);         }
+    public boolean isAllOpen() {
+        return isAll(Channel::isOpen);
+    }
 
     /**
      * Find all active list.
      *
      * @return the list
      */
-    public List<Channel>  findAllActive()     { return findAll(Channel::isActive);     }
+    public List<Channel> findAllActive() {
+        return findAll(Channel::isActive);
+    }
 
     /**
      * Find all writable list.
      *
      * @return the list
      */
-    public List<Channel>  findAllWritable()   { return findAll(Channel::isWritable);   }
+    public List<Channel> findAllWritable() {
+        return findAll(Channel::isWritable);
+    }
 
     /**
      * Find all registered list.
      *
      * @return the list
      */
-    public List<Channel>  findAllRegistered() { return findAll(Channel::isRegistered); }
+    public List<Channel> findAllRegistered() {
+        return findAll(Channel::isRegistered);
+    }
 
     /**
      * Find all open list.
      *
      * @return the list
      */
-    public List<Channel>  findAllOpen()       { return findAll(Channel::isOpen);       }
+    public List<Channel> findAllOpen() {
+        return findAll(Channel::isOpen);
+    }
 
     /**
      * Find all list.
