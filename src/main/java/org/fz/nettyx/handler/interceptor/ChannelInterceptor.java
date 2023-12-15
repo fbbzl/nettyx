@@ -10,7 +10,7 @@ import java.net.SocketAddress;
 /**
  * channel interceptor
  * All methods will NOT be intercepted by default, which method should be overridden for which event you want to intercept
- *
+ * Not Thread Safe!!!
  * @param <T> the type parameter
  * @author fengbinbin
  * @version 1.0
@@ -24,9 +24,8 @@ public abstract class ChannelInterceptor<T> extends ChannelDuplexHandler {
      * true : Means this interceptor no longer intercepts any events
      * false: Means the specified channel-event will be intercepted
      */
-    private volatile boolean state = false;
+    private boolean state = false;
 
-    // getter and setter of state
     public boolean isFreed() {
         return state;
     }
