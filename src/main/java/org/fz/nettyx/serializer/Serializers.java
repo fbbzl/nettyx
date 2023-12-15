@@ -1,14 +1,11 @@
 package org.fz.nettyx.serializer;
 
-import io.netty.util.internal.shaded.org.jctools.util.UnsafeAccess;
-import org.fz.nettyx.annotation.FieldHandler;
-import org.fz.nettyx.annotation.Ignore;
-import org.fz.nettyx.annotation.Length;
-import org.fz.nettyx.annotation.Struct;
-import org.fz.nettyx.exception.SerializeException;
-import org.fz.nettyx.serializer.typed.Basic;
-import org.fz.nettyx.serializer.typed.TypedSerializer;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.ByteBufHandler.isReadHandler;
+import static org.fz.nettyx.serializer.ByteBufHandler.isWriteHandler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -21,10 +18,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.handler.ByteBufHandler.isReadHandler;
-import static org.fz.nettyx.handler.ByteBufHandler.isWriteHandler;
+import org.fz.nettyx.annotation.FieldHandler;
+import org.fz.nettyx.annotation.Ignore;
+import org.fz.nettyx.annotation.Length;
+import org.fz.nettyx.annotation.Struct;
+import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.serializer.type.Basic;
 
 /**
  * the util for {@link TypedSerializer}
@@ -89,48 +88,46 @@ public final class Serializers {
         return allFields;
     }
 
-    public static <T extends Basic<?>> T createBasic(Field basicField) {
-        return createBasic((Class<T>) basicField.getType());
+    public static <T extends Basic<?>> T newBasicInstance(Field basicField, ByteBuf buf) {
+        return newBasicInstance((Class<T>) basicField.getType(), buf);
     }
 
-    public static <T extends Basic<?>> T createBasic(Class<T> basicType) {
-        if (isBasic(basicType)) return newInstance(basicType);
-        else                    throw new UnsupportedOperationException("can not create instance of type [" + basicType + "], its not Basic type");
+    public static <T> T newBasicInstance(Class<T> basicClass, ByteBuf buf) {
+        try {
+            if (isBasic(basicClass)) return basicClass.getConstructor(ByteBuf.class).newInstance(buf);
+            else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
+        }
+        catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException exception) {
+            throw new SerializeException(
+                "basic class [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]");
+        }
     }
 
-    public static <T> T createStruct(Field objectField) {
-        return createStruct((Class<T>) objectField.getType());
+    public static <T> T newStructInstance(Field structField) {
+        return newStructInstance((Class<T>) structField.getType());
     }
 
-    public static <T> T createStruct(Class<T> objectType) {
-        if (isStruct(objectType)) return newInstance(objectType);
-        else                      throw new UnsupportedOperationException("can not create instance of type [" + objectType + "], its not Object type");
+    public static <T> T newStructInstance(Class<T> structClass) {
+        try {
+            if (isStruct(structClass)) return structClass.getConstructor().newInstance();
+            else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
+        }
+        catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException exception) {
+            throw new SerializeException("struct class [" + structClass + "] instantiate failed...");
+        }
     }
 
-    public static <T> T[] createArray(Field arrayField) {
+    public static <T> T newHandlerInstance(Class<T> handlerClass) {
+        try {
+            return handlerClass.getConstructor().newInstance();
+        }
+        catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException exception) {
+            throw new SerializeException("struct class [" + handlerClass + "] instantiate failed...");
+        }
+    }
+
+    public static <T> T[] newArrayInstance(Field arrayField) {
         return (T[]) Array.newInstance(arrayField.getType().getComponentType(), getArrayLength(arrayField));
-    }
-
-    public static <T> T newInstance(Class<T> clazz) {
-        try {
-            return clazz.getConstructor().newInstance();
-        }
-        catch (NoSuchMethodException exception) {
-            // will use unsafe to force create instance
-            return unsafeInstantiate(clazz);
-        }
-        catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("class [" + clazz + "] instantiate failed...");
-        }
-    }
-
-    public static <T> T unsafeInstantiate(Class<T> clazz) {
-        try {
-            return (T) UnsafeAccess.UNSAFE.allocateInstance(clazz);
-        }
-        catch (InstantiationException instantiationException) {
-            throw new SerializeException("class [" + clazz + "] instantiate failed...");
-        }
     }
 
     public static int getArrayLength(Field arrayField) {
@@ -143,58 +140,6 @@ public final class Serializers {
         };
         return ARRAY_LENGTH_CACHE.computeIfAbsent(arrayField, cacheArrayLength);
     }
-
-    public static int sizeOf(Field field) {
-        if (isBasic(field))  { return basicSize(field);  }
-        if (isStruct(field)) { return structSize(field); }
-        if (isArray(field))  { return arraySize(field);  }
-        throw new UnsupportedOperationException("un-support field [" + field + "]");
-    }
-
-    public static <B extends Basic<?>> int basicSize(B basic) {
-        if (basic == null) throw new IllegalArgumentException("can not read basic size by null");
-        return basicSize(basic.getClass());
-    }
-    public static int basicSize(Field field) {
-        return basicSize((Class<? extends Basic<?>>) field.getType());
-    }
-    public static <B extends Basic<?>> int basicSize(Class<B> clazz) {
-        Function<Class<?>, Integer> cacheBasicFeature = classKey -> (newInstance(clazz)).size();
-        return BASIC_SIZE_CACHE.computeIfAbsent(clazz, cacheBasicFeature);
-    }
-
-    public static <T> int structSize(T object) {
-        if (object == null) throw new IllegalArgumentException("can not read struct size by null");
-        return structSize(object.getClass());
-    }
-    public static int structSize(Field field) { return structSize(field.getType()); }
-    public static int structSize(Class<?> clazz) {
-        Function<Class<?>, Integer> cacheStructSize = key -> {
-            int size = 0;
-            for (Field field : getInstantiateFields(clazz)) {
-                if (isBasic(field))  { size += basicSize(field);  }
-                else
-                if (isStruct(field)) { size += structSize(field); }
-                else
-                if (isArray(field))  { size += arraySize(field);  }
-            }
-            return size;
-        };
-
-        return STRUCT_SIZE_CACHE.computeIfAbsent(clazz, cacheStructSize);
-    }
-
-    public static int arraySize(Field arrayField) {
-        final Class<?> elementType = arrayField.getType().getComponentType();
-
-        int elementSize = 0;
-        if (isBasic(elementType))  { elementSize = basicSize((Class<? extends Basic<?>>) elementType); }
-        else
-        if (isStruct(elementType)) { elementSize = structSize(elementType);                            }
-
-        return getArrayLength(arrayField) * elementSize;
-    }
-
 
     /**
      * Fill array object [ ].
@@ -262,7 +207,5 @@ public final class Serializers {
 
     //******************************************      public end       ***********************************************//
 
-    private static final Map<Class<? extends Basic<?>>, Integer> BASIC_SIZE_CACHE = new ConcurrentHashMap<>(8);
-    private static final Map<Class<?>, Integer> STRUCT_SIZE_CACHE = new ConcurrentHashMap<>(256);
     private static final Map<Field, Integer> ARRAY_LENGTH_CACHE = new ConcurrentHashMap<>(256);
 }
