@@ -1,19 +1,18 @@
 package org.fz.nettyx.ssl;
 
 
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.UtilityClass;
+import static lombok.AccessLevel.PACKAGE;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
-
-import static lombok.AccessLevel.PACKAGE;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.UtilityClass;
 
 /**
  * SSL context factory, provide one-way/two-way
@@ -384,4 +383,5 @@ public class SslContextFactory {
 
         }
     }
+
 }
