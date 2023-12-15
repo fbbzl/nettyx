@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.event.ChannelEvents;
-import org.fz.nettyx.function.ChannelHandlerContextAction;
+import org.fz.nettyx.action.ChannelHandlerContextAction;
 
 import java.util.concurrent.TimeUnit;
 

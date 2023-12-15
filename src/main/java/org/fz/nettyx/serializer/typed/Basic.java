@@ -1,9 +1,10 @@
 package org.fz.nettyx.serializer.typed;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.ByteBufUtil;
 import lombok.Getter;
 
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -14,17 +15,23 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2021 /10/22 13:26
  */
-@SuppressWarnings("unchecked")
+@Getter
 public abstract class Basic<V> {
 
-    private ByteBuf buf;
+    /**
+     * byte size
+     */
+    private final int size;
 
     /**
-     * -- GETTER --
-     * Gets value.
+     * the byte byteBuf
      */
-    @Getter
-    private V value;
+    private final ByteBuf byteBuf;
+
+    /**
+     * the Java value
+     */
+    private final V value;
 
     /**
      * Has singed boolean.
@@ -41,55 +48,77 @@ public abstract class Basic<V> {
     public abstract ByteOrder order();
 
     /**
-     * size of this basic field
-     *
-     * @return size int
-     */
-    public abstract int size();
-
-    /**
-     * change value to buf
+     * change value to byteBuf
      *
      * @param value value
-     * @return buf byte buf
+     * @param size the size
+     * @return byteBuf byte byteBuf
      */
-    protected abstract ByteBuf toByteBuf(V value);
+    protected abstract ByteBuf toByteBuf(V value, int size);
 
     /**
-     * change buf to value
+     * change byteBuf to value
      *
      * @param byteBuf bytebuf of field
-     * @return value
+     * @return value v
      */
     protected abstract V toValue(ByteBuf byteBuf);
 
     /**
-     * Gets buf.
+     * Get bytes byte [ ].
      *
-     * @return the buf
+     * @return the byte [ ]
      */
-    public ByteBuf getByteBuf() {
-        return buf;
+    public byte[] getBytes() {
+        return ByteBufUtil.getBytes(this.getByteBuf());
     }
 
-    protected Basic(V value) {
-        this.setValue(value);
+    public ByteBuffer getNioBuffer() {
+        return this.getByteBuf().nioBuffer();
     }
 
-    protected Basic(ByteBuf buf) {
-        this.setByteBuf(buf);
-    }
-
-    public <B extends Basic<?>> B setByteBuf(ByteBuf buf) {
-        this.buf = Unpooled.copiedBuffer(buf);
-        this.value = toValue(buf);
-        return (B) this;
-    }
-
-    public <B extends Basic<?>> B setValue(V value) {
+    /**
+     * Instantiates a new Basic.
+     *
+     * @param value the value
+     * @param size the size
+     */
+    protected Basic(V value, int size) {
+        this.size = size;
         this.value = value;
-        this.buf = toByteBuf(value);
-        return (B) this;
+        this.byteBuf = this.toByteBuf(this.value, this.size);
+        this.fill(this.byteBuf, this.size);
     }
 
+    /**
+     * Instantiates a new Basic.
+     *
+     * @param byteBuf the byteBuf
+     * @param size the size
+     */
+    protected Basic(ByteBuf byteBuf, int size) {
+        this.size = size;
+        this.fill(byteBuf, this.size);
+        this.byteBuf = byteBuf.readBytes(this.size);
+        this.value = this.toValue(this.byteBuf.duplicate());
+    }
+
+    /**
+     * fill buffer into assigned length
+     */
+    private void fill(ByteBuf buf, int requiredSize) {
+        int fillLength = requiredSize - buf.readableBytes();
+        if (fillLength > 0) {
+            buf.writeBytes(new byte[fillLength]);
+        }
+    }
+
+    /**
+     * Hex dump string.
+     *
+     * @return Returns a hex dump  of the specified buffer's readable bytes.
+     */
+    public String hexDump() {
+        return ByteBufUtil.hexDump(this.getByteBuf());
+    }
 }
