@@ -6,7 +6,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.fz.nettyx.function.ChannelExceptionAction;
+import org.fz.nettyx.action.ChannelExceptionAction;
 
 import java.util.concurrent.TimeUnit;
 
