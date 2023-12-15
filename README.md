@@ -10,11 +10,23 @@ Based on [netty4.1.101. Final], ultra-lightweight packaging has been carried out
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.6-RELEASE</version>
+    <version>2.0.8-RELEASE</version>
 </dependency>
 ```
 ## api
 ```
+action                              Contains sufficient functional interfaces to support nettyx functional programming 
+  ---Actions                        Action Generic util                                            
+  ---ChannelAction                      
+  ---ChannelBindAction
+  ---ChannelConnectAction
+  ---ChannelEventAction
+  ---ChannelExceptionAction
+  ---ChannelFutureAction
+  ---ChannelHandlerContextAction
+  ---ChannelPromiseAction
+  ---ChannelReadAction
+  ---ChannelWriteAction
 annotation
   ---FieldHandler                     When serializing fields, you can specify field serialization/deserialization logic
   ---Ignore                           ignore this field when serializing
@@ -45,34 +57,26 @@ envet                                Provide support for netty events
   ---ChannelEvents                     Channel Event Object Tool
 exception                           Abnormal extension
   ---ClosingChannelException           In conjunction with channel advice, the channel can be closed by throwing the abnormal subclass
-function                            Contains sufficient functional interfaces to support nettyx functional programming                                             
-  ---ChannelAction                      
-  ---ChannelBindAction
-  ---ChannelConnectAction
-  ---ChannelEventAction
-  ---ChannelExceptionAction
-  ---ChannelFutureAction
-  ---ChannelHandlerContextAction
-  ---ChannelPromiseAction
-  ---ChannelReadAction
-  ---ChannelWriteAction
 handler                             Provided some basic channel handler implementations
   actionable
      ---ActionableIdleStateHandler     Actionable Idle State Handler
      ---ActionableReadTimeoutHandler   Actionable ReadTimeout Handler
      ---ActionableWriteTimeoutHandler  Actionable WriteTimeout Handler
+  advice
+     ---InboundAdvice                  Inbound Advice
+     ---OutboundAdvice                 Outbound Advice
+  interceptor
+     ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
+     ---ChannelInterceptors               Channel interceptor utils
   ---AdvisableChannelInitializer       Channel advice initializer
-  ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
   ---ExceptionHandler                  exception handler
   ---HeartBeater                       TCP heartbeat device
   ---LoggerHandler                     Entry and exit message log
   ---MessageStealer                    use to discard message
-  ---ReadHandler                       use to extends read bytebuf 
-  ---ReadWriteHandler                  use to extends read-write bytebuf 
-  ---WriteHandler                      use to extends write bytebuf 
 listener
   ---ActionableChannelFutureListener   Actionable channel future listener
 serializer                             Serialization tool
+  ---ctype                             internal C basic type
   ---typed
     ---Basic                              base type when serialized deserialized by type
     ---TypedByteBufSerializer             type based serializer

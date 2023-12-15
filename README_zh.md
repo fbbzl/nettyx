@@ -10,11 +10,23 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.6-RELEASE</version>
+    <version>2.0.8-RELEASE</version>
 </dependency>
 ```
 ## api
 ```
+action                              包含了充足的函数式接口, 为nettyx函数式编程提供支持   
+  ---Actions                        Action通用工具类                                          
+  ---ChannelAction                      
+  ---ChannelBindAction
+  ---ChannelConnectAction
+  ---ChannelEventAction
+  ---ChannelExceptionAction
+  ---ChannelFutureAction
+  ---ChannelHandlerContextAction
+  ---ChannelPromiseAction
+  ---ChannelReadAction
+  ---ChannelWriteAction
 annotation
   ---FieldHandler                     在序列化字段时，可以指定字段序列化/反序列化逻辑
   ---Ignore                           序列化时忽略此字段
@@ -45,34 +57,26 @@ envet                                对netty事件提供支持
   ---ChannelEvents                     Channel事件对象工具
 exception                           异常扩展
   ---ClosingChannelException           配合channel advice, 可以通过抛出该异常子类来关闭channel
-function                            包含了充足的函数式接口, 为nettyx函数式编程提供支持                                                 
-  ---ChannelAction                      
-  ---ChannelBindAction
-  ---ChannelConnectAction
-  ---ChannelEventAction
-  ---ChannelExceptionAction
-  ---ChannelFutureAction
-  ---ChannelHandlerContextAction
-  ---ChannelPromiseAction
-  ---ChannelReadAction
-  ---ChannelWriteAction
 handler                             提供了一些基础的channel handler实现
   actionable
      ---ActionableIdleStateHandler     可操作闲置处理器
      ---ActionableReadTimeoutHandler   可操作读取超时处理器
      ---ActionableWriteTimeoutHandler  可操作写超时处理器
+  advice
+     ---InboundAdvice                  入站建言
+     ---OutboundAdvice                 出站建言
+  interceptor
+     ---ChannelInterceptor             Channel拦截器, 适用于通信前的握手动作等前置操作
+     ---ChannelInterceptors            Channel拦截器工具类
   ---AdvisableChannelInitializer       channel建言初始化器
-  ---ChannelInterceptor                channel拦截器, 适用于通信前的握手动作等前置操作
   ---ExceptionHandler                  异常处理器
   ---HeartBeater                       tcp心跳器
   ---LoggerHandler                     出入站消息日志
   ---MessageStealer                    用来忽略一些消息
-  ---ReadHandler                       用来扩展字段的读序列化逻辑
-  ---ReadWriteHandler                  用来扩展字段的读写序列化逻辑
-  ---WriteHandler                      用来扩展字段的写序列化逻辑
 listener
   ---ActionableChannelFutureListener   可操作channel future监听器
 serializer                             序列化工具
+  ---ctype                             内置C基础类型
   ---typed
     ---Basic                              序列化时的基类型by type
     ---TypedByteBufSerializer             基于类型的序列化器
