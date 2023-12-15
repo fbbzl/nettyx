@@ -1,4 +1,4 @@
-package org.fz.nettyx.function;
+package org.fz.nettyx.action;
 
 import io.netty.channel.ChannelHandlerContext;
 
