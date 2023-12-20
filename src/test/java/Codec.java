@@ -9,6 +9,7 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
 import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
+import org.fz.nettyx.handler.advice.InboundAdvice;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -33,7 +34,7 @@ public class Codec {
         }
 
         private ChannelInitializer<NioSocketChannel> channelInitializer() {
-            AdvisableChannelInitializer.InboundAdvice inboundAdvice = new AdvisableChannelInitializer.InboundAdvice();
+            InboundAdvice inboundAdvice = new InboundAdvice();
 
             return new AdvisableChannelInitializer<NioSocketChannel>(inboundAdvice) {
                 @Override

@@ -8,6 +8,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.ByteBufHandler.ReadHandler;
 import org.fz.nettyx.serializer.ByteBufHandler.WriteHandler;
+import org.fz.nettyx.serializer.type.Basic;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import org.fz.nettyx.serializer.type.Basic;
 
 import static org.fz.nettyx.serializer.Serializers.*;
 
@@ -300,7 +300,7 @@ public final class TypedSerializer implements Serializer {
      */
     public static void readHandled(Field handledField, Object domain, TypedSerializer upperSerializer) {
         final Class<? extends ByteBufHandler> handlerClass = handledField.getAnnotation(FieldHandler.class).value();
-        Serializers.writeField(domain, handledField, ((ReadHandler<TypedSerializer>) Serializers.newStructInstance(handlerClass)).doRead(upperSerializer, handledField));
+        Serializers.writeField(domain, handledField, ((ReadHandler<TypedSerializer>) Serializers.newHandlerInstance(handlerClass)).doRead(upperSerializer, handledField));
     }
 
     /**
