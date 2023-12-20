@@ -1,17 +1,18 @@
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.Setter;
-import org.fz.nettyx.annotation.FieldHandler;
 import org.fz.nettyx.annotation.Length;
 import org.fz.nettyx.annotation.Struct;
-import org.fz.nettyx.serializer.ByteBufHandler;
 import org.fz.nettyx.serializer.TypedSerializer;
-import org.fz.nettyx.serializer.type.c.signed.*;
+import org.fz.nettyx.serializer.type.c.signed.Cchar;
+import org.fz.nettyx.serializer.type.c.signed.Cdouble;
+import org.fz.nettyx.serializer.type.c.signed.Cfloat;
+import org.fz.nettyx.serializer.type.c.signed.Cint;
+import org.fz.nettyx.serializer.type.c.signed.Clong4;
+import org.fz.nettyx.serializer.type.c.signed.Clong8;
+import org.fz.nettyx.serializer.type.c.unsigned.Cuchar;
 import org.fz.nettyx.serializer.type.c.unsigned.Cuint;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 
 
@@ -24,41 +25,38 @@ public class TypedSerializerTest {
 
     public static void main(String[] args) {
         // these bytes may from nio, netty, input-stream, output-stream.....
-        byte[] bytes = {12, -11, -45, -123, -67, -57, -90, -99, -11, -22, -78, -90, -45, -33, -67, -56, -67, -77, -7, -55, -66, -45, -77, -77, -45, -55, -62,
-            -90, -45, -3, -111, -77, -55, -52, -56, -77, -45, -54, -45, -52, -23, -44, -35, -11, -78, -51, -112, -42, -22, -45, -33, -52, -45, -99, -33, -11, -66,
-            -6, -78, -1, 48, 111, 12};
+        User user = new User();
+        user.setUid(null);
+        user.setUname(null);
+        user.setIsMarried(null);
+        user.setSex(null);
+        user.setAddress(null);
+        user.setPlatformId(null);
+        user.setDescription(null);
+        user.setBill(null);
+        user.setLoginNames(null);
 
-        User demo = TypedSerializer.read(Unpooled.wrappedBuffer(bytes), User.class);
-        System.err.println("Read data: " + demo);
-
-        final byte[] userWriteBytes = TypedSerializer.writeBytes(demo);
+        final byte[] userWriteBytes = TypedSerializer.writeBytes(user);
         System.err.println(userWriteBytes.length);
 
         System.err.println("Write data: " + Arrays.toString(userWriteBytes));
-    }
 
-    public static class InnerEntityHandler implements ByteBufHandler.ReadWriteHandler<TypedSerializer> {
+        User read = TypedSerializer.read(userWriteBytes, User.class);
+        System.err.println(read);
 
-        @Override
-        public String doRead(TypedSerializer serializer, Field field) {
-            return "■■■■■■this value may from DB or the other way■■■■■";
-        }
-
-        @Override
-        public void doWrite(TypedSerializer serializer, Field field, Object value, ByteBuf add) {
-            add.writeBytes(new byte[]{99, 99, 99, 99, 99});
-        }
     }
 
     @Getter
+    @Setter
     @Struct
     public static class Bill {
 
-        @FieldHandler(InnerEntityHandler.class)
-        private String bid;
+        //@FieldHandler(InnerEntityHandler.class)
+        private Cuchar bid;
 
-        public void setBid(String bid) {
-            this.bid = bid;
+        @Override
+        public String toString() {
+            return "Bill{" + "bid='" + bid + '\'' + '}';
         }
     }
 
