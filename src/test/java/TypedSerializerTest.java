@@ -26,7 +26,7 @@ public class TypedSerializerTest {
     public static void main(String[] args) {
         // these bytes may from nio, netty, input-stream, output-stream.....
         User user = new User();
-        user.setUid(null);
+        user.setUid(new Clong4(1));
         user.setUname(null);
         user.setIsMarried(null);
         user.setSex(null);
@@ -34,7 +34,7 @@ public class TypedSerializerTest {
         user.setPlatformId(null);
         user.setDescription(null);
         user.setBill(null);
-        user.setLoginNames(null);
+        user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
         final byte[] userWriteBytes = TypedSerializer.writeBytes(user);
         System.err.println(userWriteBytes.length);
