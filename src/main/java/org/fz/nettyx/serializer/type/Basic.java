@@ -91,7 +91,7 @@ public abstract class Basic<V> {
         this.size = size;
         this.fill(byteBuf, this.size);
         this.byteBuf = byteBuf.readBytes(this.size);
-        this.value = this.toValue(this.byteBuf);
+        this.value = this.toValue(this.byteBuf.duplicate());
     }
 
     /**
