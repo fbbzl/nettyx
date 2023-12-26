@@ -2,27 +2,43 @@ package org.fz.nettyx.serializer;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.reflect.Field;
+
 /**
  * target handler
  *
  * @author fengbinbin
- * @since 2022-01-16 16:39
- **/
+ * @since 2022 -01-16 16:39
+ */
 public interface ByteBufHandler {
 
+    /**
+     * Is read handler boolean.
+     *
+     * @param clazz the clazz
+     * @return the boolean
+     */
     static boolean isReadHandler(Class<?> clazz) {
         return ReadHandler.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * Is write handler boolean.
+     *
+     * @param clazz the clazz
+     * @return the boolean
+     */
     static boolean isWriteHandler(Class<?> clazz) {
         return WriteHandler.class.isAssignableFrom(clazz);
     }
 
 
     /**
+     * The interface Read handler.
+     *
+     * @param <S> the type parameter
      * @author fengbinbin
-     * @since 2022-01-16 13:37
-     **/
+     * @since 2022 -01-16 13:37
+     */
     interface ReadHandler<S extends Serializer> extends ByteBufHandler {
 
         /**
@@ -37,17 +53,23 @@ public interface ByteBufHandler {
     }
 
     /**
+     * The interface Read write handler.
+     *
+     * @param <S> the type parameter
      * @author fengbinbin
-     * @since 2022-01-20 19:46
-     **/
+     * @since 2022 -01-20 19:46
+     */
     interface ReadWriteHandler<S extends Serializer> extends ReadHandler<S>, WriteHandler<S> {
 
     }
 
     /**
+     * The interface Write handler.
+     *
+     * @param <S> the type parameter
      * @author fengbinbin
-     * @since 2022-01-16 13:37
-     **/
+     * @since 2022 -01-16 13:37
+     */
     interface WriteHandler<S extends Serializer> extends ByteBufHandler {
 
         /**

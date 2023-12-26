@@ -49,6 +49,7 @@ public abstract class Basic<V> {
      * change value to byteBuf
      *
      * @param value value
+     * @param size the size
      * @return byteBuf byte byteBuf
      */
     protected abstract ByteBuf toByteBuf(V value, int size);
@@ -74,6 +75,7 @@ public abstract class Basic<V> {
      * Instantiates a new Basic.
      *
      * @param value the value
+     * @param size the size
      */
     protected Basic(V value, int size) {
         this.size = size;
@@ -86,6 +88,7 @@ public abstract class Basic<V> {
      * Instantiates a new Basic.
      *
      * @param byteBuf the byteBuf
+     * @param size the size
      */
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
@@ -99,6 +102,17 @@ public abstract class Basic<V> {
      */
     private void fill(ByteBuf buf, int requiredSize) {
         int fillLength = requiredSize - buf.readableBytes();
-        if (fillLength > 0) buf.writeBytes(new byte[fillLength]);
+        if (fillLength > 0) {
+            buf.writeBytes(new byte[fillLength]);
+        }
+    }
+
+    /**
+     * Hex dump string.
+     *
+     * @return Returns a hex dump  of the specified buffer's readable bytes.
+     */
+    public String hexDump() {
+        return ByteBufUtil.hexDump(this.getByteBuf());
     }
 }
