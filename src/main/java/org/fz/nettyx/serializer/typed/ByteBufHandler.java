@@ -67,9 +67,9 @@ public interface ByteBufHandler {
          * @param serializer the serializer
          * @param field the field
          * @param value the value
-         * @param add the add
+         * @param writingBuffer the writingBuffer
          */
-        void doWrite(S serializer, Field field, Object value, ByteBuf add);
+        void doWrite(S serializer, Field field, Object value, ByteBuf writingBuffer);
     }
 
     /**

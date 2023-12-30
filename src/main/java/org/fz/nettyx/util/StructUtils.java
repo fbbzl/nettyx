@@ -1,6 +1,7 @@
 package org.fz.nettyx.util;
 
 import lombok.experimental.UtilityClass;
+import org.fz.nettyx.exception.TypeJudgmentException;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -105,6 +106,12 @@ public class StructUtils {
             bytes[j] = stage;
         }
         return bytes;
+    }
+
+    public static void checkAssignable(Field field, Class<?> clazz) {
+        Class<?> type = field.getType();
+        if (clazz.isAssignableFrom(type))
+            throw new TypeJudgmentException("field [" + field + "] is not assignable from [" + clazz + "]");
     }
 
 }
