@@ -2,11 +2,11 @@ package org.fz.nettyx.serializer.typed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.serializer.typed.annotation.FieldHandler;
 import org.fz.nettyx.serializer.typed.annotation.Ignore;
 import org.fz.nettyx.serializer.typed.annotation.Length;
 import org.fz.nettyx.serializer.typed.annotation.Struct;
-import org.fz.nettyx.exception.SerializeException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.fz.nettyx.serializer.typed.ByteBufHandler.isReadHandler;
 import static org.fz.nettyx.serializer.typed.ByteBufHandler.isWriteHandler;
@@ -32,6 +33,11 @@ public final class Serializers {
     }
 
     //******************************************      public start     ***********************************************//
+
+    public static <T> T nullDefault(T obj, Supplier<T> defSupplier) {
+        if (obj == null) return defSupplier.get();
+        else             return obj;
+    }
 
     /**
      * New basic instance t.
@@ -53,7 +59,7 @@ public final class Serializers {
      * @param buf the buf
      * @return the t
      */
-    public static <T> T newBasicInstance(Class<T> basicClass, ByteBuf buf) {
+    public static <T extends Basic<?>> T newBasicInstance(Class<T> basicClass, ByteBuf buf) {
         try {
             if (isBasic(basicClass)) return basicClass.getConstructor(ByteBuf.class).newInstance(buf);
             else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
@@ -119,6 +125,10 @@ public final class Serializers {
         return (T[]) Array.newInstance(arrayField.getType().getComponentType(), getArrayLength(arrayField));
     }
 
+    public static <T> T[] newArrayInstance(Class<?> componentType, int length) {
+        return (T[]) Array.newInstance(componentType, length);
+    }
+
     /**
      * Gets array length.
      *
@@ -144,8 +154,8 @@ public final class Serializers {
      * @param length the length
      * @return the object [ ]
      */
-    public static Object[] fillArray(Object[] arrayValue, Class<?> elementType, int length) {
-        Object[] filledArray = (Object[]) Array.newInstance(elementType, length);
+    public static <T> T[] fillArray(T[] arrayValue, Class<?> elementType, int length) {
+        T[] filledArray = (T[]) Array.newInstance(elementType, length);
         System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
         return filledArray;
     }

@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client;
+package org.fz.nettyx.endpoint.tcp.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;

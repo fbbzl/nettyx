@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client.tcp;
+package org.fz.nettyx.endpoint.tcp.client.tcp;
 
 
 import io.netty.channel.Channel;
@@ -8,7 +8,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.Client;
+import org.fz.nettyx.endpoint.tcp.client.Client;
 
 import java.net.SocketAddress;
 
