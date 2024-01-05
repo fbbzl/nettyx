@@ -43,7 +43,7 @@ public @interface ToCharSequence {
      */
     int bufferLength() default 0;
 
-    class CharSequenceHandler implements SerializerHandler.ReadWriteHandler<StructSerializer> {
+    class CharSequenceHandler implements SerializerHandler.ReadWriteHandler {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field) {

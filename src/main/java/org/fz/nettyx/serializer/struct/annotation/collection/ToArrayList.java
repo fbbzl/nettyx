@@ -51,7 +51,7 @@ public @interface ToArrayList {
     /**
      * The type Array list handler.
      */
-    class ArrayListHandler implements SerializerHandler.ReadWriteHandler<StructSerializer> {
+    class ArrayListHandler implements SerializerHandler.ReadWriteHandler {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field) {
