@@ -51,24 +51,23 @@ public @interface ToArrayList {
     /**
      * The type Array list handler.
      */
-    class ArrayListHandler implements SerializerHandler.ReadWriteHandler {
+    class ArrayListHandler implements SerializerHandler.ReadWriteHandler<ToArrayList> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field) {
+        public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             StructUtils.checkAssignable(field, List.class);
-
-            ToArrayList toArrayList = StructUtils.findAnnotation(field, ToArrayList.class);
             Class<?> elementType = toArrayList.elementType();
             int bufferLength = toArrayList.bufferLength();
 
-            return new ArrayList<>(Arrays.asList(StructSerializer.readArray(elementType, toArrayList.size(), serializer.readBytes(bufferLength))));
+            return new ArrayList<>(Arrays.asList(
+                StructSerializer.readArray(elementType, toArrayList.size(), serializer.readBytes(bufferLength))));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ByteBuf writingBuffer) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
+            ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, List.class);
 
-            ToArrayList toArrayList = field.getAnnotation(ToArrayList.class);
             Class<?> elementType = toArrayList.elementType();
             int size = toArrayList.size();
 

@@ -338,8 +338,9 @@ public final class StructSerializer implements Serializer {
      * @see PropertyHandler
      */
     public static Object readHandled(Field handledField, StructSerializer upperSerializer) {
-        ReadHandler readHandler = StructUtils.getPropertySerializerHandler(handledField);
-        return readHandler.doRead(upperSerializer, handledField);
+        ReadHandler<?> readHandler = StructUtils.getPropertySerializerHandler(handledField);
+        // TODO
+        return readHandler.doRead(upperSerializer, handledField, null);
     }
 
     /**
@@ -405,8 +406,9 @@ public final class StructSerializer implements Serializer {
      */
     public static void writeHandled(Field handleField, Object fieldValue, StructSerializer upperSerializer,
         ByteBuf writingBuf) {
-        WriteHandler writeHandler = StructUtils.getPropertySerializerHandler(handleField);
-        writeHandler.doWrite(upperSerializer, handleField, fieldValue, writingBuf);
+        WriteHandler<?> writeHandler = StructUtils.getPropertySerializerHandler(handleField);
+        // TODO
+        writeHandler.doWrite(upperSerializer, handleField, fieldValue, null, writingBuf);
     }
 
     /**

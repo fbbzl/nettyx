@@ -60,13 +60,12 @@ public @interface ToHashSet {
     /**
      * The type Byte buf set handler.
      */
-    class HashSetHandler implements SerializerHandler.ReadWriteHandler {
+    class HashSetHandler implements SerializerHandler.ReadWriteHandler<ToHashSet> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field) {
+        public Object doRead(StructSerializer serializer, Field field, ToHashSet toHashSet) {
             StructUtils.checkAssignable(field, Set.class);
 
-            ToHashSet toHashSet = field.getAnnotation(ToHashSet.class);
             Class<?> elementType = toHashSet.elementType();
             int bufferLength = toHashSet.bufferLength();
 
@@ -74,10 +73,10 @@ public @interface ToHashSet {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ByteBuf writingBuffer) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToHashSet toHashSet,
+            ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, Set.class);
 
-            ToHashSet toHashSet = field.getAnnotation(ToHashSet.class);
             Class<?> elementType = toHashSet.elementType();
             int size = toHashSet.size();
 
