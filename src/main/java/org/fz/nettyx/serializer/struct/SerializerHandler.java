@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
  * @author fengbinbin
  * @since 2022 -01-16 16:39
  */
-public interface SerializerHandler {
+public interface SerializerHandler<A> {
 
     /**
      * Is read handler boolean.
@@ -17,7 +17,7 @@ public interface SerializerHandler {
      * @param clazz the clazz
      * @return the boolean
      */
-    static <S extends SerializerHandler> boolean isReadHandler(Class<S> clazz) {
+    static <S extends SerializerHandler<?>> boolean isReadHandler(Class<S> clazz) {
         return ReadHandler.class.isAssignableFrom(clazz);
     }
 
@@ -27,7 +27,7 @@ public interface SerializerHandler {
      * @param clazz the clazz
      * @return the boolean
      */
-    static <S extends SerializerHandler> boolean isWriteHandler(Class<S> clazz) {
+    static <S extends SerializerHandler<?>> boolean isWriteHandler(Class<S> clazz) {
         return WriteHandler.class.isAssignableFrom(clazz);
     }
 
@@ -37,7 +37,7 @@ public interface SerializerHandler {
      * @param handler the handler
      * @return the boolean
      */
-    static <S extends SerializerHandler> boolean isReadHandler(S handler) {
+    static <S extends SerializerHandler<?>> boolean isReadHandler(S handler) {
         return handler instanceof ReadHandler;
     }
 
@@ -47,7 +47,7 @@ public interface SerializerHandler {
      * @param handler the handler
      * @return the boolean
      */
-    static <S extends SerializerHandler> boolean isWriteHandler(S handler) {
+    static <S extends SerializerHandler<?>> boolean isWriteHandler(S handler) {
         return handler instanceof WriteHandler;
     }
 
@@ -57,7 +57,7 @@ public interface SerializerHandler {
      * @author fengbinbin
      * @since 2022 -01-16 13:37
      */
-    interface ReadHandler extends SerializerHandler {
+    interface ReadHandler<A> extends SerializerHandler<A> {
 
         /**
          * Do read object. if not override, this method will return null
@@ -66,7 +66,7 @@ public interface SerializerHandler {
          * @param field the field
          * @return the final returned field value
          */
-        Object doRead(StructSerializer serializer, Field field);
+        Object doRead(StructSerializer serializer, Field field, A annotation);
 
     }
 
@@ -76,7 +76,7 @@ public interface SerializerHandler {
      * @author fengbinbin
      * @since 2022 -01-16 13:37
      */
-    interface WriteHandler extends SerializerHandler {
+    interface WriteHandler<A> extends SerializerHandler<A> {
 
         /**
          * Do write.
@@ -86,7 +86,7 @@ public interface SerializerHandler {
          * @param value the value
          * @param writingBuffer the writingBuffer
          */
-        void doWrite(StructSerializer serializer, Field field, Object value, ByteBuf writingBuffer);
+        void doWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writingBuffer);
     }
 
     /**
@@ -95,7 +95,7 @@ public interface SerializerHandler {
      * @author fengbinbin
      * @since 2022 -01-20 19:46
      */
-    interface ReadWriteHandler extends ReadHandler, WriteHandler {
+    interface ReadWriteHandler<A> extends ReadHandler<A>, WriteHandler<A> {
 
     }
 
