@@ -60,7 +60,7 @@ public @interface ToHashSet {
     /**
      * The type Byte buf set handler.
      */
-    class HashSetHandler implements SerializerHandler.ReadWriteHandler<StructSerializer> {
+    class HashSetHandler implements SerializerHandler.ReadWriteHandler {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field) {

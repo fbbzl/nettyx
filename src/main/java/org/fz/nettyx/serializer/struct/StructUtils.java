@@ -140,7 +140,7 @@ public class StructUtils {
      * @param element the element
      * @return the serializer handler
      */
-    public <S extends SerializerHandler> S getSerializerHandler(AnnotatedElement element) {
+    public <S extends SerializerHandler> S getPropertySerializerHandler(AnnotatedElement element) {
         Supplier<SerializerHandler> bufHandlerSupplier = BYTEBUFFER_HANDLER_CACHE.computeIfAbsent(element, e -> {
             PropertyHandler handlerAnnotation = findPropertyHandlerAnnotation(e);
             if (handlerAnnotation != null) {
@@ -164,8 +164,8 @@ public class StructUtils {
      * @param handlerClass the handler class
      * @return the handler constructor
      */
-    public <H extends SerializerHandler> Constructor<H> getSerializerHandlerConstructor(Class<H> handlerClass) {
-        return (Constructor<H>) StructCache.BYTEBUFFER_HANDLER_CONSTRUCTOR_CACHE.computeIfAbsent(handlerClass, c -> {
+    public <H extends SerializerHandler> Constructor<H> getPropertySerializerHandlerConstructor(Class<H> handlerClass) {
+        return (Constructor<H>) StructCache.PROPERTY_SERIALIZE_HANDLER_CONSTRUCTOR_CACHE.computeIfAbsent(handlerClass, c -> {
             try {
                 return c.getConstructor();
             } catch (NoSuchMethodException exception) {
@@ -220,7 +220,7 @@ public class StructUtils {
      */
     public static <T extends SerializerHandler> T newSerializerHandler(Class<T> clazz) {
         try {
-            return getSerializerHandlerConstructor(clazz).newInstance();
+            return getPropertySerializerHandlerConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...");
         }
@@ -465,7 +465,7 @@ public class StructUtils {
         static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
             512);
         static final Map<Class<?>, Constructor<?>> STRUCT_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(512);
-        static final Map<Class<? extends SerializerHandler>, Constructor<? extends SerializerHandler>> BYTEBUFFER_HANDLER_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
+        static final Map<Class<? extends SerializerHandler>, Constructor<? extends SerializerHandler>> PROPERTY_SERIALIZE_HANDLER_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
             512);
 
         private StructCache() {
