@@ -338,8 +338,9 @@ public final class StructSerializer implements Serializer {
      * @see PropertyHandler
      */
     public static Object readHandled(Field handledField, StructSerializer upperSerializer) {
-        ReadHandler readHandler = StructUtils.getSerializerHandler(handledField);
-        return readHandler.doRead(upperSerializer, handledField);
+        ReadHandler<?> readHandler = StructUtils.getPropertySerializerHandler(handledField);
+        // TODO
+        return readHandler.doRead(upperSerializer, handledField, null);
     }
 
     /**
@@ -403,9 +404,11 @@ public final class StructSerializer implements Serializer {
      * @param upperSerializer the upper serializer
      * @param writingBuf the byte buf
      */
-    public static void writeHandled(Field handleField, Object fieldValue, StructSerializer upperSerializer, ByteBuf writingBuf) {
-        WriteHandler writeHandler = StructUtils.getSerializerHandler(handleField);
-        writeHandler.doWrite(upperSerializer, handleField, fieldValue, writingBuf);
+    public static void writeHandled(Field handleField, Object fieldValue, StructSerializer upperSerializer,
+        ByteBuf writingBuf) {
+        WriteHandler<?> writeHandler = StructUtils.getPropertySerializerHandler(handleField);
+        // TODO
+        writeHandler.doWrite(upperSerializer, handleField, fieldValue, null, writingBuf);
     }
 
     /**
@@ -545,7 +548,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((SerializerHandler) StructUtils.getSerializerHandler(field));
+        return isReadHandler((SerializerHandler) StructUtils.getPropertySerializerHandler(field));
     }
 
     /**
@@ -555,7 +558,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((SerializerHandler) StructUtils.getSerializerHandler(field));
+        return isWriteHandler((SerializerHandler) StructUtils.getPropertySerializerHandler(field));
     }
 
     /**

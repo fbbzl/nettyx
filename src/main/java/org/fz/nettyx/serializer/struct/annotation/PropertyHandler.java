@@ -21,6 +21,6 @@ public @interface PropertyHandler {
 
     boolean isSingleton() default true;
 
-    Class<? extends SerializerHandler> value();
+    Class<? extends SerializerHandler<?>> value();
 
 }
