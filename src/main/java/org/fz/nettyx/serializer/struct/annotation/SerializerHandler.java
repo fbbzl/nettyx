@@ -6,7 +6,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import org.fz.nettyx.serializer.struct.SerializerHandler;
+import org.fz.nettyx.serializer.struct.handler.PropertyHandler;
 
 /**
  * If you use a custom field handler annotation, you can use it as a meta annotation
@@ -17,10 +17,10 @@ import org.fz.nettyx.serializer.struct.SerializerHandler;
  */
 @Target({FIELD, TYPE})
 @Retention(RUNTIME)
-public @interface PropertyHandler {
+public @interface SerializerHandler {
 
     boolean isSingleton() default true;
 
-    Class<? extends SerializerHandler<?>> value();
+    Class<? extends PropertyHandler<?>> value();
 
 }

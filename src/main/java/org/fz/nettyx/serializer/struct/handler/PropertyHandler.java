@@ -1,7 +1,8 @@
-package org.fz.nettyx.serializer.struct;
+package org.fz.nettyx.serializer.struct.handler;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.reflect.Field;
+import org.fz.nettyx.serializer.struct.StructSerializer;
 
 /**
  * The top-level parent class of all custom serialization processors
@@ -9,7 +10,7 @@ import java.lang.reflect.Field;
  * @author fengbinbin
  * @since 2022 -01-16 16:39
  */
-public interface SerializerHandler<A> {
+public interface PropertyHandler<A> {
 
     /**
      * Is read handler boolean.
@@ -17,7 +18,7 @@ public interface SerializerHandler<A> {
      * @param clazz the clazz
      * @return the boolean
      */
-    static <S extends SerializerHandler<?>> boolean isReadHandler(Class<S> clazz) {
+    static <S extends PropertyHandler<?>> boolean isReadHandler(Class<S> clazz) {
         return ReadHandler.class.isAssignableFrom(clazz);
     }
 
@@ -27,7 +28,7 @@ public interface SerializerHandler<A> {
      * @param clazz the clazz
      * @return the boolean
      */
-    static <S extends SerializerHandler<?>> boolean isWriteHandler(Class<S> clazz) {
+    static <S extends PropertyHandler<?>> boolean isWriteHandler(Class<S> clazz) {
         return WriteHandler.class.isAssignableFrom(clazz);
     }
 
@@ -37,7 +38,7 @@ public interface SerializerHandler<A> {
      * @param handler the handler
      * @return the boolean
      */
-    static <S extends SerializerHandler<?>> boolean isReadHandler(S handler) {
+    static <S extends PropertyHandler<?>> boolean isReadHandler(S handler) {
         return handler instanceof ReadHandler;
     }
 
@@ -47,7 +48,7 @@ public interface SerializerHandler<A> {
      * @param handler the handler
      * @return the boolean
      */
-    static <S extends SerializerHandler<?>> boolean isWriteHandler(S handler) {
+    static <S extends PropertyHandler<?>> boolean isWriteHandler(S handler) {
         return handler instanceof WriteHandler;
     }
 
@@ -57,7 +58,7 @@ public interface SerializerHandler<A> {
      * @author fengbinbin
      * @since 2022 -01-16 13:37
      */
-    interface ReadHandler<A> extends SerializerHandler<A> {
+    interface ReadHandler<A> extends PropertyHandler<A> {
 
         /**
          * Do read object. if not override, this method will return null
@@ -76,7 +77,7 @@ public interface SerializerHandler<A> {
      * @author fengbinbin
      * @since 2022 -01-16 13:37
      */
-    interface WriteHandler<A> extends SerializerHandler<A> {
+    interface WriteHandler<A> extends PropertyHandler<A> {
 
         /**
          * Do write.

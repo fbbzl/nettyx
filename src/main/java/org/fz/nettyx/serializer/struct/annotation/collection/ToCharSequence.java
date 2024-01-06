@@ -11,10 +11,10 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import org.fz.nettyx.serializer.struct.SerializerHandler;
+import org.fz.nettyx.serializer.struct.handler.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
-import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
+import org.fz.nettyx.serializer.struct.annotation.SerializerHandler;
 
 /**
  * The interface Char sequence.
@@ -25,7 +25,6 @@ import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@PropertyHandler(ToCharSequence.CharSequenceHandler.class)
 public @interface ToCharSequence {
 
     /**
@@ -43,7 +42,7 @@ public @interface ToCharSequence {
      */
     int bufferLength() default 0;
 
-    class CharSequenceHandler implements SerializerHandler.ReadWriteHandler<ToCharSequence> {
+    class CharSequenceHandler implements PropertyHandler.ReadWriteHandler<ToCharSequence> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToCharSequence toCharSequence) {
