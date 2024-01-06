@@ -4,9 +4,11 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import org.fz.nettyx.serializer.struct.SerializerHandler;
+import org.fz.nettyx.serializer.struct.PropertyHandler;
+
 
 /**
  * If you use a custom field handler annotation, you can use it as a meta annotation
@@ -17,10 +19,11 @@ import org.fz.nettyx.serializer.struct.SerializerHandler;
  */
 @Target({FIELD, TYPE})
 @Retention(RUNTIME)
-public @interface PropertyHandler {
+public @interface SerializerHandler {
 
-    boolean isSingleton() default true;
-
-    Class<? extends SerializerHandler<?>> value();
+    /**
+     * will create handler instance every time
+     */
+    Class<? extends PropertyHandler<Annotation>> value();
 
 }
