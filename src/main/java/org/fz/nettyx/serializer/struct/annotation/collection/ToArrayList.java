@@ -10,10 +10,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.fz.nettyx.serializer.struct.SerializerHandler;
+import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
-import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
 
 /**
  * The interface List.
@@ -24,7 +23,6 @@ import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-@PropertyHandler(ToArrayList.ArrayListHandler.class)
 public @interface ToArrayList {
 
     /**
@@ -51,7 +49,7 @@ public @interface ToArrayList {
     /**
      * The type Array list handler.
      */
-    class ArrayListHandler implements SerializerHandler.ReadWriteHandler<ToArrayList> {
+    class ToArrayListHandler implements PropertyHandler.ReadWriteHandler<ToArrayList> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {

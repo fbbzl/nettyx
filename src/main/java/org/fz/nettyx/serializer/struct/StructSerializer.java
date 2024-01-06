@@ -1,8 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
 import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.SerializerHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.SerializerHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.getArrayLength;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
@@ -25,11 +25,11 @@ import java.util.function.Supplier;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.SerializerHandler.ReadHandler;
-import org.fz.nettyx.serializer.struct.SerializerHandler.WriteHandler;
+import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
+import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Length;
-import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
+import org.fz.nettyx.serializer.struct.annotation.SerializerHandler;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 
 /**
@@ -331,16 +331,15 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * read the field with annotation {@link PropertyHandler}
+     * read the field with annotation {@link SerializerHandler}
      *
-     * @param handledField    the field with the {@link PropertyHandler}
+     * @param handledField    the field with the {@link SerializerHandler}
      * @param upperSerializer the upper serializer
-     * @see PropertyHandler
+     * @see SerializerHandler
      */
     public static Object readHandled(Field handledField, StructSerializer upperSerializer) {
-        ReadHandler<?> readHandler = StructUtils.getPropertySerializerHandler(handledField);
-        // TODO
-        return readHandler.doRead(upperSerializer, handledField, null);
+        ReadHandler<?> readHandler = StructUtils.getHandler(handledField);
+        return readHandler.doRead(upperSerializer, handledField, StructUtils.findHandlerAnnotation(handledField));
     }
 
     /**
@@ -406,8 +405,8 @@ public final class StructSerializer implements Serializer {
      */
     public static void writeHandled(Field handleField, Object fieldValue, StructSerializer upperSerializer,
         ByteBuf writingBuf) {
-        WriteHandler<?> writeHandler = StructUtils.getPropertySerializerHandler(handleField);
-        // TODO
+        WriteHandler<?> writeHandler = StructUtils.getHandler(handleField);
+
         writeHandler.doWrite(upperSerializer, handleField, fieldValue, null, writingBuf);
     }
 
@@ -548,7 +547,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((SerializerHandler) StructUtils.getPropertySerializerHandler(field));
+        return isReadHandler((PropertyHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
@@ -558,7 +557,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((SerializerHandler) StructUtils.getPropertySerializerHandler(field));
+        return isWriteHandler((PropertyHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
