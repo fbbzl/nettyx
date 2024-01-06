@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.fz.nettyx.serializer.struct.SerializerHandler;
+import org.fz.nettyx.serializer.struct.handler.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
-import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
+import org.fz.nettyx.serializer.struct.annotation.SerializerHandler;
 
 /**
  * The interface Set.
@@ -26,7 +26,6 @@ import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
 
 @Target(FIELD)
 @Retention(RUNTIME)
-@PropertyHandler(ToHashSet.HashSetHandler.class)
 public @interface ToHashSet {
 
     /**
@@ -60,7 +59,7 @@ public @interface ToHashSet {
     /**
      * The type Byte buf set handler.
      */
-    class HashSetHandler implements SerializerHandler.ReadWriteHandler<ToHashSet> {
+    class HashSetHandler implements PropertyHandler.ReadWriteHandler<ToHashSet> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToHashSet toHashSet) {

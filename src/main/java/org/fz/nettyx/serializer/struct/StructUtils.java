@@ -4,7 +4,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ARRAY_LENGTH_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_CONSTRUCTOR_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BYTEBUFFER_HANDLER_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.HANDLER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READ_METHOD_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITE_METHOD_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_CONSTRUCTOR_CACHE;
@@ -36,7 +36,8 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Length;
-import org.fz.nettyx.serializer.struct.annotation.PropertyHandler;
+import org.fz.nettyx.serializer.struct.annotation.SerializerHandler;
+import org.fz.nettyx.serializer.struct.handler.PropertyHandler;
 
 /**
  * The type Struct utils.
@@ -59,19 +60,19 @@ public class StructUtils {
     }
 
     /**
-     * will find the annotation {@link PropertyHandler} and will also search the upper 1-level meta annotation
-     * @see PropertyHandler
+     * will find the annotation {@link SerializerHandler} and will also search the upper 1-level meta annotation
+     * @see SerializerHandler
      */
-    public PropertyHandler findPropertyHandlerAnnotation(AnnotatedElement element) {
+    public SerializerHandler findPropertyHandlerAnnotation(AnnotatedElement element) {
         for (Annotation annotation : allAnnotations(element)) {
             Class<? extends Annotation> annotationType = annotation.annotationType();
 
-            PropertyHandler meta;
+            SerializerHandler meta;
             // first use handler
-            if (annotationType.equals(PropertyHandler.class)) return (PropertyHandler) annotation;
+            if (annotationType.equals(SerializerHandler.class)) return (SerializerHandler) annotation;
             else
             // and also find in meta annotation 1 upper-level
-            if ((meta = findAnnotation(annotationType, PropertyHandler.class)) != null) return meta;
+            if ((meta = findAnnotation(annotationType, SerializerHandler.class)) != null) return meta;
         }
         return null;
     }
@@ -140,14 +141,14 @@ public class StructUtils {
      * @param element the element
      * @return the serializer handler
      */
-    public <S extends SerializerHandler> S getPropertySerializerHandler(AnnotatedElement element) {
-        Supplier<SerializerHandler> bufHandlerSupplier = BYTEBUFFER_HANDLER_CACHE.computeIfAbsent(element, e -> {
-            PropertyHandler handlerAnnotation = findPropertyHandlerAnnotation(e);
+    public <S extends PropertyHandler<?>> S getPropertyHandler(AnnotatedElement element) {
+        Supplier<PropertyHandler<?>> bufHandlerSupplier = HANDLER_CACHE.computeIfAbsent(element, e -> {
+            SerializerHandler handlerAnnotation = findPropertyHandlerAnnotation(e);
             if (handlerAnnotation != null) {
                 // if is singleton
                 if (handlerAnnotation.isSingleton()) {
-                    SerializerHandler singleton = newSerializerHandler(handlerAnnotation.value());
-                    return () -> singleton;
+                    PropertyHandler<?> singletonHandler = newSerializerHandler(handlerAnnotation.value());
+                    return () -> singletonHandler;
                 }
                 // if is not singleton will invoke constructor to create
                 else return () -> newSerializerHandler(handlerAnnotation.value());
@@ -164,8 +165,8 @@ public class StructUtils {
      * @param handlerClass the handler class
      * @return the handler constructor
      */
-    public <H extends SerializerHandler> Constructor<H> getPropertySerializerHandlerConstructor(Class<H> handlerClass) {
-        return (Constructor<H>) StructCache.PROPERTY_SERIALIZE_HANDLER_CONSTRUCTOR_CACHE.computeIfAbsent(handlerClass, c -> {
+    public <H extends PropertyHandler<?>> Constructor<H> getPropertyHandlerConstructor(Class<H> handlerClass) {
+        return (Constructor<H>) StructCache.HANDLER_CONSTRUCTOR_CACHE.computeIfAbsent(handlerClass, c -> {
             try {
                 return c.getConstructor();
             } catch (NoSuchMethodException exception) {
@@ -218,9 +219,9 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    public static <T extends SerializerHandler> T newSerializerHandler(Class<T> clazz) {
+    public static <T extends PropertyHandler<?>> T newSerializerHandler(Class<T> clazz) {
         try {
-            return getPropertySerializerHandlerConstructor(clazz).newInstance();
+            return getPropertyHandlerConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...");
         }
@@ -458,14 +459,14 @@ public class StructUtils {
         static final Map<Class<?>, Field[]> STRUCT_FIELDS_CACHE = new ConcurrentHashMap<>(128);
         static final Map<Field, Integer> ARRAY_LENGTH_CACHE = new ConcurrentHashMap<>(512);
         static final Map<AnnotatedElement, List<Annotation>> ANNOTATION_CACHE = new ConcurrentHashMap<>(512);
-        static final Map<AnnotatedElement, Supplier<SerializerHandler>> BYTEBUFFER_HANDLER_CACHE = new ConcurrentHashMap<>(
+        static final Map<AnnotatedElement, Supplier<PropertyHandler<?>>> HANDLER_CACHE = new ConcurrentHashMap<>(
             512);
 
         /* constructor cache */
         static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
             512);
         static final Map<Class<?>, Constructor<?>> STRUCT_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(512);
-        static final Map<Class<? extends SerializerHandler>, Constructor<? extends SerializerHandler>> PROPERTY_SERIALIZE_HANDLER_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
+        static final Map<Class<? extends PropertyHandler<?>>, Constructor<? extends PropertyHandler<?>>> HANDLER_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
             512);
 
         private StructCache() {
