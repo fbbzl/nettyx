@@ -422,7 +422,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean isIgnore(Field field) {
-        return StructUtils.isAnnotationPresent(field, Ignore.class);
+        return StructUtils.isAnnotationPresent(field, Ignore.class) || StructUtils.isTransient(field);
     }
 
     /**

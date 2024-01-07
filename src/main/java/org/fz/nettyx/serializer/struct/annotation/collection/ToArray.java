@@ -5,7 +5,6 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
-import static org.fz.nettyx.serializer.struct.StructUtils.newArray;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
@@ -18,7 +17,6 @@ import java.lang.reflect.Field;
 import org.fz.nettyx.serializer.struct.Basic;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 
 /**
  * array field must use this to assign array length!!!
@@ -49,9 +47,17 @@ public @interface ToArray {
             Class<?> elementType = getComponentType(field);
             int declaredLength = annotation.length();
 
-            Object[] array = (Object[]) nullDefault(arrayValue, () -> StructUtils.newArray(field));
+            Object[] array = (Object[]) nullDefault(arrayValue, () -> newArray(field, declaredLength));
 
             writeArray(array, elementType, declaredLength, writingBuffer);
+        }
+
+        public static <T> T[] newArray(Field arrayField, int arrayLength) {
+            return (T[]) Array.newInstance(arrayField.getType().getComponentType(), arrayLength);
+        }
+
+        public static <T> T[] newArray(Class<?> componentType, int length) {
+            return (T[]) Array.newInstance(componentType, length);
         }
 
         public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {

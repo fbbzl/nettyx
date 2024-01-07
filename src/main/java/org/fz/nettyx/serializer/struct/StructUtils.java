@@ -1,17 +1,20 @@
 package org.fz.nettyx.serializer.struct;
 
+import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static java.util.stream.Collectors.toSet;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ARRAY_LENGTH_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_CONSTRUCTOR_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READ_METHOD_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITE_METHOD_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_CONSTRUCTOR_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_FIELDS_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
 
+import cn.hutool.core.collection.ConcurrentHashSet;
+import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -19,7 +22,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -33,13 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
 
 /**
  * The type Struct utils.
@@ -56,6 +57,10 @@ public class StructUtils {
      * The Is static.
      */
     Predicate<Field> isStatic = f -> Modifier.isStatic(f.getModifiers());
+
+    public boolean isTransient(Field field) {
+        return TRANSIENT_FIELD_CACHE.contains(field);
+    }
 
     /**
      * Is annotation present boolean.
@@ -94,7 +99,8 @@ public class StructUtils {
      * @return the collection
      */
     public <A extends Annotation> Collection<A> allAnnotations(AnnotatedElement element) {
-        return (Collection<A>) StructCache.ANNOTATION_CACHE.computeIfAbsent(element, e -> Arrays.asList(e.getAnnotations()));
+        return (Collection<A>) StructCache.ANNOTATED_ELEMENT_ANNOTATION_CACHE.computeIfAbsent(element,
+            e -> newHashSet(e.getAnnotations()));
     }
 
     /**
@@ -300,28 +306,6 @@ public class StructUtils {
         }
     }
 
-    /**
-     * New array instance t [ ].
-     *
-     * @param <T> the type parameter
-     * @param arrayField the array field
-     * @return the t [ ]
-     */
-    public static <T> T[] newArray(Field arrayField) {
-        return (T[]) Array.newInstance(arrayField.getType().getComponentType(), getArrayLength(arrayField));
-    }
-
-    /**
-     * New array instance t [ ].
-     *
-     * @param <T> the type parameter
-     * @param componentType the component type
-     * @param length the length
-     * @return the t [ ]
-     */
-    public static <T> T[] newArray(Class<?> componentType, int length) {
-        return (T[]) Array.newInstance(componentType, length);
-    }
 
     /**
      * The constant EMPTY_FIELD_ARRAY.
@@ -337,7 +321,7 @@ public class StructUtils {
      */
     public static void writeField(Object object, Field field, Object value) {
         try {
-            Method writeMethod = FIELD_WRITE_METHOD_CACHE.computeIfAbsent(field, f -> {
+            Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> {
                 try {
                     return new PropertyDescriptor(field.getName(), object.getClass()).getWriteMethod();
                 } catch (IntrospectionException exception) {
@@ -363,7 +347,7 @@ public class StructUtils {
      */
     public static <T> T readField(Object object, Field field) {
         try {
-            Method readMethod = FIELD_READ_METHOD_CACHE.computeIfAbsent(field, f -> {
+            Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> {
                 try {
                     return new PropertyDescriptor(field.getName(), object.getClass()).getReadMethod();
                 } catch (IntrospectionException exception) {
@@ -377,24 +361,6 @@ public class StructUtils {
             throw new UnsupportedOperationException(
                 "field read failed, field is [" + field + "], check parameter type or field getter/setter", exception);
         }
-    }
-
-    /**
-     * Gets array length.
-     *
-     * @param arrayField the array field
-     * @return the array length
-     */
-    public static int getArrayLength(Field arrayField) {
-        Function<Field, Integer> cacheArrayLength = field -> {
-            ToArray toArray = field.getAnnotation(ToArray.class);
-
-            if (toArray
-                == null) throw new SerializeException("read array [" + arrayField + "] error, must use @" + ToArray.class.getSimpleName() + " to assign array arrayLength");
-
-            return toArray.length();
-        };
-        return ARRAY_LENGTH_CACHE.computeIfAbsent(arrayField, cacheArrayLength);
     }
 
     /**
@@ -478,27 +444,22 @@ public class StructUtils {
      */
     static final class StructCache {
 
-        /**
-         * The constant FIELD_READ_METHOD_CACHE.
-         */
+        static final Set<Field> TRANSIENT_FIELD_CACHE = new ConcurrentHashSet<>(512);
+
         /* reflection cache */
-        static final Map<Field, Method> FIELD_READ_METHOD_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Field, Method> FIELD_READER_CACHE = new ConcurrentHashMap<>(512);
         /**
          * The Field write method cache.
          */
-        static final Map<Field, Method> FIELD_WRITE_METHOD_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Field, Method> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(512);
         /**
          * The Struct fields cache.
          */
         static final Map<Class<?>, Field[]> STRUCT_FIELDS_CACHE = new ConcurrentHashMap<>(512);
         /**
-         * The Array length cache.
-         */
-        static final Map<Field, Integer> ARRAY_LENGTH_CACHE = new ConcurrentHashMap<>(512);
-        /**
          * The Annotation cache.
          */
-        static final Map<AnnotatedElement, List<Annotation>> ANNOTATION_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<AnnotatedElement, Set<Annotation>> ANNOTATED_ELEMENT_ANNOTATION_CACHE = new ConcurrentHashMap<>(512);
 
         /**
          * The constant BASIC_CONSTRUCTOR_CACHE.
@@ -523,26 +484,49 @@ public class StructUtils {
         static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>(32);
 
         static {
-            scanForHandlers();
+            try {
+                scanHandlers();
+                scanStructs();
+            } catch (Exception e) {
+                throw new NotInitedException("init nettyx serializer cache failed please check", e);
+            }
         }
 
-        private static void scanForHandlers() {
-            final String allPackage = "";
-            Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(
-                allPackage, PropertyHandler.class);
+        private static final String ALL_PACKAGE = "";
+
+        private static synchronized void scanHandlers() {
+            Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(ALL_PACKAGE, PropertyHandler.class);
 
             for (Class<?> handlerClass : handlerClasses) {
-
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(handlerClass);
                 if (targetAnnotationType != null) {
-                    synchronized (StructCache.class) {
-                        ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(targetAnnotationType,
-                            (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass);
+                    ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(targetAnnotationType,
+                        (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass);
 
-                        HANDLER_CONSTRUCTOR_CACHE.putIfAbsent(
-                            (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass, StructUtils.getHandlerConstructor(
-                                ((Class<? extends PropertyHandler<? extends Annotation>>) handlerClass)));
+                    HANDLER_CONSTRUCTOR_CACHE.putIfAbsent(
+                        (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass,
+                        StructUtils.getHandlerConstructor(
+                            ((Class<? extends PropertyHandler<? extends Annotation>>) handlerClass)));
+                }
+            }
+        }
+
+        private static synchronized void scanStructs() throws NoSuchMethodException, IntrospectionException {
+            Set<Class<?>> structClasses = ClassScanner.scanAllPackageByAnnotation(ALL_PACKAGE, Struct.class);
+            for (Class<?> structClass : structClasses) {
+                STRUCT_CONSTRUCTOR_CACHE.putIfAbsent(structClass, structClass.getConstructor());
+
+                Field[] structFields = StructUtils.getStructFields(structClass);
+
+                for (Field field : structFields) {
+                    if (Modifier.isTransient(field.getModifiers())) {
+                        TRANSIENT_FIELD_CACHE.add(field);
                     }
+                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), structClass);
+                    FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor .getReadMethod());
+                    FIELD_WRITER_CACHE.put(field, propertyDescriptor.getWriteMethod());
+
+                    StructUtils.allAnnotations(field);
                 }
             }
         }
