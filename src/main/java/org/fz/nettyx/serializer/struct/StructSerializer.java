@@ -194,7 +194,7 @@ public final class StructSerializer implements Serializer {
      * @return the byte buffer
      */
     public static <T> ByteBuffer writeNioBuffer(T struct) {
-        return StructSerializer.write(struct).nioBuffer();
+        return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
     }
 
     /**
