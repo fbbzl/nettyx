@@ -2,6 +2,9 @@ package org.fz.nettyx.serializer.struct.annotation.collection;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
+import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Retention;
@@ -49,13 +52,6 @@ public @interface ToHashSet {
     int size() default 0;
 
     /**
-     * Buffer length int.
-     *
-     * @return the buffer occupied by this char set
-     */
-    int bufferLength() default 0;
-
-    /**
      * The type Byte buf set handler.
      */
     class ToHashSetHandler implements PropertyHandler.ReadWriteHandler<ToHashSet> {
@@ -65,9 +61,8 @@ public @interface ToHashSet {
             StructUtils.checkAssignable(field, Set.class);
 
             Class<?> elementType = toHashSet.elementType();
-            int bufferLength = toHashSet.bufferLength();
 
-            return new HashSet<>(Arrays.asList(StructSerializer.readArray(elementType, toHashSet.size(), serializer.readBytes(bufferLength))));
+            return new HashSet<>(Arrays.asList(readArray(elementType, toHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
@@ -78,7 +73,7 @@ public @interface ToHashSet {
             Class<?> elementType = toHashSet.elementType();
             int size = toHashSet.size();
 
-            StructSerializer.writeArray(((HashSet<?>) value).toArray(), elementType, size, writingBuffer);
+            writeArray(((HashSet<?>) nullDefault(value, HashSet::new)).toArray(), elementType, size, writingBuffer);
         }
 
     }

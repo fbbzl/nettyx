@@ -26,7 +26,7 @@ public class Clong8 extends CBasic<Long> {
     /**
      * Instantiates a new Clong 8.
      *
-     * @param value the value
+     * @param value the length
      */
     public Clong8(Long value) {
         super(value, 8);

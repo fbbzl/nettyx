@@ -28,7 +28,7 @@ public abstract class Basic<V> {
     private final ByteBuf byteBuf;
 
     /**
-     * the Java value
+     * the Java length
      */
     private final V value;
 
@@ -47,19 +47,19 @@ public abstract class Basic<V> {
     public abstract ByteOrder order();
 
     /**
-     * change value to byteBuf
+     * change length to byteBuf
      *
-     * @param value value
+     * @param value length
      * @param size the size
      * @return byteBuf byte byteBuf
      */
     protected abstract ByteBuf toByteBuf(V value, int size);
 
     /**
-     * change byteBuf to value
+     * change byteBuf to length
      *
      * @param byteBuf bytebuf of field
-     * @return value v
+     * @return length v
      */
     protected abstract V toValue(ByteBuf byteBuf);
 
@@ -79,7 +79,7 @@ public abstract class Basic<V> {
     /**
      * Instantiates a new Basic.
      *
-     * @param value the value
+     * @param value the length
      * @param size the size
      */
     protected Basic(V value, int size) {

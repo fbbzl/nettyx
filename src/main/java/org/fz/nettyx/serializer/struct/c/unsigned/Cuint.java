@@ -26,7 +26,7 @@ public class Cuint extends CBasic<Long> {
     /**
      * Instantiates a new Cuint.
      *
-     * @param value the value
+     * @param value the length
      */
     public Cuint(Long value) {
         super(value, 4);

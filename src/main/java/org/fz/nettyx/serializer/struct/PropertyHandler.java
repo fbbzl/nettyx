@@ -15,24 +15,9 @@ import java.lang.reflect.Type;
 @SuppressWarnings("unchecked")
 public interface PropertyHandler<A extends Annotation> {
 
-    default A getTargetAnnotation() {
-        Type[] genericInterfaces = this.getClass().getGenericInterfaces();
-
-        for (Type genericInterface : genericInterfaces) {
-            if (genericInterface instanceof ParameterizedType) {
-                ParameterizedType type = (ParameterizedType) genericInterface;
-                Type[] annotationTypes = type.getActualTypeArguments();
-                if (type.getOwnerType() == PropertyHandler.class && annotationTypes.length > 0) {
-                    return (A) annotationTypes[0];
-                }
-            }
-        }
-        return null;
-    }
-
-    default <T extends Annotation> boolean isTargetAnnotation(T otherAnnotationType) {
-        A targetAnnotation = getTargetAnnotation();
-        return targetAnnotation.annotationType() == otherAnnotationType.annotationType();
+    default <T extends Annotation> boolean isTargetAnnotation(Class<T> otherAnnotationType) {
+        Class<Annotation> targetAnnotationType = getTargetAnnotationType(this.getClass());
+        return targetAnnotationType == otherAnnotationType;
     }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
@@ -107,7 +92,7 @@ public interface PropertyHandler<A extends Annotation> {
          *
          * @param serializer the serializer
          * @param field the field
-         * @return the final returned field value
+         * @return the final returned field length
          */
         Object doRead(StructSerializer serializer, Field field, A annotation);
 
@@ -126,7 +111,7 @@ public interface PropertyHandler<A extends Annotation> {
          *
          * @param serializer the serializer
          * @param field the field
-         * @param value the value
+         * @param value the length
          * @param writingBuffer the writingBuffer
          */
         void doWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writingBuffer);

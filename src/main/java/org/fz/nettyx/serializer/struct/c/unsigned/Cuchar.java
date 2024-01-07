@@ -28,7 +28,7 @@ public class Cuchar extends CBasic<Short> {
     /**
      * Instantiates a new Cuchar.
      *
-     * @param value the value
+     * @param value the length
      */
     public Cuchar(Integer value) {
         super(value.shortValue(), 1);

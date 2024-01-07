@@ -24,7 +24,7 @@ public class Clonglong extends Clong8 {
     /**
      * Instantiates a new Clonglong.
      *
-     * @param value the value
+     * @param value the length
      */
     public Clonglong(Long value) {
         super(value);

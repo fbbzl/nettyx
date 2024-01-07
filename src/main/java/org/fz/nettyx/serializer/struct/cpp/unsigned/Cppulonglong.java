@@ -25,7 +25,7 @@ public class Cppulonglong extends Cppulong8 {
     /**
      * Instantiates a new Culonglong.
      *
-     * @param value the value
+     * @param value the length
      */
     public Cppulonglong(BigInteger value) {
         super(value);
