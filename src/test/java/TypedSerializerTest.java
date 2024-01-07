@@ -1,19 +1,17 @@
 import java.util.Arrays;
 import lombok.Getter;
 import lombok.Setter;
-import org.fz.nettyx.annotation.Length;
-import org.fz.nettyx.annotation.Struct;
-import org.fz.nettyx.serializer.TypedSerializer;
-import org.fz.nettyx.serializer.type.c.signed.Cchar;
-import org.fz.nettyx.serializer.type.c.signed.Cdouble;
-import org.fz.nettyx.serializer.type.c.signed.Cfloat;
-import org.fz.nettyx.serializer.type.c.signed.Cint;
-import org.fz.nettyx.serializer.type.c.signed.Clong4;
-import org.fz.nettyx.serializer.type.c.signed.Clong8;
-import org.fz.nettyx.serializer.type.c.unsigned.Cuchar;
-import org.fz.nettyx.serializer.type.c.unsigned.Cuint;
-
-
+import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.collection.ToArray;
+import org.fz.nettyx.serializer.struct.c.signed.Cchar;
+import org.fz.nettyx.serializer.struct.c.signed.Cdouble;
+import org.fz.nettyx.serializer.struct.c.signed.Cfloat;
+import org.fz.nettyx.serializer.struct.c.signed.Cint;
+import org.fz.nettyx.serializer.struct.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.c.signed.Clong8;
+import org.fz.nettyx.serializer.struct.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.c.unsigned.Cuint;
 
 
 /**
@@ -36,12 +34,12 @@ public class TypedSerializerTest {
         user.setBill(null);
         user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
-        final byte[] userWriteBytes = TypedSerializer.writeBytes(user);
+        final byte[] userWriteBytes = StructSerializer.writeBytes(user);
         System.err.println(userWriteBytes.length);
 
         System.err.println("Write data: " + Arrays.toString(userWriteBytes));
 
-        User read = TypedSerializer.read(userWriteBytes, User.class);
+        User read = StructSerializer.read(userWriteBytes, User.class);
         System.err.println(read);
 
     }
@@ -73,7 +71,7 @@ public class TypedSerializerTest {
         private Cdouble platformId;//2
         private Clong8 description;//2
         private Bill bill;//2
-        @Length(2)
+        @ToArray(length = 2)
         private Cuint[] loginNames;// 26
 
         @Override
