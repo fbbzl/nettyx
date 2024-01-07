@@ -1,9 +1,15 @@
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
+import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
+import org.fz.nettyx.serializer.struct.annotation.collection.ToString;
 import org.fz.nettyx.serializer.struct.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.c.signed.Cdouble;
 import org.fz.nettyx.serializer.struct.c.signed.Cfloat;
@@ -12,7 +18,6 @@ import org.fz.nettyx.serializer.struct.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.c.signed.Clong8;
 import org.fz.nettyx.serializer.struct.c.unsigned.Cuchar;
 import org.fz.nettyx.serializer.struct.c.unsigned.Cuint;
-
 
 /**
  * @author fengbinbin
@@ -58,6 +63,24 @@ public class TypedSerializerTest {
         }
     }
 
+    @Data
+    @Struct
+    public static class Wife {
+
+        @ToString
+        private String name;
+    }
+
+    @Data
+    @Struct
+    public static class Son {
+
+        @ToString
+        private String name;
+
+    }
+
+
     @Getter
     @Setter
     @Struct
@@ -71,22 +94,19 @@ public class TypedSerializerTest {
         private Cdouble platformId;//2
         private Clong8 description;//2
         private Bill bill;//2
+
         @ToArray(length = 2)
         private Cuint[] loginNames;// 26
+        @ToArrayList(elementType = Wife.class)
+        private List<Wife> wifes;
+        @ToHashSet(elementType = Son.class)
+        private Set<Son> sons;
 
         @Override
         public String toString() {
-            return "User{" +
-                "uid=" + uid.getValue() +
-                ", uname=" + uname.getValue() +
-                ", isMarried=" + isMarried.getValue() +
-                ", sex=" + sex.getValue() +
-                ", address=" + address.getValue() +
-                ", platformId=" + platformId.getValue() +
-                ", description=" + description.getValue() +
-                ", bill=" + bill +
-                ", loginNames=" + Arrays.toString(loginNames) +
-                '}';
+            return "User{" + "uid=" + uid + ", uname=" + uname + ", isMarried=" + isMarried + ", sex=" + sex
+                + ", address=" + address + ", platformId=" + platformId + ", description=" + description + ", bill="
+                + bill + ", loginNames=" + Arrays.toString(loginNames) + ", wifes=" + wifes + ", sons=" + sons + '}';
         }
     }
 }
