@@ -24,7 +24,7 @@ import org.fz.nettyx.serializer.struct.StructUtils;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToCharSequence {
+public @interface ToString {
 
     /**
      * Charset string.
@@ -41,28 +41,28 @@ public @interface ToCharSequence {
      */
     int bufferLength() default 0;
 
-    class ToCharSequenceHandler implements PropertyHandler.ReadWriteHandler<ToCharSequence> {
+    class ToCharSequenceHandler implements PropertyHandler.ReadWriteHandler<ToString> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToCharSequence toCharSequence) {
+        public Object doRead(StructSerializer serializer, Field field, ToString toString) {
             StructUtils.checkAssignable(field, CharSequence.class);
 
-            String charset = toCharSequence.charset();
+            String charset = toString.charset();
             if (!Charset.isSupported(charset)) throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
             ByteBuf byteBuf = serializer.getByteBuf();
             if (!byteBuf.isReadable())
                 throw new IllegalArgumentException("buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "]");
 
-            return byteBuf.readBytes(toCharSequence.bufferLength()).toString(Charset.forName(charset));
+            return byteBuf.readBytes(toString.bufferLength()).toString(Charset.forName(charset));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToCharSequence toCharSequence, ByteBuf writingBuffer) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, CharSequence.class);
 
-            int bufferLength = toCharSequence.bufferLength();
-            String charset = toCharSequence.charset();
+            int bufferLength = toString.bufferLength();
+            String charset = toString.charset();
 
             if (value != null) writingBuffer.writeBytes(value.toString().getBytes(Charset.forName(charset)));
             else               writingBuffer.writeBytes(new byte[bufferLength]);
