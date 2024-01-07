@@ -519,9 +519,8 @@ public class StructUtils {
                 Field[] structFields = StructUtils.getStructFields(structClass);
 
                 for (Field field : structFields) {
-                    if (Modifier.isTransient(field.getModifiers())) {
-                        TRANSIENT_FIELD_CACHE.add(field);
-                    }
+                    if (Modifier.isTransient(field.getModifiers())) TRANSIENT_FIELD_CACHE.add(field);
+
                     PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), structClass);
                     FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor .getReadMethod());
                     FIELD_WRITER_CACHE.put(field, propertyDescriptor.getWriteMethod());
