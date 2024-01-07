@@ -9,6 +9,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,7 +183,7 @@ public final class StructSerializer implements Serializer {
             return bytes;
         }
         finally {
-            writeBuf.release();
+            ReferenceCountUtil.release(writeBuf);
         }
     }
 
