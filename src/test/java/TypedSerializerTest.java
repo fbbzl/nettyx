@@ -27,26 +27,31 @@ import org.fz.nettyx.serializer.struct.c.unsigned.Cuint;
 public class TypedSerializerTest {
 
     public static void main(String[] args) {
-        // these bytes may from nio, netty, input-stream, output-stream.....
-        User user = new User();
-        user.setUid(new Clong4(1));
-        user.setUname(null);
-        user.setIsMarried(null);
-        user.setSex(null);
-        user.setAddress(null);
-        user.setPlatformId(null);
-        user.setDescription(null);
-        user.setBill(null);
-        user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
+        long l = System.currentTimeMillis();
 
-        final byte[] userWriteBytes = StructSerializer.writeBytes(user);
-        System.err.println(userWriteBytes.length);
+        for (int i = 0; i < 1_000_000; i++) {
+            // these bytes may from nio, netty, input-stream, output-stream.....
+            User user = new User();
+            user.setUid(new Clong4(1));
+            user.setUname(null);
+            user.setIsMarried(null);
+            user.setSex(null);
+            user.setAddress(null);
+            user.setPlatformId(null);
+            user.setDescription(null);
+            user.setBill(null);
+            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
-        System.err.println("Write data: " + Arrays.toString(userWriteBytes));
+            final byte[] userWriteBytes = StructSerializer.writeBytes(user);
+            //System.err.println(userWriteBytes.length);
 
-        User read = StructSerializer.read(userWriteBytes, User.class);
-        System.err.println(read);
+            //System.err.println("Write data: " + Arrays.toString(userWriteBytes));
 
+            User read = StructSerializer.read(userWriteBytes, User.class);
+            // System.err.println(read);
+        }
+
+        System.err.println(System.currentTimeMillis() - l);
     }
 
     @Getter

@@ -10,6 +10,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -178,10 +179,12 @@ public final class StructSerializer implements Serializer {
     public static <T> byte[] writeBytes(T struct) {
         ByteBuf writeBuf = StructSerializer.write(struct);
         try {
-            return ByteBufUtil.getBytes(writeBuf);
+            byte[] bytes = new byte[writeBuf.readableBytes()];
+            writeBuf.readBytes(bytes);
+            return bytes;
         }
         finally {
-            writeBuf.release();
+            ReferenceCountUtil.release(writeBuf);
         }
     }
 
