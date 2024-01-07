@@ -467,7 +467,7 @@ public class StructUtils {
      */
     public static void checkAssignable(Field field, Class<?> clazz) {
         Class<?> type = field.getType();
-        if (clazz.isAssignableFrom(type))
+        if (!clazz.isAssignableFrom(type))
             throw new TypeJudgmentException("field [" + field + "] is not assignable from [" + clazz + "]");
     }
 
