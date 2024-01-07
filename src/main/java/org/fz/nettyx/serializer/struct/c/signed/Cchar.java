@@ -28,7 +28,7 @@ public class Cchar extends CBasic<Byte> {
     /**
      * Instantiates a new Cchar.
      *
-     * @param value the value
+     * @param value the length
      */
     public Cchar(Integer value) {
         super(value.byteValue(), 1);

@@ -30,7 +30,7 @@ public interface ByteBufHandler {
          *
          * @param serializer the serializer
          * @param field the field
-         * @return the final returned field value
+         * @return the final returned field length
          */
         Object doRead(S serializer, Field field);
 
@@ -55,7 +55,7 @@ public interface ByteBufHandler {
          *
          * @param serializer the serializer
          * @param field the field
-         * @param value the value
+         * @param value the length
          * @param add the add
          */
         void doWrite(S serializer, Field field, Object value, ByteBuf add);
