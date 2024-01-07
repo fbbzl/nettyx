@@ -48,6 +48,7 @@ public class ChannelInterceptors {
      * @param pipeline the pipeline
      * @return the interceptors
      */
+    @SuppressWarnings("unchecked")
     public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(ChannelPipeline pipeline) {
         List<T> result = new ArrayList<>(10);
 

@@ -30,9 +30,8 @@ public class HexBins {
      * @return the string
      */
     public String toBinary(String hex) {
-        if (hex == null || hex.length() % 2 != 0) {
-            return null;
-        }
+        if (hex == null || hex.length() % 2 != 0) return null;
+
         StringBuilder bString = new StringBuilder();
         String tmp;
         for (int i = 0; i < hex.length(); i++) {
@@ -72,9 +71,8 @@ public class HexBins {
      * @return return encoded string
      */
     public static String encode(byte... bytes) {
-        if (bytes == null) {
-            return null;
-        }
+        if (bytes == null) return null;
+
         int lengthData = bytes.length;
         int lengthEncode = lengthData * 2;
         char[] encodedData = new char[lengthEncode];
