@@ -29,7 +29,7 @@ public class Culong8 extends CBasic<BigInteger> {
     /**
      * Instantiates a new Culong 8.
      *
-     * @param value the value
+     * @param value the length
      */
     public Culong8(BigInteger value) {
         super(value, 8);
@@ -59,7 +59,7 @@ public class Culong8 extends CBasic<BigInteger> {
     protected BigInteger toValue(ByteBuf byteBuf) {
         final byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
-        // the no sign value in BigInteger is 1
+        // the no sign length in BigInteger is 1
         final int noSign = 1;
         return new BigInteger(noSign, reverseOrder(bytes));
     }

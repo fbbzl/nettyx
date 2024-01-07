@@ -2,6 +2,9 @@ package org.fz.nettyx.serializer.struct.annotation.collection;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
+import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Retention;
@@ -40,13 +43,6 @@ public @interface ToArrayList {
     int size() default 0;
 
     /**
-     * Buffer length int.
-     *
-     * @return the int
-     */
-    int bufferLength() default 0;
-
-    /**
      * The type Array list handler.
      */
     class ToArrayListHandler implements PropertyHandler.ReadWriteHandler<ToArrayList> {
@@ -55,10 +51,8 @@ public @interface ToArrayList {
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             StructUtils.checkAssignable(field, List.class);
             Class<?> elementType = toArrayList.elementType();
-            int bufferLength = toArrayList.bufferLength();
 
-            return new ArrayList<>(Arrays.asList(
-                StructSerializer.readArray(elementType, toArrayList.size(), serializer.readBytes(bufferLength))));
+            return new ArrayList<>(Arrays.asList(readArray(elementType, toArrayList.size(), serializer.getByteBuf())));
         }
 
         @Override
@@ -69,7 +63,7 @@ public @interface ToArrayList {
             Class<?> elementType = toArrayList.elementType();
             int size = toArrayList.size();
 
-            StructSerializer.writeArray(((ArrayList<?>) value).toArray(), elementType, size, writingBuffer);
+            writeArray(((ArrayList<?>) nullDefault(value, ArrayList::new)).toArray(), elementType, size, writingBuffer);
         }
     }
 }
