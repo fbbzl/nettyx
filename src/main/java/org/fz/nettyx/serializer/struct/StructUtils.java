@@ -462,10 +462,10 @@ public class StructUtils {
 
         static {
             final String allPackage = "";
-            Set<Class<? extends PropertyHandler<? extends Annotation>>> serializerHandlerClasses = (Set<Class<? extends PropertyHandler<? extends Annotation>>>) ClassScanner.scanPackageBySuper(
+            Set<Class<? extends PropertyHandler<? extends Annotation>>> handlerClasses = (Set<Class<? extends PropertyHandler<? extends Annotation>>>) ClassScanner.scanPackageBySuper(
                 allPackage, PropertyHandler.class);
 
-            for (Class<? extends PropertyHandler<? extends Annotation>> handlerClass : serializerHandlerClasses) {
+            for (Class<? extends PropertyHandler<? extends Annotation>> handlerClass : handlerClasses) {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(handlerClass);
                 if (targetAnnotationType != null) {
                     synchronized (StructCache.class) {
