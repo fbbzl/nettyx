@@ -26,7 +26,7 @@ public class Cfloat extends CBasic<Float> {
     /**
      * Instantiates a new Cfloat.
      *
-     * @param value the value
+     * @param value the length
      */
     public Cfloat(Float value) {
         super(value, 4);

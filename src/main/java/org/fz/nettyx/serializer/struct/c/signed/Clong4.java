@@ -24,7 +24,7 @@ public class Clong4 extends Cint {
     /**
      * Instantiates a new Clong 4.
      *
-     * @param value the value
+     * @param value the length
      */
     public Clong4(Integer value) {
         super(value);

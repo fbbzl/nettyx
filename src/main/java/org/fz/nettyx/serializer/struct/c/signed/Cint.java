@@ -26,7 +26,7 @@ public class Cint extends CBasic<Integer> {
     /**
      * Instantiates a new Cint.
      *
-     * @param value the value
+     * @param value the length
      */
     public Cint(Integer value) {
         super(value, 4);

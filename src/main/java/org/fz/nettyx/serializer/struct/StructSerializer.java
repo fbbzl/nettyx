@@ -3,12 +3,9 @@ package org.fz.nettyx.serializer.struct;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
-import static org.fz.nettyx.serializer.struct.StructUtils.getArrayLength;
-import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
-import static org.fz.nettyx.serializer.struct.StructUtils.newArray;
-import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -18,18 +15,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
-import java.util.function.Supplier;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
-import org.fz.nettyx.serializer.struct.annotation.Length;
-import org.fz.nettyx.serializer.struct.annotation.SerializerHandler;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 
 /**
@@ -237,7 +230,6 @@ public final class StructSerializer implements Serializer {
                 if (useReadHandler(field)) fieldValue = readHandled(field, this);
                 else if (isBasic(field))   fieldValue = readBasic(field,  this.getByteBuf());
                 else if (isStruct(field))  fieldValue = readStruct(field, this.getByteBuf());
-                else if (isArray(field))   fieldValue = readArray(field.getType().getComponentType(), getArrayLength(field), this.getByteBuf());
                 else                       throw new TypeJudgmentException("can not determine field type, field is[" + field + "]");
 
                 StructUtils.writeField(struct, field, fieldValue);
@@ -259,15 +251,13 @@ public final class StructSerializer implements Serializer {
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
-                if (useWriteHandler(field)) writeHandled(field, this.struct, this, this.getByteBuf());
+                if (useWriteHandler(field)) writeHandled(field, fieldValue, this, this.getByteBuf());
                 else
                 if (isBasic(field))         writeBasic((Basic<?>) nullDefault(fieldValue, () -> StructUtils.newBasic(field, buffer())), this.getByteBuf());
                 else
                 if (isStruct(field))        writeStruct(nullDefault(fieldValue, () -> StructUtils.newStruct(field)), this.getByteBuf());
-                else
-                if (isArray(field))         writeArray(nullDefault(fieldValue, () -> StructUtils.newArray(field)), getComponentType(field), getArrayLength(field), this.getByteBuf());
 
-                else throw new TypeJudgmentException("can not determine field type, field is[" + field + "]");
+                else throw new TypeJudgmentException("can not determine field type, field is [" + field + "]");
             } catch (Exception exception) {
                 throw new SerializeException("field write exception, field [" + field + "]", exception);
             }
@@ -301,71 +291,9 @@ public final class StructSerializer implements Serializer {
         return StructSerializer.read(byteBuf, struct);
     }
 
-    /**
-     * read array field
-     *
-     * @param <E>        the type parameter
-     * @param arrayField the array field
-     * @param byteBuf    the byte buf
-     */
-    public static <E> E[] readArray(Field arrayField, ByteBuf byteBuf) {
-        E[] array = StructUtils.newArray(arrayField);
-
-        Class<E> elementType = (Class<E>) arrayField.getType().getComponentType();
-
-        Object[] arrayValue = isBasic(elementType) ?
-                readBasicArray((Basic<?>[]) array, byteBuf) :
-                readStructArray(array, byteBuf);
-
-        return (E[]) arrayValue;
-    }
-
-    public static <E> E[] readArray(Class<E> elementType, int length, ByteBuf byteBuf) {
-        E[] array = newArray(elementType, length);
-
-        Object[] arrayValue = isBasic(elementType) ?
-                readBasicArray((Basic<?>[]) array, byteBuf) :
-                readStructArray(array, byteBuf);
-
-        return (E[]) arrayValue;
-    }
-
-    /**
-     * read the field with annotation {@link SerializerHandler}
-     *
-     * @param handledField    the field with the {@link SerializerHandler}
-     * @param upperSerializer the upper serializer
-     * @see SerializerHandler
-     */
     public static Object readHandled(Field handledField, StructSerializer upperSerializer) {
         ReadHandler<?> readHandler = StructUtils.getHandler(handledField);
         return readHandler.doRead(upperSerializer, handledField, StructUtils.findHandlerAnnotation(handledField));
-    }
-
-    /**
-     * convert to basic array
-     */
-    private static <B extends Basic<?>> B[] readBasicArray(B[] basics, ByteBuf arrayBuf) {
-        Class<B> elementType = (Class<B>) basics.getClass().getComponentType();
-
-        for (int i = 0; i < basics.length; i++) {
-            basics[i] = newBasic(elementType, arrayBuf);
-        }
-
-        return basics;
-    }
-
-    /**
-     * convert to struct array
-     */
-    private static <S> S[] readStructArray(S[] structs, ByteBuf arrayBuf) {
-        Class<S> elementType = (Class<S>) structs.getClass().getComponentType();
-
-        for (int i = 0; i < structs.length; i++) {
-            structs[i] = StructSerializer.read(arrayBuf, elementType);
-        }
-
-        return structs;
     }
 
     //*************************************         read write splitter         **************************************//
@@ -386,16 +314,6 @@ public final class StructSerializer implements Serializer {
         writingBuf.writeBytes(StructSerializer.write(structValue));
     }
 
-    public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength, ByteBuf writingBuf) {
-        // cast to array
-        T[] array = (T[]) arrayValue;
-        if (declaredLength < array.length) throw new IllegalArgumentException("array length exceed the declared length in annotation [" + Length.class + "]");
-        if (declaredLength > array.length) array = fillArray(array, elementType, declaredLength);
-
-        if (isBasic(elementType)) writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
-        else                      writeStructArray(array, elementType, writingBuf);
-    }
-
     /**
      * write using handler
      *
@@ -407,44 +325,7 @@ public final class StructSerializer implements Serializer {
         ByteBuf writingBuf) {
         WriteHandler<?> writeHandler = StructUtils.getHandler(handleField);
 
-        writeHandler.doWrite(upperSerializer, handleField, fieldValue, null, writingBuf);
-    }
-
-    /**
-     * write basic array
-     */
-    private static void writeBasicArray(Basic<?>[] basicArray, Class<Basic<?>> basicType, ByteBuf writingBuf) {
-        for (Basic<?> basic : basicArray) {
-            writingBuf.writeBytes(nullDefault(basic, () -> newBasic(basicType, buffer())).getByteBuf());
-        }
-    }
-
-    /**
-     * write struct array
-     */
-    private static void writeStructArray(Object[] structArray, Class<?> structType, ByteBuf writingBuf) {
-        for (Object struct : structArray) {
-            writingBuf.writeBytes(StructSerializer.write(nullDefault(struct, () -> newStruct(structType))));
-        }
-    }
-
-    public static <T> T nullDefault(T obj, Supplier<T> defSupplier) {
-        if (obj == null) return defSupplier.get();
-        else             return obj;
-    }
-
-    /**
-     * Fill array object [ ].
-     *
-     * @param arrayValue the array value
-     * @param elementType the element type
-     * @param length the length
-     * @return the object [ ]
-     */
-    public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
-        T[] filledArray = (T[]) Array.newInstance(elementType, length);
-        System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
-        return filledArray;
+        writeHandler.doWrite(upperSerializer, handleField, fieldValue, StructUtils.findHandlerAnnotation(handleField), writingBuf);
     }
 
     /**
@@ -476,6 +357,10 @@ public final class StructSerializer implements Serializer {
      */
     public static boolean isBasic(Class<?> clazz) {
         return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    }
+
+    public static boolean isStruct(Field field) {
+        return isStruct(field.getType());
     }
 
     /**
@@ -537,7 +422,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean isIgnore(Field field) {
-        return StructUtils.isAnnotationPresent(field, Ignore.class);
+        return StructUtils.isAnnotationPresent(field, Ignore.class) || StructUtils.isTransient(field);
     }
 
     /**

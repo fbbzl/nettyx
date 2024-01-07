@@ -41,7 +41,7 @@ public @interface ToCharSequence {
      */
     int bufferLength() default 0;
 
-    class ToCharSequenceHandler<K,V> implements PropertyHandler.ReadWriteHandler<ToCharSequence> {
+    class ToCharSequenceHandler implements PropertyHandler.ReadWriteHandler<ToCharSequence> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToCharSequence toCharSequence) {
