@@ -1,12 +1,13 @@
 package org.fz.nettyx.serializer.struct;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
-import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -24,6 +25,7 @@ import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -250,9 +252,9 @@ public final class StructSerializer implements Serializer {
 
                 if (useWriteHandler(field)) writeHandled(field, fieldValue, this, this.getByteBuf());
                 else
-                if (isBasic(field))         writeBasic((Basic<?>) nullDefault(fieldValue, () -> StructUtils.newBasic(field, buffer())), this.getByteBuf());
+                if (isBasic(field))         writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newBasic(field, buffer())), this.getByteBuf());
                 else
-                if (isStruct(field))        writeStruct(nullDefault(fieldValue, () -> StructUtils.newStruct(field)), this.getByteBuf());
+                if (isStruct(field))        writeStruct(defaultIfNull(fieldValue, () -> StructUtils.newStruct(field)), this.getByteBuf());
 
                 else throw new TypeJudgmentException("can not determine field type, field is [" + field + "]");
             } catch (Exception exception) {
@@ -299,7 +301,7 @@ public final class StructSerializer implements Serializer {
      * write basic bytes
      */
     public static <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(basicValue.getByteBuf());
+        writingBuf.writeBytes(basicValue.getBytes());
     }
 
     /**
@@ -378,38 +380,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean isStruct(Class<?> clazz) {
-        return StructUtils.isAnnotationPresent(clazz, Struct.class);
-    }
-
-    /**
-     * Is array boolean.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @return the boolean
-     */
-    public static <T> boolean isArray(T object) {
-        return isArray(object.getClass());
-    }
-
-    /**
-     * Is array boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean isArray(Field field) {
-        return field.getType().isArray();
-    }
-
-    /**
-     * Is array boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
-    public static boolean isArray(Class<?> clazz) {
-        return clazz.isArray();
+        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
     }
 
     /**
@@ -419,7 +390,7 @@ public final class StructSerializer implements Serializer {
      * @return the boolean
      */
     public static boolean isIgnore(Field field) {
-        return StructUtils.isAnnotationPresent(field, Ignore.class) || StructUtils.isTransient(field);
+        return AnnotationUtil.hasAnnotation(field, Ignore.class) || StructUtils.isTransient(field);
     }
 
     /**
@@ -443,8 +414,8 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * Early struct t.
-     *
+     * this is a  useful method that sometimes you may read the field value before current field value, if so
+     * you can get the serializing struct object by this method
      * @param <T> the type parameter
      * @return the t
      */
