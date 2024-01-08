@@ -13,14 +13,14 @@ import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
-import org.fz.nettyx.serializer.struct.c.signed.Cchar;
-import org.fz.nettyx.serializer.struct.c.signed.Cdouble;
-import org.fz.nettyx.serializer.struct.c.signed.Cfloat;
-import org.fz.nettyx.serializer.struct.c.signed.Cint;
-import org.fz.nettyx.serializer.struct.c.signed.Clong4;
-import org.fz.nettyx.serializer.struct.c.signed.Clong8;
-import org.fz.nettyx.serializer.struct.c.unsigned.Cuchar;
-import org.fz.nettyx.serializer.struct.c.unsigned.Cuint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuint;
 
 /**
  * @author fengbinbin
@@ -48,12 +48,9 @@ public class TypedSerializerTest {
             user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
             final ByteBuf userWriteBytes = StructSerializer.write(user);
-            //System.err.println(userWriteBytes.length);
 
-            //System.err.println("Write data: " + Arrays.toString(userWriteBytes));
+            User read = StructSerializer.read(userWriteBytes, User.class);
 
-          //  User read = StructSerializer.read(userWriteBytes, User.class);
-            // System.err.println(read);
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l)/1000 + "");
         System.err.println(l1);
