@@ -34,6 +34,7 @@ public @interface ToEnum {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToEnum annotation) {
+
             return null;
         }
 
