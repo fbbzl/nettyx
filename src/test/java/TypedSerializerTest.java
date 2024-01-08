@@ -1,3 +1,5 @@
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +20,7 @@ import org.fz.nettyx.serializer.struct.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.c.signed.Clong8;
 import org.fz.nettyx.serializer.struct.c.unsigned.Cuchar;
 import org.fz.nettyx.serializer.struct.c.unsigned.Cuint;
+import org.fz.nettyx.util.HexBins;
 
 /**
  * @author fengbinbin
@@ -28,30 +31,34 @@ public class TypedSerializerTest {
 
     public static void main(String[] args) {
         long l = System.currentTimeMillis();
-
-        for (int i = 0; i < 1_000_000; i++) {
+        int times = 1_00_000;
+        for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User user = new User();
-            user.setUid(new Clong4(1));
-            user.setUname(null);
-            user.setIsMarried(null);
-            user.setSex(null);
-            user.setAddress(null);
-            user.setPlatformId(null);
-            user.setDescription(null);
-            user.setBill(null);
-            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
+            String x = "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+            User user = StructSerializer.read(HexBins.decode(x), User.class);
 
-            final byte[] userWriteBytes = StructSerializer.writeBytes(user);
+//            user.setUid(new Clong4(1));
+//            user.setUname(null);
+//            user.setIsMarried(null);
+//            user.setSex(null);
+//            user.setAddress(null);
+//            user.setPlatformId(null);
+//            user.setDescription(null);
+//            user.setBill(null);
+//            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
+
+            //final ByteBuf userWriteBytes = StructSerializer.write(user);
             //System.err.println(userWriteBytes.length);
 
             //System.err.println("Write data: " + Arrays.toString(userWriteBytes));
 
-            User read = StructSerializer.read(userWriteBytes, User.class);
+          //  User read = StructSerializer.read(userWriteBytes, User.class);
             // System.err.println(read);
         }
+        BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l)/1000 + "");
+        System.err.println(l1);
 
-        System.err.println(System.currentTimeMillis() - l);
+        System.err.println(l1.divide(new BigDecimal(times+""), 10, RoundingMode.HALF_UP));
     }
 
     @Getter
