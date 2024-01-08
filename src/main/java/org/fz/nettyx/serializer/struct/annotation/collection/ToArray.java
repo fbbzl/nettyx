@@ -10,6 +10,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 
 import io.netty.buffer.ByteBuf;
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
@@ -25,10 +26,14 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
  * @since 2021-10-20 08:18
  **/
 
+@Documented
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ToArray {
 
+    /**
+     * array length
+     */
     int length() default 0;
 
     @SuppressWarnings("unchecked")
