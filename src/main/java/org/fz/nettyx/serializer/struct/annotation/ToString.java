@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.collection;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
