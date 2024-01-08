@@ -31,6 +31,9 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 @Retention(RUNTIME)
 public @interface ToArray {
 
+    /**
+     * array length
+     */
     int length() default 0;
 
     @SuppressWarnings("unchecked")

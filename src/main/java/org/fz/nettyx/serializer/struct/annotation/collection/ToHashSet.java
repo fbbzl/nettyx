@@ -46,7 +46,7 @@ public @interface ToHashSet {
     Class<? extends java.util.List> type() default ArrayList.class;
 
     /**
-     * Size int.
+     * set size int.
      *
      * @return the int
      */

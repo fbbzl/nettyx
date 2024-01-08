@@ -37,7 +37,7 @@ public @interface ToLinkedList {
     Class<?> elementType();
 
     /**
-     * Size int.
+     * list size int.
      *
      * @return the int
      */
