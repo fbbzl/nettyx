@@ -1,6 +1,6 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
-import static cn.hutool.core.collection.CollUtil.newArrayList;
+import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -19,16 +19,15 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 
 /**
- * The interface List.
- *
  * @author fengbinbin
  * @version 1.0
- * @since 2023 /12/27 10:26
+ * @since 2024/1/8 13:15
  */
-@Documented
+
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToArrayList {
+@Documented
+public @interface ToLinkedList {
 
     /**
      * Element type class.
@@ -38,35 +37,33 @@ public @interface ToArrayList {
     Class<?> elementType();
 
     /**
-     * list size
+     * list size int.
      *
      * @return the int
      */
     int size() default 0;
 
-    /**
-     * The type Array list handler.
-     */
-    class ToArrayListHandler implements PropertyHandler.ReadWriteHandler<ToArrayList> {
+    class ToLinkedListHandler implements PropertyHandler.ReadWriteHandler<ToLinkedList> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
+        public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             StructUtils.checkAssignable(field, List.class);
-            Class<?> elementType = toArrayList.elementType();
+            Class<?> elementType = toLinkedList.elementType();
 
-            return ListUtil.toList(readArray(elementType, toArrayList.size(), serializer.getByteBuf()));
+            return ListUtil.toLinkedList(readArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
             ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, List.class);
 
-            Class<?> elementType = toArrayList.elementType();
-            int size = toArrayList.size();
+            Class<?> elementType = toLinkedList.elementType();
+            int size = toLinkedList.size();
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
+            List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
             writeArray(list.toArray(), elementType, size, writingBuffer);
         }
     }
+
 }
