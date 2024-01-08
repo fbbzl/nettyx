@@ -17,9 +17,9 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface ToBoolean {
 
-    int trueValue();
+    int trueValue() default 1;
 
-    int falseValue();
+    int falseValue() default 0;
 
 
 
