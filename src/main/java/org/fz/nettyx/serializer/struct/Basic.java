@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public abstract class Basic<V> {
     /**
      * the byte byteBuf
      */
-    private final ByteBuf byteBuf;
+    private final byte[] bytes;
 
     /**
      * the Java length
@@ -63,17 +64,12 @@ public abstract class Basic<V> {
      */
     protected abstract V toValue(ByteBuf byteBuf);
 
-    /**
-     * Get bytes byte [ ].
-     *
-     * @return the byte [ ]
-     */
-    public byte[] getBytes() {
-        return ByteBufUtil.getBytes(this.getByteBuf());
+    public ByteBuf getByteBuf() {
+        return Unpooled.wrappedBuffer(this.getBytes());
     }
 
     public ByteBuffer getNioBuffer() {
-        return this.getByteBuf().nioBuffer();
+        return ByteBuffer.wrap(this.getBytes());
     }
 
     /**
@@ -85,8 +81,8 @@ public abstract class Basic<V> {
     protected Basic(V value, int size) {
         this.size = size;
         this.value = value;
-        this.byteBuf = this.toByteBuf(this.value, this.size);
-        this.fill(this.byteBuf, this.size);
+        this.bytes = new byte[this.size];
+        this.toByteBuf(this.value, this.size).readBytes(this.bytes);
     }
 
     /**
@@ -97,19 +93,9 @@ public abstract class Basic<V> {
      */
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
-        this.fill(byteBuf, this.size);
-        this.byteBuf = byteBuf.readBytes(this.size);
-        this.value = this.toValue(this.byteBuf.duplicate());
-    }
-
-    /**
-     * fill buffer into assigned length
-     */
-    private void fill(ByteBuf buf, int requiredSize) {
-        int fillLength = requiredSize - buf.readableBytes();
-        if (fillLength > 0) {
-            buf.writeBytes(new byte[fillLength]);
-        }
+        this.bytes = new byte[this.size];
+        byteBuf.readBytes(this.bytes);
+        this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
     }
 
     /**
@@ -118,6 +104,6 @@ public abstract class Basic<V> {
      * @return Returns a hex dump  of the specified buffer's readable bytes.
      */
     public String hexDump() {
-        return ByteBufUtil.hexDump(this.getByteBuf());
+        return ByteBufUtil.hexDump(this.getBytes());
     }
 }

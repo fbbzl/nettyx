@@ -6,7 +6,7 @@ import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotatio
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_CONSTRUCTOR_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_BUF_CONSTRUCTOR_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_CONSTRUCTOR_CACHE;
@@ -191,7 +191,7 @@ public class StructUtils {
                 return c.getConstructor();
             } catch (NoSuchMethodException exception) {
                 throw new UnsupportedOperationException(
-                    "can not find serializer handler [" + handlerClass + "] no-args constructor");
+                    "can not find serializer handler [" + handlerClass + "] no-args constructor", exception);
             }
         });
     }
@@ -209,7 +209,7 @@ public class StructUtils {
                 return c.getConstructor();
             } catch (NoSuchMethodException exception) {
                 throw new UnsupportedOperationException(
-                    "can not find struct [" + structClass + "] no-args constructor");
+                    "can not find struct [" + structClass + "] no-args constructor", exception);
             }
         });
     }
@@ -222,12 +222,12 @@ public class StructUtils {
      * @return the basic constructor
      */
     <B extends Basic<?>> Constructor<B> getBasicConstructor(Class<B> basicClass) {
-        return (Constructor<B>) BASIC_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, c -> {
+        return (Constructor<B>) BASIC_BUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, c -> {
             try {
                 return c.getConstructor(ByteBuf.class);
             } catch (NoSuchMethodException exception) {
                 throw new UnsupportedOperationException(
-                    "can not find basic constructor with arg [" + ByteBuf.class + "]");
+                    "can not find basic constructor with arg [" + ByteBuf.class + "]", exception);
             }
         });
     }
@@ -243,7 +243,7 @@ public class StructUtils {
         try {
             return getHandlerConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...");
+            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
     }
 
@@ -274,7 +274,7 @@ public class StructUtils {
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException(
-                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]");
+                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", exception);
         }
     }
 
@@ -302,7 +302,7 @@ public class StructUtils {
             else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("struct [" + structClass + "] instantiate failed...");
+            throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
         }
     }
 
@@ -465,7 +465,7 @@ public class StructUtils {
          * The constant BASIC_CONSTRUCTOR_CACHE.
          */
         /* constructor cache */
-        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
+        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_BUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
             512);
         /**
          * The Struct constructor cache.
@@ -486,6 +486,7 @@ public class StructUtils {
         static {
             try {
                 scanHandlers();
+                scanBasics();
                 scanStructs();
             } catch (Exception e) {
                 throw new NotInitedException("init nettyx serializer cache failed please check", e);
@@ -508,6 +509,15 @@ public class StructUtils {
                         StructUtils.getHandlerConstructor(
                             ((Class<? extends PropertyHandler<? extends Annotation>>) handlerClass)));
                 }
+            }
+        }
+
+        private static synchronized void scanBasics() throws NoSuchMethodException {
+            Set<Class<?>> basicClasses = ClassScanner.scanPackageBySuper(ALL_PACKAGE, Basic.class);
+            for (Class<?> basicClass : basicClasses) {
+                if (Modifier.isAbstract(basicClass.getModifiers())) continue;
+                Constructor<? extends Basic<?>> basicConstructor = (Constructor<? extends Basic<?>>) basicClass.getConstructor(ByteBuf.class);
+                BASIC_BUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) basicClass, basicConstructor);
             }
         }
 

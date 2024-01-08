@@ -299,7 +299,7 @@ public final class StructSerializer implements Serializer {
      * write basic bytes
      */
     public static <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(basicValue.getByteBuf());
+        writingBuf.writeBytes(basicValue.getBytes());
     }
 
     /**
