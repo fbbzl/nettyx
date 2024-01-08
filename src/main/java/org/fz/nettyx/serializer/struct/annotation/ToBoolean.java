@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * TODO
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/1/7 23:36
@@ -16,6 +16,10 @@ import java.lang.annotation.Target;
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ToBoolean {
+
+    int trueValue();
+
+    int falseValue();
 
 
 
