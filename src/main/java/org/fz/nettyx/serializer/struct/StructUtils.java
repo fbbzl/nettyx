@@ -1,46 +1,39 @@
 package org.fz.nettyx.serializer.struct;
 
-import static cn.hutool.core.collection.CollUtil.newHashSet;
-import static java.util.stream.Collectors.toSet;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_CONSTRUCTOR_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_CONSTRUCTOR_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_FIELDS_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
+import cn.hutool.core.lang.reflect.MethodHandleUtil;
+import cn.hutool.core.map.WeakConcurrentMap;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The type Struct utils.
@@ -53,25 +46,8 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 @UtilityClass
 public class StructUtils {
 
-    /**
-     * The Is static.
-     */
-    Predicate<Field> isStatic = f -> Modifier.isStatic(f.getModifiers());
-
     public boolean isTransient(Field field) {
         return TRANSIENT_FIELD_CACHE.contains(field);
-    }
-
-    /**
-     * Is annotation present boolean.
-     *
-     * @param <A> the type parameter
-     * @param element the element
-     * @param annoType the anno type
-     * @return the boolean
-     */
-    public <A extends Annotation> boolean isAnnotationPresent(AnnotatedElement element, Class<A> annoType) {
-        return findAnnotation(element, annoType) != null;
     }
 
     /**
@@ -82,83 +58,13 @@ public class StructUtils {
      * @return the a
      */
     public <A extends Annotation> A findHandlerAnnotation(AnnotatedElement element) {
-        for (Annotation annotation : allAnnotations(element)) {
+        for (Annotation annotation : AnnotationUtil.getAnnotations(element, false)) {
             Class<? extends Annotation> annotationType = annotation.annotationType();
             if (ANNOTATION_HANDLER_MAPPING_CACHE.containsKey(annotationType)) {
                 return (A) annotation;
             }
         }
         return null;
-    }
-
-    /**
-     * All annotations collection.
-     *
-     * @param <A> the type parameter
-     * @param element the element
-     * @return the collection
-     */
-    public <A extends Annotation> Collection<A> allAnnotations(AnnotatedElement element) {
-        return (Collection<A>) StructCache.ANNOTATED_ELEMENT_ANNOTATION_CACHE.computeIfAbsent(element,
-            e -> newHashSet(e.getAnnotations()));
-    }
-
-    /**
-     * Find annotation a.
-     *
-     * @param <A> the type parameter
-     * @param element the element
-     * @param clazz the clazz
-     * @return the a
-     */
-    public <A extends Annotation> A findAnnotation(AnnotatedElement element, Class<A> clazz) {
-        return filterAnnotation(element, a -> a.annotationType() == clazz);
-    }
-
-    /**
-     * Find annotations set.
-     *
-     * @param <A> the type parameter
-     * @param element the element
-     * @param clazz the clazz
-     * @return the set
-     */
-    public <A extends Annotation> Set<A> findAnnotations(AnnotatedElement element, Class<A> clazz) {
-        return filterAnnotations(element, a -> a.annotationType() == clazz);
-    }
-
-    /**
-     * Filter annotation a.
-     *
-     * @param <A> the type parameter
-     * @param element the element
-     * @param filter the filter
-     * @return the a
-     */
-    public <A extends Annotation> A filterAnnotation(AnnotatedElement element, Predicate<Annotation> filter) {
-        Set<Annotation> annotations = filterAnnotations(element, filter);
-        if (annotations.size() > 1) {
-            throw new UnsupportedOperationException(
-                "keep [" + element + "] only have one serializer handler annotation, annotation now are ["
-                    + annotations + "]");
-        }
-        if (annotations.isEmpty()) {
-            return null;
-        }
-        return (A) annotations.iterator().next();
-    }
-
-    /**
-     * Filter annotations a [ ].
-     *
-     * @param <A> the type parameter
-     * @param annotatedElement the annotated element
-     * @param filter the filter
-     * @return the a [ ]
-     */
-    public <A extends Annotation> Set<A> filterAnnotations(AnnotatedElement annotatedElement,
-        Predicate<Annotation> filter) {
-        return (Set<A>) allAnnotations(annotatedElement).stream().filter(filter).collect(toSet());
     }
 
     /**
@@ -179,60 +85,6 @@ public class StructUtils {
     }
 
     /**
-     * Gets handler constructor.
-     *
-     * @param <H> the type parameter
-     * @param handlerClass the handler class
-     * @return the handler constructor
-     */
-    <H extends PropertyHandler<? extends Annotation>> Constructor<H> getHandlerConstructor(Class<H> handlerClass) {
-        return (Constructor<H>) StructCache.HANDLER_CONSTRUCTOR_CACHE.computeIfAbsent(handlerClass, c -> {
-            try {
-                return c.getConstructor();
-            } catch (NoSuchMethodException exception) {
-                throw new UnsupportedOperationException(
-                    "can not find serializer handler [" + handlerClass + "] no-args constructor");
-            }
-        });
-    }
-
-    /**
-     * Gets struct constructor.
-     *
-     * @param <C> the type parameter
-     * @param structClass the struct class
-     * @return the struct constructor
-     */
-    <C> Constructor<C> getStructConstructor(Class<C> structClass) {
-        return (Constructor<C>) STRUCT_CONSTRUCTOR_CACHE.computeIfAbsent(structClass, c -> {
-            try {
-                return c.getConstructor();
-            } catch (NoSuchMethodException exception) {
-                throw new UnsupportedOperationException(
-                    "can not find struct [" + structClass + "] no-args constructor");
-            }
-        });
-    }
-
-    /**
-     * Gets basic constructor.
-     *
-     * @param <B> the type parameter
-     * @param basicClass the basic class
-     * @return the basic constructor
-     */
-    <B extends Basic<?>> Constructor<B> getBasicConstructor(Class<B> basicClass) {
-        return (Constructor<B>) BASIC_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, c -> {
-            try {
-                return c.getConstructor(ByteBuf.class);
-            } catch (NoSuchMethodException exception) {
-                throw new UnsupportedOperationException(
-                    "can not find basic constructor with arg [" + ByteBuf.class + "]");
-            }
-        });
-    }
-
-    /**
      * New handler instance t.
      *
      * @param <T> the type parameter
@@ -241,9 +93,9 @@ public class StructUtils {
      */
     static <T extends PropertyHandler<?>> T newHandler(Class<T> clazz) {
         try {
-            return getHandlerConstructor(clazz).newInstance();
+            return ReflectUtil.getConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...");
+            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
     }
 
@@ -269,12 +121,12 @@ public class StructUtils {
      */
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, ByteBuf buf) {
         try {
-            if (isBasic(basicClass)) return getBasicConstructor(basicClass).newInstance(buf);
+            if (isBasic(basicClass)) return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
             else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException(
-                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]");
+                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", exception);
         }
     }
 
@@ -298,19 +150,13 @@ public class StructUtils {
      */
     public static <T> T newStruct(Class<T> structClass) {
         try {
-            if (isStruct(structClass)) return getStructConstructor(structClass).newInstance();
+            if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
             else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("struct [" + structClass + "] instantiate failed...");
+            throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
         }
     }
-
-
-    /**
-     * The constant EMPTY_FIELD_ARRAY.
-     */
-    static final Field[] EMPTY_FIELD_ARRAY = {};
 
     /**
      * Write field.
@@ -330,7 +176,7 @@ public class StructUtils {
                             + "], check the correct parameter type of field getter/setter", exception);
                 }
             });
-            writeMethod.invoke(object, value);
+            MethodHandleUtil.invoke(object, writeMethod, value);
         } catch (Exception exception) {
             throw new UnsupportedOperationException("field write failed, field is [" + field + "], length is [" + value
                 + "], check the correct parameter type of field getter/setter", exception);
@@ -356,7 +202,8 @@ public class StructUtils {
                         exception);
                 }
             });
-            return (T) readMethod.invoke(object);
+
+            return (T) MethodHandleUtil.invoke(object, readMethod);
         } catch (Exception exception) {
             throw new UnsupportedOperationException(
                 "field read failed, field is [" + field + "], check parameter type or field getter/setter", exception);
@@ -370,17 +217,7 @@ public class StructUtils {
      * @return the component type
      */
     public static Class<?> getComponentType(Field arrayField) {
-        return arrayField.getType().getComponentType();
-    }
-
-    /**
-     * Gets all fields list.
-     *
-     * @param clazz the clazz
-     * @return the all fields list
-     */
-    public static List<Field> getStructFieldList(Class<?> clazz) {
-        return Arrays.asList(getStructFields(clazz));
+        return ArrayUtil.getComponentType(arrayField.getType());
     }
 
     /**
@@ -390,39 +227,7 @@ public class StructUtils {
      * @return the field [ ]
      */
     public static Field[] getStructFields(Class<?> clazz) {
-        return STRUCT_FIELDS_CACHE.computeIfAbsent(clazz, c -> {
-            final List<Field> allFields = new ArrayList<>(10);
-            Class<?> currentClass = clazz;
-            while (currentClass != null && isStruct(currentClass)) {
-                final Field[] declaredFields = currentClass.getDeclaredFields();
-                Collections.addAll(allFields, declaredFields);
-                currentClass = currentClass.getSuperclass();
-            }
-            // remove static fields
-            allFields.removeIf(isStatic);
-
-            return allFields.toArray(EMPTY_FIELD_ARRAY);
-        });
-    }
-
-    /**
-     * reverse bytes order
-     *
-     * @param bytes the bytes
-     * @return the byte [ ]
-     */
-    public static byte[] reverseOrder(byte[] bytes) {
-        for (int i = 0, j = bytes.length - 1; i < bytes.length / 2; i++, j--) {
-            byte stage = bytes[i];
-            bytes[i] = bytes[j];
-            bytes[j] = stage;
-        }
-        return bytes;
-    }
-
-    public static <T> T nullDefault(T obj, Supplier<T> defSupplier) {
-        if (obj == null) return defSupplier.get();
-        else             return obj;
+        return ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()));
     }
 
     /**
@@ -433,9 +238,10 @@ public class StructUtils {
      */
     public static void checkAssignable(Field field, Class<?> clazz) {
         Class<?> type = field.getType();
-        if (!clazz.isAssignableFrom(type)) {
+        if (!ClassUtil.isAssignable(clazz, type)) {
             throw new TypeJudgmentException(
-                "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz + "]");
+                "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz
+                    + "]");
         }
     }
 
@@ -447,46 +253,22 @@ public class StructUtils {
         static final Set<Field> TRANSIENT_FIELD_CACHE = new ConcurrentHashSet<>(512);
 
         /* reflection cache */
-        static final Map<Field, Method> FIELD_READER_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
         /**
          * The Field write method cache.
          */
-        static final Map<Field, Method> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(512);
-        /**
-         * The Struct fields cache.
-         */
-        static final Map<Class<?>, Field[]> STRUCT_FIELDS_CACHE = new ConcurrentHashMap<>(512);
-        /**
-         * The Annotation cache.
-         */
-        static final Map<AnnotatedElement, Set<Annotation>> ANNOTATED_ELEMENT_ANNOTATION_CACHE = new ConcurrentHashMap<>(512);
-
-        /**
-         * The constant BASIC_CONSTRUCTOR_CACHE.
-         */
-        /* constructor cache */
-        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
-            512);
-        /**
-         * The Struct constructor cache.
-         */
-        static final Map<Class<?>, Constructor<?>> STRUCT_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(512);
-        /**
-         * The Handler constructor cache.
-         */
-        static final Map<Class<? extends PropertyHandler<? extends Annotation>>, Constructor<? extends PropertyHandler<? extends Annotation>>> HANDLER_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
-            512);
-
+        static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
         /**
          * The constant ANNOTATION_HANDLER_MAPPING_CACHE.
          */
         /* mapping handler and annotation */
-        static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>(32);
+        static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new WeakConcurrentMap<>();
 
         static {
             try {
-                scanHandlers();
-                scanStructs();
+                scanAllHandlers();
+                scanAllBasics();
+                scanAllStructs();
             } catch (Exception e) {
                 throw new NotInitedException("init nettyx serializer cache failed please check", e);
             }
@@ -494,8 +276,8 @@ public class StructUtils {
 
         private static final String ALL_PACKAGE = "";
 
-        private static synchronized void scanHandlers() {
-            Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(ALL_PACKAGE, PropertyHandler.class);
+        private static synchronized void scanAllHandlers() {
+            Set<Class<?>> handlerClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, PropertyHandler.class);
 
             for (Class<?> handlerClass : handlerClasses) {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(handlerClass);
@@ -503,29 +285,38 @@ public class StructUtils {
                     ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(targetAnnotationType,
                         (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass);
 
-                    HANDLER_CONSTRUCTOR_CACHE.putIfAbsent(
-                        (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass,
-                        StructUtils.getHandlerConstructor(
-                            ((Class<? extends PropertyHandler<? extends Annotation>>) handlerClass)));
+                    ReflectUtil.getConstructor(handlerClass);
                 }
             }
         }
 
-        private static synchronized void scanStructs() throws NoSuchMethodException, IntrospectionException {
+        private static synchronized void scanAllBasics() {
+            Set<Class<?>> basicClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, Basic.class);
+            for (Class<?> basicClass : basicClasses) {
+                if (Modifier.isAbstract(basicClass.getModifiers())) {
+                    continue;
+                }
+                ReflectUtil.getConstructor(basicClass);
+            }
+        }
+
+        private static synchronized void scanAllStructs() throws IntrospectionException {
             Set<Class<?>> structClasses = ClassScanner.scanAllPackageByAnnotation(ALL_PACKAGE, Struct.class);
             for (Class<?> structClass : structClasses) {
-                STRUCT_CONSTRUCTOR_CACHE.putIfAbsent(structClass, structClass.getConstructor());
+                ReflectUtil.getConstructor(structClass);
 
                 Field[] structFields = StructUtils.getStructFields(structClass);
 
                 for (Field field : structFields) {
-                    if (Modifier.isTransient(field.getModifiers())) TRANSIENT_FIELD_CACHE.add(field);
+                    if (Modifier.isTransient(field.getModifiers())) {
+                        TRANSIENT_FIELD_CACHE.add(field);
+                    }
 
                     PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), structClass);
-                    FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor .getReadMethod());
+                    FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor.getReadMethod());
                     FIELD_WRITER_CACHE.put(field, propertyDescriptor.getWriteMethod());
 
-                    StructUtils.allAnnotations(field);
+                    AnnotationUtil.getAnnotations(field, false);
                 }
             }
         }

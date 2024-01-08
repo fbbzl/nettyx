@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -7,16 +8,16 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
-import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 
 import io.netty.buffer.ByteBuf;
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import org.fz.nettyx.serializer.struct.Basic;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * array field must use this to assign array length!!!
@@ -25,10 +26,14 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
  * @since 2021-10-20 08:18
  **/
 
+@Documented
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ToArray {
 
+    /**
+     * array length
+     */
     int length() default 0;
 
     @SuppressWarnings("unchecked")
@@ -36,6 +41,8 @@ public @interface ToArray {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
+            checkIsArray(field);
+
             Class<?> elementType = getComponentType(field);
             int length = annotation.length();
             return readArray(elementType, length, serializer.getByteBuf());
@@ -44,12 +51,20 @@ public @interface ToArray {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
             ByteBuf writingBuffer) {
+            checkIsArray(field);
+
             Class<?> elementType = getComponentType(field);
             int declaredLength = annotation.length();
 
-            Object[] array = (Object[]) nullDefault(arrayValue, () -> newArray(field, declaredLength));
+            Object[] array = (Object[]) defaultIfNull(arrayValue, () -> newArray(field, declaredLength));
 
             writeArray(array, elementType, declaredLength, writingBuffer);
+        }
+
+        public static void checkIsArray(Field field) {
+            if (!field.getType().isArray()) {
+                throw new UnsupportedOperationException("field [" + field + "] is not array field please check");
+            }
         }
 
         public static <T> T[] newArray(Field arrayField, int arrayLength) {
@@ -75,7 +90,6 @@ public @interface ToArray {
 
             return (E[]) arrayValue;
         }
-
 
         /**
          * convert to basic array
@@ -118,7 +132,7 @@ public @interface ToArray {
          */
         private static void writeBasicArray(Basic<?>[] basicArray, Class<Basic<?>> basicType, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
-                writingBuf.writeBytes(nullDefault(basic, () -> newBasic(basicType, buffer())).getByteBuf());
+                writingBuf.writeBytes(defaultIfNull(basic, () -> newBasic(basicType, buffer())).getBytes());
             }
         }
 
@@ -127,7 +141,7 @@ public @interface ToArray {
          */
         private static void writeStructArray(Object[] structArray, Class<?> structType, ByteBuf writingBuf) {
             for (Object struct : structArray) {
-                writingBuf.writeBytes(StructSerializer.write(nullDefault(struct, () -> newStruct(structType))));
+                writingBuf.writeBytes(StructSerializer.write(defaultIfNull(struct, () -> newStruct(structType))));
             }
         }
     }
