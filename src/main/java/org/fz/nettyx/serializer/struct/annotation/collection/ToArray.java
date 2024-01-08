@@ -15,9 +15,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import org.fz.nettyx.serializer.struct.Basic;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * array field must use this to assign array length!!!
