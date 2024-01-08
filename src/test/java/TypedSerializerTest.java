@@ -66,7 +66,6 @@ public class TypedSerializerTest {
     @Struct
     public static class Bill {
 
-        //@FieldHandler(InnerEntityHandler.class)
         private Cuchar bid;
 
         @Override
