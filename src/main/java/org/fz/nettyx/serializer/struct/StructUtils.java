@@ -191,7 +191,7 @@ public class StructUtils {
                 return c.getConstructor();
             } catch (NoSuchMethodException exception) {
                 throw new UnsupportedOperationException(
-                    "can not find serializer handler [" + handlerClass + "] no-args constructor");
+                    "can not find serializer handler [" + handlerClass + "] no-args constructor", exception);
             }
         });
     }
@@ -209,7 +209,7 @@ public class StructUtils {
                 return c.getConstructor();
             } catch (NoSuchMethodException exception) {
                 throw new UnsupportedOperationException(
-                    "can not find struct [" + structClass + "] no-args constructor");
+                    "can not find struct [" + structClass + "] no-args constructor", exception);
             }
         });
     }
@@ -227,7 +227,7 @@ public class StructUtils {
                 return c.getConstructor(ByteBuf.class);
             } catch (NoSuchMethodException exception) {
                 throw new UnsupportedOperationException(
-                    "can not find basic constructor with arg [" + ByteBuf.class + "]");
+                    "can not find basic constructor with arg [" + ByteBuf.class + "]", exception);
             }
         });
     }
@@ -243,7 +243,7 @@ public class StructUtils {
         try {
             return getHandlerConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...");
+            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
     }
 
@@ -274,7 +274,7 @@ public class StructUtils {
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException(
-                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]");
+                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", exception);
         }
     }
 
@@ -302,7 +302,7 @@ public class StructUtils {
             else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("struct [" + structClass + "] instantiate failed...");
+            throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
         }
     }
 
