@@ -38,7 +38,7 @@ public @interface ToLinkedHashSet {
     Class<?> elementType();
 
     /**
-     * Size int.
+     * set size int.
      *
      * @return the int
      */

@@ -38,7 +38,7 @@ public @interface ToArrayList {
     Class<?> elementType();
 
     /**
-     * Size int.
+     * list size
      *
      * @return the int
      */
