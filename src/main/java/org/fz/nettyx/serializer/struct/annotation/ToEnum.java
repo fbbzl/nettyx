@@ -7,16 +7,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * TODO
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/7 23:36
+ * @since 2024/1/8 15:03
  */
 
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToBoolean {
+public @interface ToEnum {
 
 
+
+
+    enum MatchType {
+        BY_INDEX,
+        BY_NAME,
+        BY_NAME_IGNORE_CASE,
+        BY_NAME_IGNORE_CASE_AND_IGNORE_UNDERLINE,;
+
+    }
 
 }
