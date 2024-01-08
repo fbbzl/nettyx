@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct.basic;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import lombok.Getter;
@@ -82,7 +83,9 @@ public abstract class Basic<V> {
         this.size = size;
         this.value = value;
         this.bytes = new byte[this.size];
-        this.toByteBuf(this.value, this.size).readBytes(this.bytes);
+        ByteBuf buf = this.toByteBuf(this.value, this.size);
+        buf.readBytes(this.bytes);
+        ReferenceCountUtil.release(buf);
     }
 
     /**
