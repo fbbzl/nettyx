@@ -12,23 +12,22 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 
 /**
- * The interface List.
- *
  * @author fengbinbin
  * @version 1.0
- * @since 2023 /12/27 10:26
+ * @since 2024/1/8 13:15
  */
-@Documented
+
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToArrayList {
+@Documented
+public @interface ToLinkedList {
 
     /**
      * Element type class.
@@ -38,34 +37,32 @@ public @interface ToArrayList {
     Class<?> elementType();
 
     /**
-     * list size
+     * list size int.
      *
      * @return the int
      */
     int size() default 0;
 
-    /**
-     * The type Array list handler.
-     */
-    class ToArrayListHandler implements PropertyHandler.ReadWriteHandler<ToArrayList> {
+    class ToLinkedListHandler implements PropertyHandler.ReadWriteHandler<ToLinkedList> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
+        public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             StructUtils.checkAssignable(field, List.class);
-            Class<?> elementType = toArrayList.elementType();
+            Class<?> elementType = toLinkedList.elementType();
 
-            return ListUtil.toList(readArray(elementType, toArrayList.size(), serializer.getByteBuf()));
+            return ListUtil.toLinkedList(readArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
             ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, List.class);
 
-            Class<?> elementType = toArrayList.elementType();
-            int size = toArrayList.size();
+            Class<?> elementType = toLinkedList.elementType();
+            int size = toLinkedList.size();
 
-            writeArray(((ArrayList<?>) nullDefault(value, ArrayList::new)).toArray(), elementType, size, writingBuffer);
+            writeArray(((LinkedList<?>) nullDefault(value, LinkedList::new)).toArray(), elementType, size, writingBuffer);
         }
     }
+
 }
