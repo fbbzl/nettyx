@@ -8,7 +8,6 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import java.io.ByteArrayOutputStream;
@@ -196,7 +195,7 @@ public final class StructSerializer implements Serializer {
      * @return the byte buffer
      */
     public static <T> ByteBuffer writeNioBuffer(T struct) {
-        return StructSerializer.write(struct).nioBuffer();
+        return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
     }
 
     /**
@@ -208,13 +207,8 @@ public final class StructSerializer implements Serializer {
      * @throws IOException the io exception
      */
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
-        ByteBuf writeBuf = StructSerializer.write(struct);
-        try {
-            outputStream.write(ByteBufUtil.getBytes(writeBuf));
-        }
-        finally {
-            writeBuf.release();
-        }
+        byte[] writeBuf = StructSerializer.writeBytes(struct);
+        outputStream.write(writeBytes(writeBuf));
     }
 
     /**

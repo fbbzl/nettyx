@@ -76,7 +76,6 @@ public @interface ToArray {
             return (E[]) arrayValue;
         }
 
-
         /**
          * convert to basic array
          */
