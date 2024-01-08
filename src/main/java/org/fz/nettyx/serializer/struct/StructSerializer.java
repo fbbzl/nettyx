@@ -24,6 +24,7 @@ import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -299,7 +300,7 @@ public final class StructSerializer implements Serializer {
      * write basic bytes
      */
     public static <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(basicValue.getByteBuf());
+        writingBuf.writeBytes(basicValue.getBytes());
     }
 
     /**
