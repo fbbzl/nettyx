@@ -6,7 +6,7 @@ import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotatio
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_CONSTRUCTOR_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_BUF_CONSTRUCTOR_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.STRUCT_CONSTRUCTOR_CACHE;
@@ -222,7 +222,7 @@ public class StructUtils {
      * @return the basic constructor
      */
     <B extends Basic<?>> Constructor<B> getBasicConstructor(Class<B> basicClass) {
-        return (Constructor<B>) BASIC_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, c -> {
+        return (Constructor<B>) BASIC_BUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, c -> {
             try {
                 return c.getConstructor(ByteBuf.class);
             } catch (NoSuchMethodException exception) {
@@ -465,7 +465,7 @@ public class StructUtils {
          * The constant BASIC_CONSTRUCTOR_CACHE.
          */
         /* constructor cache */
-        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
+        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_BUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
             512);
         /**
          * The Struct constructor cache.
@@ -486,6 +486,7 @@ public class StructUtils {
         static {
             try {
                 scanHandlers();
+                scanBasics();
                 scanStructs();
             } catch (Exception e) {
                 throw new NotInitedException("init nettyx serializer cache failed please check", e);
@@ -511,6 +512,15 @@ public class StructUtils {
             }
         }
 
+        private static synchronized void scanBasics() throws NoSuchMethodException {
+            Set<Class<?>> basicClasses = ClassScanner.scanPackageBySuper(ALL_PACKAGE, Basic.class);
+            for (Class<?> basicClass : basicClasses) {
+                if (Modifier.isAbstract(basicClass.getModifiers())) continue;
+                Constructor<? extends Basic<?>> basicConstructor = (Constructor<? extends Basic<?>>) basicClass.getConstructor(ByteBuf.class);
+                BASIC_BUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) basicClass, basicConstructor);
+            }
+        }
+
         private static synchronized void scanStructs() throws NoSuchMethodException, IntrospectionException {
             Set<Class<?>> structClasses = ClassScanner.scanAllPackageByAnnotation(ALL_PACKAGE, Struct.class);
             for (Class<?> structClass : structClasses) {
@@ -519,9 +529,8 @@ public class StructUtils {
                 Field[] structFields = StructUtils.getStructFields(structClass);
 
                 for (Field field : structFields) {
-                    if (Modifier.isTransient(field.getModifiers())) {
-                        TRANSIENT_FIELD_CACHE.add(field);
-                    }
+                    if (Modifier.isTransient(field.getModifiers())) TRANSIENT_FIELD_CACHE.add(field);
+
                     PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), structClass);
                     FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor .getReadMethod());
                     FIELD_WRITER_CACHE.put(field, propertyDescriptor.getWriteMethod());
