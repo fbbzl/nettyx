@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
+import org.fz.nettyx.util.Throws;
 
 /**
  * The interface Set.
@@ -37,7 +39,7 @@ public @interface ToHashSet {
      *
      * @return the class
      */
-    Class<?> elementType();
+    Class<?> elementType() default Object.class;
 
     /**
      * Type class.
@@ -62,7 +64,12 @@ public @interface ToHashSet {
         public Object doRead(StructSerializer serializer, Field field, ToHashSet toHashSet) {
             StructUtils.checkAssignable(field, Set.class);
 
-            Class<?> elementType = toHashSet.elementType();
+            Class<?> elementType =
+                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
+                    : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             return new HashSet<>(Arrays.asList(readArray(elementType, toHashSet.size(), serializer.getByteBuf())));
         }
@@ -72,11 +79,15 @@ public @interface ToHashSet {
             ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, Set.class);
 
-            Class<?> elementType = toHashSet.elementType();
-            int size = toHashSet.size();
+            Class<?> elementType =
+                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
+                    : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newHashSet());
-            writeArray(set.toArray(), elementType, size, writingBuffer);
+            writeArray(set.toArray(), elementType, toHashSet.size(), writingBuffer);
         }
 
     }
