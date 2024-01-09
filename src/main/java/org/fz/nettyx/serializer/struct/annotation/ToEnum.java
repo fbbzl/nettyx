@@ -23,11 +23,30 @@ public @interface ToEnum {
 
     MatchType match() default BY_INDEX;
 
+    String charset() default "US-ASCII";
+
     enum MatchType {
-        BY_INDEX,
-        BY_NAME,
-        BY_NAME_IGNORE_CASE,
-        BY_NAME_IGNORE_CASE_AND_IGNORE_UNDERLINE,;
+        BY_INDEX {
+            @Override
+            <E extends Enum<E>> E toEnum() {
+
+                return null;
+            }
+        },
+        BY_NAME {
+            @Override
+            <E extends Enum<E>> E toEnum() {
+                return null;
+            }
+        },
+        BY_NAME_IGNORE_CASE {
+            @Override
+            <E extends Enum<E>> E toEnum() {
+                return null;
+            }
+        },;
+
+        abstract <E extends Enum<E>> E toEnum();
     }
 
     class ToEnumHandler implements PropertyHandler.ReadWriteHandler<ToEnum> {
