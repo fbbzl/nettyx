@@ -17,6 +17,7 @@ import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import java.beans.IntrospectionException;
@@ -27,6 +28,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -48,6 +51,19 @@ public class StructUtils {
 
     public boolean isTransient(Field field) {
         return TRANSIENT_FIELD_CACHE.contains(field);
+    }
+
+    public Class<?> getFieldParameterizedType(Field field) {
+        Type type = TypeUtil.getType(field);
+        // If it's a Class, it means that no generics are specified
+        if (type instanceof Class<?>) {
+            return Object.class;
+        }
+
+        Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
+
+        // will get the first, will not appear index-out-of-bounds exception
+        return (Class<?>) actualTypeArguments[0];
     }
 
     /**

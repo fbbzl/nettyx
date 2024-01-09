@@ -16,16 +16,19 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
+import org.fz.nettyx.util.Throws;
 
 /**
+ * The interface To linked hash set.
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/8 13:15
+ * @since 2024 /1/8 13:15
  */
-
 @Target(FIELD)
 @Retention(RUNTIME)
 @Documented
@@ -36,7 +39,7 @@ public @interface ToLinkedHashSet {
      *
      * @return the class
      */
-    Class<?> elementType();
+    Class<?> elementType() default Object.class;
 
     /**
      * set size int.
@@ -45,16 +48,22 @@ public @interface ToLinkedHashSet {
      */
     int size() default 0;
 
+    /**
+     * The type To linked hash set handler.
+     */
     class ToLinkedHashSetHandler implements PropertyHandler.ReadWriteHandler<ToLinkedHashSet> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedHashSet toLinkedHashSet) {
             StructUtils.checkAssignable(field, Set.class);
 
-            Class<?> elementType = toLinkedHashSet.elementType();
-            int size = toLinkedHashSet.size();
+            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
+                ? toLinkedHashSet.elementType() : elementType;
 
-            return newHashSet(Arrays.asList(readArray(elementType, size, serializer.getByteBuf())));
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+
+            return newHashSet(Arrays.asList(readArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
@@ -62,11 +71,14 @@ public @interface ToLinkedHashSet {
             ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, Set.class);
 
-            Class<?> elementType = toLinkedHashSet.elementType();
-            int size = toLinkedHashSet.size();
+            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
+                ? toLinkedHashSet.elementType() : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newLinkedHashSet());
-            writeArray(set.toArray(), elementType, size, writingBuffer);
+            writeArray(set.toArray(), elementType, toLinkedHashSet.size(), writingBuffer);
         }
 
     }
