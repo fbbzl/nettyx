@@ -94,17 +94,18 @@ public class TypedSerializerTest {
     @Struct
     public static class User {
 
-        private Clong4 uid;//4
-        private Cchar uname;//1
-        private Cint isMarried;//2
-        private Cchar sex;//1
-        private Cfloat address;//4
-        private Cdouble platformId;//2
-        private Clong8 description;//2
-        private Bill bill;//2
+        private Clong4 uid;
+        private Cchar uname;
+        private Cint isMarried;
+        private Cchar sex;
+        private Cfloat address;
+        private Cdouble platformId;
+        private Clong8 description;
+        private Clong8 interest;
+        private Bill bill;
 
         @ToArray(length = 2)
-        private Cuint[] loginNames;// 26
+        private Cuint[] loginNames;
         @ToArrayList(elementType = Wife.class)
         private List<Wife> wifes;
         @ToHashSet(elementType = Son.class)
