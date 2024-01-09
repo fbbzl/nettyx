@@ -84,6 +84,7 @@ public abstract class Basic<V> {
         this.value = value;
         this.bytes = new byte[this.size];
         ByteBuf buf = this.toByteBuf(this.value, this.size);
+        this.fill(buf, this.size);
         buf.readBytes(this.bytes);
         ReferenceCountUtil.release(buf);
     }
