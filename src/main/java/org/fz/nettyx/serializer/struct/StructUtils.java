@@ -16,6 +16,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
+import cn.hutool.core.map.WeakConcurrentMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import java.beans.IntrospectionException;
@@ -34,7 +35,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
@@ -448,41 +448,39 @@ public class StructUtils {
         static final Set<Field> TRANSIENT_FIELD_CACHE = new ConcurrentHashSet<>(512);
 
         /* reflection cache */
-        static final Map<Field, Method> FIELD_READER_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
         /**
          * The Field write method cache.
          */
-        static final Map<Field, Method> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
         /**
          * The Struct fields cache.
          */
-        static final Map<Class<?>, Field[]> STRUCT_FIELDS_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Class<?>, Field[]> STRUCT_FIELDS_CACHE = new WeakConcurrentMap<>();
         /**
          * The Annotation cache.
          */
-        static final Map<AnnotatedElement, Set<Annotation>> ANNOTATED_ELEMENT_ANNOTATION_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<AnnotatedElement, Set<Annotation>> ANNOTATED_ELEMENT_ANNOTATION_CACHE = new WeakConcurrentMap<>();
 
         /**
          * The constant BASIC_CONSTRUCTOR_CACHE.
          */
         /* constructor cache */
-        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_BUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
-            512);
+        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_BUF_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
         /**
          * The Struct constructor cache.
          */
-        static final Map<Class<?>, Constructor<?>> STRUCT_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(512);
+        static final Map<Class<?>, Constructor<?>> STRUCT_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
         /**
          * The Handler constructor cache.
          */
-        static final Map<Class<? extends PropertyHandler<? extends Annotation>>, Constructor<? extends PropertyHandler<? extends Annotation>>> HANDLER_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(
-            512);
+        static final Map<Class<? extends PropertyHandler<? extends Annotation>>, Constructor<? extends PropertyHandler<? extends Annotation>>> HANDLER_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
 
         /**
          * The constant ANNOTATION_HANDLER_MAPPING_CACHE.
          */
         /* mapping handler and annotation */
-        static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>(32);
+        static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new WeakConcurrentMap<>();
 
         static {
             try {

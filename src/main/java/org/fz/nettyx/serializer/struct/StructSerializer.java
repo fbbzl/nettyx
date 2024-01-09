@@ -444,8 +444,8 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * Early struct t.
-     *
+     * this is a  useful method that sometimes you may read the field value before current field value, if so
+     * you can get the serializing struct object by this method
      * @param <T> the type parameter
      * @return the t
      */
