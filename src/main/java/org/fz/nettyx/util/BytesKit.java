@@ -230,7 +230,7 @@ public class BytesKit {
         public short toUnsignedByte(byte[] bytes)  { return (short) Byte.toUnsignedInt(toByteValue(bytes)); }
         public int   toUnsignedShort(byte[] bytes) { return Short.toUnsignedInt(toShortValue(bytes));       }
         public long  toUnsignedInt(byte[] bytes)   { return Integer.toUnsignedLong(toIntValue(bytes));      }
-        public float  toUnsignedFloat(byte[] bytes)   { return  Float.intBitsToFloat(toFloatValue(bytes));      }
+        public float toUnsignedFloat(byte[] bytes) { return  Float.intBitsToFloat(toFloatValue(bytes));     }
 
         /**
          * cut more and less make up
