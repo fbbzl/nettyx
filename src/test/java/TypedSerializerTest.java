@@ -21,6 +21,7 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuint;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 
 /**
  * @author fengbinbin
@@ -101,7 +102,7 @@ public class TypedSerializerTest {
         private Cfloat address;
         private Cdouble platformId;
         private Clong8 description;
-        private Clong8 interest;
+        private Culong8 interest;
         private Bill bill;
 
         @ToArray(length = 2)
