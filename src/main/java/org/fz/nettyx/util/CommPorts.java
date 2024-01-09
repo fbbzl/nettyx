@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -26,6 +26,7 @@ import lombok.experimental.UtilityClass;
  * @version 1.0
  * @since 3/31/2022 11:06 AM
  */
+@Slf4j
 @UtilityClass
 public class CommPorts {
 
@@ -77,32 +78,51 @@ public class CommPorts {
                 index++;
             }
         } catch (IOException ioException) {
-            throw new RuntimeException("exception occur while reading windows regedit, command: " + command);
+            throw new UnsupportedOperationException("exception occur while reading windows regedit, command: " + command);
         }
 
         return ports;
     }
 
     public static List<String> getComPortsLinux() {
-        String devPath = "/dev/";
-        String cmd = "dmesg";
-        String execResult = executeLinuxCmd(cmd);
+        try {
+            String cmd = "dmesg";
+            String execResult = executeLinuxCmd(cmd);
 
-        String[] infos = execResult.split("\\s+");
+            String[] infos = execResult.split("\\s+");
 
-        Set<String> ttys = new HashSet<>();
-        for (String info : infos) {
-            if (info.contains("ttyS") || info.contains("ttyU")) {
-                String info2 = info.replace("[", "").replace(":", "").replace("]", "");
-                String ttyPath = devPath + info2;
+            Set<String> ttys = new HashSet<>();
+            for (String info : infos) {
+                if (info.contains("ttyS") || info.contains("ttyU")) {
+                    String info2 = info.replace("[", "").replace(":", "").replace("]", "");
+                    String ttyPath = "/dev/" + info2;
 
-                File file = new File(ttyPath);
-                if (file.exists()) {
-                    ttys.add(ttyPath);
+                    File file = new File(ttyPath);
+                    if (file.exists()) {
+                        ttys.add(ttyPath);
+                    }
                 }
             }
+            return newArrayList(ttys);
+        } catch (IOException exception) {
+            throw new UnsupportedOperationException("can not find comm-ports please check");
         }
-        return newArrayList(ttys);
+    }
+
+    public static String executeLinuxCmd(String cmd) throws IOException {
+        Runtime run = Runtime.getRuntime();
+        Process process;
+        process = run.exec(cmd);
+        InputStream in = process.getInputStream();
+        StringBuilder out = new StringBuilder();
+        byte[] b = new byte[8192];
+        for (int n; (n = in.read(b)) != -1; ) {
+            out.append(new String(b, 0, n));
+        }
+
+        in.close();
+        process.destroy();
+        return out.toString();
     }
 
 }
