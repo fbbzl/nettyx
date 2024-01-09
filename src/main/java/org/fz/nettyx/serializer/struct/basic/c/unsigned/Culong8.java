@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
-import static org.fz.nettyx.serializer.struct.StructUtils.reverseOrder;
-
+import cn.hutool.core.util.PrimitiveArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigInteger;
@@ -24,7 +23,8 @@ public class Culong8 extends CBasic<BigInteger> {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Culong8 MAX_VALUE = new Culong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
+    public static final Culong8 MAX_VALUE = new Culong8(
+        BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
 
     /**
      * Instantiates a new Culong 8.
@@ -51,7 +51,7 @@ public class Culong8 extends CBasic<BigInteger> {
 
     @Override
     protected ByteBuf toByteBuf(BigInteger value, int size) {
-        byte[] bytes = reverseOrder(value.toByteArray());
+        byte[] bytes = PrimitiveArrayUtil.reverse(value.toByteArray());
         return Unpooled.buffer(size).writeBytes(bytes);
     }
 
@@ -61,7 +61,7 @@ public class Culong8 extends CBasic<BigInteger> {
         byteBuf.readBytes(bytes);
         // the no sign length in BigInteger is 1
         final int noSign = 1;
-        return new BigInteger(noSign, reverseOrder(bytes));
+        return new BigInteger(noSign, PrimitiveArrayUtil.reverse(bytes));
     }
 
 }

@@ -1,8 +1,9 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
+import static cn.hutool.core.collection.CollUtil.newLinkedList;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
 import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
 
@@ -12,7 +13,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.LinkedList;
 import java.util.List;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -61,7 +61,8 @@ public @interface ToLinkedList {
             Class<?> elementType = toLinkedList.elementType();
             int size = toLinkedList.size();
 
-            writeArray(((LinkedList<?>) nullDefault(value, LinkedList::new)).toArray(), elementType, size, writingBuffer);
+            List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
+            writeArray(list.toArray(), elementType, size, writingBuffer);
         }
     }
 
