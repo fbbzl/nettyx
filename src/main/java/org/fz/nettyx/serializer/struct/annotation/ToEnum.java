@@ -23,6 +23,9 @@ public @interface ToEnum {
 
     MatchType match() default BY_INDEX;
 
+    /**
+     * if you use by name, this will be the name charset
+     */
     String charset() default "US-ASCII";
 
     enum MatchType {
