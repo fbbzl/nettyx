@@ -1,8 +1,9 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
+import static cn.hutool.core.collection.CollUtil.newArrayList;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.StructUtils.nullDefault;
 import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
 import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
 
@@ -12,7 +13,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -65,7 +65,8 @@ public @interface ToArrayList {
             Class<?> elementType = toArrayList.elementType();
             int size = toArrayList.size();
 
-            writeArray(((ArrayList<?>) nullDefault(value, ArrayList::new)).toArray(), elementType, size, writingBuffer);
+            List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
+            writeArray(list.toArray(), elementType, size, writingBuffer);
         }
     }
 }
