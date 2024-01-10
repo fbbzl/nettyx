@@ -14,9 +14,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.List;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
+import org.fz.nettyx.util.Throws;
 
 /**
  * @author fengbinbin
@@ -48,7 +50,13 @@ public @interface ToLinkedList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             StructUtils.checkAssignable(field, List.class);
-            Class<?> elementType = toLinkedList.elementType();
+
+            Class<?> elementType =
+                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
+                    : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             return ListUtil.toLinkedList(readArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
         }
@@ -58,11 +66,15 @@ public @interface ToLinkedList {
             ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, List.class);
 
-            Class<?> elementType = toLinkedList.elementType();
-            int size = toLinkedList.size();
+            Class<?> elementType =
+                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
+                    : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
-            writeArray(list.toArray(), elementType, size, writingBuffer);
+            writeArray(list.toArray(), elementType, toLinkedList.size(), writingBuffer);
         }
     }
 
