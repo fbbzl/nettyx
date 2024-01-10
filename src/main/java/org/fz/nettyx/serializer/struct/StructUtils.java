@@ -25,11 +25,13 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -37,6 +39,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 /**
  * The type Struct utils.
@@ -63,7 +66,14 @@ public class StructUtils {
         Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
 
         // will get the first, will not appear index-out-of-bounds exception
-        return (Class<?>) actualTypeArguments[0];
+        Type actualTypeArgument = actualTypeArguments[0];
+        if (actualTypeArgument instanceof TypeVariableImpl) {
+            GenericDeclaration genericDeclaration = ((TypeVariableImpl<?>) actualTypeArgument).getGenericDeclaration();
+            TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
+            return (Class<?>) typeParameters[0].getGenericDeclaration();
+        }
+
+        return (Class<?>) actualTypeArgument;
     }
 
     /**

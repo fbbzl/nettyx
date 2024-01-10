@@ -39,7 +39,7 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-             User user = StructSerializer.read(bytes, User.class);
+             User<Son> user = StructSerializer.read(bytes, User.class);
 //              user = new User();
 //            user.setUid(new Clong4(1));
 //            user.setUname(null);
@@ -96,7 +96,7 @@ public class TypedSerializerTest {
     @Getter
     @Setter
     @Struct
-    public static class User {
+    public static class User<T> {
 
         private Clong4 uid;
         private Cchar uname;
@@ -112,8 +112,8 @@ public class TypedSerializerTest {
         private Cuint[] loginNames;
         @ToArrayList(elementType = Wife.class)
         private List<Wife> wifes;
-        @ToHashSet
-        private Set<Son> sons;
+        @ToHashSet(elementType = Son.class)
+        private Set<T> sons;
 
         @Override
         public String toString() {
