@@ -101,7 +101,6 @@ public abstract class Basic<V> {
         if (byteBuf.readableBytes() < size) {
             throw new TooLessBytesException(size, byteBuf.readableBytes());
         }
-        this.fill(byteBuf, this.size);
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);
         this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
