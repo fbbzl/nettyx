@@ -36,7 +36,7 @@ public class TypedSerializerTest {
         byte[] bytes = HexBins.decode(x);
      //   bytes = HexBins.decode("111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         long l = System.currentTimeMillis();
-        int times = 1_00;
+        int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
              User user = StructSerializer.read(bytes, User.class);
