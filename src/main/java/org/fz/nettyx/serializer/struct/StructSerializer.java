@@ -67,7 +67,11 @@ public final class StructSerializer implements Serializer {
      * @return the t
      */
     public static <T> T read(ByteBuf byteBuf, T struct) {
-        return new StructSerializer(byteBuf, struct).toObject();
+        try {
+            return new StructSerializer(byteBuf, struct).toObject();
+        } finally {
+            ReferenceCountUtil.release(byteBuf);
+        }
     }
 
     /**
