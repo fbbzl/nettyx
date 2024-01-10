@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import lombok.Getter;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.util.Throws;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -98,9 +99,8 @@ public abstract class Basic<V> {
      */
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
-        if (byteBuf.readableBytes() < size) {
-            throw new TooLessBytesException(size, byteBuf.readableBytes());
-        }
+        Throws.ifLess(byteBuf.readableBytes(), size, new TooLessBytesException(size, byteBuf.readableBytes()));
+
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);
         this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
