@@ -16,7 +16,7 @@ public class TooLessBytesException extends RuntimeException {
     private final int provideSize;
 
     public TooLessBytesException(int expectSize, int provideSize) {
-        super("expect size is [" + expectSize + "] but provide [" + provideSize + "]");
+        super("to less bytes, expect bytes length is [" + expectSize + "] but provide bytes length is [" + provideSize + "]");
         this.expectSize = expectSize;
         this.provideSize = provideSize;
     }
