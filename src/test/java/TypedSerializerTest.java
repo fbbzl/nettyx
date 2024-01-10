@@ -39,7 +39,8 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-             User<Son> user = StructSerializer.read(bytes, User.class);
+            Self user = StructSerializer.read(bytes, Self.class);
+            System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
 //            user.setUname(null);
@@ -85,13 +86,21 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
-    public static class Son {
+    public static class Son<S> {
 
         @ToString
-        private String name;
+        private S name;
 
     }
 
+    @Data
+    @Struct
+    public static class Self extends User<Son<Integer>> {
+
+        @ToString
+        private String nam111e;
+
+    }
 
     @Getter
     @Setter

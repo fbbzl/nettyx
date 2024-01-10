@@ -25,13 +25,11 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -68,9 +66,14 @@ public class StructUtils {
         // will get the first, will not appear index-out-of-bounds exception
         Type actualTypeArgument = actualTypeArguments[0];
         if (actualTypeArgument instanceof TypeVariableImpl) {
-            GenericDeclaration genericDeclaration = ((TypeVariableImpl<?>) actualTypeArgument).getGenericDeclaration();
-            TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
-            return (Class<?>) typeParameters[0].getGenericDeclaration();
+            System.err.println(TypeUtil.getTypeArgument(actualTypeArgument));
+            System.err.println(TypeUtil.getClass(actualTypeArgument));
+            Type[] bounds = ((TypeVariableImpl<?>) actualTypeArgument).getBounds();
+//            bounds[]
+//            TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
+//            System.err.println((Class<?>) typeParameters[0].getGenericDeclaration());
+//            return (Class<?>) typeParameters[0].getGenericDeclaration();
+            return null;
         }
 
         return (Class<?>) actualTypeArgument;
