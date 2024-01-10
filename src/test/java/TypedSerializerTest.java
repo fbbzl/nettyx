@@ -38,8 +38,6 @@ public class TypedSerializerTest {
         int times = 1_000;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-
-
              User user = StructSerializer.read(bytes, User.class);
 //              user = new User();
 //            user.setUid(new Clong4(1));
