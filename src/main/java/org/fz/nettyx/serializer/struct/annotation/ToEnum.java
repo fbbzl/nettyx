@@ -28,6 +28,9 @@ public @interface ToEnum {
      */
     String charset() default "US-ASCII";
 
+
+    int bufferLength() default 0;
+
     enum MatchType {
         BY_INDEX {
             @Override
