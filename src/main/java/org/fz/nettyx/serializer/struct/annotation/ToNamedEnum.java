@@ -30,7 +30,7 @@ public @interface ToNamedEnum {
      *
      * @return the class
      */
-    Class<? extends Enum<?>> enumType();
+    Class<? extends Enum> enumType();
 
     /**
      * Ignore case boolean.
