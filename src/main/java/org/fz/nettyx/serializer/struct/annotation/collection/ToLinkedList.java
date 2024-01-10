@@ -21,11 +21,12 @@ import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
+ * The interface To linked list.
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/8 13:15
+ * @since 2024 /1/8 13:15
  */
-
 @Target(FIELD)
 @Retention(RUNTIME)
 @Documented
@@ -36,7 +37,7 @@ public @interface ToLinkedList {
      *
      * @return the class
      */
-    Class<?> elementType();
+    Class<?> elementType() default Object.class;
 
     /**
      * list size int.
@@ -45,6 +46,9 @@ public @interface ToLinkedList {
      */
     int size() default 0;
 
+    /**
+     * The type To linked list handler.
+     */
     class ToLinkedListHandler implements PropertyHandler.ReadWriteHandler<ToLinkedList> {
 
         @Override

@@ -39,7 +39,7 @@ public @interface ToHashSet {
      *
      * @return the class
      */
-    Class<?> elementType();
+    Class<?> elementType() default Object.class;
 
     /**
      * Type class.
