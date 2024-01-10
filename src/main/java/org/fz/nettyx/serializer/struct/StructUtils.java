@@ -17,6 +17,7 @@ import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import java.beans.IntrospectionException;
@@ -27,6 +28,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -34,6 +37,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
 
 /**
  * The type Struct utils.
@@ -48,6 +52,16 @@ public class StructUtils {
 
     public boolean isTransient(Field field) {
         return TRANSIENT_FIELD_CACHE.contains(field);
+    }
+
+    public Class<?> getFieldParameterizedType(Field field) {
+        ParameterizedType type = (ParameterizedType) TypeUtil.getType(field);
+        Type[] actualTypeArguments = type.getActualTypeArguments();
+
+        Throws.ifTrue(actualTypeArguments.length > 1, "only keep one generic type arg on field [" + field + "]");
+
+        if (actualTypeArguments.length == 0) return Object.class;
+        else                                 return (Class<?>) actualTypeArguments[0];
     }
 
     /**

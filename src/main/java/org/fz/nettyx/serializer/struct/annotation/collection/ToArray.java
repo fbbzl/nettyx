@@ -84,9 +84,8 @@ public @interface ToArray {
         public static <E> E[] readArray(Class<E> elementType, int length, ByteBuf byteBuf) {
             E[] array = newArray(elementType, length);
 
-            Object[] arrayValue = isBasic(elementType) ?
-                readBasicArray((Basic<?>[]) array, byteBuf) :
-                readStructArray(array, byteBuf);
+            Object[] arrayValue =
+                isBasic(elementType) ? readBasicArray((Basic<?>[]) array, byteBuf) : readStructArray(array, byteBuf);
 
             return (E[]) arrayValue;
         }
@@ -117,14 +116,23 @@ public @interface ToArray {
             return structs;
         }
 
-        public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength, ByteBuf writingBuf) {
+        public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength,
+            ByteBuf writingBuf) {
             // cast to array
             T[] array = (T[]) arrayValue;
-            if (declaredLength < array.length) throw new IllegalArgumentException("array length exceed the declared length in annotation [" + ToArray.class + "]");
-            if (declaredLength > array.length) array = fillArray(array, elementType, declaredLength);
+            if (declaredLength < array.length) {
+                throw new IllegalArgumentException(
+                    "array length exceed the declared length in annotation [" + ToArray.class + "]");
+            }
+            if (declaredLength > array.length) {
+                array = fillArray(array, elementType, declaredLength);
+            }
 
-            if (isBasic(elementType)) writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
-            else                      writeStructArray(array, elementType, writingBuf);
+            if (isBasic(elementType)) {
+                writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
+            } else {
+                writeStructArray(array, elementType, writingBuf);
+            }
         }
 
         /**
