@@ -55,14 +55,14 @@ public class StructUtils {
 
     public Class<?> getFieldParameterizedType(Field field) {
         Type type = TypeUtil.getType(field);
+        // If it's a Class, it means that no generics are specified
         if (type instanceof Class<?>) {
             return Object.class;
         }
 
-        ParameterizedType paramType = (ParameterizedType) type;
-        Type[] actualTypeArguments = paramType.getActualTypeArguments();
+        Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
 
-        // do
+        // will get the first, will not appear index-out-of-bounds exception
         return (Class<?>) actualTypeArguments[0];
     }
 
