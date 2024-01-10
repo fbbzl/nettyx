@@ -32,6 +32,11 @@ import org.fz.nettyx.util.Throws;
 @Retention(RUNTIME)
 public @interface ToArrayList {
 
+    /**
+     * Element type class.
+     *
+     * @return the class
+     */
     Class<?> elementType() default Object.class;
 
     /**

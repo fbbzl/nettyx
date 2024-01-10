@@ -23,11 +23,12 @@ import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
+ * The interface To linked hash set.
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/8 13:15
+ * @since 2024 /1/8 13:15
  */
-
 @Target(FIELD)
 @Retention(RUNTIME)
 @Documented
@@ -38,7 +39,7 @@ public @interface ToLinkedHashSet {
      *
      * @return the class
      */
-    Class<?> elementType();
+    Class<?> elementType() default Object.class;
 
     /**
      * set size int.
@@ -47,6 +48,9 @@ public @interface ToLinkedHashSet {
      */
     int size() default 0;
 
+    /**
+     * The type To linked hash set handler.
+     */
     class ToLinkedHashSetHandler implements PropertyHandler.ReadWriteHandler<ToLinkedHashSet> {
 
         @Override
