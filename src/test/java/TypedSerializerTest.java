@@ -113,7 +113,7 @@ public class TypedSerializerTest {
         @ToArrayList(elementType = Wife.class)
         private List<Wife> wifes;
         @ToHashSet
-        private Set sons;
+        private Set<Son> sons;
 
         @Override
         public String toString() {

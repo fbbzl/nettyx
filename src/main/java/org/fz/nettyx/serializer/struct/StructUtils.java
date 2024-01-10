@@ -37,7 +37,6 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
 
 /**
  * The type Struct utils.
@@ -59,13 +58,12 @@ public class StructUtils {
         if (type instanceof Class<?>) {
             return Object.class;
         }
+
         ParameterizedType paramType = (ParameterizedType) type;
         Type[] actualTypeArguments = paramType.getActualTypeArguments();
 
-        Throws.ifTrue(actualTypeArguments.length > 1, "only keep one generic type arg on field [" + field + "]");
-
-        if (actualTypeArguments.length == 0) return Object.class;
-        else                                 return (Class<?>) actualTypeArguments[0];
+        // do
+        return (Class<?>) actualTypeArguments[0];
     }
 
     /**
