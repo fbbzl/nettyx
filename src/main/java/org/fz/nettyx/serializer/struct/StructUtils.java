@@ -55,8 +55,12 @@ public class StructUtils {
     }
 
     public Class<?> getFieldParameterizedType(Field field) {
-        ParameterizedType type = (ParameterizedType) TypeUtil.getType(field);
-        Type[] actualTypeArguments = type.getActualTypeArguments();
+        Type type = TypeUtil.getType(field);
+        if (type instanceof Class<?>) {
+            return Object.class;
+        }
+        ParameterizedType paramType = (ParameterizedType) type;
+        Type[] actualTypeArguments = paramType.getActualTypeArguments();
 
         Throws.ifTrue(actualTypeArguments.length > 1, "only keep one generic type arg on field [" + field + "]");
 
