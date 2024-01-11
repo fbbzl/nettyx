@@ -173,7 +173,7 @@ public class TypedSerializerTest {
         private CppBool cppBool;;
 
         @ToArray(length = 2)
-        private Cuint[] loginNames;
+        private Cchar[] loginNames;
         @ToArrayList(elementType = Wife.class, size = 2)
         private List<Wife> wifes;
         @ToHashSet(elementType = Son.class, size = 1)
