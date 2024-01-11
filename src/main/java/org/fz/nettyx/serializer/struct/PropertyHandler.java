@@ -113,12 +113,15 @@ public interface PropertyHandler<A extends Annotation> {
         }
 
         default void preReadHandle(StructSerializer serializer, Field field, A annotation) {
+            // default is no nothing
         }
 
         default void postReadHandle(StructSerializer serializer, Field field, A annotation) {
+            // default is no nothing
         }
 
         default void beforeReadThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
+            // default is no nothing
         }
     }
 
@@ -146,12 +149,15 @@ public interface PropertyHandler<A extends Annotation> {
         }
 
         default void preWriteHandle(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
+            // default is no nothing
         }
 
         default void postWriteHandle(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
+            // default is no nothing
         }
 
         default void beforeWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
+            // default is no nothing
         }
 
     }
