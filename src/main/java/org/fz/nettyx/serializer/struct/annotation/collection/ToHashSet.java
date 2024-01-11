@@ -53,7 +53,7 @@ public @interface ToHashSet {
      *
      * @return the int
      */
-    int size() default 0;
+    int size();
 
     /**
      * The type Byte buf set handler.
