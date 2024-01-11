@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -40,7 +41,7 @@ public class TypedSerializerTest {
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
             Self user = StructSerializer.read(bytes, Self.class);
-
+            System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
 //            user.setUname(null);
@@ -93,8 +94,10 @@ public class TypedSerializerTest {
 
     }
 
+    @EqualsAndHashCode(callSuper = false)
     @Data
     @Struct
+    @lombok.ToString(callSuper = true)
     public static class Self extends User {
 
         @ToString
@@ -119,9 +122,9 @@ public class TypedSerializerTest {
 
         @ToArray(length = 2)
         private Cuint[] loginNames;
-        @ToArrayList(elementType = Wife.class)
+        @ToArrayList(elementType = Wife.class, size = 2)
         private List<Wife> wifes;
-        @ToHashSet(elementType = Son.class)
+        @ToHashSet(elementType = Son.class, size = 1)
         private Set<Son> sons;
 
         @Override
