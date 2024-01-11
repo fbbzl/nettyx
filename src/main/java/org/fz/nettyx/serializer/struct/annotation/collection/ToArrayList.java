@@ -4,8 +4,8 @@ import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
 
 import cn.hutool.core.collection.ListUtil;
 import io.netty.buffer.ByteBuf;
@@ -44,7 +44,7 @@ public @interface ToArrayList {
      *
      * @return the int
      */
-    int size() default 0;
+    int size();
 
     /**
      * The type Array list handler.
@@ -67,7 +67,7 @@ public @interface ToArrayList {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
-            ByteBuf writingBuffer) {
+            ByteBuf writing) {
             StructUtils.checkAssignable(field, List.class);
 
             Class<?> elementType =
@@ -78,7 +78,7 @@ public @interface ToArrayList {
                 new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
-            writeArray(list.toArray(), elementType, toArrayList.size(), writingBuffer);
+            writeArray(list.toArray(), elementType, toArrayList.size(), writing);
         }
     }
 }
