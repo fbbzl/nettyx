@@ -9,6 +9,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRIT
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
@@ -193,21 +194,9 @@ public class StructUtils {
      * @param value the length
      */
     public static void writeField(Object object, Field field, Object value) {
-        try {
-            Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> {
-                try {
-                    return new PropertyDescriptor(field.getName(), object.getClass()).getWriteMethod();
-                } catch (IntrospectionException exception) {
-                    throw new UnsupportedOperationException(
-                        "field write failed, field is [" + field + "], length is [" + value
-                            + "], check the correct parameter type of field getter/setter", exception);
-                }
-            });
-            MethodHandleUtil.invoke(object, writeMethod, value);
-        } catch (Exception exception) {
-            throw new UnsupportedOperationException("field write failed, field is [" + field + "], length is [" + value
-                + "], check the correct parameter type of field getter/setter", exception);
-        }
+        Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field,
+            f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getWriteMethod());
+        MethodHandleUtil.invoke(object, writeMethod, value);
     }
 
     /**
@@ -219,22 +208,10 @@ public class StructUtils {
      * @return the t
      */
     public static <T> T readField(Object object, Field field) {
-        try {
-            Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> {
-                try {
-                    return new PropertyDescriptor(field.getName(), object.getClass()).getReadMethod();
-                } catch (IntrospectionException exception) {
-                    throw new UnsupportedOperationException(
-                        "field read failed, field is [" + field + "], check parameter type or field getter/setter",
-                        exception);
-                }
-            });
+        Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field,
+            f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
 
-            return (T) MethodHandleUtil.invoke(object, readMethod);
-        } catch (Exception exception) {
-            throw new UnsupportedOperationException(
-                "field read failed, field is [" + field + "], check parameter type or field getter/setter", exception);
-        }
+        return MethodHandleUtil.invoke(object, readMethod);
     }
 
     /**
