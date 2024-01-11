@@ -297,7 +297,7 @@ public class StructUtils {
                 scanAllBasics();
                 scanAllStructs();
             } catch (Exception e) {
-                throw new NotInitedException("init serializer context cache failed please check", e);
+                throw new NotInitedException("init serializer context failed please check", e);
             }
         }
 
