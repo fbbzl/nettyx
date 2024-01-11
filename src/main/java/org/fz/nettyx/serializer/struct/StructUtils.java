@@ -319,7 +319,8 @@ public class StructUtils {
         private static synchronized void scanAllBasics() {
             Set<Class<?>> basicClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, Basic.class);
             for (Class<?> basicClass : basicClasses) {
-                if (Modifier.isAbstract(basicClass.getModifiers())) {
+                int mod = basicClass.getModifiers();
+                if (basicClass.isEnum() || Modifier.isAbstract(mod) || Modifier.isInterface(mod)) {
                     continue;
                 }
                 ReflectUtil.getConstructor(basicClass);
