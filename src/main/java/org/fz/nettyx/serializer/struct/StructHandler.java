@@ -7,6 +7,12 @@ import java.lang.annotation.Annotation;
  * @version 1.0
  * @since 2024/1/9 15:22
  */
+
+@SuppressWarnings("all")
 public interface StructHandler<A extends Annotation> {
+
+
+
+
 
 }
