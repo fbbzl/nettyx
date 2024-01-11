@@ -39,7 +39,7 @@ public @interface ToString {
      *
      * @return the buffer occupied by this char sequence
      */
-    int bufferLength() default 0;
+    int bufferLength();
 
     class ToCharSequenceHandler implements PropertyHandler.ReadWriteHandler<ToString> {
 

@@ -51,7 +51,7 @@ public @interface ToNamedEnum {
      *
      * @return the int
      */
-    int bufferLength() default 0;
+    int bufferLength();
 
     /**
      * The type To named enum handler.

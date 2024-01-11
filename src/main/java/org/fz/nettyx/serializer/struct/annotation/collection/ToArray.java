@@ -35,7 +35,7 @@ public @interface ToArray {
      *
      * @return the int
      */
-    int length() default 0;
+    int length();
 
     /**
      * The type To array handler.

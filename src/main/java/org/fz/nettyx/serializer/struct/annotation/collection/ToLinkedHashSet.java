@@ -46,7 +46,7 @@ public @interface ToLinkedHashSet {
      *
      * @return the int
      */
-    int size() default 0;
+    int size();
 
     /**
      * The type To linked hash set handler.
