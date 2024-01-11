@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
-import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -145,10 +144,6 @@ public class StructUtils {
         try {
             if (isBasic(basicClass)) return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
             else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
-        }
-        catch (TooLessBytesException tooLessBytesException) {
-            throw new SerializeException(
-                "basic [" + basicClass + "] instantiate failed..., to less bytes provided", tooLessBytesException);
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException(
