@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.collection;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
@@ -54,7 +54,7 @@ public @interface ToArray {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
-            ByteBuf writingBuffer) {
+            ByteBuf writing) {
             checkIsArray(field);
 
             Class<?> elementType = getComponentType(field);
@@ -62,7 +62,7 @@ public @interface ToArray {
 
             Object[] array = (Object[]) defaultIfNull(arrayValue, () -> newArray(field, declaredLength));
 
-            writeArray(array, elementType, declaredLength, writingBuffer);
+            writeArray(array, elementType, declaredLength, writing);
         }
 
         /**

@@ -5,8 +5,8 @@ import static cn.hutool.core.collection.CollUtil.newLinkedHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -68,7 +68,7 @@ public @interface ToLinkedHashSet {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedHashSet toLinkedHashSet,
-            ByteBuf writingBuffer) {
+            ByteBuf writing) {
             StructUtils.checkAssignable(field, Set.class);
 
             Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
@@ -78,7 +78,7 @@ public @interface ToLinkedHashSet {
                 new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newLinkedHashSet());
-            writeArray(set.toArray(), elementType, toLinkedHashSet.size(), writingBuffer);
+            writeArray(set.toArray(), elementType, toLinkedHashSet.size(), writing);
         }
 
     }

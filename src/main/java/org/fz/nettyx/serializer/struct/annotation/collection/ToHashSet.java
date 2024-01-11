@@ -4,8 +4,8 @@ import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -76,7 +76,7 @@ public @interface ToHashSet {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToHashSet toHashSet,
-            ByteBuf writingBuffer) {
+            ByteBuf writing) {
             StructUtils.checkAssignable(field, Set.class);
 
             Class<?> elementType =
@@ -87,7 +87,7 @@ public @interface ToHashSet {
                 new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newHashSet());
-            writeArray(set.toArray(), elementType, toHashSet.size(), writingBuffer);
+            writeArray(set.toArray(), elementType, toHashSet.size(), writing);
         }
 
     }
