@@ -44,7 +44,7 @@ public @interface ToArrayList {
      *
      * @return the int
      */
-    int size() default 0;
+    int size();
 
     /**
      * The type Array list handler.

@@ -44,7 +44,7 @@ public @interface ToLinkedList {
      *
      * @return the int
      */
-    int size() default 0;
+    int size();
 
     /**
      * The type To linked list handler.
