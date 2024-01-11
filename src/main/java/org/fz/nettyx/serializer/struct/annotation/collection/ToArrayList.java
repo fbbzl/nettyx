@@ -14,9 +14,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.List;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
+import org.fz.nettyx.util.Throws;
 
 /**
  * The interface List.
@@ -35,7 +37,7 @@ public @interface ToArrayList {
      *
      * @return the class
      */
-    Class<?> elementType();
+    Class<?> elementType() default Object.class;
 
     /**
      * list size
@@ -52,7 +54,13 @@ public @interface ToArrayList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             StructUtils.checkAssignable(field, List.class);
-            Class<?> elementType = toArrayList.elementType();
+
+            Class<?> elementType =
+                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toArrayList.elementType()
+                    : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             return ListUtil.toList(readArray(elementType, toArrayList.size(), serializer.getByteBuf()));
         }
@@ -62,11 +70,15 @@ public @interface ToArrayList {
             ByteBuf writingBuffer) {
             StructUtils.checkAssignable(field, List.class);
 
-            Class<?> elementType = toArrayList.elementType();
-            int size = toArrayList.size();
+            Class<?> elementType =
+                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toArrayList.elementType()
+                    : elementType;
+
+            Throws.ifTrue(elementType == Object.class,
+                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
-            writeArray(list.toArray(), elementType, size, writingBuffer);
+            writeArray(list.toArray(), elementType, toArrayList.size(), writingBuffer);
         }
     }
 }

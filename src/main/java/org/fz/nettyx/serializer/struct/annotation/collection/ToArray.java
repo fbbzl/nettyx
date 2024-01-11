@@ -23,9 +23,8 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
  * array field must use this to assign array length!!!
  *
  * @author fengbinbin
- * @since 2021-10-20 08:18
- **/
-
+ * @since 2021 -10-20 08:18
+ */
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
@@ -33,9 +32,14 @@ public @interface ToArray {
 
     /**
      * array length
+     *
+     * @return the int
      */
     int length() default 0;
 
+    /**
+     * The type To array handler.
+     */
     @SuppressWarnings("unchecked")
     class ToArrayHandler implements PropertyHandler.ReadWriteHandler<ToArray> {
 
@@ -61,32 +65,70 @@ public @interface ToArray {
             writeArray(array, elementType, declaredLength, writingBuffer);
         }
 
+        /**
+         * Check is array.
+         *
+         * @param field the field
+         */
         public static void checkIsArray(Field field) {
             if (!field.getType().isArray()) {
                 throw new UnsupportedOperationException("field [" + field + "] is not array field please check");
             }
         }
 
+        /**
+         * New array t [ ].
+         *
+         * @param <T> the type parameter
+         * @param arrayField the array field
+         * @param arrayLength the array length
+         * @return the t [ ]
+         */
         public static <T> T[] newArray(Field arrayField, int arrayLength) {
             return (T[]) Array.newInstance(arrayField.getType().getComponentType(), arrayLength);
         }
 
+        /**
+         * New array t [ ].
+         *
+         * @param <T> the type parameter
+         * @param componentType the component type
+         * @param length the length
+         * @return the t [ ]
+         */
         public static <T> T[] newArray(Class<?> componentType, int length) {
             return (T[]) Array.newInstance(componentType, length);
         }
 
+        /**
+         * Fill array t [ ].
+         *
+         * @param <T> the type parameter
+         * @param arrayValue the array value
+         * @param elementType the element type
+         * @param length the length
+         * @return the t [ ]
+         */
         public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
             T[] filledArray = (T[]) Array.newInstance(elementType, length);
             System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
             return filledArray;
         }
 
+        /**
+         * Read array e [ ].
+         *
+         * @param <E> the type parameter
+         * @param elementType the element type
+         * @param length the length
+         * @param byteBuf the byte buf
+         * @return the e [ ]
+         */
         public static <E> E[] readArray(Class<E> elementType, int length, ByteBuf byteBuf) {
             E[] array = newArray(elementType, length);
 
-            Object[] arrayValue = isBasic(elementType) ?
-                readBasicArray((Basic<?>[]) array, byteBuf) :
-                readStructArray(array, byteBuf);
+            Object[] arrayValue =
+                isBasic(elementType) ? readBasicArray((Basic<?>[]) array, byteBuf) : readStructArray(array, byteBuf);
 
             return (E[]) arrayValue;
         }
@@ -117,14 +159,32 @@ public @interface ToArray {
             return structs;
         }
 
-        public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength, ByteBuf writingBuf) {
+        /**
+         * Write array.
+         *
+         * @param <T> the type parameter
+         * @param arrayValue the array value
+         * @param elementType the element type
+         * @param declaredLength the declared length
+         * @param writingBuf the writing buf
+         */
+        public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength,
+            ByteBuf writingBuf) {
             // cast to array
             T[] array = (T[]) arrayValue;
-            if (declaredLength < array.length) throw new IllegalArgumentException("array length exceed the declared length in annotation [" + ToArray.class + "]");
-            if (declaredLength > array.length) array = fillArray(array, elementType, declaredLength);
+            if (declaredLength < array.length) {
+                throw new IllegalArgumentException(
+                    "array length exceed the declared length in annotation [" + ToArray.class + "]");
+            }
+            if (declaredLength > array.length) {
+                array = fillArray(array, elementType, declaredLength);
+            }
 
-            if (isBasic(elementType)) writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
-            else                      writeStructArray(array, elementType, writingBuf);
+            if (isBasic(elementType)) {
+                writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
+            } else {
+                writeStructArray(array, elementType, writingBuf);
+            }
         }
 
         /**
