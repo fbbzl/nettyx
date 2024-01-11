@@ -39,7 +39,7 @@ public @interface ToString {
      *
      * @return the buffer occupied by this char sequence
      */
-    int bufferLength() default 0;
+    int bufferLength();
 
     class ToCharSequenceHandler implements PropertyHandler.ReadWriteHandler<ToString> {
 
@@ -51,21 +51,24 @@ public @interface ToString {
             if (!Charset.isSupported(charset)) throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
             ByteBuf byteBuf = serializer.getByteBuf();
-            if (!byteBuf.isReadable())
-                throw new IllegalArgumentException("buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "]");
+            if (!byteBuf.isReadable()) {
+                throw new IllegalArgumentException(
+                    "buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "], field is [" + field
+                        + "]");
+            }
 
             return byteBuf.readBytes(toString.bufferLength()).toString(Charset.forName(charset));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writingBuffer) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writing) {
             StructUtils.checkAssignable(field, CharSequence.class);
 
             int bufferLength = toString.bufferLength();
             String charset = toString.charset();
 
-            if (value != null) writingBuffer.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else               writingBuffer.writeBytes(new byte[bufferLength]);
+            if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
+            else               writing.writeBytes(new byte[bufferLength]);
 
         }
 
