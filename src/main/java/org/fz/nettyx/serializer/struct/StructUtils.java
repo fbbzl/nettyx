@@ -37,6 +37,8 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
+import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 /**
  * The type Struct utils.
@@ -64,6 +66,7 @@ public class StructUtils {
 
         // will get the first, will not appear index-out-of-bounds exception
         Type actualTypeArgument = actualTypeArguments[0];
+        Throws.ifInstanceOf(TypeVariableImpl.class, actualTypeArgument, "please use TypeReference to assign generic type");
 
         return (Class<?>) actualTypeArgument;
     }
