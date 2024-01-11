@@ -9,13 +9,13 @@ import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRIT
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -185,56 +185,16 @@ public class StructUtils {
         }
     }
 
-    /**
-     * Write field.
-     *
-     * @param object the object
-     * @param field the field
-     * @param value the length
-     */
     public static void writeField(Object object, Field field, Object value) {
-        try {
-            Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> {
-                try {
-                    return new PropertyDescriptor(field.getName(), object.getClass()).getWriteMethod();
-                } catch (IntrospectionException exception) {
-                    throw new UnsupportedOperationException(
-                        "field write failed, field is [" + field + "], length is [" + value
-                            + "], check the correct parameter type of field getter/setter", exception);
-                }
-            });
-            MethodHandleUtil.invoke(object, writeMethod, value);
-        } catch (Exception exception) {
-            throw new UnsupportedOperationException("field write failed, field is [" + field + "], length is [" + value
-                + "], check the correct parameter type of field getter/setter", exception);
-        }
+        Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field,
+            f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getWriteMethod());
+        MethodHandleUtil.invoke(object, writeMethod, value);
     }
 
-    /**
-     * Read field t.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @param field the field
-     * @return the t
-     */
     public static <T> T readField(Object object, Field field) {
-        try {
-            Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> {
-                try {
-                    return new PropertyDescriptor(field.getName(), object.getClass()).getReadMethod();
-                } catch (IntrospectionException exception) {
-                    throw new UnsupportedOperationException(
-                        "field read failed, field is [" + field + "], check parameter type or field getter/setter",
-                        exception);
-                }
-            });
-
-            return (T) MethodHandleUtil.invoke(object, readMethod);
-        } catch (Exception exception) {
-            throw new UnsupportedOperationException(
-                "field read failed, field is [" + field + "], check parameter type or field getter/setter", exception);
-        }
+        Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field,
+            f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
+        return MethodHandleUtil.invoke(object, readMethod);
     }
 
     /**
@@ -265,11 +225,9 @@ public class StructUtils {
      */
     public static void checkAssignable(Field field, Class<?> clazz) {
         Class<?> type = field.getType();
-        if (!ClassUtil.isAssignable(clazz, type)) {
-            throw new TypeJudgmentException(
-                "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz
-                    + "]");
-        }
+
+        Throws.ifNotAssignable(clazz, type, new TypeJudgmentException(
+            "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz + "]"));
     }
 
     /**
@@ -297,7 +255,7 @@ public class StructUtils {
                 scanAllBasics();
                 scanAllStructs();
             } catch (Exception e) {
-                throw new NotInitedException("init nettyx serializer cache failed please check", e);
+                throw new NotInitedException("init serializer context failed please check", e);
             }
         }
 
