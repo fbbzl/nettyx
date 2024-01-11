@@ -11,13 +11,14 @@ import lombok.Getter;
 @Getter
 public class TooLessBytesException extends RuntimeException {
 
-    private final int expectSize;
+    private final int expectLength;
 
-    private final int provideSize;
+    private final int provideLength;
 
-    public TooLessBytesException(int expectSize, int provideSize) {
-        super("to less bytes, expect bytes length is [" + expectSize + "] but provide bytes length is [" + provideSize + "]");
-        this.expectSize = expectSize;
-        this.provideSize = provideSize;
+    public TooLessBytesException(int expectLength, int provideLength) {
+        super("bytes missing when doing serialization, field expect bytes length is [" + expectLength
+            + "] but the provided readable bytes length is [" + provideLength + "]");
+        this.expectLength = expectLength;
+        this.provideLength = provideLength;
     }
 }
