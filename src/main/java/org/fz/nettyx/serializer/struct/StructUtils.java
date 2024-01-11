@@ -209,7 +209,6 @@ public class StructUtils {
     public static <T> T readField(Object object, Field field) {
         Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field,
             f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
-
         return MethodHandleUtil.invoke(object, readMethod);
     }
 
