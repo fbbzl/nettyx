@@ -185,27 +185,12 @@ public class StructUtils {
         }
     }
 
-    /**
-     * Write field.
-     *
-     * @param object the object
-     * @param field the field
-     * @param value the length
-     */
     public static void writeField(Object object, Field field, Object value) {
         Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field,
             f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getWriteMethod());
         MethodHandleUtil.invoke(object, writeMethod, value);
     }
 
-    /**
-     * Read field t.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @param field the field
-     * @return the t
-     */
     public static <T> T readField(Object object, Field field) {
         Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field,
             f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
