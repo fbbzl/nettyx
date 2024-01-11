@@ -51,7 +51,7 @@ public @interface ToNamedEnum {
      *
      * @return the int
      */
-    int bufferLength() default 0;
+    int bufferLength();
 
     /**
      * The type To named enum handler.
@@ -70,8 +70,8 @@ public @interface ToNamedEnum {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum,
-            ByteBuf writingBuffer) {
-
+            ByteBuf writing) {
+                //TODO
         }
     }
 
