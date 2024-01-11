@@ -16,7 +16,6 @@ import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -242,11 +241,9 @@ public class StructUtils {
      */
     public static void checkAssignable(Field field, Class<?> clazz) {
         Class<?> type = field.getType();
-        if (!ClassUtil.isAssignable(clazz, type)) {
-            throw new TypeJudgmentException(
-                "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz
-                    + "]");
-        }
+
+        Throws.ifNotAssignable(clazz, type, new TypeJudgmentException(
+            "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz + "]"));
     }
 
     /**
