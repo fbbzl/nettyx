@@ -302,7 +302,7 @@ public final class StructSerializer implements Serializer {
             return handledValue;
         } catch (Exception readHandlerException) {
             readHandler.beforeReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
-            throw new HandlerException(handleField, readHandler.getClass());
+            throw new HandlerException(handleField, readHandler.getClass(), readHandlerException);
         }
     }
 
@@ -342,7 +342,7 @@ public final class StructSerializer implements Serializer {
         } catch (Exception writeHandlerException) {
             writeHandler.beforeWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing,
                 writeHandlerException);
-            throw new HandlerException(handleField, writeHandler.getClass());
+            throw new HandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
     }
 

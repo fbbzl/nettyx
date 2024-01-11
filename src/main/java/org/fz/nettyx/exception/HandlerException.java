@@ -15,8 +15,8 @@ public class HandlerException extends RuntimeException {
 
     private final Class<?> handlerClass;
 
-    public HandlerException(Field field, Class<?> handlerClass) {
-        super("handler cause exception please check [" + handlerClass + "], this handler is on field [" + field + "]");
+    public HandlerException(Field field, Class<?> handlerClass, Throwable throwable) {
+        super("handler cause exception please check [" + handlerClass + "], this handler is on field [" + field + "]", throwable);
         this.field = field;
         this.handlerClass = handlerClass;
     }
