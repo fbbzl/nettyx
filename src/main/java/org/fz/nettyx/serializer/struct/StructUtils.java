@@ -17,6 +17,7 @@ import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import java.beans.IntrospectionException;
@@ -27,6 +28,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -34,6 +37,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 /**
  * The type Struct utils.
@@ -48,6 +52,31 @@ public class StructUtils {
 
     public boolean isTransient(Field field) {
         return TRANSIENT_FIELD_CACHE.contains(field);
+    }
+
+    public Class<?> getFieldParameterizedType(Field field) {
+        Type type = TypeUtil.getType(field);
+        // If it's a Class, it means that no generics are specified
+        if (type instanceof Class<?>) {
+            return Object.class;
+        }
+
+        Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
+
+        // will get the first, will not appear index-out-of-bounds exception
+        Type actualTypeArgument = actualTypeArguments[0];
+        if (actualTypeArgument instanceof TypeVariableImpl) {
+            System.err.println(TypeUtil.getTypeArgument(actualTypeArgument));
+            System.err.println(TypeUtil.getClass(actualTypeArgument));
+            Type[] bounds = ((TypeVariableImpl<?>) actualTypeArgument).getBounds();
+//            bounds[]
+//            TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
+//            System.err.println((Class<?>) typeParameters[0].getGenericDeclaration());
+//            return (Class<?>) typeParameters[0].getGenericDeclaration();
+            return null;
+        }
+
+        return (Class<?>) actualTypeArgument;
     }
 
     /**
