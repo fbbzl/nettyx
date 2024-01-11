@@ -15,9 +15,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
@@ -250,7 +252,7 @@ public final class StructSerializer implements Serializer {
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
-                if (useWriteHandler(field)) writeHandled(field, fieldValue, this, this.getByteBuf());
+                if (useWriteHandler(field)) writeHandled(field, fieldValue, this);
                 else
                 if (isBasic(field))         writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newBasic(field, buffer())), this.getByteBuf());
                 else
@@ -290,9 +292,18 @@ public final class StructSerializer implements Serializer {
         return StructSerializer.read(byteBuf, struct);
     }
 
-    public static Object readHandled(Field handledField, StructSerializer upperSerializer) {
-        ReadHandler<?> readHandler = StructUtils.getHandler(handledField);
-        return readHandler.doRead(upperSerializer, handledField, StructUtils.findHandlerAnnotation(handledField));
+    public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
+        ReadHandler<A> readHandler = StructUtils.getHandler(handleField);
+        A handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        try {
+            readHandler.preReadHandle(upperSerializer, handleField, handlerAnnotation);
+            Object handledValue = readHandler.doRead(upperSerializer, handleField, handlerAnnotation);
+            readHandler.postReadHandle(upperSerializer, handleField, handlerAnnotation);
+            return handledValue;
+        } catch (Exception readHandlerException) {
+            readHandler.beforeReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
+            throw new HandlerException(handleField, readHandler.getClass());
+        }
     }
 
     //*************************************         read write splitter         **************************************//
@@ -318,13 +329,21 @@ public final class StructSerializer implements Serializer {
      *
      * @param handleField the handled field
      * @param upperSerializer the upper serializer
-     * @param writingBuf the byte buf
      */
-    public static void writeHandled(Field handleField, Object fieldValue, StructSerializer upperSerializer,
-        ByteBuf writingBuf) {
-        WriteHandler<?> writeHandler = StructUtils.getHandler(handleField);
-
-        writeHandler.doWrite(upperSerializer, handleField, fieldValue, StructUtils.findHandlerAnnotation(handleField), writingBuf);
+    public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue,
+        StructSerializer upperSerializer) {
+        WriteHandler<A> writeHandler = StructUtils.getHandler(handleField);
+        A handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        ByteBuf writing = upperSerializer.getByteBuf();
+        try {
+            writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.doWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.postWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+        } catch (Exception writeHandlerException) {
+            writeHandler.beforeWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing,
+                writeHandlerException);
+            throw new HandlerException(handleField, writeHandler.getClass());
+        }
     }
 
     /**

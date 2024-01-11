@@ -58,14 +58,14 @@ public @interface ToString {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writingBuffer) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writing) {
             StructUtils.checkAssignable(field, CharSequence.class);
 
             int bufferLength = toString.bufferLength();
             String charset = toString.charset();
 
-            if (value != null) writingBuffer.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else               writingBuffer.writeBytes(new byte[bufferLength]);
+            if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
+            else               writing.writeBytes(new byte[bufferLength]);
 
         }
 

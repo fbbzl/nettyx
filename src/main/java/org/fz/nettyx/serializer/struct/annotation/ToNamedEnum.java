@@ -70,8 +70,8 @@ public @interface ToNamedEnum {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum,
-            ByteBuf writingBuffer) {
-
+            ByteBuf writing) {
+                //TODO
         }
     }
 
