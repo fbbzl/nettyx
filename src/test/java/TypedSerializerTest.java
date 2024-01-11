@@ -182,8 +182,17 @@ public class TypedSerializerTest {
         @Override
         public String toString() {
             return "User{" + "uid=" + uid + ", uname=" + uname + ", isMarried=" + isMarried + ", sex=" + sex
-                + ", address=" + address + ", platformId=" + platformId + ", description=" + description + ", bill="
-                + bill + ", loginNames=" + Arrays.toString(loginNames) + ", wifes=" + wifes + ", sons=" + sons + '}';
+                + ", address=" + address + ", platformId=" + platformId + ", description=" + description + ", interest="
+                + interest + ", bill=" + bill + ", Cchar=" + Cchar + ", Cdouble=" + Cdouble + ", Cfloat=" + Cfloat
+                + ", Cint=" + Cint + ", Clong4=" + Clong4 + ", Clong8=" + Clong8 + ", Clonglong=" + Clonglong
+                + ", Cshort=" + Cshort + ", Cuchar=" + Cuchar + ", Cuint=" + Cuint + ", Culong4=" + Culong4
+                + ", Culong8=" + Culong8 + ", Culonglong=" + Culonglong + ", Cushort=" + Cushort + ", Cpp8tchar="
+                + Cpp8tchar + ", Cpp16tchar=" + Cpp16tchar + ", Cpp32tchar=" + Cpp32tchar + ", Cppdouble=" + Cppdouble
+                + ", Cppfloat=" + Cppfloat + ", Cppint=" + Cppint + ", Cpplong4=" + Cpplong4 + ", Cpplong8=" + Cpplong8
+                + ", Cpplonglong=" + Cpplonglong + ", Cppshort=" + Cppshort + ", Cppuchar=" + Cppuchar + ", Cppuint="
+                + Cppuint + ", Cppulong4=" + Cppulong4 + ", Cppulong8=" + Cppulong8 + ", Cppulonglong=" + Cppulonglong
+                + ", Cppushort=" + Cppushort + ", cppBool=" + cppBool + ", loginNames=" + Arrays.toString(loginNames)
+                + ", wifes=" + wifes + ", sons=" + sons + '}';
         }
     }
 }
