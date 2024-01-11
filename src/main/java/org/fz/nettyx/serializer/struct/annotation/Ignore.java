@@ -7,7 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * if use this annotation, will skip the bytes allocation
+ * use this annotation, will skip the bytes-allocation.
+ * If the field is transient decorated, it will not participate in serialization either
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021/1/20 11:04

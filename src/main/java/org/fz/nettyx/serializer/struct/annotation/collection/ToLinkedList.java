@@ -4,8 +4,8 @@ import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.collection.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
 
 import cn.hutool.core.collection.ListUtil;
 import io.netty.buffer.ByteBuf;
@@ -14,7 +14,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.List;
-import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
@@ -44,7 +44,7 @@ public @interface ToLinkedList {
      *
      * @return the int
      */
-    int size() default 0;
+    int size();
 
     /**
      * The type To linked list handler.
@@ -59,26 +59,24 @@ public @interface ToLinkedList {
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             return ListUtil.toLinkedList(readArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
         }
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
-            ByteBuf writingBuffer) {
+            ByteBuf writing) {
             StructUtils.checkAssignable(field, List.class);
 
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
-            writeArray(list.toArray(), elementType, toLinkedList.size(), writingBuffer);
+            writeArray(list.toArray(), elementType, toLinkedList.size(), writing);
         }
     }
 
