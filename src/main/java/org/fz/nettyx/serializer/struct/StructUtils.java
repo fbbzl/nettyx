@@ -37,7 +37,6 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 /**
  * The type Struct utils.
@@ -65,16 +64,6 @@ public class StructUtils {
 
         // will get the first, will not appear index-out-of-bounds exception
         Type actualTypeArgument = actualTypeArguments[0];
-        if (actualTypeArgument instanceof TypeVariableImpl) {
-            System.err.println(TypeUtil.getTypeArgument(actualTypeArgument));
-            System.err.println(TypeUtil.getClass(actualTypeArgument));
-            Type[] bounds = ((TypeVariableImpl<?>) actualTypeArgument).getBounds();
-//            bounds[]
-//            TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
-//            System.err.println((Class<?>) typeParameters[0].getGenericDeclaration());
-//            return (Class<?>) typeParameters[0].getGenericDeclaration();
-            return null;
-        }
 
         return (Class<?>) actualTypeArgument;
     }
