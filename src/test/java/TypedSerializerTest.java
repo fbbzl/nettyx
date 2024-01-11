@@ -81,7 +81,7 @@ public class TypedSerializerTest {
     @Struct
     public static class Wife {
 
-        @ToString
+        @ToString(bufferLength = 2)
         private String name;
     }
 
@@ -89,7 +89,7 @@ public class TypedSerializerTest {
     @Struct
     public static class Son {
 
-        @ToString
+        @ToString(bufferLength = 2)
         private String name;
 
     }
@@ -99,8 +99,7 @@ public class TypedSerializerTest {
     @Struct
     @lombok.ToString(callSuper = true)
     public static class Self extends User {
-
-        @ToString
+        @ToString(bufferLength = 2, charset = "US-ASCII")
         private String nam111e;
 
     }
