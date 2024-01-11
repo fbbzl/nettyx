@@ -147,8 +147,9 @@ public class StructUtils {
             else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
         }
         catch (InvocationTargetException invocationException) {
-            if (invocationException.getCause() instanceof TooLessBytesException) throw new SerializeException(invocationException.getCause().getMessage());
-            else throw new SerializeException(invocationException.getCause());
+            Throwable cause = invocationException.getCause();
+            if (cause instanceof TooLessBytesException) throw new SerializeException(cause.getMessage());
+            else                                        throw new SerializeException(cause);
         }
         catch (IllegalAccessException | InstantiationException exception) {
             throw new SerializeException(
