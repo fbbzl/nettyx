@@ -25,13 +25,11 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
-import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
@@ -39,6 +37,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
 import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 /**
@@ -67,11 +66,7 @@ public class StructUtils {
 
         // will get the first, will not appear index-out-of-bounds exception
         Type actualTypeArgument = actualTypeArguments[0];
-        if (actualTypeArgument instanceof TypeVariableImpl) {
-            GenericDeclaration genericDeclaration = ((TypeVariableImpl<?>) actualTypeArgument).getGenericDeclaration();
-            TypeVariable<?>[] typeParameters = genericDeclaration.getTypeParameters();
-            return (Class<?>) typeParameters[0].getGenericDeclaration();
-        }
+        Throws.ifInstanceOf(TypeVariableImpl.class, actualTypeArgument, "please use TypeReference to assign generic type");
 
         return (Class<?>) actualTypeArgument;
     }
@@ -319,7 +314,8 @@ public class StructUtils {
         private static synchronized void scanAllBasics() {
             Set<Class<?>> basicClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, Basic.class);
             for (Class<?> basicClass : basicClasses) {
-                if (Modifier.isAbstract(basicClass.getModifiers())) {
+                int mod = basicClass.getModifiers();
+                if (basicClass.isEnum() || Modifier.isAbstract(mod) || Modifier.isInterface(mod)) {
                     continue;
                 }
                 ReflectUtil.getConstructor(basicClass);

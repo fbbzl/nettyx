@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @UtilityClass
+@SuppressWarnings("all")
 public class Try {
 
     public Runnable run(UncheckedRunnable runnable) {
@@ -93,7 +94,8 @@ public class Try {
     }
 
     /**
-     * Use this method with caution!! Capture, but it can be used in scenarios where only information is printed, and it is not recommended for other scenarios
+     * Use this method with caution!! Capture, but it can be used in scenarios where only information is printed, and it
+     * is not recommended for other scenarios
      */
     public Runnable suppress(UncheckedRunnable run) {
         return () -> {
@@ -119,62 +121,36 @@ public class Try {
     @FunctionalInterface
     public interface UncheckedConsumer<T> {
 
-        /**
-         * @param t
-         * @throws Exception
-         */
         void accept(T t) throws Exception;
     }
 
     @FunctionalInterface
     public interface UncheckedBiConsumer<T, U> {
 
-        /**
-         * @param t
-         * @param u
-         * @throws Exception
-         */
         void accept(T t, U u) throws Exception;
     }
 
     @FunctionalInterface
     public interface UncheckedFunction<T, R> {
 
-        /**
-         * @param t
-         * @return
-         * @throws Exception
-         */
         R apply(T t) throws Exception;
     }
 
     @FunctionalInterface
     public interface UncheckedRunnable {
 
-        /**
-         * @throws Exception
-         */
         void run() throws Exception;
     }
 
     @FunctionalInterface
     public interface UncheckedSupplier<T> {
 
-        /**
-         * @return
-         * @throws Exception
-         */
         T get() throws Exception;
     }
 
     @FunctionalInterface
     public interface UncheckedPredicate<T> {
 
-        /**
-         * @param t
-         * @return
-         * @throws Exception
-         */
         boolean test(T t) throws Exception;
     }
 
@@ -192,7 +168,8 @@ public class Try {
             super(cause);
         }
 
-        public LambdasException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        public LambdasException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
             super(message, cause, enableSuppression, writableStackTrace);
         }
     }
