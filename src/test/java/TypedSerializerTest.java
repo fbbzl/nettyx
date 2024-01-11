@@ -27,6 +27,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong4;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culonglong;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cushort;
+import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
 import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp16tchar;
 import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp32tchar;
 import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp8tchar;
@@ -169,6 +170,7 @@ public class TypedSerializerTest {
         private Cppulong8 Cppulong8;
         private Cppulonglong Cppulonglong;
         private Cppushort Cppushort;
+        private CppBool cppBool;;
 
         @ToArray(length = 2)
         private Cuint[] loginNames;
