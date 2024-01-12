@@ -23,8 +23,8 @@ public class Cpp32tchar extends CppBasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
-        return Unpooled.buffer(getSize()).writeIntLE(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(getSize()).writeIntLE((Integer) value);
     }
 
     @Override
