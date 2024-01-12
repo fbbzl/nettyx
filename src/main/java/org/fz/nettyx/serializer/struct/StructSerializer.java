@@ -19,7 +19,10 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.nio.ByteBuffer;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
@@ -75,11 +78,25 @@ public final class StructSerializer implements Serializer {
 
     public static <T> T read(ByteBuf byteBuf, Type type) {
         if (type instanceof Class<?>) {
-            return new StructSerializer(byteBuf, newStruct((Class<T>) type), type).toObject();
-        } else {
-            System.err.println(type.getClass());
+            Class<T> clazz = (Class<T>) type;
+            Throws.ifTrue(clazz.isArray() || clazz.isEnum() || clazz.isPrimitive(),
+                "un support type [" + type + "], please check");
+            return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+            System.err.println(parameterizedType);
             return null;
+        } else if (type instanceof WildcardType) {
+
+        } else if (type instanceof TypeVariable) {
+
+        } else if (type instanceof TypeReference) {
+            return read(byteBuf, ((TypeReference<T>) type).getType());
         }
+
+        return null;
     }
 
     public static <T> T read(byte[] bytes, TypeReference<?> typeReference) {
