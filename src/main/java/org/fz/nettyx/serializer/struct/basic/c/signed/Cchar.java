@@ -18,20 +18,20 @@ public class Cchar extends CBasic<Byte> {
     /**
      * The constant MIN_VALUE.
      */
-    public static final Cchar MIN_VALUE = new Cchar(Integer.valueOf(Byte.MIN_VALUE));
+    public static final Cchar MIN_VALUE = new Cchar((int) Byte.MIN_VALUE);
 
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cchar MAX_VALUE = new Cchar(Integer.valueOf(Byte.MAX_VALUE));
+    public static final Cchar MAX_VALUE = new Cchar((int) Byte.MAX_VALUE);
 
     /**
      * Instantiates a new Cchar.
      *
      * @param value the length
      */
-    public Cchar(Integer value) {
-        super(value.byteValue(), 1);
+    public Cchar(Object value) {
+        super(value, 1);
     }
 
     /**

@@ -15,20 +15,20 @@ public class Cshort extends CBasic<Short> {
     /**
      * The constant MIN_VALUE.
      */
-    public static final Cshort MIN_VALUE = new Cshort(Integer.valueOf(Short.MIN_VALUE));
+    public static final Cshort MIN_VALUE = new Cshort((int) Short.MIN_VALUE);
 
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cshort MAX_VALUE = new Cshort(Integer.valueOf(Short.MAX_VALUE));
+    public static final Cshort MAX_VALUE = new Cshort((int) Short.MAX_VALUE);
 
     /**
      * Instantiates a new Cshort.
      *
      * @param value the length
      */
-    public Cshort(Integer value) {
-        super(value.shortValue(), 2);
+    public Cshort(Object value) {
+        super(value, 2);
     }
 
     /**

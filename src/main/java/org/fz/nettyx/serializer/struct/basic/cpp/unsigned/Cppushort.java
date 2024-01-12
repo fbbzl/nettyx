@@ -22,7 +22,7 @@ public class Cppushort extends Cushort {
      */
     public static final Cppushort MAX_VALUE = new Cppushort(Short.MAX_VALUE >> 2);
 
-    public Cppushort(Integer value) {
+    public Cppushort(Object value) {
         super(value);
     }
 

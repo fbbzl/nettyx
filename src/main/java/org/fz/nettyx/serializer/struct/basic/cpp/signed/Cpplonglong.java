@@ -19,7 +19,7 @@ public class Cpplonglong extends Cpplong8 {
      */
     public static final Cpplonglong MAX_VALUE = new Cpplonglong(Long.MAX_VALUE);
 
-    public Cpplonglong(Long value) {
+    public Cpplonglong(Object value) {
         super(value);
     }
 

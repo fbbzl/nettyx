@@ -27,7 +27,7 @@ public class Cppulonglong extends Cppulong8 {
      *
      * @param value the length
      */
-    public Cppulonglong(BigInteger value) {
+    public Cppulonglong(Object value) {
         super(value);
     }
 
