@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.cpp.CppBasic;
  */
 public class Cpp16tchar extends CppBasic<Character> {
 
-    public Cpp16tchar(Character value) {
+    public Cpp16tchar(Object value) {
         super(value, 2);
     }
 
@@ -22,8 +22,8 @@ public class Cpp16tchar extends CppBasic<Character> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(getSize()).writeChar((Character) value);
+    protected ByteBuf toByteBuf(Character value, int size) {
+        return Unpooled.buffer(getSize()).writeChar(value);
     }
 
     @Override
