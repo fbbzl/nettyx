@@ -28,7 +28,7 @@ public class Cushort extends CBasic<Integer> {
      *
      * @param value the length
      */
-    public Cushort(Integer value) {
+    public Cushort(Object value) {
         super(value, 2);
     }
 
@@ -47,8 +47,8 @@ public class Cushort extends CBasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(size).writeShortLE(((Integer) value).shortValue());
+    protected ByteBuf toByteBuf(Integer value, int size) {
+        return Unpooled.buffer(size).writeShortLE(value.shortValue());
     }
 
     @Override

@@ -30,8 +30,8 @@ public class Cuchar extends CBasic<Short> {
      *
      * @param value the length
      */
-    public Cuchar(Integer value) {
-        super(value.shortValue(), 1);
+    public Cuchar(Object value) {
+        super(value, 1);
     }
 
     /**
@@ -49,8 +49,8 @@ public class Cuchar extends CBasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(size).writeByte(((Short) value).byteValue());
+    protected ByteBuf toByteBuf(Short value, int size) {
+        return Unpooled.buffer(size).writeByte(value.byteValue());
     }
 
     @Override
