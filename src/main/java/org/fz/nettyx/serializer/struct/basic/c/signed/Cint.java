@@ -28,7 +28,7 @@ public class Cint extends CBasic<Integer> {
      *
      * @param value the length
      */
-    public Cint(Integer value) {
+    public Cint(Object value) {
         super(value, 4);
     }
 
@@ -42,8 +42,8 @@ public class Cint extends CBasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(size).writeIntLE((Integer) value);
+    protected ByteBuf toByteBuf(Integer value, int size) {
+        return Unpooled.buffer(size).writeIntLE(value);
     }
 
     @Override
