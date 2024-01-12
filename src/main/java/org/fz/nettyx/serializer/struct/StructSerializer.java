@@ -82,19 +82,23 @@ public final class StructSerializer implements Serializer {
             Throws.ifTrue(clazz.isArray() || clazz.isEnum() || clazz.isPrimitive(),
                 "un support type [" + type + "], please check");
             return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
-        } else if (type instanceof ParameterizedType) {
+        }
+        else if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
 
             System.err.println(parameterizedType);
             return null;
-        } else if (type instanceof WildcardType) {
+        }
+        else if (type instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) type;
 
-        } else if (type instanceof TypeVariable) {
+        }
+        else if (type instanceof TypeVariable) {
             TypeVariable typeVariable = (TypeVariable) type;
 
-        } else if (type instanceof TypeReference) {
+        }
+        else if (type instanceof TypeReference) {
             return read(byteBuf, ((TypeReference<T>) type).getType());
         }
 
