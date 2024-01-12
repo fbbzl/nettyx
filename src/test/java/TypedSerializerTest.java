@@ -162,7 +162,7 @@ public class TypedSerializerTest {
         private Cppulong8 Cppulong8;
         private Cppulonglong Cppulonglong;
         private Cppushort Cppushort;
-        private CppBool cppBool;;
+        private CppBool cppBool;
 
         @ToArray(length = 2)
         private Cchar[] loginNames;
