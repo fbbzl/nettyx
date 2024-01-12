@@ -30,8 +30,8 @@ public class Cuchar extends CBasic<Short> {
      *
      * @param value the length
      */
-    public Cuchar(Object value) {
-        super(value, 1);
+    public Cuchar(Integer value) {
+        super(value.shortValue(), 1);
     }
 
     /**
