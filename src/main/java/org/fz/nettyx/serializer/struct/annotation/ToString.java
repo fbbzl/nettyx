@@ -51,8 +51,11 @@ public @interface ToString {
             if (!Charset.isSupported(charset)) throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
             ByteBuf byteBuf = serializer.getByteBuf();
-            if (!byteBuf.isReadable())
-                throw new IllegalArgumentException("buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "]");
+            if (!byteBuf.isReadable()) {
+                throw new IllegalArgumentException(
+                    "buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "], field is [" + field
+                        + "]");
+            }
 
             return byteBuf.readBytes(toString.bufferLength()).toString(Charset.forName(charset));
         }

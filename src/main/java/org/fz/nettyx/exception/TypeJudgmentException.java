@@ -1,6 +1,7 @@
 package org.fz.nettyx.exception;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 /**
  * @author fengbinbin
@@ -17,7 +18,11 @@ public class TypeJudgmentException extends RuntimeException {
     }
 
     public TypeJudgmentException(Field field) {
-        super("can not determine field [" + field + "] type");
+        super("can not determine type of field [" + field + "]");
+    }
+
+    public TypeJudgmentException(Type type) {
+        super("can not determine type [" + type + "]");
     }
 
     public TypeJudgmentException(String message, Throwable cause) {
