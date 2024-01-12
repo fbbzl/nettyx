@@ -8,6 +8,9 @@ import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -18,7 +21,10 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -28,6 +34,8 @@ import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
+import org.fz.nettyx.util.TypeRef;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -45,6 +53,11 @@ public final class StructSerializer implements Serializer {
     private final ByteBuf byteBuf;
 
     /**
+     * type of struct
+     */
+    private final Type type;
+
+    /**
      * an object ready for serialization/deserialization
      */
     private final Object struct;
@@ -55,164 +68,111 @@ public final class StructSerializer implements Serializer {
      * @param byteBuf the byte buf
      * @param struct  the struct
      */
-    StructSerializer(ByteBuf byteBuf, Object struct) {
+    StructSerializer(ByteBuf byteBuf, Object struct, Type type) {
         this.byteBuf = byteBuf;
         this.struct = struct;
+        this.type = type;
     }
 
-    /**
-     * convert byteBuf to struct object
-     *
-     * @param <T>     the type parameter
-     * @param byteBuf the byte buf
-     * @param struct  the struct
-     * @return the t
-     */
-    public static <T> T read(ByteBuf byteBuf, T struct) {
-        return new StructSerializer(byteBuf, struct).toObject();
+    public static <T> T read(ByteBuf byteBuf, TypeRef<T> typeReference) {
+        return read(byteBuf, typeReference.getType());
     }
 
-    /**
-     * convert byteBuf to struct object by class
-     *
-     * @param <T>     the type parameter
-     * @param byteBuf the byte buf
-     * @param clazz   the clazz
-     * @return the t
-     */
-    public static <T> T read(ByteBuf byteBuf, Class<T> clazz) {
-        return read(byteBuf, newStruct(clazz));
+    public static <T> T read(ByteBuf byteBuf, Type type) {
+        if (type instanceof Class<?>) {
+            Class<T> clazz = (Class<T>) type;
+            Throws.ifFalse(BeanUtil.isBean(clazz), new TypeJudgmentException(type));
+
+            return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Class<T> structType = (Class<T>) parameterizedType.getRawType();
+
+            return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
+        } else if (type instanceof TypeReference) {
+            return read(byteBuf, ((TypeReference<T>) type).getType());
+        } else {
+            throw new TypeJudgmentException(type);
+        }
     }
 
-    /**
-     * convert byte-array to struct object
-     *
-     * @param <T>    the type parameter
-     * @param bytes  the bytes
-     * @param struct the struct
-     * @return the t
-     */
-    public static <T> T read(byte[] bytes, T struct) {
-        return StructSerializer.read(Unpooled.wrappedBuffer(bytes), struct);
+    public static <T> T read(byte[] bytes, TypeRef<T> typeReference) {
+        return read(bytes, typeReference.getType());
     }
 
-    /**
-     * convert byte-array to struct object by class
-     *
-     * @param <T>   the type parameter
-     * @param bytes the bytes
-     * @param clazz the clazz
-     * @return the t
-     */
-    public static <T> T read(byte[] bytes, Class<T> clazz) {
-        return read(bytes, newStruct(clazz));
+    public static <T> T read(byte[] bytes, Type type) {
+        return read(Unpooled.wrappedBuffer(bytes), type);
     }
 
-    /**
-     * convert nio byteBuf to struct object
-     *
-     * @param <T>        the type parameter
-     * @param byteBuffer the byte buffer
-     * @param struct     the struct
-     * @return the t
-     */
-    public static <T> T read(ByteBuffer byteBuffer, T struct) {
-        return StructSerializer.read(Unpooled.wrappedBuffer(byteBuffer), struct);
+    public static <T> T read(ByteBuffer byteBuffer, TypeRef<T> typeReference) {
+        return read(byteBuffer, typeReference.getType());
     }
 
-    /**
-     * convert byteBuf to struct object by class
-     *
-     * @param <T>        the type parameter
-     * @param byteBuffer the byte buffer
-     * @param clazz      the clazz
-     * @return the t
-     */
-    public static <T> T read(ByteBuffer byteBuffer, Class<T> clazz) {
-        return read(byteBuffer, newStruct(clazz));
+    public static <T> T read(ByteBuffer byteBuffer, Type type) {
+        return read(Unpooled.wrappedBuffer(byteBuffer), type);
     }
 
-    /**
-     * convert InputStream to struct object
-     *
-     * @param <T>    the type parameter
-     * @param is     the is
-     * @param struct the struct
-     * @return the t
-     * @throws IOException the io exception
-     */
-    public static <T> T read(InputStream is, T struct) throws IOException {
+    public static <T> T read(InputStream inputStream, TypeRef<T> typeReference) throws IOException {
+        return read(inputStream, typeReference.getType());
+    }
+
+    public static <T> T read(InputStream is, Type type) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (int b = is.read(); b >= 0; b = is.read()) baos.write(b);
+        for (int b = is.read(); b >= 0; b = is.read()) {
+            baos.write(b);
+        }
         is.close();
-        return StructSerializer.read(baos.toByteArray(), struct);
+        return read(baos.toByteArray(), type);
     }
 
-    /**
-     * convert InputStream to struct object by class
-     *
-     * @param <T>         the type parameter
-     * @param inputStream the input stream
-     * @param clazz       the clazz
-     * @return the t
-     * @throws IOException the io exception
-     */
-    public static <T> T read(InputStream inputStream, Class<T> clazz) throws IOException {
-        return read(inputStream, newStruct(clazz));
+    //*************************************      read write splitter      ********************************************//
+
+    public static <T> ByteBuf write(T struct, TypeRef<T> typeReference) {
+        return new StructSerializer(buffer(), struct, typeReference).toByteBuf();
     }
 
-    /**
-     * convert struct to byteBuf
-     *
-     * @param <T>    the type parameter
-     * @param struct the struct
-     * @return the byte buf
-     */
     public static <T> ByteBuf write(T struct) {
-        return new StructSerializer(buffer(), struct).toByteBuf();
+        Throws.ifNull(struct, "struct can not be null when write");
+        return new StructSerializer(buffer(), struct, struct.getClass()).toByteBuf();
     }
 
-    /**
-     * convert struct to byte-array
-     *
-     * @param <T>    the type parameter
-     * @param struct the object
-     * @return the byte [ ]
-     */
+    public static <T> byte[] writeBytes(T struct, TypeRef<T> typeReference) {
+        ByteBuf writeBuf = StructSerializer.write(struct, typeReference);
+        try {
+            byte[] bytes = new byte[writeBuf.readableBytes()];
+            writeBuf.readBytes(bytes);
+            return bytes;
+        } finally {
+            ReferenceCountUtil.release(writeBuf);
+        }
+    }
+
     public static <T> byte[] writeBytes(T struct) {
         ByteBuf writeBuf = StructSerializer.write(struct);
         try {
             byte[] bytes = new byte[writeBuf.readableBytes()];
             writeBuf.readBytes(bytes);
             return bytes;
-        }
-        finally {
+        } finally {
             ReferenceCountUtil.release(writeBuf);
         }
     }
 
-    /**
-     * convert struct to nio byteBuf
-     *
-     * @param <T>    the type parameter
-     * @param struct the object
-     * @return the byte buffer
-     */
+    public static <T> ByteBuffer writeNioBuffer(T struct, TypeRef<T> typeReference) {
+        return ByteBuffer.wrap(StructSerializer.writeBytes(struct, typeReference));
+    }
+
     public static <T> ByteBuffer writeNioBuffer(T struct) {
         return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
     }
 
-    /**
-     * convert struct to output stream
-     *
-     * @param <T>          the type parameter
-     * @param struct       the object
-     * @param outputStream the output stream
-     * @throws IOException the io exception
-     */
+    public static <T> void writeStream(T struct, OutputStream outputStream, TypeRef<T> typeReference)
+        throws IOException {
+        outputStream.write(writeBytes(struct, typeReference));
+    }
+
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
-        byte[] writeBuf = StructSerializer.writeBytes(struct);
-        outputStream.write(writeBytes(writeBuf));
+        outputStream.write(writeBytes(struct));
     }
 
     /**
@@ -287,9 +247,7 @@ public final class StructSerializer implements Serializer {
      * @return the s
      */
     public static <S> S readStruct(Field structField, ByteBuf byteBuf) {
-        // invoke struct no-arg constructor
-        S struct = StructUtils.newStruct(structField);
-        return StructSerializer.read(byteBuf, struct);
+        return StructSerializer.read(byteBuf, structField.getType());
     }
 
     public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
@@ -443,7 +401,28 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getStructType() {
-        return (Class<T>) this.struct.getClass();
+        if (this.type instanceof Class<?>) {
+            return (Class<T>) this.type;
+        }
+        throw new TypeJudgmentException(this.type);
+    }
+
+    public ParameterizedType getStructParameterizedType() {
+        if (this.type instanceof ParameterizedType) {
+            return (ParameterizedType) this.type;
+        }
+        throw new TypeJudgmentException(this.type);
+    }
+
+    public Map<Type, Type> getStructParameterizedTypeMap() {
+        // TODO
+        if (this.type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) this.type;
+            Map<Type, Type> typeMap = TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+
+            return TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+        }
+        throw new TypeJudgmentException(this.type);
     }
 
     @Override

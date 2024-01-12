@@ -19,7 +19,7 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The top-level parent class of all custom serialization processors
- *
+ * default is not singleton
  * @author fengbinbin
  * @since 2022 -01-16 16:39
  */
