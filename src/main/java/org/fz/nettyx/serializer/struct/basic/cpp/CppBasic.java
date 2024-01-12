@@ -38,6 +38,11 @@ public abstract class CppBasic<V extends Comparable<V>> extends Basic<V> impleme
     }
 
     @Override
+    public int hashCode() {
+        return this.getValue().hashCode();
+    }
+
+    @Override
     public boolean equals(Object anotherObj) {
         if (anotherObj == null) return false;
 
