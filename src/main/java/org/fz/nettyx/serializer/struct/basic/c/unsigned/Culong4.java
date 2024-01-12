@@ -26,7 +26,7 @@ public class Culong4 extends Cuint {
      *
      * @param value the length
      */
-    public Culong4(Long value) {
+    public Culong4(Object value) {
         super(value);
     }
 

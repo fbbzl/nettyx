@@ -28,7 +28,7 @@ public class Clong8 extends CBasic<Long> {
      *
      * @param value the length
      */
-    public Clong8(Long value) {
+    public Clong8(Object value) {
         super(value, 8);
     }
 
@@ -42,8 +42,8 @@ public class Clong8 extends CBasic<Long> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(size).writeLongLE((Long) value);
+    protected ByteBuf toByteBuf(Long value, int size) {
+        return Unpooled.buffer(size).writeLongLE(value);
     }
 
     @Override
