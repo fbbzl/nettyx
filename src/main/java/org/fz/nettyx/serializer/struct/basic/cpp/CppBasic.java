@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.cpp;
 import io.netty.buffer.ByteBuf;
 import java.nio.ByteOrder;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
 /**
  * The type Cpp basic.
@@ -34,6 +35,28 @@ public abstract class CppBasic<V extends Comparable<V>> extends Basic<V> impleme
     @Override
     public ByteOrder order() {
         return CPP_DEFAULT_ENDIAN;
+    }
+
+    @Override
+    public boolean equals(Object anotherObj) {
+        if (anotherObj == null) return false;
+
+        if (anotherObj instanceof CBasic<?>) {
+            CBasic<?> anotherCBasic = (CBasic<?>) anotherObj;
+            if (   this.getSize()   != anotherCBasic.getSize()
+                || this.hasSinged() != anotherCBasic.hasSinged()
+                || this.order()     != anotherCBasic.order()) {
+                return false;
+            }
+
+            return this.getValue().equals(anotherCBasic.getValue());
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.getValue().toString();
     }
 
     @Override
