@@ -177,13 +177,11 @@ public final class StructSerializer implements Serializer {
 
     public static <T> void writeStream(T struct, OutputStream outputStream, TypeRef<T> typeReference)
         throws IOException {
-        byte[] writeBuf = StructSerializer.writeBytes(struct, typeReference);
-        outputStream.write(writeBytes(writeBuf));
+        outputStream.write(writeBytes(struct, typeReference));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
-        byte[] writeBuf = StructSerializer.writeBytes(struct);
-        outputStream.write(writeBytes(writeBuf));
+        outputStream.write(writeBytes(struct));
     }
 
     /**
