@@ -86,19 +86,17 @@ public final class StructSerializer implements Serializer {
         }
         else if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            Class<T> rawType = (Class<T>) parameterizedType.getRawType();
+            Class<T> structType = (Class<T>) parameterizedType.getRawType();
 
-            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-
-            System.err.println(parameterizedType);
-            return null;
+            return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
         }
         else if (type instanceof TypeReference) {
             return read(byteBuf, ((TypeReference<T>) type).getType());
         }
         else if (type instanceof WildcardType) {
             WildcardType wildcardType = (WildcardType) type;
-            return null;
+
+            return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
         }
         else if (type instanceof TypeVariable) {
             TypeVariable typeVariable = (TypeVariable) type;
