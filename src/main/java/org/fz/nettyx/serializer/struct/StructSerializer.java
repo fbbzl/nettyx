@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import org.fz.nettyx.exception.HandlerException;
@@ -76,10 +77,14 @@ public final class StructSerializer implements Serializer {
     public static <T> T read(ByteBuf byteBuf, Type type) {
         if (type instanceof Class<?>) {
             return new StructSerializer(byteBuf, newStruct((Class<T>) type), type).toObject();
-        } else {
+        }
+        else
+        if (type instanceof ParameterizedType){
             System.err.println(type.getClass());
             return null;
         }
+
+        return null;
     }
 
     public static <T> T read(byte[] bytes, TypeReference<?> typeReference) {
