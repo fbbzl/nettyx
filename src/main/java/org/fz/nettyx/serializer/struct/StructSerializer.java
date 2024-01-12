@@ -69,17 +69,17 @@ public final class StructSerializer implements Serializer {
         this.type = type;
     }
 
-    public static <T> T read(ByteBuf byteBuf, T struct, TypeReference<?> typeReference) {
+    public static <T> T read(ByteBuf byteBuf, T struct, TypeReference<T> typeReference) {
         Throws.ifNull(struct, "struct can not be null");
         return new StructSerializer(byteBuf, struct, typeReference.getType()).toObject();
     }
 
     public static <T> T read(ByteBuf byteBuf, T struct) {
         Throws.ifNull(struct, "struct can not be null when read");
-        return new StructSerializer(byteBuf, struct, struct.getClass()).toObject();
+        return (T) new StructSerializer(byteBuf, struct, struct.getClass()).toObject();
     }
 
-    public static <T> T read(ByteBuf byteBuf, Class<T> clazz, TypeReference<?> typeReference) {
+    public static <T> T read(ByteBuf byteBuf, Class<T> clazz, TypeReference<T> typeReference) {
         return read(byteBuf, newStruct(clazz), typeReference);
     }
 
@@ -87,7 +87,7 @@ public final class StructSerializer implements Serializer {
         return read(byteBuf, newStruct(clazz));
     }
 
-    public static <T> T read(byte[] bytes, T struct, TypeReference<?> typeReference) {
+    public static <T> T read(byte[] bytes, T struct, TypeReference<T> typeReference) {
         return read(Unpooled.wrappedBuffer(bytes), struct, typeReference);
     }
 
@@ -95,7 +95,7 @@ public final class StructSerializer implements Serializer {
         return read(Unpooled.wrappedBuffer(bytes), struct);
     }
 
-    public static <T> T read(byte[] bytes, Class<T> clazz, TypeReference<?> typeReference) {
+    public static <T> T read(byte[] bytes, Class<T> clazz, TypeReference<T> typeReference) {
         return read(bytes, newStruct(clazz), typeReference);
     }
 
@@ -103,7 +103,7 @@ public final class StructSerializer implements Serializer {
         return read(bytes, newStruct(clazz));
     }
 
-    public static <T> T read(ByteBuffer byteBuffer, T struct, TypeReference<?> typeReference) {
+    public static <T> T read(ByteBuffer byteBuffer, T struct, TypeReference<T> typeReference) {
         return read(Unpooled.wrappedBuffer(byteBuffer), struct, typeReference);
     }
 
@@ -111,7 +111,7 @@ public final class StructSerializer implements Serializer {
         return read(Unpooled.wrappedBuffer(byteBuffer), struct);
     }
 
-    public static <T> T read(ByteBuffer byteBuffer, Class<T> clazz, TypeReference<?> typeReference) {
+    public static <T> T read(ByteBuffer byteBuffer, Class<T> clazz, TypeReference<T> typeReference) {
         return read(byteBuffer, newStruct(clazz), typeReference);
     }
 
@@ -119,7 +119,7 @@ public final class StructSerializer implements Serializer {
         return read(byteBuffer, newStruct(clazz));
     }
 
-    public static <T> T read(InputStream inputStream, Class<T> clazz, TypeReference<?> typeReference) throws IOException {
+    public static <T> T read(InputStream inputStream, Class<T> clazz, TypeReference<T> typeReference) throws IOException {
         return read(inputStream, newStruct(clazz), typeReference);
     }
 
@@ -127,7 +127,7 @@ public final class StructSerializer implements Serializer {
         return read(inputStream, newStruct(clazz));
     }
 
-    public static <T> T read(InputStream is, T struct, TypeReference<?> typeReference) throws IOException {
+    public static <T> T read(InputStream is, T struct, TypeReference<T> typeReference) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (int b = is.read(); b >= 0; b = is.read()) baos.write(b);
         is.close();
@@ -143,7 +143,7 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      read write splitter      ********************************************//
 
-    public static <T> ByteBuf write(T struct, TypeReference<?> typeReference) {
+    public static <T> ByteBuf write(T struct, TypeReference<T> typeReference) {
         return new StructSerializer(buffer(), struct, typeReference).toByteBuf();
     }
     public static <T> ByteBuf write(T struct) {
@@ -151,7 +151,7 @@ public final class StructSerializer implements Serializer {
         return new StructSerializer(buffer(), struct, struct.getClass()).toByteBuf();
     }
 
-    public static <T> byte[] writeBytes(T struct, TypeReference<?> typeReference) {
+    public static <T> byte[] writeBytes(T struct, TypeReference<T> typeReference) {
         ByteBuf writeBuf = StructSerializer.write(struct, typeReference);
         try {
             byte[] bytes = new byte[writeBuf.readableBytes()];
@@ -173,7 +173,7 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public static <T> ByteBuffer writeNioBuffer(T struct, TypeReference<?> typeReference) {
+    public static <T> ByteBuffer writeNioBuffer(T struct, TypeReference<T> typeReference) {
         return ByteBuffer.wrap(StructSerializer.writeBytes(struct, typeReference));
     }
 
@@ -181,7 +181,7 @@ public final class StructSerializer implements Serializer {
         return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
     }
 
-    public static <T> void writeStream(T struct, OutputStream outputStream, TypeReference<?> typeReference) throws IOException {
+    public static <T> void writeStream(T struct, OutputStream outputStream, TypeReference<T> typeReference) throws IOException {
         byte[] writeBuf = StructSerializer.writeBytes(struct, typeReference);
         outputStream.write(writeBytes(writeBuf));
     }
