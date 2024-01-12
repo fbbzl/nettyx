@@ -31,7 +31,7 @@ public class Cchar extends CBasic<Byte> {
      * @param value the length
      */
     public Cchar(Object value) {
-        super(((Integer) value).byteValue(), 1);
+        super(value, 1);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Cchar extends CBasic<Byte> {
 
     @Override
     protected ByteBuf toByteBuf(Byte value, int size) {
-        return Unpooled.buffer(size).writeByte( value);
+        return Unpooled.buffer(size).writeByte(value);
     }
 
     @Override
