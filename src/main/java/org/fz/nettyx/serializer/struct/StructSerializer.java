@@ -137,12 +137,13 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      read write splitter      ********************************************//
 
-    public static <T> ByteBuf write(T struct, TypeRef<T> typeReference) {
-        return new StructSerializer(buffer(), struct, typeReference).toByteBuf();
-    }
     public static <T> ByteBuf write(T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
         return new StructSerializer(buffer(), struct, struct.getClass()).toByteBuf();
+    }
+
+    public static <T> ByteBuf write(T struct, TypeRef<T> typeReference) {
+        return new StructSerializer(buffer(), struct, typeReference).toByteBuf();
     }
 
     public static <T> byte[] writeBytes(T struct, TypeRef<T> typeReference) {
