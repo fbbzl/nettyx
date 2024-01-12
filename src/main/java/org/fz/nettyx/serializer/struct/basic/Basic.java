@@ -59,7 +59,7 @@ public abstract class Basic<V> {
      * @param size the size
      * @return byteBuf byte byteBuf
      */
-    protected abstract ByteBuf toByteBuf(Object value, int size);
+    protected abstract ByteBuf toByteBuf(V value, int size);
 
     /**
      * change byteBuf to length
@@ -90,7 +90,7 @@ public abstract class Basic<V> {
         this.bytes = new byte[this.size];
 
         if (this.value != null) {
-            ByteBuf buf = this.toByteBuf(this.value, this.size);
+            ByteBuf buf = this.toByteBuf(this.getValue(), this.size);
             this.fill(buf, this.size);
             buf.readBytes(this.bytes);
             ReferenceCountUtil.release(buf);

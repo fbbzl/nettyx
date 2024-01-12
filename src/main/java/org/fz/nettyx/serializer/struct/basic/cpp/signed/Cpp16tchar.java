@@ -22,8 +22,8 @@ public class Cpp16tchar extends CppBasic<Character> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Character value, int size) {
-        return Unpooled.buffer(getSize()).writeChar(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(getSize()).writeChar((Character) value);
     }
 
     @Override
