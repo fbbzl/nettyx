@@ -19,7 +19,7 @@ public class Culong4 extends Cuint {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Culong4 MAX_VALUE = new Culong4(Long.valueOf(Integer.MAX_VALUE >> 2));
+    public static final Culong4 MAX_VALUE = new Culong4((long) (Integer.MAX_VALUE >> 2));
 
     /**
      * Instantiates a new Culong 4.
