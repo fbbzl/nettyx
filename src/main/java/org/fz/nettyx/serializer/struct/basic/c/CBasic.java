@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public abstract class CBasic<V extends Comparable<V>> extends Basic implements Comparable<CBasic<V>> {
+public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implements Comparable<CBasic<V>> {
 
     private static final boolean C_DEFAULT_SINGED = true;
     private static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
