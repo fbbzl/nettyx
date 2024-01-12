@@ -84,12 +84,15 @@ public abstract class Basic<V> {
     protected Basic(V value, int size) {
         this.size = size;
         this.value = value;
+
         this.bytes = new byte[this.size];
 
-        ByteBuf buf = this.toByteBuf(this.value, this.size);
-        this.fill(buf, this.size);
-        buf.readBytes(this.bytes);
-        ReferenceCountUtil.release(buf);
+        if (this.value != null) {
+            ByteBuf buf = this.toByteBuf(this.value, this.size);
+            this.fill(buf, this.size);
+            buf.readBytes(this.bytes);
+            ReferenceCountUtil.release(buf);
+        }
     }
 
     /**
