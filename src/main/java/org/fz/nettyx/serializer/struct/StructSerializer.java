@@ -167,21 +167,21 @@ public final class StructSerializer implements Serializer {
         }
     }
 
+    public static <T> ByteBuffer writeNioBuffer(T struct) {
+        return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
+    }
+
     public static <T> ByteBuffer writeNioBuffer(T struct, TypeRef<T> typeReference) {
         return ByteBuffer.wrap(StructSerializer.writeBytes(struct, typeReference));
     }
 
-    public static <T> ByteBuffer writeNioBuffer(T struct) {
-        return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
+    public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
+        outputStream.write(writeBytes(struct));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream, TypeRef<T> typeReference)
         throws IOException {
         outputStream.write(writeBytes(struct, typeReference));
-    }
-
-    public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
-        outputStream.write(writeBytes(struct));
     }
 
     /**
