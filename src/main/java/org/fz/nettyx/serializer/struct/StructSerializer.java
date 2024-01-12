@@ -64,7 +64,7 @@ public final class StructSerializer implements Serializer {
 
     public static <T> T read(ByteBuf byteBuf, T struct, TypeReference<T> typeReference) {
         Type type = typeReference.getType();
-
+        System.err.println(type);
         return new StructSerializer(byteBuf, struct).toObject();
     }
 
@@ -80,14 +80,12 @@ public final class StructSerializer implements Serializer {
         return new StructSerializer(byteBuf, struct).toObject();
     }
 
-    /**
-     * convert byteBuf to struct object by class
-     *
-     * @param <T>     the type parameter
-     * @param byteBuf the byte buf
-     * @param clazz   the clazz
-     * @return the t
-     */
+    public static <T> T read(ByteBuf byteBuf, Class<T> clazz, TypeReference<?> typeReference) {
+        Type type = typeReference.getType();
+        System.err.println(type);
+        return read(byteBuf, newStruct(clazz));
+    }
+
     public static <T> T read(ByteBuf byteBuf, Class<T> clazz) {
         return read(byteBuf, newStruct(clazz));
     }
