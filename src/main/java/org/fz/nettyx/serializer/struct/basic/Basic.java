@@ -33,6 +33,11 @@ public abstract class Basic<V> {
 
     private final Object value;
 
+    @SuppressWarnings("unchecked")
+    public V getValue() {
+        return (V) this.value;
+    }
+
     /**
      * Has singed boolean.
      *
