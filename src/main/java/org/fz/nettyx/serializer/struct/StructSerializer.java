@@ -399,7 +399,11 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getStructType() {
-        return (Class<T>) this.struct.getClass();
+        return (Class<T>) this.type;
+    }
+
+    public ParameterizedType getStructParameterizedType() {
+        return (ParameterizedType) this.type;
     }
 
     @Override
