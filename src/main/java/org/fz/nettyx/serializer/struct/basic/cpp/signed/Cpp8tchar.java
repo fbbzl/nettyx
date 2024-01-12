@@ -10,7 +10,7 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
  */
 public class Cpp8tchar extends Cchar {
 
-    public Cpp8tchar(Integer value) {
+    public Cpp8tchar(Object value) {
         super(value);
     }
 
