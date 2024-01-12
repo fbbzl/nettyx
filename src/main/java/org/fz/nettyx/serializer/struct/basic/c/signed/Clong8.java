@@ -42,8 +42,8 @@ public class Clong8 extends CBasic<Long> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value, int size) {
-        return Unpooled.buffer(size).writeLongLE(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(size).writeLongLE((Long) value);
     }
 
     @Override

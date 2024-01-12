@@ -41,8 +41,8 @@ public class Cshort extends CBasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value, int size) {
-        return Unpooled.buffer(size).writeShortLE(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(size).writeShortLE((Short) value);
     }
 
     @Override

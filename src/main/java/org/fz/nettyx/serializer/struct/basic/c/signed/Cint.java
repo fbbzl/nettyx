@@ -42,8 +42,8 @@ public class Cint extends CBasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
-        return Unpooled.buffer(size).writeIntLE(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(size).writeIntLE((Integer) value);
     }
 
     @Override

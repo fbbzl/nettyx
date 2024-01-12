@@ -42,8 +42,8 @@ public class Cdouble extends CBasic<Double> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Double value, int size) {
-        return Unpooled.buffer(size).writeDoubleLE(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(size).writeDoubleLE((Double) value);
     }
 
     @Override
