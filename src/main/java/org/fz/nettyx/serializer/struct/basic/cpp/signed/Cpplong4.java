@@ -19,7 +19,7 @@ public class Cpplong4 extends Cppint {
      */
     public static final Cpplong4 MAX_VALUE = new Cpplong4(Integer.MAX_VALUE);
 
-    public Cpplong4(Integer value) {
+    public Cpplong4(Object value) {
         super(value);
     }
 

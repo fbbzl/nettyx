@@ -20,7 +20,7 @@ public class Cppfloat extends Cfloat {
      */
     public static final Cppfloat MAX_VALUE = new Cppfloat(Float.MAX_VALUE);
 
-    public Cppfloat(Float value) {
+    public Cppfloat(Object value) {
         super(value);
     }
 

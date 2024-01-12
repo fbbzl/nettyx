@@ -20,7 +20,7 @@ public class Cppshort extends Cshort {
      */
     public static final Cppshort MAX_VALUE = new Cppshort(Integer.valueOf(Short.MAX_VALUE));
 
-    public Cppshort(Integer value) {
+    public Cppshort(Object value) {
         super(value);
     }
 
