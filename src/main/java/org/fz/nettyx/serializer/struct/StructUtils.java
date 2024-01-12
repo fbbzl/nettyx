@@ -24,6 +24,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -128,7 +129,8 @@ public class StructUtils {
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
         try {
             if (isBasic(basicClass)) {
-                return ReflectUtil.getConstructor(basicClass, Object.class).newInstance(fieldValue);
+                Constructor<T> constructor = ReflectUtil.getConstructor(basicClass, Object.class);
+                return constructor.newInstance(fieldValue);
             } else {
                 throw new UnsupportedOperationException(
                     "can not create instance of basic type [" + basicClass + "], its not a Basic type");
