@@ -13,12 +13,12 @@ public class Cppshort extends Cshort {
     /**
      * The constant MIN_VALUE.
      */
-    public static final Cppshort MIN_VALUE = new Cppshort(Integer.valueOf(Short.MIN_VALUE));
+    public static final Cppshort MIN_VALUE = new Cppshort((int) Short.MIN_VALUE);
 
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cppshort MAX_VALUE = new Cppshort(Integer.valueOf(Short.MAX_VALUE));
+    public static final Cppshort MAX_VALUE = new Cppshort((int) Short.MAX_VALUE);
 
     public Cppshort(Object value) {
         super(value);
