@@ -89,8 +89,10 @@ public final class StructSerializer implements Serializer {
             System.err.println(parameterizedType);
             return null;
         } else if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
 
         } else if (type instanceof TypeVariable) {
+            TypeVariable typeVariable = (TypeVariable) type;
 
         } else if (type instanceof TypeReference) {
             return read(byteBuf, ((TypeReference<T>) type).getType());
