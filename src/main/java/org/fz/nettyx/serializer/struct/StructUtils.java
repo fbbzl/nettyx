@@ -24,6 +24,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -118,6 +119,33 @@ public class StructUtils {
             return ReflectUtil.getConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
+        }
+    }
+
+    static <T extends Basic<?>> T newBasic(Field basicField, Object fieldValue) {
+        return newBasic((Class<T>) basicField.getType(), fieldValue);
+    }
+
+    public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
+        try {
+            if (isBasic(basicClass)) {
+                Constructor<T> constructor = ReflectUtil.getConstructor(basicClass, Object.class);
+                return constructor.newInstance(fieldValue);
+            } else {
+                throw new UnsupportedOperationException(
+                    "can not create instance of basic type [" + basicClass + "], its not a Basic type");
+            }
+        } catch (InvocationTargetException invocationException) {
+            Throwable cause = invocationException.getCause();
+            if (cause instanceof TooLessBytesException) {
+                throw new SerializeException(cause.getMessage());
+            } else {
+                throw new SerializeException(cause);
+            }
+        } catch (IllegalAccessException | InstantiationException exception) {
+            throw new SerializeException(
+                "new basic [" + basicClass + "] instantiate by value failed..., value is: [" + fieldValue + "]",
+                exception);
         }
     }
 
