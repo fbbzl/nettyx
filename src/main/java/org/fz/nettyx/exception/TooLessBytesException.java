@@ -16,8 +16,8 @@ public class TooLessBytesException extends RuntimeException {
     private final int provideLength;
 
     public TooLessBytesException(int expectLength, int provideLength) {
-        super("bytes missing when doing serialization, field expect bytes length is [" + expectLength + "] but the provided readable bytes length is ["
-            + provideLength + "]");
+        super("bytes missing when doing serialization, field expect bytes length is [" + expectLength
+            + "] but the provided readable bytes length is [" + provideLength + "]");
         this.expectLength = expectLength;
         this.provideLength = provideLength;
     }

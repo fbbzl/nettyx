@@ -14,7 +14,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.List;
-import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
@@ -59,8 +59,7 @@ public @interface ToLinkedList {
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             return ListUtil.toLinkedList(readArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
         }
@@ -74,8 +73,7 @@ public @interface ToLinkedList {
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
             writeArray(list.toArray(), elementType, toLinkedList.size(), writing);

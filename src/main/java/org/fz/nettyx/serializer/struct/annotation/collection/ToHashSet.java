@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
@@ -68,8 +68,7 @@ public @interface ToHashSet {
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             return new HashSet<>(Arrays.asList(readArray(elementType, toHashSet.size(), serializer.getByteBuf())));
         }
@@ -83,8 +82,7 @@ public @interface ToHashSet {
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newHashSet());
             writeArray(set.toArray(), elementType, toHashSet.size(), writing);
