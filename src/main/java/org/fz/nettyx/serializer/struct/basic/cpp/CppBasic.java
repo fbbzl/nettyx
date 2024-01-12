@@ -17,7 +17,6 @@ public abstract class CppBasic<V extends Comparable<V>> extends Basic<V> impleme
     private static final boolean CPP_DEFAULT_SINGED = true;
     private static final ByteOrder CPP_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
 
-
     protected CppBasic(Object value, int size) {
         super(value, size);
     }
@@ -25,7 +24,6 @@ public abstract class CppBasic<V extends Comparable<V>> extends Basic<V> impleme
     protected CppBasic(ByteBuf buf, int size) {
         super(buf, size);
     }
-
 
     @Override
     public boolean hasSinged() {
