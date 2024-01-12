@@ -8,6 +8,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -18,6 +19,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
@@ -58,6 +60,12 @@ public final class StructSerializer implements Serializer {
     StructSerializer(ByteBuf byteBuf, Object struct) {
         this.byteBuf = byteBuf;
         this.struct = struct;
+    }
+
+    public static <T> T read(ByteBuf byteBuf, T struct, TypeReference<T> typeReference) {
+        Type type = typeReference.getType();
+
+        return new StructSerializer(byteBuf, struct).toObject();
     }
 
     /**
@@ -229,10 +237,11 @@ public final class StructSerializer implements Serializer {
                 if (isIgnore(field)) continue;
 
                 if (useReadHandler(field)) fieldValue = readHandled(field, this);
-                else if (isBasic(field))   fieldValue = readBasic(field,  this.getByteBuf());
-                else if (isStruct(field))  fieldValue = readStruct(field, this.getByteBuf());
-                else                       throw new TypeJudgmentException("can not determine field type, field is[" + field + "]");
-
+                else
+                if (isBasic(field))        fieldValue = readBasic(field,  this.getByteBuf());
+                else
+                if (isStruct(field))       fieldValue = readStruct(field, this.getByteBuf());
+                else                       throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
             }
             catch (Exception exception) { throw new SerializeException("field read exception, field is[" + field + "]", exception); }
@@ -257,8 +266,7 @@ public final class StructSerializer implements Serializer {
                 if (isBasic(field))         writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newBasic(field, buffer())), this.getByteBuf());
                 else
                 if (isStruct(field))        writeStruct(defaultIfNull(fieldValue, () -> StructUtils.newStruct(field)), this.getByteBuf());
-
-                else throw new TypeJudgmentException("can not determine field type, field is [" + field + "]");
+                else throw new TypeJudgmentException(field);
             } catch (Exception exception) {
                 throw new SerializeException("field write exception, field [" + field + "]", exception);
             }

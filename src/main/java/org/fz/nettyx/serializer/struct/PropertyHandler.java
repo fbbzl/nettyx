@@ -109,7 +109,7 @@ public interface PropertyHandler<A extends Annotation> {
             if (isBasic(field))  return readBasic(field, serializer.getByteBuf());
             if (isStruct(field)) return readStruct(field, serializer.getByteBuf());
 
-            throw new TypeJudgmentException("can not determine field type, field is[" + field + "]");
+            throw new TypeJudgmentException(field);
         }
 
         default void preReadHandle(StructSerializer serializer, Field field, A annotation) {
@@ -145,7 +145,7 @@ public interface PropertyHandler<A extends Annotation> {
             if (isBasic(field))  writeBasic((Basic<?>) defaultIfNull(value, () -> StructUtils.newBasic(field, buffer())), writing);
             if (isStruct(field)) writeStruct(defaultIfNull(value, () -> StructUtils.newStruct(field)), writing);
 
-            else throw new TypeJudgmentException("can not determine field type, field is [" + field + "]");
+            else throw new TypeJudgmentException(field);
         }
 
         default void preWriteHandle(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {

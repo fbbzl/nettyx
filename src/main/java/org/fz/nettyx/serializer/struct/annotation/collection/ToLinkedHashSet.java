@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
@@ -60,8 +60,7 @@ public @interface ToLinkedHashSet {
             Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
                 ? toLinkedHashSet.elementType() : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             return newHashSet(Arrays.asList(readArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
         }
@@ -74,8 +73,7 @@ public @interface ToLinkedHashSet {
             Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
                 ? toLinkedHashSet.elementType() : elementType;
 
-            Throws.ifTrue(elementType == Object.class,
-                new TypeJudgmentException("can not determine field [" + field + "] parameterized type"));
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newLinkedHashSet());
             writeArray(set.toArray(), elementType, toLinkedHashSet.size(), writing);
