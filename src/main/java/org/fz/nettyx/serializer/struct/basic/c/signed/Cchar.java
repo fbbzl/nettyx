@@ -44,8 +44,8 @@ public class Cchar extends CBasic<Byte> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Byte value, int size) {
-        return Unpooled.buffer(size).writeByte(value);
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(size).writeByte((Byte)value);
     }
 
     @Override

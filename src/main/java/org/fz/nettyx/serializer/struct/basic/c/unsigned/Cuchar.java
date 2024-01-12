@@ -49,8 +49,8 @@ public class Cuchar extends CBasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value, int size) {
-        return Unpooled.buffer(size).writeByte(value.byteValue());
+    protected ByteBuf toByteBuf(Object value, int size) {
+        return Unpooled.buffer(size).writeByte(((Short) value).byteValue());
     }
 
     @Override
