@@ -128,7 +128,7 @@ public class StructUtils {
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
         try {
             if (isBasic(basicClass)) return ReflectUtil.getConstructor(basicClass, Object.class).newInstance(fieldValue);
-             else                    throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
+            else                    throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
         } catch (InvocationTargetException invocationException) {
             Throwable cause = invocationException.getCause();
             if (cause instanceof TooLessBytesException) {

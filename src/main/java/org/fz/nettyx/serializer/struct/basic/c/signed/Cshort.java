@@ -28,7 +28,13 @@ public class Cshort extends CBasic<Short> {
      * @param value the length
      */
     public Cshort(Object value) {
-        super(((Integer) value).shortValue(), 2);
+        super(value, 2);
+    }
+
+    @Override
+    public Short getValue() {
+        Number value = super.getValue();
+        return value.shortValue();
     }
 
     /**
