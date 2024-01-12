@@ -64,7 +64,7 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<String>> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), User.class, new TypeReference<User<Son<String>>>(){});
+            User<Son<String>, Wife> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), new TypeReference<User<Son<String>, Wife>>(){});
             System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
@@ -121,7 +121,7 @@ public class TypedSerializerTest {
     @Getter
     @Setter
     @Struct
-    public static class User<T> {
+    public static class User<T, W> {
 
         private Clong4 uid;
         private Cchar uname;
@@ -167,7 +167,7 @@ public class TypedSerializerTest {
         @ToArray(length = 2)
         private Cchar[] loginNames;
         @ToArrayList(elementType = Wife.class, size = 2)
-        private List<Wife> wifes;
+        private List<W> wifes;
         @ToHashSet(elementType = Son.class, size = 1)
         private Set<T> sons;
 
