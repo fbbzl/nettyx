@@ -38,8 +38,10 @@ import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.ReflectUtils;
 import org.fz.nettyx.util.Throws;
 import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
+
 
 /**
  * The type Struct utils.
@@ -165,7 +167,7 @@ public class StructUtils {
      */
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, ByteBuf buf) {
         try {
-            if (isBasic(basicClass)) return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
+            if (isBasic(basicClass)) return ReflectUtils.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
             else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
         }
         catch (InvocationTargetException invocationException) {
@@ -199,7 +201,7 @@ public class StructUtils {
      */
     public static <T> T newStruct(Class<T> structClass) {
         try {
-            if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
+            if (isStruct(structClass)) return ReflectUtils.getConstructor(structClass).newInstance();
             else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
