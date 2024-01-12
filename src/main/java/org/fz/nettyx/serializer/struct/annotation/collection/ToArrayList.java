@@ -13,6 +13,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
@@ -55,6 +56,8 @@ public @interface ToArrayList {
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             StructUtils.checkAssignable(field, List.class);
 
+            ParameterizedType structParameterizedType = serializer.getStructParameterizedType();
+            System.err.println(structParameterizedType);
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toArrayList.elementType()
                     : elementType;
