@@ -14,7 +14,7 @@ public class Cpp32tchar extends CppBasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 
-    public Cpp32tchar(Integer value) {
+    public Cpp32tchar(Object value) {
         super(value, 4);
     }
 
@@ -23,8 +23,8 @@ public class Cpp32tchar extends CppBasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(getSize()).writeIntLE((Integer) value);
+    protected ByteBuf toByteBuf(Integer value, int size) {
+        return Unpooled.buffer(getSize()).writeIntLE(value);
     }
 
     @Override
