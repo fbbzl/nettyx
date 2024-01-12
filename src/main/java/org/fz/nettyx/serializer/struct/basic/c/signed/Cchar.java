@@ -31,7 +31,7 @@ public class Cchar extends CBasic<Byte> {
      * @param value the length
      */
     public Cchar(Object value) {
-        super(value, 1);
+        super(((Integer) value).byteValue(), 1);
     }
 
     /**
