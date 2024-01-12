@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
@@ -192,7 +191,7 @@ public @interface ToArray {
          */
         private static void writeBasicArray(Basic<?>[] basicArray, Class<Basic<?>> basicType, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
-                writingBuf.writeBytes(defaultIfNull(basic, () -> newBasic(basicType, buffer())).getBytes());
+                writingBuf.writeBytes(defaultIfNull(basic, () -> newBasic(basicType, (Object) null)).getBytes());
             }
         }
 
