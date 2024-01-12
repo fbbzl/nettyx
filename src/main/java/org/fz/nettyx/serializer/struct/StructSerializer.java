@@ -415,6 +415,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public Map<Type, Type> getStructParameterizedTypeMap() {
+        // TODO
         if (this.type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) this.type;
             Map<Type, Type> typeMap = TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
