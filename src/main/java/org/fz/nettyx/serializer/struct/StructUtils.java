@@ -121,39 +121,55 @@ public class StructUtils {
         }
     }
 
-    /**
-     * New basic instance t.
-     *
-     * @param <T> the type parameter
-     * @param basicField the basic field
-     * @param buf the buf
-     * @return the t
-     */
+    static <T extends Basic<?>> T newBasic(Field basicField, Object fieldValue) {
+        return newBasic((Class<T>) basicField.getType(), fieldValue);
+    }
+
+    public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
+        try {
+            if (isBasic(basicClass)) {
+                return ReflectUtil.getConstructor(basicClass, Object.class).newInstance(fieldValue);
+            } else {
+                throw new UnsupportedOperationException(
+                    "can not create instance of basic type [" + basicClass + "], its not a Basic type");
+            }
+        } catch (InvocationTargetException invocationException) {
+            Throwable cause = invocationException.getCause();
+            if (cause instanceof TooLessBytesException) {
+                throw new SerializeException(cause.getMessage());
+            } else {
+                throw new SerializeException(cause);
+            }
+        } catch (IllegalAccessException | InstantiationException exception) {
+            throw new SerializeException(
+                "new basic [" + basicClass + "] instantiate by value failed..., value is: [" + fieldValue + "]",
+                exception);
+        }
+    }
+
     static <T extends Basic<?>> T newBasic(Field basicField, ByteBuf buf) {
         return newBasic((Class<T>) basicField.getType(), buf);
     }
 
-    /**
-     * New basic instance t.
-     *
-     * @param <T> the type parameter
-     * @param basicClass the basic class
-     * @param buf the buf
-     * @return the t
-     */
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, ByteBuf buf) {
         try {
-            if (isBasic(basicClass)) return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
-            else                     throw new UnsupportedOperationException("can not create instance of basic type [" + basicClass + "], its not a Basic type");
-        }
-        catch (InvocationTargetException invocationException) {
+            if (isBasic(basicClass)) {
+                return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
+            } else {
+                throw new UnsupportedOperationException(
+                    "can not create instance of basic type [" + basicClass + "], its not a Basic type");
+            }
+        } catch (InvocationTargetException invocationException) {
             Throwable cause = invocationException.getCause();
-            if (cause instanceof TooLessBytesException) throw new SerializeException(cause.getMessage());
-            else                                        throw new SerializeException(cause);
-        }
-        catch (IllegalAccessException | InstantiationException exception) {
+            if (cause instanceof TooLessBytesException) {
+                throw new SerializeException(cause.getMessage());
+            } else {
+                throw new SerializeException(cause);
+            }
+        } catch (IllegalAccessException | InstantiationException exception) {
             throw new SerializeException(
-                "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", exception);
+                "new basic [" + basicClass + "] instantiate by buffer failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]",
+                exception);
         }
     }
 
