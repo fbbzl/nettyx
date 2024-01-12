@@ -20,14 +20,15 @@ public class Culonglong extends Culong8 {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Culonglong MAX_VALUE = new Culonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
+    public static final Culonglong MAX_VALUE = new Culonglong(
+        BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
 
     /**
      * Instantiates a new Culonglong.
      *
      * @param value the length
      */
-    public Culonglong(BigInteger value) {
+    public Culonglong(Object value) {
         super(value);
     }
 

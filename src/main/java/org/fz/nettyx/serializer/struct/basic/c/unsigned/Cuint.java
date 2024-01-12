@@ -21,14 +21,14 @@ public class Cuint extends CBasic<Long> {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cuint MAX_VALUE = new Cuint(Long.valueOf(Integer.MAX_VALUE >> 2));
+    public static final Cuint MAX_VALUE = new Cuint((long) (Integer.MAX_VALUE >> 2));
 
     /**
      * Instantiates a new Cuint.
      *
      * @param value the length
      */
-    public Cuint(Long value) {
+    public Cuint(Object value) {
         super(value, 4);
     }
 

@@ -19,9 +19,9 @@ public class Cppulong4 extends Cppuint {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cppulong4 MAX_VALUE = new Cppulong4(Long.valueOf(Integer.MAX_VALUE >> 2));
+    public static final Cppulong4 MAX_VALUE = new Cppulong4((long) (Integer.MAX_VALUE >> 2));
 
-    public Cppulong4(Long value) {
+    public Cppulong4(Object value) {
         super(value);
     }
 

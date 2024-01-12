@@ -31,7 +31,7 @@ public class Culong8 extends CBasic<BigInteger> {
      *
      * @param value the length
      */
-    public Culong8(BigInteger value) {
+    public Culong8(Object value) {
         super(value, 8);
     }
 
@@ -51,7 +51,7 @@ public class Culong8 extends CBasic<BigInteger> {
 
     @Override
     protected ByteBuf toByteBuf(BigInteger value, int size) {
-        byte[] bytes = PrimitiveArrayUtil.reverse(value.toByteArray());
+        byte[] bytes = PrimitiveArrayUtil.reverse((value).toByteArray());
         return Unpooled.buffer(size).writeBytes(bytes);
     }
 
