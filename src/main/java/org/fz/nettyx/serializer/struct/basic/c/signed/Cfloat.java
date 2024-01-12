@@ -42,8 +42,8 @@ public class Cfloat extends CBasic<Float> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(size).writeFloatLE((Float) value);
+    protected ByteBuf toByteBuf(Float value, int size) {
+        return Unpooled.buffer(size).writeFloatLE(value);
     }
 
     @Override

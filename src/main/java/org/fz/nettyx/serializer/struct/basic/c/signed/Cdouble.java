@@ -28,7 +28,7 @@ public class Cdouble extends CBasic<Double> {
      *
      * @param value the length
      */
-    public Cdouble(Double value) {
+    public Cdouble(Object value) {
         super(value, 8);
     }
 
@@ -42,8 +42,8 @@ public class Cdouble extends CBasic<Double> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Object value, int size) {
-        return Unpooled.buffer(size).writeDoubleLE((Double) value);
+    protected ByteBuf toByteBuf(Double value, int size) {
+        return Unpooled.buffer(size).writeDoubleLE(value);
     }
 
     @Override
