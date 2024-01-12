@@ -18,7 +18,7 @@ import org.fz.nettyx.util.Throws;
  * @since 2021 /10/22 13:26
  */
 @Getter
-public abstract class Basic {
+public abstract class Basic<V> {
 
     /**
      * byte size
@@ -62,7 +62,7 @@ public abstract class Basic {
      * @param byteBuf bytebuf of field
      * @return length v
      */
-    protected abstract Object toValue(ByteBuf byteBuf);
+    protected abstract V toValue(ByteBuf byteBuf);
 
     public ByteBuf getByteBuf() {
         return Unpooled.wrappedBuffer(this.getBytes());
