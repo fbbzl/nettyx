@@ -8,6 +8,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -21,8 +22,6 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
 import java.nio.ByteBuffer;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
@@ -80,30 +79,19 @@ public final class StructSerializer implements Serializer {
     public static <T> T read(ByteBuf byteBuf, Type type) {
         if (type instanceof Class<?>) {
             Class<T> clazz = (Class<T>) type;
-            Throws.ifTrue(clazz.isArray() || clazz.isEnum() || clazz.isPrimitive(),
-                "un support type [" + type + "], please check");
+            Throws.ifFalse(BeanUtil.isBean(clazz), new TypeJudgmentException(type));
+
             return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
-        }
-        else if (type instanceof ParameterizedType) {
+        } else if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Class<T> structType = (Class<T>) parameterizedType.getRawType();
 
             return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
-        }
-        else if (type instanceof TypeReference) {
+        } else if (type instanceof TypeReference) {
             return read(byteBuf, ((TypeReference<T>) type).getType());
+        } else {
+            throw new TypeJudgmentException(type);
         }
-        else if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
-
-            return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
-        }
-        else if (type instanceof TypeVariable) {
-            TypeVariable typeVariable = (TypeVariable) type;
-            return null;
-        }
-
-        return null;
     }
 
     public static <T> T read(byte[] bytes, TypeRef<T> typeReference) {
