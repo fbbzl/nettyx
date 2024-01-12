@@ -129,7 +129,8 @@ public class StructUtils {
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
         try {
             if (isBasic(basicClass)) {
-                Constructor<T> constructor = ReflectUtil.getConstructor(basicClass, Object.class);
+                Constructor<T> constructor = ReflectUtil.getConstructor(basicClass, );
+                constructor.
                 return constructor.newInstance(fieldValue);
             } else {
                 throw new UnsupportedOperationException(

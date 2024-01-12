@@ -13,13 +13,12 @@ import org.fz.nettyx.util.Throws;
 /**
  * The type Basic. The specific implementation can be enhanced
  *
- * @param <V> the type parameter, may be the java type
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /10/22 13:26
  */
 @Getter
-public abstract class Basic<V> {
+public abstract class Basic {
 
     /**
      * byte size
@@ -34,7 +33,7 @@ public abstract class Basic<V> {
     /**
      * the Java length
      */
-    private final V value;
+    private final Object value;
 
     /**
      * Has singed boolean.
@@ -50,22 +49,9 @@ public abstract class Basic<V> {
      */
     public abstract ByteOrder order();
 
-    /**
-     * change length to byteBuf
-     *
-     * @param value length
-     * @param size the size
-     * @return byteBuf byte byteBuf
-     */
-    protected abstract ByteBuf toByteBuf(V value, int size);
+    protected abstract ByteBuf toByteBuf(Object value, int size);
 
-    /**
-     * change byteBuf to length
-     *
-     * @param byteBuf bytebuf of field
-     * @return length v
-     */
-    protected abstract V toValue(ByteBuf byteBuf);
+    protected abstract <V> V toValue(ByteBuf byteBuf);
 
     public ByteBuf getByteBuf() {
         return Unpooled.wrappedBuffer(this.getBytes());
@@ -75,13 +61,7 @@ public abstract class Basic<V> {
         return ByteBuffer.wrap(this.getBytes());
     }
 
-    /**
-     * Instantiates a new Basic.
-     *
-     * @param value the length
-     * @param size the size
-     */
-    protected Basic(V value, int size) {
+    protected Basic(Object value, int size) {
         this.size = size;
         this.value = value;
 
