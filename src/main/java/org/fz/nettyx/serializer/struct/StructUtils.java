@@ -127,26 +127,15 @@ public class StructUtils {
     }
 
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
-        try {
-            if (isBasic(basicClass)) {
-                Constructor<T> constructor = ReflectUtil.getConstructor(basicClass, );
-                constructor.
-                return constructor.newInstance(fieldValue);
-            } else {
-                throw new UnsupportedOperationException(
-                    "can not create instance of basic type [" + basicClass + "], its not a Basic type");
-            }
-        } catch (InvocationTargetException invocationException) {
-            Throwable cause = invocationException.getCause();
-            if (cause instanceof TooLessBytesException) {
-                throw new SerializeException(cause.getMessage());
-            } else {
-                throw new SerializeException(cause);
-            }
-        } catch (IllegalAccessException | InstantiationException exception) {
-            throw new SerializeException(
-                "new basic [" + basicClass + "] instantiate by value failed..., value is: [" + fieldValue + "]",
-                exception);
+        if (isBasic(basicClass)) {
+            Constructor<T>[] constructors = ReflectUtil.getConstructors(basicClass);
+
+            System.err.println(constructors);
+           // return constructor.newInstance(fieldValue);
+            return null;
+        } else {
+            throw new UnsupportedOperationException(
+                "can not create instance of basic type [" + basicClass + "], its not a Basic type");
         }
     }
 
