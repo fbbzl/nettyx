@@ -1,4 +1,6 @@
+import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -62,8 +64,8 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-//            User<Son<String>> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), User.class, new TypeReference<User<Son<String>>>(){});
-//            System.err.println(user);
+            User<Son<String>> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), User.class, new TypeReference<User<Son<String>>>(){});
+            System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
 //            user.setUname(null);
