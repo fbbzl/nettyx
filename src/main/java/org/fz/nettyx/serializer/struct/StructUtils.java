@@ -128,10 +128,10 @@ public class StructUtils {
 
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
         if (isBasic(basicClass)) {
-            Constructor<T>[] constructors = ReflectUtil.getConstructors(basicClass);
-            //TODO
-            System.err.println(constructors);
-           // return constructor.newInstance(fieldValue);return null;
+            Constructor<T> constructor = ReflectUtil.getConstructor(basicClass, Object.class);
+
+            System.err.println(constructor);
+            return constructor.newInstance(fieldValue);
         } else {
             throw new UnsupportedOperationException(
                 "can not create instance of basic type [" + basicClass + "], its not a Basic type");
