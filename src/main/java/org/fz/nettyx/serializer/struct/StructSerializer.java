@@ -399,7 +399,17 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getStructType() {
-        return (Class<T>) this.struct.getClass();
+        if (this.type instanceof Class<?>) {
+            return (Class<T>) this.type;
+        }
+        throw new TypeJudgmentException(this.type);
+    }
+
+    public ParameterizedType getStructParameterizedType() {
+        if (this.type instanceof ParameterizedType) {
+            return (ParameterizedType) this.type;
+        }
+        throw new TypeJudgmentException(this.type);
     }
 
     @Override
