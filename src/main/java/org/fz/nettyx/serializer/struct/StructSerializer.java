@@ -195,8 +195,9 @@ public final class StructSerializer implements Serializer {
                 if (isStruct(field))       fieldValue = readStruct(field, this.getByteBuf());
                 else                       throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
+            } catch (Exception exception) {
+                throw new SerializeException("field read exception, field is[" + field + "]", exception);
             }
-            catch (Exception exception) { throw new SerializeException("field read exception, field is[" + field + "]", exception); }
         }
         return (T) struct;
     }
