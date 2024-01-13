@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.cpp.CppBasic;
  */
 public class Cpp16tchar extends CppBasic<Character> {
 
-    public Cpp16tchar(Object value) {
+    public Cpp16tchar(Character value) {
         super(value, 2);
     }
 

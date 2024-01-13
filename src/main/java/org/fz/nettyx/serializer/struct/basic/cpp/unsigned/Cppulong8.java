@@ -23,7 +23,7 @@ public class Cppulong8 extends Culong8 {
      */
     public static final Cppulong8 MAX_VALUE = new Cppulong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
 
-    public Cppulong8(Object value) {
+    public Cppulong8(BigInteger value) {
         super(value);
     }
 

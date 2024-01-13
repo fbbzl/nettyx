@@ -28,7 +28,7 @@ public class Cushort extends CBasic<Integer> {
      *
      * @param value the length
      */
-    public Cushort(Object value) {
+    public Cushort(Integer value) {
         super(value, 2);
     }
 
