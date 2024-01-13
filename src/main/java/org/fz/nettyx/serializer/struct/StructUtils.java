@@ -128,7 +128,7 @@ public class StructUtils {
     }
 
     static <T extends Basic<?>> T newEmptyBasic(Field basicField) {
-        return newBasic((Class<T>) basicField.getType(), (Object) null);
+        return newBasic((Class<T>) basicField.getType(), 0);
     }
 
     static <T extends Basic<?>> T newBasic(Field basicField, Object fieldValue) {
