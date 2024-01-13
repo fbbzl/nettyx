@@ -21,10 +21,11 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
-import java.util.Map;
+import lombok.Getter;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -35,7 +36,7 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
-import org.fz.nettyx.util.TypeRef;
+import org.fz.nettyx.util.TypeRefer;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -50,11 +51,13 @@ public final class StructSerializer implements Serializer {
     /**
      * byteBuf ready for serialization/deserialization
      */
+    @Getter
     private final ByteBuf byteBuf;
 
     /**
      * type of struct
      */
+    @Getter
     private final Type type;
 
     /**
@@ -74,46 +77,38 @@ public final class StructSerializer implements Serializer {
         this.type = type;
     }
 
-    public static <T> T read(ByteBuf byteBuf, TypeRef<T> typeReference) {
-        return read(byteBuf, typeReference.getType());
-    }
-
     public static <T> T read(ByteBuf byteBuf, Type type) {
         if (type instanceof Class<?>) {
             Class<T> clazz = (Class<T>) type;
             Throws.ifFalse(BeanUtil.isBean(clazz), new TypeJudgmentException(type));
 
             return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
-        } else if (type instanceof ParameterizedType) {
+        }
+        else
+        if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Class<T> structType = (Class<T>) parameterizedType.getRawType();
 
             return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
-        } else if (type instanceof TypeReference) {
-            return read(byteBuf, ((TypeReference<T>) type).getType());
-        } else {
-            throw new TypeJudgmentException(type);
         }
-    }
-
-    public static <T> T read(byte[] bytes, TypeRef<T> typeReference) {
-        return read(bytes, typeReference.getType());
+        else
+        if (type instanceof TypeRefer) {
+            return read(byteBuf, ((TypeRefer<T>) type).getType());
+        }
+        // also support hutool
+        else
+        if (type instanceof TypeReference) {
+            return read(byteBuf, ((TypeReference<T>) type).getType());
+        }
+        else throw new TypeJudgmentException(type);
     }
 
     public static <T> T read(byte[] bytes, Type type) {
         return read(Unpooled.wrappedBuffer(bytes), type);
     }
 
-    public static <T> T read(ByteBuffer byteBuffer, TypeRef<T> typeReference) {
-        return read(byteBuffer, typeReference.getType());
-    }
-
     public static <T> T read(ByteBuffer byteBuffer, Type type) {
         return read(Unpooled.wrappedBuffer(byteBuffer), type);
-    }
-
-    public static <T> T read(InputStream inputStream, TypeRef<T> typeReference) throws IOException {
-        return read(inputStream, typeReference.getType());
     }
 
     public static <T> T read(InputStream is, Type type) throws IOException {
@@ -127,24 +122,9 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      read write splitter      ********************************************//
 
-    public static <T> ByteBuf write(T struct, TypeRef<T> typeReference) {
-        return new StructSerializer(buffer(), struct, typeReference).toByteBuf();
-    }
-
     public static <T> ByteBuf write(T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
         return new StructSerializer(buffer(), struct, struct.getClass()).toByteBuf();
-    }
-
-    public static <T> byte[] writeBytes(T struct, TypeRef<T> typeReference) {
-        ByteBuf writeBuf = StructSerializer.write(struct, typeReference);
-        try {
-            byte[] bytes = new byte[writeBuf.readableBytes()];
-            writeBuf.readBytes(bytes);
-            return bytes;
-        } finally {
-            ReferenceCountUtil.release(writeBuf);
-        }
     }
 
     public static <T> byte[] writeBytes(T struct) {
@@ -158,22 +138,15 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public static <T> ByteBuffer writeNioBuffer(T struct, TypeRef<T> typeReference) {
-        return ByteBuffer.wrap(StructSerializer.writeBytes(struct, typeReference));
-    }
-
     public static <T> ByteBuffer writeNioBuffer(T struct) {
         return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
-    }
-
-    public static <T> void writeStream(T struct, OutputStream outputStream, TypeRef<T> typeReference)
-        throws IOException {
-        outputStream.write(writeBytes(struct, typeReference));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
         outputStream.write(writeBytes(struct));
     }
+
+    //*************************************      working code splitter      ******************************************//
 
     /**
      * parse ByteBuf to Object
@@ -392,8 +365,9 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * this is a  useful method that sometimes you may read the field value before current field value, if so
-     * you can get the serializing struct object by this method
+     * this is a  useful method that sometimes you may read the field value before current field value, if so you can
+     * get the serializing struct object by this method
+     *
      * @param <T> the type parameter
      * @return the t
      */
@@ -405,42 +379,34 @@ public final class StructSerializer implements Serializer {
         if (this.type instanceof Class<?>) {
             return (Class<T>) this.type;
         } else if (this.type instanceof ParameterizedType) {
-            return (Class<T>) getStructParameterizedType().getOwnerType();
+            return (Class<T>) ((ParameterizedType) this.type).getRawType();
         }
         throw new TypeJudgmentException(this.type);
     }
 
-    public ParameterizedType getStructParameterizedType() {
+    public <T> Class<T> getFieldActualType(Field field) {
+        Type fieldType = TypeUtil.getType(field);
+        // If it's a Class, it means that no generics are specified
+        if (fieldType instanceof Class<?>) {
+            return (Class<T>) Object.class;
+        }
+        else
         if (this.type instanceof ParameterizedType) {
-            return (ParameterizedType) this.type;
+            Type actualType = TypeUtil.getActualType(this.type, field);
+            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
+            if (actualTypeArguments.length == 0) return (Class<T>) Object.class;
+
+            return (Class<T>) actualTypeArguments[0];
         }
-        throw new TypeJudgmentException(this.type);
+        return (Class<T>) Object.class;
     }
 
-    public Map<Type, Type> getStructParameterizedTypeMap() {
-        // TODO
+    public <T> Class<T> getArrayFieldActualType(Field field) {
         if (this.type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) this.type;
-            Map<Type, Type> typeMap = TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
-
-            return TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+            GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.type, field);
+            return (Class<T>) TypeUtil.getActualType(this.type, actualType.getGenericComponentType());
         }
-        throw new TypeJudgmentException(this.type);
-    }
-
-    @Override
-    public ByteBuf getByteBuf() {
-        return this.byteBuf;
-    }
-
-    /**
-     * Take byte buf byte buf.
-     *
-     * @param length the take length
-     * @return the byte buf
-     */
-    public ByteBuf readBytes(int length) {
-        return getByteBuf().readBytes(length);
+        return (Class<T>) Object.class;
     }
 
     //******************************************      public end       ***********************************************//

@@ -5,8 +5,8 @@ import static cn.hutool.core.collection.CollUtil.newLinkedHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.readStructArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.writeStructArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -19,7 +19,6 @@ import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -55,28 +54,26 @@ public @interface ToLinkedHashSet {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedHashSet toLinkedHashSet) {
-            StructUtils.checkAssignable(field, Set.class);
-
-            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
-                ? toLinkedHashSet.elementType() : elementType;
+            Class<?> elementType =
+                (elementType = toLinkedHashSet.elementType()) == Object.class ? serializer.getFieldActualType(field)
+                    : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newHashSet(Arrays.asList(readArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
+            return newHashSet(Arrays.asList(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedHashSet toLinkedHashSet,
             ByteBuf writing) {
-            StructUtils.checkAssignable(field, Set.class);
-
-            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class
-                ? toLinkedHashSet.elementType() : elementType;
+            Class<?> elementType =
+                (elementType = toLinkedHashSet.elementType()) == Object.class ? serializer.getFieldActualType(field)
+                    : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newLinkedHashSet());
-            writeArray(set.toArray(), elementType, toLinkedHashSet.size(), writing);
+            writeStructArray(set.toArray(), elementType, toLinkedHashSet.size(), writing);
         }
 
     }
