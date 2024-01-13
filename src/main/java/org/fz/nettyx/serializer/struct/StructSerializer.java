@@ -195,8 +195,9 @@ public final class StructSerializer implements Serializer {
                 if (isStruct(field))       fieldValue = readStruct(field, this.getByteBuf());
                 else                       throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
+            } catch (Exception exception) {
+                throw new SerializeException("field read exception, field is[" + field + "]", exception);
             }
-            catch (Exception exception) { throw new SerializeException("field read exception, field is[" + field + "]", exception); }
         }
         return (T) struct;
     }
@@ -215,7 +216,7 @@ public final class StructSerializer implements Serializer {
 
                 if (useWriteHandler(field)) writeHandled(field, fieldValue, this);
                 else
-                if (isBasic(field))         writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newBasic(field, fieldValue)), this.getByteBuf());
+                if (isBasic(field))         writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newEmptyBasic(field)), this.getByteBuf());
                 else
                 if (isStruct(field))        writeStruct(defaultIfNull(fieldValue, () -> StructUtils.newStruct(field)), this.getByteBuf());
                 else throw new TypeJudgmentException(field);

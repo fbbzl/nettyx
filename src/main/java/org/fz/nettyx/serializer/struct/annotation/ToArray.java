@@ -16,7 +16,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
@@ -192,7 +191,7 @@ public @interface ToArray {
          */
         private static void writeBasicArray(Basic<?>[] basicArray, Class<Basic<?>> basicType, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
-                writingBuf.writeBytes(defaultIfNull(basic, () -> StructUtils.newEmptyBasic(basicType, (Object) null)).getBytes());
+                writingBuf.writeBytes(defaultIfNull(basic, () -> newBasic(basicType, (Object) null)).getBytes());
             }
         }
 
