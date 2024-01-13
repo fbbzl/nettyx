@@ -23,7 +23,7 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implement
      * @param value the length
      * @param size the size
      */
-    protected CBasic(Object value, int size) {
+    protected CBasic(V value, int size) {
         super(value, size);
     }
 
