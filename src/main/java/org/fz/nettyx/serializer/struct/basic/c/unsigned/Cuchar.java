@@ -30,14 +30,8 @@ public class Cuchar extends CBasic<Short> {
      *
      * @param value the length
      */
-    public Cuchar(Object value) {
-        super(value, 1);
-    }
-
-    @Override
-    public Short getValue() {
-        Number value = super.getValue();
-        return value.shortValue();
+    public Cuchar(Integer value) {
+        super(value.shortValue(), 1);
     }
 
     /**

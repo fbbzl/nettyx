@@ -21,7 +21,7 @@ public class Cppint extends Cint {
      */
     public static final Cppint MAX_VALUE = new Cppint(Integer.MAX_VALUE);
 
-    public Cppint(Object value) {
+    public Cppint(Integer value) {
         super(value);
     }
 

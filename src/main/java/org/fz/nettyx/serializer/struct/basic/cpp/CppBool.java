@@ -15,7 +15,7 @@ public class CppBool extends CppBasic<Boolean> {
     private static final CppBool CPP_TRUE = new CppBool(true);
     private static final CppBool CPP_FALSE = new CppBool(false);
 
-    public CppBool(Object value) {
+    public CppBool(Boolean value) {
         super(value, 1);
     }
 

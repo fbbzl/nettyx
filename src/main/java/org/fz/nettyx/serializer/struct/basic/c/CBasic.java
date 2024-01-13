@@ -20,6 +20,7 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implement
 
     /**
      * Instantiates a new C basic.
+     *
      * @param value the length
      * @param size the size
      */

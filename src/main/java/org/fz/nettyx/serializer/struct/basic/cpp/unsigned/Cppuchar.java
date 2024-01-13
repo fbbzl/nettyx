@@ -21,7 +21,7 @@ public class Cppuchar extends Cuchar {
      */
     public static final Cppuchar MAX_VALUE = new Cppuchar(Byte.MAX_VALUE >> 2);
 
-    public Cppuchar(Object value) {
+    public Cppuchar(Integer value) {
         super(value);
     }
 

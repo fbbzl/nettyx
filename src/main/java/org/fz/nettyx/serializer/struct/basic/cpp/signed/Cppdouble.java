@@ -20,7 +20,7 @@ public class Cppdouble extends Cdouble {
      */
     public static final Cppdouble MAX_VALUE = new Cppdouble(Double.MAX_VALUE);
 
-    public Cppdouble(Object value) {
+    public Cppdouble(Double value) {
         super(value);
     }
 

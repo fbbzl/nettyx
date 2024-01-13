@@ -14,7 +14,7 @@ public class Cpp32tchar extends CppBasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 
-    public Cpp32tchar(Object value) {
+    public Cpp32tchar(Integer value) {
         super(value, 4);
     }
 

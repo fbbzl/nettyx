@@ -28,7 +28,7 @@ public class Cdouble extends CBasic<Double> {
      *
      * @param value the length
      */
-    public Cdouble(Object value) {
+    public Cdouble(Double value) {
         super(value, 8);
     }
 
