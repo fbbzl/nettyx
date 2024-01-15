@@ -132,7 +132,7 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
-        BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(bc -> {
+        byte[] emptyBytes = new byte[BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(bc -> {
             Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) bc,
                 c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
 
@@ -146,9 +146,9 @@ public class StructUtils {
             fillingBuf.skipBytes(fillingBuf.readableBytes());
             fillingBuf.release();
             return size;
-        }));
+        }))];
 
-        return newBasic(basicClass, Unpooled.EMPTY_BUFFER);
+        return newBasic(basicClass, Unpooled.wrappedBuffer(emptyBytes));
     }
 
     /**
