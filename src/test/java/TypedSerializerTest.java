@@ -1,3 +1,4 @@
+import com.sun.xml.internal.bind.v2.model.core.TypeRef;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
@@ -46,7 +47,6 @@ import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulong8;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulonglong;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 import org.fz.nettyx.util.HexBins;
-import org.fz.nettyx.util.TypeRef;
 
 /**
  * @author fengbinbin
