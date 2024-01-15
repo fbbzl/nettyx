@@ -79,16 +79,19 @@ public final class StructSerializer implements Serializer {
             Throws.ifFalse(BeanUtil.isBean(clazz), new TypeJudgmentException(type));
 
             return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
-        } else if (type instanceof ParameterizedType) {
+        }
+        else
+        if (type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             Class<T> structType = (Class<T>) parameterizedType.getRawType();
 
             return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
-        } else if (type instanceof TypeReference) {
-            return read(byteBuf, ((TypeReference<T>) type).getType());
-        } else {
-            throw new TypeJudgmentException(type);
         }
+        else
+        if (type instanceof TypeReference) {
+            return read(byteBuf, ((TypeReference<T>) type).getType());
+        }
+        else throw new TypeJudgmentException(type);
     }
 
     public static <T> T read(byte[] bytes, Type type) {
