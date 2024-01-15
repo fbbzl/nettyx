@@ -143,6 +143,8 @@ public final class StructSerializer implements Serializer {
         outputStream.write(writeBytes(struct));
     }
 
+    //*************************************      working code splitter      ******************************************//
+
     /**
      * parse ByteBuf to Object
      *
