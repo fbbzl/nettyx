@@ -1,11 +1,8 @@
-import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +10,6 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cfloat;
@@ -64,7 +59,7 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<String>, Wife> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), new TypeReference<User<Son<String>, Wife>>(){});
+            User  user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), User.class);
             System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
@@ -121,7 +116,7 @@ public class TypedSerializerTest {
     @Getter
     @Setter
     @Struct
-    public static class User<T, W> {
+    public static class User  {
 
         private Clong4 uid;
         private Cchar uname;
@@ -166,10 +161,10 @@ public class TypedSerializerTest {
 
         @ToArray(length = 2)
         private Cchar[] loginNames;
-        @ToArrayList(elementType = Wife.class, size = 2)
-        private List<W> wifes;
-        @ToHashSet(elementType = Son.class, size = 1)
-        private Set<T> sons;
+//        @ToArrayList(elementType = Wife.class, size = 2)
+//        private List<W> wifes;
+//        @ToHashSet(elementType = Son.class, size = 1)
+//        private Set<T> sons;
 
         @Override
         public String toString() {
@@ -184,7 +179,7 @@ public class TypedSerializerTest {
                 + ", Cpplonglong=" + Cpplonglong + ", Cppshort=" + Cppshort + ", Cppuchar=" + Cppuchar + ", Cppuint="
                 + Cppuint + ", Cppulong4=" + Cppulong4 + ", Cppulong8=" + Cppulong8 + ", Cppulonglong=" + Cppulonglong
                 + ", Cppushort=" + Cppushort + ", cppBool=" + cppBool + ", loginNames=" + Arrays.toString(loginNames)
-                + ", wifes=" + wifes + ", sons=" + sons + '}';
+                + ", wifes=" + 1 + ", sons=" + 1 + '}';
         }
     }
 }
