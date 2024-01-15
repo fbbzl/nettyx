@@ -160,7 +160,7 @@ public class StructUtils {
         }
     }
 
-    public static <V, T extends Basic<V>> Constructor<T> filterConstructor(Class<T> basicClass,
+    public static <T extends Basic<?>> Constructor<T> filterConstructor(Class<T> basicClass,
         Predicate<Constructor<T>> filter) {
         Constructor<T>[] constructors = ReflectUtil.getConstructors(basicClass);
         return Arrays.stream(constructors).filter(filter).findFirst().orElse(null);
