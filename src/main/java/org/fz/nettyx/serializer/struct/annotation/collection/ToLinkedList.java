@@ -53,8 +53,6 @@ public @interface ToLinkedList {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
-            StructUtils.checkAssignable(field, List.class);
-
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
@@ -67,8 +65,6 @@ public @interface ToLinkedList {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
             ByteBuf writing) {
-            StructUtils.checkAssignable(field, List.class);
-
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
