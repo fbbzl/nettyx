@@ -1,4 +1,3 @@
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -77,7 +76,7 @@ public class TypedSerializerTest {
 //            user.setBill(null);
 //            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
-            final ByteBuf userWriteBytes = StructSerializer.write(user);
+            //final ByteBuf userWriteBytes = StructSerializer.write(user);
 
             //  User read = StructSerializer.read(userWriteBytes, User.class);
 
@@ -121,7 +120,7 @@ public class TypedSerializerTest {
     @Getter
     @Setter
     @Struct
-    public static class User<T, W>  {
+    public static class User<S, W>  {
 
         private Clong4 uid;
         private Cchar uname;
@@ -166,10 +165,10 @@ public class TypedSerializerTest {
 
         @ToArray(length = 2)
         private Cchar[] loginNames;
-        @ToArrayList(elementType = Wife.class, size = 2)
+        @ToArrayList(size = 2)
         private List<W> wifes;
-        @ToHashSet(elementType = Son.class, size = 1)
-        private Set<T> sons;
+        @ToHashSet(size = 1)
+        private Set<S> sons;
 
         @Override
         public String toString() {
@@ -184,7 +183,7 @@ public class TypedSerializerTest {
                 + ", Cpplonglong=" + Cpplonglong + ", Cppshort=" + Cppshort + ", Cppuchar=" + Cppuchar + ", Cppuint="
                 + Cppuint + ", Cppulong4=" + Cppulong4 + ", Cppulong8=" + Cppulong8 + ", Cppulonglong=" + Cppulonglong
                 + ", Cppushort=" + Cppushort + ", cppBool=" + cppBool + ", loginNames=" + Arrays.toString(loginNames)
-                + ", wifes=" + 1 + ", sons=" + sons + '}';
+                + ", wifes=" + wifes + ", sons=" + 1 + '}';
         }
     }
 }
