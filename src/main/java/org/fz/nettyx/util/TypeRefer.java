@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * @since 2024/1/15 11:24
  */
 @NoArgsConstructor
-public abstract class TypeRef<T> implements Type {
+public abstract class TypeRefer<T> implements Type {
 
     private final Type type = TypeUtil.getTypeArgument(this.getClass());
 
