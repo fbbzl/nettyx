@@ -1,9 +1,14 @@
 package org.fz.nettyx.serializer.struct.basic;
 
+import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
+
+import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import lombok.Getter;
@@ -115,6 +120,25 @@ public abstract class Basic<V> {
         int fillLength = requiredSize - buf.readableBytes();
         if (fillLength > 0) {
             buf.writeBytes(new byte[fillLength]);
+        }
+    }
+
+    public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass)
+        throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) basicClass,
+            c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
+
+        if (basicConstructor == null) {
+            throw new IllegalArgumentException(
+                "can not find basic [" + basicClass + "] constructor with bytebuf, please check");
+        }
+
+        ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
+        try {
+            return basicConstructor.newInstance(fillingBuf).getSize();
+        } finally {
+            fillingBuf.skipBytes(fillingBuf.readableBytes());
+            fillingBuf.release();
         }
     }
 
