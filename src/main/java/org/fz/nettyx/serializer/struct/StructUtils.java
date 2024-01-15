@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_BYTES_SIZE_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
@@ -42,6 +43,7 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
+import org.fz.nettyx.util.Try;
 import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 
@@ -96,16 +98,16 @@ public class StructUtils {
     /**
      * Gets serializer handler.
      *
-     * @param <S> the type parameter
+     * @param <H> the type parameter
      * @param element the element
      * @return the serializer handler
      */
-    public <S extends PropertyHandler<?>> S getHandler(AnnotatedElement element) {
+    public <H extends PropertyHandler<?>> H getHandler(AnnotatedElement element) {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
         if (handlerAnnotation != null) {
             Class<? extends PropertyHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING_CACHE.get(
                 handlerAnnotation.annotationType());
-            return (S) newHandler(handlerClass);
+            return (H) newHandler(handlerClass);
         }
         return null;
     }
@@ -113,11 +115,11 @@ public class StructUtils {
     /**
      * New handler instance t.
      *
-     * @param <T> the type parameter
+     * @param <H> the type parameter
      * @param clazz the struct class
      * @return the t
      */
-    static <T extends PropertyHandler<?>> T newHandler(Class<T> clazz) {
+    static <H extends PropertyHandler<?>> H newHandler(Class<H> clazz) {
         try {
             return ReflectUtil.getConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
@@ -125,27 +127,51 @@ public class StructUtils {
         }
     }
 
-    /**
-     * New basic instance t.
-     *
-     * @param <T> the type parameter
-     * @param basicField the basic field
-     * @param buf the buf
-     * @return the t
-     */
-    static <T extends Basic<?>> T newBasic(Field basicField, ByteBuf buf) {
-        return newBasic((Class<T>) basicField.getType(), buf);
+    static <B extends Basic<?>> B newEmptyBasic(Field basicField) {
+        return newEmptyBasic((Class<B>) basicField.getType());
+    }
+
+    static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
+        BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(bc -> {
+            Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) bc,
+                c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
+
+            if (basicConstructor == null) {
+                throw new IllegalArgumentException(
+                    "can not find basic [" + bc + "] constructor with bytebuf, please check");
+            }
+
+            ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
+            int size = basicConstructor.newInstance(fillingBuf).getSize();
+            fillingBuf.skipBytes(fillingBuf.readableBytes());
+            fillingBuf.release();
+            return size;
+        }));
+
+        return newBasic(basicClass, Unpooled.EMPTY_BUFFER);
     }
 
     /**
      * New basic instance t.
      *
-     * @param <T> the type parameter
+     * @param <B> the type parameter
+     * @param basicField the basic field
+     * @param buf the buf
+     * @return the t
+     */
+    static <B extends Basic<?>> B newBasic(Field basicField, ByteBuf buf) {
+        return newBasic((Class<B>) basicField.getType(), buf);
+    }
+
+    /**
+     * New basic instance t.
+     *
+     * @param <B> the type parameter
      * @param basicClass the basic class
      * @param buf the buf
      * @return the t
      */
-    public static <T extends Basic<?>> T newBasic(Class<T> basicClass, ByteBuf buf) {
+    public static <B extends Basic<?>> B newBasic(Class<B> basicClass, ByteBuf buf) {
         try {
             return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException invocationException) {
@@ -160,31 +186,31 @@ public class StructUtils {
         }
     }
 
-    public static <T extends Basic<?>> Constructor<T> filterConstructor(Class<T> basicClass,
-        Predicate<Constructor<T>> filter) {
-        Constructor<T>[] constructors = ReflectUtil.getConstructors(basicClass);
+    public static <B extends Basic<?>> Constructor<B> filterConstructor(Class<B> basicClass,
+        Predicate<Constructor<B>> filter) {
+        Constructor<B>[] constructors = ReflectUtil.getConstructors(basicClass);
         return Arrays.stream(constructors).filter(filter).findFirst().orElse(null);
     }
 
     /**
      * New struct instance t.
      *
-     * @param <T> the type parameter
+     * @param <S> the type parameter
      * @param structField the struct field
      * @return the t
      */
-    public static <T> T newStruct(Field structField) {
-        return (T) newStruct(structField.getType());
+    public static <S> S newStruct(Field structField) {
+        return (S) newStruct(structField.getType());
     }
 
     /**
      * New struct instance t.
      *
-     * @param <T> the type parameter
+     * @param <S> the type parameter
      * @param structClass the struct class
      * @return the t
      */
-    public static <T> T newStruct(Class<T> structClass) {
+    public static <S> S newStruct(Class<S> structClass) {
         try {
             if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
             else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
