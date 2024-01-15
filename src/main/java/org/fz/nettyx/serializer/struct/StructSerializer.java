@@ -93,6 +93,7 @@ public final class StructSerializer implements Serializer {
         if (type instanceof TypeRefer) {
             return read(byteBuf, ((TypeRefer<T>) type).getType());
         }
+        // also support hutool
         else
         if (type instanceof TypeReference) {
             return read(byteBuf, ((TypeReference<T>) type).getType());
