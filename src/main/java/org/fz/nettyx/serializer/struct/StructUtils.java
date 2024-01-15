@@ -119,7 +119,7 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    static <H extends PropertyHandler<?>> H newHandler(Class<H> clazz) {
+    public static <H extends PropertyHandler<?>> H newHandler(Class<H> clazz) {
         try {
             return ReflectUtil.getConstructor(clazz).newInstance();
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
@@ -127,11 +127,11 @@ public class StructUtils {
         }
     }
 
-    static <B extends Basic<?>> B newEmptyBasic(Field basicField) {
+    public static <B extends Basic<?>> B newEmptyBasic(Field basicField) {
         return newEmptyBasic((Class<B>) basicField.getType());
     }
 
-    static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
+    public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
         BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(bc -> {
             Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) bc,
                 c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
@@ -159,7 +159,7 @@ public class StructUtils {
      * @param buf the buf
      * @return the t
      */
-    static <B extends Basic<?>> B newBasic(Field basicField, ByteBuf buf) {
+    public static <B extends Basic<?>> B newBasic(Field basicField, ByteBuf buf) {
         return newBasic((Class<B>) basicField.getType(), buf);
     }
 
