@@ -191,7 +191,7 @@ public @interface ToArray {
          */
         private static void writeBasicArray(Basic<?>[] basicArray, Class<Basic<?>> basicType, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
-                writingBuf.writeBytes(defaultIfNull(basic, () -> newBasic(basicType, (Object) null)).getBytes());
+                writingBuf.writeBytes(defaultIfNull(basic, () -> newEmptyBasic(basicType)).getBytes());
             }
         }
 
