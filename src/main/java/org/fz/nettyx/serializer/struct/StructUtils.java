@@ -70,10 +70,10 @@ public class StructUtils {
         }
 
         Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
-
+        //TODO
         // will get the first, will not appear index-out-of-bounds exception
         Type actualTypeArgument = actualTypeArguments[0];
-        Throws.ifInstanceOf(TypeVariableImpl.class, actualTypeArgument, "please use TypeReference to assign generic type");
+        Throws.ifInstanceOf(TypeVariableImpl.class, actualTypeArgument, "please use TypeRefer to assign generic type");
 
         return (Class<?>) actualTypeArgument;
     }
