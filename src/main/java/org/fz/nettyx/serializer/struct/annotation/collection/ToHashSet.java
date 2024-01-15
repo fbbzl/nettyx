@@ -12,11 +12,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
@@ -66,13 +64,9 @@ public @interface ToHashSet {
         public Object doRead(StructSerializer serializer, Field field, ToHashSet toHashSet) {
             StructUtils.checkAssignable(field, Set.class);
 
-            Map<Type, Type> structParameterizedTypeMap = serializer.getStructParameterizedTypeMap();
-
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
                     : elementType;
-
-
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
