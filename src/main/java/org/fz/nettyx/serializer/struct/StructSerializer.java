@@ -372,7 +372,7 @@ public final class StructSerializer implements Serializer {
         if (this.type instanceof Class<?>) {
             return (Class<T>) this.type;
         } else if (this.type instanceof ParameterizedType) {
-            return (Class<T>) getStructParameterizedType().getOwnerType();
+            return (Class<T>) getStructParameterizedType().getRawType();
         }
         throw new TypeJudgmentException(this.type);
     }
