@@ -44,7 +44,6 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 
 /**
@@ -62,20 +61,21 @@ public class StructUtils {
         return TRANSIENT_FIELD_CACHE.contains(field);
     }
 
-    public Class<?> getFieldParameterizedType(Field field) {
-        Type type = TypeUtil.getType(field);
+    public Class<?> getFieldParameterizedType(Type type, Field field) {
+        Type fieldType = TypeUtil.getType(field);
         // If it's a Class, it means that no generics are specified
-        if (type instanceof Class<?>) {
+        if (fieldType instanceof Class<?>) {
             return Object.class;
         }
+        else
+        if (type instanceof ParameterizedType) {
+            Type actualType = TypeUtil.getActualType(type, field);
+            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
+            if (actualTypeArguments.length == 0) return Object.class;
 
-        Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
-
-        // will get the first, will not appear index-out-of-bounds exception
-        Type actualTypeArgument = actualTypeArguments[0];
-        Throws.ifInstanceOf(TypeVariableImpl.class, actualTypeArgument, "please use TypeReference to assign generic type");
-
-        return (Class<?>) actualTypeArgument;
+            return (Class<?>) actualTypeArguments[0];
+        }
+        return Object.class;
     }
 
     /**

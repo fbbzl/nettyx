@@ -56,7 +56,7 @@ public @interface ToArrayList {
             StructUtils.checkAssignable(field, List.class);
 
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toArrayList.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toArrayList.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -70,7 +70,7 @@ public @interface ToArrayList {
             StructUtils.checkAssignable(field, List.class);
 
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toArrayList.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toArrayList.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));

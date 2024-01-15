@@ -65,7 +65,7 @@ public @interface ToHashSet {
             StructUtils.checkAssignable(field, Set.class);
 
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toHashSet.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -79,7 +79,7 @@ public @interface ToHashSet {
             StructUtils.checkAssignable(field, Set.class);
 
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toHashSet.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toHashSet.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
