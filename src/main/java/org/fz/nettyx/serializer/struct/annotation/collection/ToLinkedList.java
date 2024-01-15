@@ -56,7 +56,7 @@ public @interface ToLinkedList {
             StructUtils.checkAssignable(field, List.class);
 
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -70,7 +70,7 @@ public @interface ToLinkedList {
             StructUtils.checkAssignable(field, List.class);
 
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(field)) == Object.class ? toLinkedList.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
