@@ -132,22 +132,8 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
-        byte[] zeroedBytes = new byte[BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(bc -> {
-            Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) bc,
-                c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
-
-            if (basicConstructor == null) {
-                throw new IllegalArgumentException(
-                    "can not find basic [" + bc + "] constructor with bytebuf, please check");
-            }
-
-            ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
-            int size = basicConstructor.newInstance(fillingBuf).getSize();
-            fillingBuf.skipBytes(fillingBuf.readableBytes());
-            fillingBuf.release();
-            return size;
-        }))];
-
+        int basicBytesSize = BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
+        byte[] zeroedBytes = new byte[basicBytesSize];
         return newBasic(basicClass, Unpooled.wrappedBuffer(zeroedBytes));
     }
 
@@ -321,16 +307,9 @@ public class StructUtils {
                 if (basicClass.isEnum() || Modifier.isAbstract(mod) || Modifier.isInterface(mod)) {
                     continue;
                 }
-                Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) basicClass,
-                    c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
 
-                if (basicConstructor == null) throw new IllegalArgumentException(
-                        "can not find basic [" + basicClass + "] constructor with bytebuf, please check");
-
-                ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
-                BASIC_BYTES_SIZE_CACHE.put((Class<? extends Basic<?>>) basicClass, basicConstructor.newInstance(fillingBuf).getSize());
-                fillingBuf.skipBytes(fillingBuf.readableBytes());
-                fillingBuf.release();
+                BASIC_BYTES_SIZE_CACHE.put((Class<? extends Basic<?>>) basicClass,
+                    Basic.reflectForSize((Class<? extends Basic<?>>) basicClass));
             }
         }
 
