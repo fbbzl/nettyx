@@ -128,6 +128,7 @@ public class StructUtils {
     }
 
     static <T extends Basic<?>> T newEmptyBasic(Field basicField) {
+        //TODO use empty bytes init empty basic
         return newBasic((Class<T>) basicField.getType(), 0);
     }
 
@@ -296,6 +297,8 @@ public class StructUtils {
         static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_VALUE_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
 
         static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_BYTEBUF_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
+
+        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_LENGTH_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
 
         /**
          * The constant ANNOTATION_HANDLER_MAPPING_CACHE.
