@@ -1,4 +1,4 @@
-import com.sun.xml.internal.bind.v2.model.core.TypeRef;
+import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
@@ -64,7 +64,7 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<String>, Wife>  user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), new TypeRef<User<Son<String>, Wife>>() {});
+            User<Son<String>, Wife>  user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), new TypeReference<User<Son<String>, Wife>>() {});
             System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
