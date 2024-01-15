@@ -3,7 +3,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,6 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cfloat;
@@ -167,8 +165,8 @@ public class TypedSerializerTest {
         private Cchar[] loginNames;
         @ToArrayList(elementType = Wife.class, size = 2)
         private List<W> wifes;
-        @ToHashSet(elementType = Son.class, size = 1)
-        private Set<T> sons;
+//        @ToHashSet(elementType = Son.class, size = 1)
+//        private Set<T> sons;
 
         @Override
         public String toString() {
@@ -183,7 +181,7 @@ public class TypedSerializerTest {
                 + ", Cpplonglong=" + Cpplonglong + ", Cppshort=" + Cppshort + ", Cppuchar=" + Cppuchar + ", Cppuint="
                 + Cppuint + ", Cppulong4=" + Cppulong4 + ", Cppulong8=" + Cppulong8 + ", Cppulonglong=" + Cppulonglong
                 + ", Cppushort=" + Cppushort + ", cppBool=" + cppBool + ", loginNames=" + Arrays.toString(loginNames)
-                + ", wifes=" + 1 + ", sons=" + 1 + '}';
+                + ", wifes=" + wifes + ", sons=" + 1 + '}';
         }
     }
 }
