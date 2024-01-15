@@ -11,7 +11,6 @@ import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 
 /**
  * find enum by enum name
@@ -63,8 +62,6 @@ public @interface ToNamedEnum {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum,
             ByteBuf writing) {
-            StructUtils.checkAssignable(field, Enum.class);
-
             int bufferLength = toNamedEnum.bufferLength();
             String charset = toNamedEnum.charset();
 
