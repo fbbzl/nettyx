@@ -375,6 +375,13 @@ public final class StructSerializer implements Serializer {
         throw new TypeJudgmentException(this.type);
     }
 
+    public ParameterizedType getStructParameterizedType() {
+        if (this.type instanceof ParameterizedType) {
+            return (ParameterizedType) this.type;
+        }
+        throw new TypeJudgmentException(this.type);
+    }
+
     @Override
     public ByteBuf getByteBuf() {
         return this.byteBuf;
