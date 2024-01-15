@@ -35,6 +35,7 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
+import org.fz.nettyx.util.TypeRef;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -86,6 +87,10 @@ public final class StructSerializer implements Serializer {
             Class<T> structType = (Class<T>) parameterizedType.getRawType();
 
             return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
+        }
+        else
+        if (type instanceof TypeRef) {
+            return read(byteBuf, ((TypeRef<T>) type).getType());
         }
         else
         if (type instanceof TypeReference) {
