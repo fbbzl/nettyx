@@ -183,7 +183,7 @@ public class TypedSerializerTest {
                 + ", Cpplonglong=" + Cpplonglong + ", Cppshort=" + Cppshort + ", Cppuchar=" + Cppuchar + ", Cppuint="
                 + Cppuint + ", Cppulong4=" + Cppulong4 + ", Cppulong8=" + Cppulong8 + ", Cppulonglong=" + Cppulonglong
                 + ", Cppushort=" + Cppushort + ", cppBool=" + cppBool + ", loginNames=" + Arrays.toString(loginNames)
-                + ", wifes=" + wifes + ", sons=" + 1 + '}';
+                + ", wifes=" + wifes + ", sons=" + sons + '}';
         }
     }
 }
