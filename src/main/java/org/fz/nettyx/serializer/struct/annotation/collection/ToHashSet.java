@@ -63,7 +63,7 @@ public @interface ToHashSet {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToHashSet toHashSet) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toHashSet.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toHashSet.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -75,7 +75,7 @@ public @interface ToHashSet {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToHashSet toHashSet,
             ByteBuf writing) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructType(), field)) == Object.class ? toHashSet.elementType()
+                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toHashSet.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));

@@ -39,10 +39,8 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
 
 
@@ -236,19 +234,6 @@ public class StructUtils {
      */
     public static Field[] getStructFields(Class<?> clazz) {
         return ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()));
-    }
-
-    /**
-     * Check assignable.
-     *
-     * @param field the field
-     * @param clazz the clazz
-     */
-    public static void checkAssignable(Field field, Class<?> clazz) {
-        Class<?> type = field.getType();
-
-        Throws.ifNotAssignable(clazz, type, new TypeJudgmentException(
-            "type of field [" + field + "] is [" + field.getType() + "], it is not assignable from [" + clazz + "]"));
     }
 
     /**
