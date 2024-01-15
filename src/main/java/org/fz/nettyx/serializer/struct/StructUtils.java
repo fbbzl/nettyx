@@ -44,7 +44,6 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 
 /**
@@ -62,32 +61,22 @@ public class StructUtils {
         return TRANSIENT_FIELD_CACHE.contains(field);
     }
 
-    public Class<?> getFieldParameterizedType(Field field) {
-        Type type = TypeUtil.getType(field);
+    public Class<?> getFieldParameterizedType(Type type, Field field) {
+        Type fieldType = TypeUtil.getType(field);
         // If it's a Class, it means that no generics are specified
-        if (type instanceof Class<?>) {
+        if (fieldType instanceof Class<?>) {
             return Object.class;
         }
-
-        Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
-        //TODO
-        // will get the first, will not appear index-out-of-bounds exception
-        Type actualTypeArgument = actualTypeArguments[0];
-        Throws.ifInstanceOf(TypeVariableImpl.class, actualTypeArgument, "please use TypeRefer to assign generic type");
-
-        return (Class<?>) actualTypeArgument;
-    }
-
-    public Map<Type, Type> getStructParameterizedTypeMap(Type type) {
+        else
         if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Map<Type, Type> typeMap = TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+            Type actualType = TypeUtil.getActualType(type, field);
+            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
+            if (actualTypeArguments.length == 0) return Object.class;
 
-            return TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+            return (Class<?>) actualTypeArguments[0];
         }
-        throw new TypeJudgmentException(type);
+        return Object.class;
     }
-
 
     /**
      * Find handler annotation a.
@@ -209,10 +198,13 @@ public class StructUtils {
      */
     public static <S> S newStruct(Class<S> structClass) {
         try {
-            if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
-            else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
-        }
-        catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
+            if (isStruct(structClass)) {
+                return ReflectUtil.getConstructor(structClass).newInstance();
+            } else {
+                throw new UnsupportedOperationException(
+                    "can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
+            }
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
         }
     }
