@@ -10,7 +10,6 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.TypeReference;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -24,7 +23,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
-import java.util.Map;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -372,25 +370,7 @@ public final class StructSerializer implements Serializer {
         if (this.type instanceof Class<?>) {
             return (Class<T>) this.type;
         } else if (this.type instanceof ParameterizedType) {
-            return (Class<T>) getStructParameterizedType().getRawType();
-        }
-        throw new TypeJudgmentException(this.type);
-    }
-
-    public ParameterizedType getStructParameterizedType() {
-        if (this.type instanceof ParameterizedType) {
-            return (ParameterizedType) this.type;
-        }
-        throw new TypeJudgmentException(this.type);
-    }
-
-    public Map<Type, Type> getStructParameterizedTypeMap() {
-        // TODO
-        if (this.type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) this.type;
-            Map<Type, Type> typeMap = TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
-
-            return TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+            return (Class<T>) ((ParameterizedType) this.type).getRawType();
         }
         throw new TypeJudgmentException(this.type);
     }

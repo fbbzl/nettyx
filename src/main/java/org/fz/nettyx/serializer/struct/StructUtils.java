@@ -78,6 +78,17 @@ public class StructUtils {
         return (Class<?>) actualTypeArgument;
     }
 
+    public Map<Type, Type> getStructParameterizedTypeMap(Type type) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) this.type;
+            Map<Type, Type> typeMap = TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+
+            return TypeUtil.getTypeMap((Class<?>) parameterizedType.getOwnerType());
+        }
+        throw new TypeJudgmentException(this.type);
+    }
+
+
     /**
      * Find handler annotation a.
      *
