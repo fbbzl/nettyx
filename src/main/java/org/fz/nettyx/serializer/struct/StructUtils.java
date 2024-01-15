@@ -1,11 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
 import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_BYTEBUF_CONSTRUCTOR_CACHE;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_VALUE_CONSTRUCTOR_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
@@ -22,6 +19,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -127,29 +125,6 @@ public class StructUtils {
         }
     }
 
-    static <T extends Basic<?>> T newEmptyBasic(Field basicField) {
-        return newBasic((Class<T>) basicField.getType(), 0);
-    }
-
-    static <T extends Basic<?>> T newBasic(Field basicField, Object fieldValue) {
-        return newBasic((Class<T>) basicField.getType(), fieldValue);
-    }
-
-    public static <T extends Basic<?>> T newBasic(Class<T> basicClass, Object fieldValue) {
-        try {
-            return getBasicConstructor(basicClass, Object.class).newInstance(fieldValue);
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException invocationException) {
-            Throwable cause = invocationException.getCause();
-            if (cause instanceof TooLessBytesException) {
-                throw new SerializeException(cause.getMessage());
-            } else {
-                throw new SerializeException(
-                    "new basic [" + basicClass + "] instantiate by value failed..., value is: [" + fieldValue + "]",
-                    cause);
-            }
-        }
-    }
-
     /**
      * New basic instance t.
      *
@@ -172,7 +147,7 @@ public class StructUtils {
      */
     public static <T extends Basic<?>> T newBasic(Class<T> basicClass, ByteBuf buf) {
         try {
-            return getBasicConstructor(basicClass, ByteBuf.class).newInstance(buf);
+            return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException invocationException) {
             Throwable cause = invocationException.getCause();
             if (cause instanceof TooLessBytesException) {
@@ -185,22 +160,7 @@ public class StructUtils {
         }
     }
 
-    public static <T extends Basic<?>> Constructor<T> getBasicConstructor(Class<T> basicClass,
-        Class<?> constructorArgType) {
-        if (isBasic(basicClass)) {
-            if (constructorArgType == ByteBuf.class) {
-                return (Constructor<T>) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass,
-                    bc -> ReflectUtil.getConstructor(basicClass, ByteBuf.class));
-            } else {
-                return (Constructor<T>) BASIC_VALUE_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass,
-                    bc -> filterConstructor(basicClass,
-                        c -> !ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class})));
-            }
-        }
-        else throw new UnsupportedOperationException("can not get constructor of basic type [" + basicClass + "], maybe it is not a Basic<?> type");
-    }
-
-    public static <T extends Basic<?>> Constructor<T> filterConstructor(Class<T> basicClass,
+    public static <V, T extends Basic<V>> Constructor<T> filterConstructor(Class<T> basicClass,
         Predicate<Constructor<T>> filter) {
         Constructor<T>[] constructors = ReflectUtil.getConstructors(basicClass);
         return Arrays.stream(constructors).filter(filter).findFirst().orElse(null);
@@ -293,9 +253,7 @@ public class StructUtils {
          */
         static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
 
-        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_VALUE_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
-
-        static final Map<Class<? extends Basic<?>>, Constructor<? extends Basic<?>>> BASIC_BYTEBUF_CONSTRUCTOR_CACHE = new WeakConcurrentMap<>();
+        static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();
 
         /**
          * The constant ANNOTATION_HANDLER_MAPPING_CACHE.
@@ -329,23 +287,24 @@ public class StructUtils {
             }
         }
 
-        private static synchronized void scanAllBasics() {
+        private static synchronized void scanAllBasics()
+            throws InvocationTargetException, InstantiationException, IllegalAccessException {
             Set<Class<?>> basicClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, Basic.class);
             for (Class<?> basicClass : basicClasses) {
                 int mod = basicClass.getModifiers();
                 if (basicClass.isEnum() || Modifier.isAbstract(mod) || Modifier.isInterface(mod)) {
                     continue;
                 }
-                Constructor<?>[] constructors = ReflectUtil.getConstructors(basicClass);
-                for (Constructor<?> constructor : constructors) {
-                    if (ArrayUtil.equals(constructor.getParameterTypes(), new Class[]{ByteBuf.class})) {
-                        BASIC_BYTEBUF_CONSTRUCTOR_CACHE.put((Class<? extends Basic<?>>) basicClass,
-                            (Constructor<? extends Basic<?>>) constructor);
-                    } else {
-                        BASIC_VALUE_CONSTRUCTOR_CACHE.put((Class<? extends Basic<?>>) basicClass,
-                            (Constructor<? extends Basic<?>>) constructor);
-                    }
-                }
+                Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) basicClass,
+                    c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
+
+                if (basicConstructor == null) throw new IllegalArgumentException(
+                        "can not find basic [" + basicClass + "] constructor with bytebuf, please check");
+
+                ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
+                BASIC_BYTES_SIZE_CACHE.put((Class<? extends Basic<?>>) basicClass, basicConstructor.newInstance(fillingBuf).getSize());
+                fillingBuf.skipBytes(fillingBuf.readableBytes());
+                fillingBuf.release();
             }
         }
 
