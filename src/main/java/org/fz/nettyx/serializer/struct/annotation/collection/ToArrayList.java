@@ -53,8 +53,6 @@ public @interface ToArrayList {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
-            StructUtils.checkAssignable(field, List.class);
-
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toArrayList.elementType()
                     : elementType;
@@ -67,8 +65,6 @@ public @interface ToArrayList {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
             ByteBuf writing) {
-            StructUtils.checkAssignable(field, List.class);
-
             Class<?> elementType =
                 (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toArrayList.elementType()
                     : elementType;

@@ -13,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 
 /**
  * The interface Char sequence.
@@ -45,8 +44,6 @@ public @interface ToString {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToString toString) {
-            StructUtils.checkAssignable(field, CharSequence.class);
-
             String charset = toString.charset();
             if (!Charset.isSupported(charset)) throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
@@ -62,8 +59,6 @@ public @interface ToString {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writing) {
-            StructUtils.checkAssignable(field, CharSequence.class);
-
             int bufferLength = toString.bufferLength();
             String charset = toString.charset();
 

@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
+import lombok.Getter;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -48,11 +49,13 @@ public final class StructSerializer implements Serializer {
     /**
      * byteBuf ready for serialization/deserialization
      */
+    @Getter
     private final ByteBuf byteBuf;
 
     /**
      * type of struct
      */
+    @Getter
     private final Type type;
 
     /**
@@ -380,21 +383,6 @@ public final class StructSerializer implements Serializer {
             return (ParameterizedType) this.type;
         }
         throw new TypeJudgmentException(this.type);
-    }
-
-    @Override
-    public ByteBuf getByteBuf() {
-        return this.byteBuf;
-    }
-
-    /**
-     * Take byte buf byte buf.
-     *
-     * @param length the take length
-     * @return the byte buf
-     */
-    public ByteBuf readBytes(int length) {
-        return getByteBuf().readBytes(length);
     }
 
     //******************************************      public end       ***********************************************//
