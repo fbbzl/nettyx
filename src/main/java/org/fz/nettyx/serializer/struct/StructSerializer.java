@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
@@ -405,14 +406,10 @@ public final class StructSerializer implements Serializer {
         // If it's a Class, it means that no generics are specified
         if (fieldType instanceof Class<?>) {
             return Object.class;
-        }
-        else
-        if (this.type instanceof ParameterizedType) {
-            Type actualType = TypeUtil.getActualType(this.type, field);
-            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
-            if (actualTypeArguments.length == 0) return Object.class;
+        } else if (this.type instanceof ParameterizedType) {
+            GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.type, field);
 
-            return (Class<?>) actualTypeArguments[0];
+            return (Class<?>) actualType.getGenericComponentType();
         }
         return Object.class;
     }
