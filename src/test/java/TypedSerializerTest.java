@@ -167,7 +167,7 @@ public class TypedSerializerTest {
         private L[] loginNames;
         @ToArrayList( size = 2)
         private List<W> wifes;
-        @ToHashSet(size = 1)
+        @ToHashSet(size = 3)
         private Set<T> sons;
 
         @Override
