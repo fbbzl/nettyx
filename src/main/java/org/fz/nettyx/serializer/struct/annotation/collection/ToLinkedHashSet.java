@@ -1,12 +1,11 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
-import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static cn.hutool.core.collection.CollUtil.newLinkedHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
