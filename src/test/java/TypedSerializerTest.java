@@ -169,9 +169,9 @@ public class TypedSerializerTest {
         @ToHashSet(size = 3)
         private Set<T> sons;
         @ToLinkedHashSet(size = 3)
-        private List<Wife> firstWifes;
+        private Set<Wife> firstWifes;
         @ToLinkedList(size = 1)
-        private Set<Son> bigSons;
+        private List<Son> bigSons;
 
 
     }
