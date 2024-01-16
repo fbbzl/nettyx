@@ -10,6 +10,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -363,8 +364,9 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * this is a  useful method that sometimes you may read the field value before current field value, if so
-     * you can get the serializing struct object by this method
+     * this is a  useful method that sometimes you may read the field value before current field value, if so you can
+     * get the serializing struct object by this method
+     *
      * @param <T> the type parameter
      * @return the t
      */
@@ -381,11 +383,21 @@ public final class StructSerializer implements Serializer {
         throw new TypeJudgmentException(this.type);
     }
 
-    public ParameterizedType getStructParameterizedType() {
-        if (this.type instanceof ParameterizedType) {
-            return (ParameterizedType) this.type;
+    public Class<?> getFieldActualType(Field field) {
+        Type fieldType = TypeUtil.getType(field);
+        // If it's a Class, it means that no generics are specified
+        if (fieldType instanceof Class<?>) {
+            return Object.class;
         }
-        throw new TypeJudgmentException(this.type);
+        else
+        if (this.type instanceof ParameterizedType) {
+            Type actualType = TypeUtil.getActualType(this.type, field);
+            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
+            if (actualTypeArguments.length == 0) return Object.class;
+
+            return (Class<?>) actualTypeArguments[0];
+        }
+        return Object.class;
     }
 
     //******************************************      public end       ***********************************************//
