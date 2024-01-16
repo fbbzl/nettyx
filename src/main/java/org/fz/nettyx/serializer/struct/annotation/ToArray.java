@@ -45,7 +45,10 @@ public @interface ToArray {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
-            Class<?> elementType = getComponentType(field);
+            Class<?> elementType =
+                (elementType = serializer.getFieldActualType(field)) == Object.class ? getComponentType(field)
+                    : elementType;
+
             int length = annotation.length();
             return readArray(elementType, length, serializer.getByteBuf());
         }
@@ -53,23 +56,15 @@ public @interface ToArray {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
             ByteBuf writing) {
-            Class<?> elementType = getComponentType(field);
+            Class<?> elementType =
+                (elementType = serializer.getFieldActualType(field)) == Object.class ? getComponentType(field)
+                    : elementType;
+
             int declaredLength = annotation.length();
 
             Object[] array = (Object[]) defaultIfNull(arrayValue, () -> newArray(field, declaredLength));
 
             writeArray(array, elementType, declaredLength, writing);
-        }
-
-        /**
-         * Check is array.
-         *
-         * @param field the field
-         */
-        public static void checkIsArray(Field field) {
-            if (!field.getType().isArray()) {
-                throw new UnsupportedOperationException("field [" + field + "] is not array field please check");
-            }
         }
 
         /**
