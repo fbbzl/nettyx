@@ -110,8 +110,7 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
-        byte[] zeroedBytes = new byte[findBasicSize(basicClass)];
-        return newBasic(basicClass, Unpooled.wrappedBuffer(zeroedBytes));
+        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
     public static <B extends Basic<?>> int findBasicSize(Class<B> basicClass) {
