@@ -37,7 +37,9 @@ public @interface ToStructArray {
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
 
-            return readStructArray(structElementType, annotation.length(), serializer.getByteBuf());
+            int declaredLength = annotation.length();
+
+            return readStructArray(structElementType, declaredLength, serializer.getByteBuf());
         }
 
         @Override
@@ -51,16 +53,7 @@ public @interface ToStructArray {
 
             int declaredLength = annotation.length();
 
-            Object[] structArray = (Object[]) arrayValue;
-
-            if (structArray == null) {
-                structArray = newArray(field, declaredLength);
-            }
-            if (structArray.length < declaredLength) {
-                structArray = fillArray(structArray, structElementType, declaredLength);
-            }
-
-            writeStructArray(structArray, structElementType, writing);
+            writeStructArray(arrayValue, structElementType, declaredLength, writing);
         }
 
         public static <T> T[] newArray(Field arrayField, int arrayLength) {
@@ -69,12 +62,6 @@ public @interface ToStructArray {
 
         public static <T> T[] newArray(Class<?> componentType, int length) {
             return (T[]) Array.newInstance(componentType, length);
-        }
-
-        public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
-            T[] filledArray = (T[]) Array.newInstance(elementType, length);
-            System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
-            return filledArray;
         }
 
         private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
@@ -87,21 +74,28 @@ public @interface ToStructArray {
             return structs;
         }
 
-        public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength,
+        public static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int declaredLength,
             ByteBuf writingBuf) {
             T[] array = (T[]) arrayValue;
 
-            if (declaredLength > array.length) {
+            if (array == null) {
+                array = newArray(elementType, declaredLength);
+            }
+
+            if (array.length < declaredLength) {
                 array = fillArray(array, elementType, declaredLength);
             }
 
-            writeStructArray(array, elementType, writingBuf);
+            for (Object struct : array) {
+                writingBuf.writeBytes(StructSerializer.write(defaultIfNull(struct, () -> newStruct(elementType))));
+            }
+
         }
 
-        private static void writeStructArray(Object[] structArray, Class<?> structType, ByteBuf writingBuf) {
-            for (Object struct : structArray) {
-                writingBuf.writeBytes(StructSerializer.write(defaultIfNull(struct, () -> newStruct(structType))));
-            }
+        public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
+            T[] filledArray = (T[]) Array.newInstance(elementType, length);
+            System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
+            return filledArray;
         }
 
     }
