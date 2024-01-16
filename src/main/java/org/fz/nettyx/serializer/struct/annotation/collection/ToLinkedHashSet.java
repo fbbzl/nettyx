@@ -19,7 +19,6 @@ import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -55,8 +54,9 @@ public @interface ToLinkedHashSet {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedHashSet toLinkedHashSet) {
-            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class
-                ? toLinkedHashSet.elementType() : elementType;
+            Class<?> elementType =
+                (elementType = serializer.getFieldActualType(field)) == Object.class ? toLinkedHashSet.elementType()
+                    : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
@@ -66,8 +66,9 @@ public @interface ToLinkedHashSet {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedHashSet toLinkedHashSet,
             ByteBuf writing) {
-            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class
-                ? toLinkedHashSet.elementType() : elementType;
+            Class<?> elementType =
+                (elementType = serializer.getFieldActualType(field)) == Object.class ? toLinkedHashSet.elementType()
+                    : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
