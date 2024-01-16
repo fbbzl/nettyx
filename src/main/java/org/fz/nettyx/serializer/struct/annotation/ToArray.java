@@ -194,12 +194,26 @@ public @interface ToArray {
             }
         }
 
+        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, ByteBuf writingBuf) {
+            for (Basic<?> basic : basicArray) {
+                if (basic == null) writingBuf.writeBytes(new byte[elementBytesSize]);
+                else               writingBuf.writeBytes(basic.getBytes());
+            }
+        }
+
         /**
          * write struct array
          */
         private static void writeStructArray(Object[] structArray, Class<?> structType, ByteBuf writingBuf) {
             for (Object struct : structArray) {
                 writingBuf.writeBytes(StructSerializer.write(defaultIfNull(struct, () -> newStruct(structType))));
+            }
+        }
+
+        private static void writeStructArray(Basic<?>[] basicArray, int elementBytesSize, ByteBuf writingBuf) {
+            for (Basic<?> basic : basicArray) {
+                if (basic == null) writingBuf.writeBytes(new byte[elementBytesSize]);
+                else               writingBuf.writeBytes(basic.getBytes());
             }
         }
     }
