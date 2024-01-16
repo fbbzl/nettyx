@@ -53,7 +53,7 @@ public @interface ToArrayList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             Class<?> elementType =
-                (elementType = serializer.getFieldActualType(field)) == Object.class ? toArrayList.elementType()
+                (elementType = toArrayList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -65,7 +65,7 @@ public @interface ToArrayList {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
             ByteBuf writing) {
             Class<?> elementType =
-                (elementType = serializer.getFieldActualType(field)) == Object.class ? toArrayList.elementType()
+                (elementType = toArrayList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
