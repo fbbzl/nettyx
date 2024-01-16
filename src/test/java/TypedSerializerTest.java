@@ -7,8 +7,8 @@ import java.util.Set;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
+import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedHashSet;
@@ -163,9 +163,9 @@ public class TypedSerializerTest {
         private Cppushort Cppushort;
         private CppBool cppBool;
 
-        @ToArray(length = 2)
+        @ToBasicArray(length = 2)
         private L[] loginNames;
-        @ToArray(length = 2)
+        @ToBasicArray(length = 2)
         private Cppushort[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
