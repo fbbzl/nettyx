@@ -14,10 +14,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
 
 /**
  * array field must use this to assign array length!!!
@@ -49,7 +51,10 @@ public @interface ToArray {
                 (elementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(field)
                     : elementType;
 
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
+
             int length = annotation.length();
+
             return readArray(elementType, length, serializer.getByteBuf());
         }
 
@@ -59,6 +64,8 @@ public @interface ToArray {
             Class<?> elementType =
                 (elementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(field)
                     : elementType;
+
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             int declaredLength = annotation.length();
 
