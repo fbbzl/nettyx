@@ -202,8 +202,8 @@ public class StructUtils {
      * @param arrayField the array field
      * @return the component type
      */
-    public static Class<?> getComponentType(Field arrayField) {
-        return ArrayUtil.getComponentType(arrayField.getType());
+    public static <C> Class<C> getComponentType(Field arrayField) {
+        return (Class<C>) ArrayUtil.getComponentType(arrayField.getType());
     }
 
     /**
@@ -225,9 +225,6 @@ public class StructUtils {
 
         /* reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
-        /**
-         * The Field write method cache.
-         */
         static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
 
         static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();
