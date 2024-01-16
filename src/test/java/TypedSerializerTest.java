@@ -176,6 +176,5 @@ public class TypedSerializerTest {
         @ToLinkedList(size = 1)
         private List<Son> bigSons;
 
-
     }
 }
