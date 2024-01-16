@@ -408,8 +408,7 @@ public final class StructSerializer implements Serializer {
             return Object.class;
         } else if (this.type instanceof ParameterizedType) {
             GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.type, field);
-
-            return (Class<?>) actualType.getGenericComponentType();
+            return (Class<?>) TypeUtil.getActualType(this.type, actualType.getGenericComponentType());
         }
         return Object.class;
     }
