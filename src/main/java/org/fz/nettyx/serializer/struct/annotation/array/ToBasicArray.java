@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct.annotation.array;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
@@ -64,18 +63,20 @@ public @interface ToBasicArray {
 
             Throws.ifTrue(basicElementType != Basic.class, new TypeJudgmentException(field));
 
-            int declaredLength = annotation.length();
+            int declaredLength = annotation.length(), elementBytesSize = StructUtils.newEmptyBasic(basicElementType)
+                .getSize();
 
-            if (arrayValue == null) {
-                StructUtils.newEmptyBasic(basicElementType).getSize();
+            Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
+
+            if (basicArray == null) {
+                writing.writeBytes(new byte[elementBytesSize * declaredLength]);
+                return;
             }
-            else {
-
+            if (basicArray.length < declaredLength) {
+                basicArray = fillArray(basicArray, basicElementType, );
             }
 
-            Object[] array = (Object[]) defaultIfNull(arrayValue, () -> newArray(field, declaredLength));
-
-            writeBasicArray(array, basicElementType, declaredLength, writing);
+            writeBasicArray(basicArray, declaredLength, writing);
         }
 
         public static <T> T[] newArray(Field arrayField, int arrayLength) {
@@ -84,6 +85,12 @@ public @interface ToBasicArray {
 
         public static <T> T[] newArray(Class<?> componentType, int length) {
             return (T[]) Array.newInstance(componentType, length);
+        }
+
+        public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
+            T[] filledArray = (T[]) Array.newInstance(elementType, length);
+            System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
+            return filledArray;
         }
 
         private static <B extends Basic<?>> B[] readBasicArray(Class<B> elementType, int declaredLength, ByteBuf arrayBuf) {
