@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation;
+package org.fz.nettyx.serializer.struct.annotation.array;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
@@ -30,7 +30,7 @@ import org.fz.nettyx.util.Throws;
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToArray {
+public @interface ToBasicArray {
 
     /**
      * array length
@@ -43,10 +43,10 @@ public @interface ToArray {
      * The type To array handler.
      */
     @SuppressWarnings("unchecked")
-    class ToArrayHandler implements PropertyHandler.ReadWriteHandler<ToArray> {
+    class ToArrayHandler implements PropertyHandler.ReadWriteHandler<ToBasicArray> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
+        public Object doRead(StructSerializer serializer, Field field, ToBasicArray annotation) {
             Class<?> elementType =
                 (elementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(field)
                     : elementType;
@@ -59,7 +59,7 @@ public @interface ToArray {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
+        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToBasicArray annotation,
             ByteBuf writing) {
             Class<?> elementType =
                 (elementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(field)
@@ -168,11 +168,10 @@ public @interface ToArray {
          */
         public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength,
             ByteBuf writingBuf) {
-            // cast to array
             T[] array = (T[]) arrayValue;
             if (declaredLength < array.length) {
                 throw new IllegalArgumentException(
-                    "array length exceed the declared length in annotation [" + ToArray.class + "]");
+                    "array length exceed the declared length in annotation [" + ToBasicArray.class + "]");
             }
             if (declaredLength > array.length) {
                 array = fillArray(array, elementType, declaredLength);
@@ -185,35 +184,43 @@ public @interface ToArray {
             }
         }
 
-        /**
-         * write basic array
-         */
+        public static <T> void writeArray(Object arrayValue, int elementBytesLength, int declaredLength,
+            ByteBuf writingBuf) {
+            T[] array = (T[]) arrayValue;
+            if (declaredLength != array.length) {
+                throw new IllegalArgumentException("array length exceed the declared length in annotation [" + ToBasicArray.class + "]");
+            }
+
+            if (isBasic(elementType)) {
+                writeBasicArray((Basic<?>[]) array, elementBytesLength, writingBuf);
+            } else {
+                writeStructArray(array, elementBytesLength, writingBuf);
+            }
+        }
+
         private static void writeBasicArray(Basic<?>[] basicArray, Class<Basic<?>> basicType, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
                 writingBuf.writeBytes(defaultIfNull(basic, () -> StructUtils.newEmptyBasic(basicType)).getBytes());
             }
         }
 
-        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, ByteBuf writingBuf) {
+        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
-                if (basic == null) writingBuf.writeBytes(new byte[elementBytesSize]);
+                if (basic == null) writingBuf.writeBytes(new byte[elementBytesLength]);
                 else               writingBuf.writeBytes(basic.getBytes());
             }
         }
 
-        /**
-         * write struct array
-         */
         private static void writeStructArray(Object[] structArray, Class<?> structType, ByteBuf writingBuf) {
             for (Object struct : structArray) {
                 writingBuf.writeBytes(StructSerializer.write(defaultIfNull(struct, () -> newStruct(structType))));
             }
         }
 
-        private static void writeStructArray(Basic<?>[] basicArray, int elementBytesSize, ByteBuf writingBuf) {
-            for (Basic<?> basic : basicArray) {
-                if (basic == null) writingBuf.writeBytes(new byte[elementBytesSize]);
-                else               writingBuf.writeBytes(basic.getBytes());
+        private static void writeStructArray(Object[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
+            for (Object struct : basicArray) {
+                if (struct == null) writingBuf.writeBytes(new byte[elementBytesLength]);
+                else                writingBuf.writeBytes(StructSerializer.write(struct));
             }
         }
     }
