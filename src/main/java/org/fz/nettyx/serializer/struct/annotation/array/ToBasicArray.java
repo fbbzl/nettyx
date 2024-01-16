@@ -2,7 +2,6 @@ package org.fz.nettyx.serializer.struct.annotation.array;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 
@@ -37,21 +36,18 @@ public @interface ToBasicArray {
      */
     int length();
 
-    /**
-     * The type To array handler.
-     */
     @SuppressWarnings("unchecked")
-    class ToArrayHandler implements PropertyHandler.ReadWriteHandler<ToBasicArray> {
+    class ToBasicArrayHandler implements PropertyHandler.ReadWriteHandler<ToBasicArray> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToBasicArray annotation) {
-            Class<? extends Basic<?>> elementType =
-                (elementType = getComponentType(field)) != Basic.class ? serializer.getArrayFieldActualType(field)
-                    : elementType;
+            Class<? extends Basic<?>> basicElementType =
+                (basicElementType = getComponentType(field)) != Basic.class ? serializer.getArrayFieldActualType(field)
+                    : basicElementType;
 
-            Throws.ifTrue(elementType != Basic.class, new TypeJudgmentException(field));
+            Throws.ifTrue(basicElementType != Basic.class, new TypeJudgmentException(field));
 
-            return readBasicArray(elementType, annotation.length(), serializer.getByteBuf());
+            return readBasicArray(basicElementType, annotation.length(), serializer.getByteBuf());
         }
 
         @Override
@@ -63,8 +59,7 @@ public @interface ToBasicArray {
 
             Throws.ifTrue(basicElementType != Basic.class, new TypeJudgmentException(field));
 
-            int declaredLength = annotation.length(), elementBytesSize = StructUtils.newEmptyBasic(basicElementType)
-                .getSize();
+            int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(basicElementType);
 
             Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
 
@@ -73,14 +68,10 @@ public @interface ToBasicArray {
                 return;
             }
             if (basicArray.length < declaredLength) {
-                basicArray = fillArray(basicArray, basicElementType, );
+                basicArray = fillArray(basicArray, (Class<Basic<?>>) basicElementType, declaredLength);
             }
 
             writeBasicArray(basicArray, declaredLength, writing);
-        }
-
-        public static <T> T[] newArray(Field arrayField, int arrayLength) {
-            return (T[]) Array.newInstance(arrayField.getType().getComponentType(), arrayLength);
         }
 
         public static <T> T[] newArray(Class<?> componentType, int length) {
@@ -93,7 +84,8 @@ public @interface ToBasicArray {
             return filledArray;
         }
 
-        private static <B extends Basic<?>> B[] readBasicArray(Class<B> elementType, int declaredLength, ByteBuf arrayBuf) {
+        private static <B extends Basic<?>> B[] readBasicArray(Class<B> elementType, int declaredLength,
+            ByteBuf arrayBuf) {
             B[] basics = newArray(elementType, declaredLength);
 
             for (int i = 0; i < basics.length; i++) {
@@ -103,42 +95,15 @@ public @interface ToBasicArray {
             return basics;
         }
 
-        public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength,
-            ByteBuf writingBuf) {
-            T[] array = (T[]) arrayValue;
-            if (declaredLength < array.length) {
-                throw new IllegalArgumentException(
-                    "array length exceed the declared length in annotation [" + ToBasicArray.class + "]");
-            }
-            if (declaredLength > array.length) {
-                array = fillArray(array, elementType, declaredLength);
-            }
-
-            writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
-        }
-
-        public static <T> void writeArray(Object arrayValue, int elementBytesLength, int declaredLength,
-            ByteBuf writingBuf) {
-            T[] array = (T[]) arrayValue;
-            if (declaredLength != array.length) {
-                throw new IllegalArgumentException("array length exceed the declared length in annotation [" + ToBasicArray.class + "]");
-            }
-
-            if (isBasic(elementType)) {
-                writeBasicArray((Basic<?>[]) array, elementBytesLength, writingBuf);
-            } else {
-                writeStructArray(array, elementBytesLength, writingBuf);
-            }
-        }
-
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
-                if (basic == null) writingBuf.writeBytes(new byte[elementBytesLength]);
-                else               writingBuf.writeBytes(basic.getBytes());
+                if (basic == null) {
+                    writingBuf.writeBytes(new byte[elementBytesLength]);
+                } else {
+                    writingBuf.writeBytes(basic.getBytes());
+                }
             }
         }
-
-
     }
 
 }
