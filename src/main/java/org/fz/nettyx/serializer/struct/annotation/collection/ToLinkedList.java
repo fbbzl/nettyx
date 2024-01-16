@@ -17,7 +17,6 @@ import java.util.List;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -54,7 +53,7 @@ public @interface ToLinkedList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toLinkedList.elementType()
+                (elementType = serializer.getFieldActualType(field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -66,7 +65,7 @@ public @interface ToLinkedList {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
             ByteBuf writing) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toLinkedList.elementType()
+                (elementType = serializer.getFieldActualType(field)) == Object.class ? toLinkedList.elementType()
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
