@@ -8,6 +8,7 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
+import org.fz.nettyx.serializer.struct.annotation.array.ToStructArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedHashSet;
@@ -164,8 +165,8 @@ public class TypedSerializerTest {
 
         @ToBasicArray(length = 2)
         private Cppushort[] loginNames;
-        @ToBasicArray(length = 2)
-        private Cppushort[] qqNames;
+        @ToStructArray(length = 2)
+        private L[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
         @ToHashSet(size = 3)
