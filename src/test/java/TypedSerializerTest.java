@@ -164,6 +164,8 @@ public class TypedSerializerTest {
 
         @ToArray(length = 2)
         private L[] loginNames;
+        @ToArray(length = 2)
+        private Cppushort[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
         @ToHashSet(size = 3)
