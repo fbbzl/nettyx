@@ -41,7 +41,7 @@ public @interface ToBasicArray {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToBasicArray annotation) {
             Class<? extends Basic<?>> basicElementType =
-                ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
+                !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : basicElementType;
 
             return readBasicArray(basicElementType, annotation.length(), serializer.getByteBuf());
@@ -51,7 +51,7 @@ public @interface ToBasicArray {
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToBasicArray annotation,
             ByteBuf writing) {
             Class<? extends Basic<?>> basicElementType =
-                ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
+                !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : basicElementType;
 
             int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(basicElementType);
