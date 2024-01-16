@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.annotation.array;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
@@ -11,8 +10,6 @@ import java.lang.reflect.Field;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
-import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -35,8 +32,8 @@ public @interface ToStructArray {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToStructArray annotation) {
             Class<?> structElementType =
-                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(field)
-                    : structElementType;
+                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(
+                    field) : structElementType;
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
 
@@ -44,30 +41,26 @@ public @interface ToStructArray {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToStructArray annotation,
+        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToStructArray annotation,
             ByteBuf writing) {
-            ReadWriteHandler.super.doWrite(serializer, field, value, annotation, writing);
             Class<?> structElementType =
-                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(field)
-                    : structElementType;
-
+                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(
+                    field) : structElementType;
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
 
-            int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(basicElementType);
+            int declaredLength = annotation.length();
 
-            Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
+            Object[] structArray = (Object[]) arrayValue;
 
-            if (basicArray == null) {
-                writing.writeBytes(new byte[elementBytesSize * declaredLength]);
-                return;
+            if (structArray == null) {
+                structArray = newArray(field, declaredLength);
             }
-            if (basicArray.length < declaredLength) {
-                basicArray = fillArray(basicArray, (Class<Basic<?>>) basicElementType, declaredLength);
+            if (structArray.length < declaredLength) {
+                structArray = fillArray(structArray, structElementType, declaredLength);
             }
 
-            writeBasicArray(basicArray, declaredLength, writing);
-
+            writeStructArray(structArray, structElementType, writing);
         }
 
         public static <T> T[] newArray(Field arrayField, int arrayLength) {
@@ -97,35 +90,13 @@ public @interface ToStructArray {
         public static <T> void writeArray(Object arrayValue, Class<T> elementType, int declaredLength,
             ByteBuf writingBuf) {
             T[] array = (T[]) arrayValue;
-            if (declaredLength < array.length) {
-                throw new IllegalArgumentException(
-                    "array length exceed the declared length in annotation [" + ToBasicArray.class + "]");
-            }
+
             if (declaredLength > array.length) {
                 array = fillArray(array, elementType, declaredLength);
             }
 
-            if (isBasic(elementType)) {
-                writeBasicArray((Basic<?>[]) array, (Class<Basic<?>>) elementType, writingBuf);
-            } else {
-                writeStructArray(array, elementType, writingBuf);
-            }
+            writeStructArray(array, elementType, writingBuf);
         }
-
-        public static <T> void writeArray(Object arrayValue, int elementBytesLength, int declaredLength,
-            ByteBuf writingBuf) {
-            T[] array = (T[]) arrayValue;
-            if (declaredLength != array.length) {
-                throw new IllegalArgumentException("array length exceed the declared length in annotation [" + ToBasicArray.class + "]");
-            }
-
-            if (isBasic(elementType)) {
-                writeBasicArray((Basic<?>[]) array, elementBytesLength, writingBuf);
-            } else {
-                writeStructArray(array, elementBytesLength, writingBuf);
-            }
-        }
-
 
         private static void writeStructArray(Object[] structArray, Class<?> structType, ByteBuf writingBuf) {
             for (Object struct : structArray) {
@@ -133,13 +104,6 @@ public @interface ToStructArray {
             }
         }
 
-        private static void writeStructArray(Object[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
-            for (Object struct : basicArray) {
-                if (struct == null) writingBuf.writeBytes(new byte[elementBytesLength]);
-                else                writingBuf.writeBytes(StructSerializer.write(struct));
-            }
-        }
     }
-
 
 }
