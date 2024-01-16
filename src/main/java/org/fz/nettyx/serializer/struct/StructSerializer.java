@@ -384,29 +384,29 @@ public final class StructSerializer implements Serializer {
         throw new TypeJudgmentException(this.type);
     }
 
-    public Class<?> getFieldActualType(Field field) {
+    public <T> Class<T> getFieldActualType(Field field) {
         Type fieldType = TypeUtil.getType(field);
         // If it's a Class, it means that no generics are specified
         if (fieldType instanceof Class<?>) {
-            return Object.class;
+            return (Class<T>) Object.class;
         }
         else
         if (this.type instanceof ParameterizedType) {
             Type actualType = TypeUtil.getActualType(this.type, field);
             Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
-            if (actualTypeArguments.length == 0) return Object.class;
+            if (actualTypeArguments.length == 0) return (Class<T>) Object.class;
 
-            return (Class<?>) actualTypeArguments[0];
+            return (Class<T>) actualTypeArguments[0];
         }
-        return Object.class;
+        return (Class<T>) Object.class;
     }
 
-    public Class<?> getArrayFieldActualType(Field field) {
+    public <T> Class<T> getArrayFieldActualType(Field field) {
         if (this.type instanceof ParameterizedType) {
             GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.type, field);
-            return (Class<?>) TypeUtil.getActualType(this.type, actualType.getGenericComponentType());
+            return (Class<T>) TypeUtil.getActualType(this.type, actualType.getGenericComponentType());
         }
-        return Object.class;
+        return (Class<T>) Object.class;
     }
 
     //******************************************      public end       ***********************************************//
