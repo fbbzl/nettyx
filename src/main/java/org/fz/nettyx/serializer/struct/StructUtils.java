@@ -110,9 +110,12 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
-        int basicBytesSize = BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
-        byte[] zeroedBytes = new byte[basicBytesSize];
+        byte[] zeroedBytes = new byte[findBasicSize(basicClass)];
         return newBasic(basicClass, Unpooled.wrappedBuffer(zeroedBytes));
+    }
+
+    public static <B extends Basic<?>> int findBasicSize(Class<B> basicClass) {
+        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
     }
 
     /**
