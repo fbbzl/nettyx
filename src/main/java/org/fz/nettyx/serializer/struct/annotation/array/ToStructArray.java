@@ -40,7 +40,7 @@ public @interface ToStructArray {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToStructArray annotation) {
             Class<?> structElementType =
-                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(
+                (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
@@ -54,7 +54,7 @@ public @interface ToStructArray {
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToStructArray annotation,
             ByteBuf writing) {
             Class<?> structElementType =
-                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(
+                (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
