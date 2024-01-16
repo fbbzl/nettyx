@@ -4,8 +4,8 @@ import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -19,7 +19,6 @@ import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -63,7 +62,7 @@ public @interface ToHashSet {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToHashSet toHashSet) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toHashSet.elementType()
+                (elementType = toHashSet.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -75,7 +74,7 @@ public @interface ToHashSet {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToHashSet toHashSet,
             ByteBuf writing) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toHashSet.elementType()
+                (elementType = toHashSet.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));

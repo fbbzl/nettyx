@@ -4,8 +4,6 @@ import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
 
 import cn.hutool.core.collection.ListUtil;
 import io.netty.buffer.ByteBuf;
@@ -17,7 +15,6 @@ import java.util.List;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -54,7 +51,7 @@ public @interface ToLinkedList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toLinkedList.elementType()
+                (elementType = toLinkedList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -66,7 +63,7 @@ public @interface ToLinkedList {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
             ByteBuf writing) {
             Class<?> elementType =
-                (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class ? toLinkedList.elementType()
+                (elementType = toLinkedList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));

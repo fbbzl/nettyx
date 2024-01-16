@@ -17,7 +17,6 @@ import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -30,8 +29,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -57,23 +54,6 @@ public class StructUtils {
 
     public boolean isTransient(Field field) {
         return TRANSIENT_FIELD_CACHE.contains(field);
-    }
-
-    public Class<?> getFieldParameterizedType(Type type, Field field) {
-        Type fieldType = TypeUtil.getType(field);
-        // If it's a Class, it means that no generics are specified
-        if (fieldType instanceof Class<?>) {
-            return Object.class;
-        }
-        else
-        if (type instanceof ParameterizedType) {
-            Type actualType = TypeUtil.getActualType(type, field);
-            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
-            if (actualTypeArguments.length == 0) return Object.class;
-
-            return (Class<?>) actualTypeArguments[0];
-        }
-        return Object.class;
     }
 
     /**
@@ -130,9 +110,11 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
-        int basicBytesSize = BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
-        byte[] zeroedBytes = new byte[basicBytesSize];
-        return newBasic(basicClass, Unpooled.wrappedBuffer(zeroedBytes));
+        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
+    }
+
+    public static <B extends Basic<?>> int findBasicSize(Class<B> basicClass) {
+        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
     }
 
     /**
@@ -222,8 +204,8 @@ public class StructUtils {
      * @param arrayField the array field
      * @return the component type
      */
-    public static Class<?> getComponentType(Field arrayField) {
-        return ArrayUtil.getComponentType(arrayField.getType());
+    public static <C> Class<C> getComponentType(Field arrayField) {
+        return (Class<C>) ArrayUtil.getComponentType(arrayField.getType());
     }
 
     /**
@@ -245,9 +227,6 @@ public class StructUtils {
 
         /* reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
-        /**
-         * The Field write method cache.
-         */
         static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
 
         static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();

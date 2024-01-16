@@ -1,12 +1,11 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
-import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static cn.hutool.core.collection.CollUtil.newLinkedHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.readArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.writeArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -19,7 +18,6 @@ import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.util.Throws;
 
 /**
@@ -55,8 +53,9 @@ public @interface ToLinkedHashSet {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedHashSet toLinkedHashSet) {
-            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class
-                ? toLinkedHashSet.elementType() : elementType;
+            Class<?> elementType =
+                (elementType = toLinkedHashSet.elementType()) == Object.class ? serializer.getFieldActualType(field)
+                    : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
@@ -66,8 +65,9 @@ public @interface ToLinkedHashSet {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedHashSet toLinkedHashSet,
             ByteBuf writing) {
-            Class<?> elementType = (elementType = StructUtils.getFieldParameterizedType(serializer.getStructParameterizedType(), field)) == Object.class
-                ? toLinkedHashSet.elementType() : elementType;
+            Class<?> elementType =
+                (elementType = toLinkedHashSet.elementType()) == Object.class ? serializer.getFieldActualType(field)
+                    : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
