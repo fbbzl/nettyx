@@ -60,7 +60,7 @@ public @interface ToStructArray {
             return (T[]) Array.newInstance(componentType, length);
         }
 
-        private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
+        public static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
             S[] structs = newArray(elementType, length);
 
             for (int i = 0; i < structs.length; i++) {
