@@ -5,18 +5,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 
+import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
 
 /**
  * array field must use this to assign array length!!!
@@ -42,10 +41,8 @@ public @interface ToBasicArray {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToBasicArray annotation) {
             Class<? extends Basic<?>> basicElementType =
-                (basicElementType = getComponentType(field)) != Basic.class ? serializer.getArrayFieldActualType(field)
+                ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : basicElementType;
-
-            Throws.ifTrue(basicElementType != Basic.class, new TypeJudgmentException(field));
 
             return readBasicArray(basicElementType, annotation.length(), serializer.getByteBuf());
         }
@@ -54,10 +51,8 @@ public @interface ToBasicArray {
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToBasicArray annotation,
             ByteBuf writing) {
             Class<? extends Basic<?>> basicElementType =
-                (basicElementType = getComponentType(field)) != Basic.class ? serializer.getArrayFieldActualType(field)
+                ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : basicElementType;
-
-            Throws.ifTrue(basicElementType != Basic.class, new TypeJudgmentException(field));
 
             int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(basicElementType);
 
