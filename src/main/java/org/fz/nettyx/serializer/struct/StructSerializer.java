@@ -402,6 +402,12 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getArrayFieldActualType(Field field) {
+        Type fieldType = TypeUtil.getType(field);
+        // If it's a Class, it means that no generics are specified
+        if (fieldType instanceof Class<?>) {
+            return (Class<T>) Object.class;
+        }
+
         if (this.type instanceof ParameterizedType) {
             GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.type, field);
             return (Class<T>) TypeUtil.getActualType(this.type, actualType.getGenericComponentType());
