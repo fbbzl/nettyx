@@ -4,8 +4,8 @@ import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray.ToBasicArrayHandler.writeArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.readStructArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.writeStructArray;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -67,7 +67,7 @@ public @interface ToHashSet {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return new HashSet<>(Arrays.asList(readArray(elementType, toHashSet.size(), serializer.getByteBuf())));
+            return new HashSet<>(Arrays.asList(readStructArray(elementType, toHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
@@ -80,7 +80,7 @@ public @interface ToHashSet {
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newHashSet());
-            writeArray(set.toArray(), elementType, toHashSet.size(), writing);
+            writeStructArray(set.toArray(), elementType, toHashSet.size(), writing);
         }
 
     }
