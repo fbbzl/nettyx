@@ -176,13 +176,10 @@ public class StructUtils {
      */
     public static <S> S newStruct(Class<S> structClass) {
         try {
-            if (isStruct(structClass)) {
-                return ReflectUtil.getConstructor(structClass).newInstance();
-            } else {
-                throw new UnsupportedOperationException(
-                    "can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
-            }
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
+            if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
+            else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
+        }
+        catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
         }
     }
