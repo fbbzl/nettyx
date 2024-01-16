@@ -8,6 +8,7 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
+import org.fz.nettyx.serializer.struct.annotation.array.ToStructArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedHashSet;
@@ -62,8 +63,8 @@ public class TypedSerializerTest {
         int times = 1;
         for (int i = 0; i < times; i++) {
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes),
-                new TypeRefer<User<Son, Wife, Cchar>>() {
+            User<Son, Wife, Wife> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes),
+                new TypeRefer<User<Son, Wife, Wife>>() {
                 });
             System.err.println(user);
 //              user = new User();
@@ -164,7 +165,7 @@ public class TypedSerializerTest {
 
         @ToBasicArray(length = 2)
         private Cppushort[] loginNames;
-        @ToBasicArray(length = 2)
+        @ToStructArray(length = 2)
         private L[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
