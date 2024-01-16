@@ -56,10 +56,6 @@ public @interface ToStructArray {
             writeStructArray(arrayValue, structElementType, declaredLength, writing);
         }
 
-        public static <T> T[] newArray(Field arrayField, int arrayLength) {
-            return (T[]) Array.newInstance(arrayField.getType().getComponentType(), arrayLength);
-        }
-
         public static <T> T[] newArray(Class<?> componentType, int length) {
             return (T[]) Array.newInstance(componentType, length);
         }
