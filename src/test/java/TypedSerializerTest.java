@@ -1,13 +1,8 @@
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -86,10 +81,7 @@ public class TypedSerializerTest {
             User<Son, Wife, Cchar> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
             System.err.println("turn :" + turn);
-            Map<String, Object> turnMap = BeanUtil.beanToMap(turn);
-            Map<String, Object> userMap = BeanUtil.beanToMap(user);
-            Collection<Entry<String, Object>> disjunction = CollectionUtil.disjunction(turnMap.entrySet(),
-                userMap.entrySet());
+
 
             System.err.println(turn.equals(user));
 
