@@ -130,7 +130,7 @@ public abstract class Basic<V> {
 
         if (basicConstructor == null) {
             throw new IllegalArgumentException(
-                "can not find basic [" + basicClass + "] constructor with bytebuf, please check");
+                "can not find basic type [" + basicClass + "] constructor with bytebuf arg, please check");
         }
 
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
