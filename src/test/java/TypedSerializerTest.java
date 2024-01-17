@@ -108,7 +108,7 @@ public class TypedSerializerTest {
 //        private Cdouble platformId;
 //        private Clong8 description;
 //        private Culong8 interest;
-//        private Bill bill;
+          private Bill bill;
 //        private Cchar Cchar;
 //        private Cdouble Cdouble;
 //        private Cfloat Cfloat;
