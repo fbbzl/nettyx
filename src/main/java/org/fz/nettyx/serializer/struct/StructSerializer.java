@@ -2,14 +2,13 @@ package org.fz.nettyx.serializer.struct;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
-import static org.fz.nettyx.serializer.struct.StructUtils.isBasic;
-import static org.fz.nettyx.serializer.struct.StructUtils.isIgnore;
-import static org.fz.nettyx.serializer.struct.StructUtils.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.useReadHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.useWriteHandler;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -32,6 +31,8 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
+import org.fz.nettyx.serializer.struct.annotation.Ignore;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.TypeRefer;
@@ -332,5 +333,70 @@ public final class StructSerializer implements Serializer {
     }
 
     //******************************************      public end       ***********************************************//
+
+    public static boolean isTransient(Field field) {
+        return TRANSIENT_FIELD_CACHE.contains(field);
+    }
+
+    public static <T> boolean isNotBasic(T object) {
+        return isNotBasic(object.getClass());
+    }
+
+    public static boolean isNotBasic(Field field) {
+        return isNotBasic(field.getType());
+    }
+
+    public static boolean isNotBasic(Class<?> clazz) {
+        return !isBasic(clazz);
+    }
+
+    public static <T> boolean isBasic(T object) {
+        return isBasic(object.getClass());
+    }
+
+    public static boolean isBasic(Field field) {
+        Class<?> fieldType = field.getType();
+        return isBasic(fieldType);
+    }
+
+    public static boolean isBasic(Class<?> clazz) {
+        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    }
+
+    public static boolean isNotStruct(Field field) {
+        return isNotStruct(field.getType());
+    }
+
+    public static <T> boolean isNotStruct(T object) {
+        return isNotStruct(object.getClass());
+    }
+
+    public static boolean isNotStruct(Class<?> clazz) {
+        return !isStruct(clazz);
+    }
+
+    public static boolean isStruct(Field field) {
+        Class<?> fieldType = field.getType();
+
+        return isStruct(fieldType);
+    }
+
+    public static <T> boolean isStruct(T object) {
+        return isStruct(object.getClass());
+    }
+
+    public static boolean isStruct(Class<?> clazz) {
+        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
+    }
+
+    /**
+     * Is ignore boolean.
+     *
+     * @param field the field
+     * @return the boolean
+     */
+    public static boolean isIgnore(Field field) {
+        return AnnotationUtil.hasAnnotation(field, Ignore.class) || isTransient(field);
+    }
 
 }
