@@ -33,8 +33,12 @@ public class TypedSerializerTest {
 
             // these bytes may from nio, netty, input-stream, output-stream.....
             User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
-            System.err.println("read :" + user);
 
+            Set<Wife> firstWifes = user.getFirstWifes();
+            for (Wife firstWife : firstWifes) {
+                firstWife.setName("11");
+            }
+            System.err.println("read :" + user);
 //            user.setAddress(null);
 //            user.setLoginNames(null);
 //            user.setQqNames(null);
@@ -50,7 +54,7 @@ public class TypedSerializerTest {
             System.err.println("turn :" + turn);
 
 
-            System.err.println(turn.equals(user));
+
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
