@@ -10,7 +10,6 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.useReadHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.useWriteHandler;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -76,42 +75,20 @@ public final class StructSerializer implements Serializer {
         this.type = type;
     }
 
-    static <T> Class<T> identifyType(Type type) {
+    static <T> Class<T> identifyClass(Type type) {
         if (type instanceof Class<?>)          return (Class<T>) type;
         else
         if (type instanceof ParameterizedType) return (Class<T>) ((ParameterizedType) type).getRawType();
         else
-        if (type instanceof TypeRefer)         return identifyType(((TypeRefer<T>) type).getType());
+        if (type instanceof TypeRefer)         return identifyClass(((TypeRefer<T>) type).getType());
         else
-        if (type instanceof TypeReference)     return identifyType(((TypeReference<T>) type).getType());
+        if (type instanceof TypeReference)     return identifyClass(((TypeReference<T>) type).getType());
 
         else throw new TypeJudgmentException(type);
     }
 
     public static <T> T read(ByteBuf byteBuf, Type type) {
-        if (type instanceof Class<?>) {
-            Class<T> clazz = (Class<T>) type;
-            Throws.ifFalse(BeanUtil.isBean(clazz), new TypeJudgmentException(type));
-
-            return new StructSerializer(byteBuf, newStruct(clazz), type).toObject();
-        }
-        else
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Class<T> structType = (Class<T>) parameterizedType.getRawType();
-
-            return new StructSerializer(byteBuf, newStruct(structType), type).toObject();
-        }
-        else
-        if (type instanceof TypeRefer) {
-            return read(byteBuf, ((TypeRefer<T>) type).getType());
-        }
-        // also support hutool
-        else
-        if (type instanceof TypeReference) {
-            return read(byteBuf, ((TypeReference<T>) type).getType());
-        }
-        else throw new TypeJudgmentException(type);
+        return new StructSerializer(byteBuf, newStruct(identifyClass(type)), type).toObject();
     }
 
     public static <T> T read(byte[] bytes, Type type) {
