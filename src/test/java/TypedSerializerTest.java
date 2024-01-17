@@ -69,18 +69,20 @@ public class TypedSerializerTest {
             User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
             System.err.println(user);
 
-            user.setAddress(null);
-            user.setLoginNames(null);
-            user.setQqNames(null);
-            user.setWifes(null);
-            user.setSons(null);
-            user.setFirstWifes(null);
-            user.setBigSons(null);
+//            user.setAddress(null);
+//            user.setLoginNames(null);
+//            user.setQqNames(null);
+//            user.setWifes(null);
+//            user.setSons(null);
+//            user.setFirstWifes(null);
+//            user.setBigSons(null);
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
-            user = StructSerializer.read(userWriteBytes, typeRefer);
+            User<Son, Wife, Cchar> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
-            System.err.println("turn :" + user);
+            System.err.println("turn :" + turn);
+
+            System.err.println(turn.equals(user));
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
