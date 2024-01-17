@@ -78,7 +78,7 @@ public class TypedSerializerTest {
 //            user.setBill(null);
 //            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
-               final ByteBuf userWriteBytes = StructSerializer.write(user);
+            final ByteBuf userWriteBytes = StructSerializer.write(user);
 
             //  User read = StructSerializer.read(userWriteBytes, User.class);
 
