@@ -64,6 +64,7 @@ public class TypedSerializerTest {
         for (int i = 0; i < times; i++) {
             TypeRefer<User<Son, Wife, Cchar>> typeRefer = new TypeRefer<User<Son, Wife, Cchar>>() {
             };
+
             // these bytes may from nio, netty, input-stream, output-stream.....
             User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
             System.err.println(user);
@@ -77,9 +78,9 @@ public class TypedSerializerTest {
             user.setBigSons(null);
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
-            User read = StructSerializer.read(userWriteBytes, User.class);
+            user = StructSerializer.read(userWriteBytes, typeRefer);
 
-            System.err.println("turn :" + read);
+            System.err.println("turn :" + user);
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
