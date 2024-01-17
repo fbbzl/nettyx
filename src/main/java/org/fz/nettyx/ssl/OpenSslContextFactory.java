@@ -3,13 +3,12 @@ package org.fz.nettyx.ssl;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import lombok.Setter;
-import lombok.experimental.UtilityClass;
-
-import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
+import javax.net.ssl.SSLException;
+import lombok.Setter;
+import lombok.experimental.UtilityClass;
 
 /**
  * For details about how to generate openssl files, see {@link ./support/openssl}.

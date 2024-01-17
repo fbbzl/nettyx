@@ -6,10 +6,9 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.net.SocketAddress;
 
 /**
  * wrap channel event to ChannelEvent, keep channel event could propagate in ApplicationContext and the others

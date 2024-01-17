@@ -1,7 +1,11 @@
 package org.fz.nettyx.endpoint.serial.rxtx;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
