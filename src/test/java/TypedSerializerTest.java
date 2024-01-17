@@ -3,7 +3,6 @@ import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Set;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
@@ -66,10 +65,7 @@ public class TypedSerializerTest {
             // these bytes may from nio, netty, input-stream, output-stream.....
             User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
-            Set<Wife> firstWifes = user.getFirstWifes();
-            for (Wife firstWife : firstWifes) {
-                firstWife.setName("11");
-            }
+
             System.err.println("read :" + user);
 //            user.setAddress(null);
 //            user.setLoginNames(null);
