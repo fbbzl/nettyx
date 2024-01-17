@@ -55,7 +55,7 @@ public @interface ToString {
                         + "]");
             }
             ByteBuf byteBuf1 = byteBuf.readBytes(toString.bufferLength());
-
+            // TODO
             System.err.println(ByteBufUtil.hexDump(byteBuf1));
             return byteBuf1.toString(Charset.forName(charset));
         }
@@ -64,6 +64,8 @@ public @interface ToString {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writing) {
             int bufferLength = toString.bufferLength();
             String charset = toString.charset();
+
+
 
             if (value != null) {
                 byte[] bytes = value.toString().getBytes(Charset.forName(charset));
