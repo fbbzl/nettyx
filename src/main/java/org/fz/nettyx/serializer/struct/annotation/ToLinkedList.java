@@ -1,18 +1,18 @@
-package org.fz.nettyx.serializer.struct.annotation.collection;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.readStructArray;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.writeStructArray;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
 
-import cn.hutool.core.collection.ListUtil;
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.LinkedList;
 import java.util.List;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
@@ -58,7 +58,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return ListUtil.toLinkedList(readStructArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
+            return readCollection(serializer.getByteBuf(), elementType, toLinkedList.size(), new LinkedList<>());
         }
 
         @Override
@@ -71,7 +71,8 @@ public @interface ToLinkedList {
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
-            writeStructArray(list.toArray(), elementType, toLinkedList.size(), writing);
+
+            writeCollection(list, elementType, toLinkedList.size(), writing);
         }
     }
 
