@@ -3,8 +3,8 @@ package org.fz.nettyx.serializer.struct.annotation.array;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
+import static org.fz.nettyx.serializer.struct.StructUtils.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import io.netty.buffer.ByteBuf;
@@ -58,7 +58,7 @@ public @interface ToStructArray {
                 (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
-            Throws.ifFalse(isStruct(structElementType), "type");
+            Throws.ifTrue(isStruct(structElementType), "type");
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
 
             int declaredLength = annotation.length();

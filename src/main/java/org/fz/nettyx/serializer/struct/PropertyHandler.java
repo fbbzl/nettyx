@@ -2,12 +2,12 @@ package org.fz.nettyx.serializer.struct;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructSerializer.readBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.readStruct;
 import static org.fz.nettyx.serializer.struct.StructSerializer.writeBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.writeStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.isBasic;
+import static org.fz.nettyx.serializer.struct.StructUtils.isStruct;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Annotation;
