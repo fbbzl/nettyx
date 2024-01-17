@@ -1,8 +1,9 @@
-package org.fz.nettyx.serializer.struct.annotation.array;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isNotStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
@@ -12,6 +13,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -57,6 +60,8 @@ public @interface ToStructArray {
                 (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
+            Throws.ifTrue(isNotStruct(structElementType),
+                "type [" + structElementType + "] is not a struct, please keep struct class with annotation @Struct");
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
 
             int declaredLength = annotation.length();
@@ -79,29 +84,35 @@ public @interface ToStructArray {
         }
 
         public static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int declaredLength,
-            ByteBuf writingBuf) {
+            ByteBuf writing) {
             T[] array = (T[]) arrayValue;
 
             if (array == null) {
                 array = newArray(elementType, declaredLength);
             }
 
-            if (array.length < declaredLength) {
-                array = fillArray(array, elementType, declaredLength);
+            for (int i = 0; i < declaredLength; i++) {
+                if (i > array.length - 1) {
+                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+                } else {
+                    writing.writeBytes(StructSerializer.write(defaultIfNull(array[i], () -> newStruct(elementType))));
+                }
             }
-
-            for (Object struct : array) {
-                writingBuf.writeBytes(StructSerializer.write(defaultIfNull(struct, () -> newStruct(elementType))));
-            }
-
         }
 
-        public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
-            T[] filledArray = (T[]) Array.newInstance(elementType, length);
-            System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
-            return filledArray;
+        public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+            ByteBuf writing) {
+            Iterator<?> iterator = collection.iterator();
+
+            for (int i = 0; i < declaredLength; i++) {
+                if (iterator.hasNext()) {
+                    writing.writeBytes(
+                        StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+                } else {
+                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+                }
+            }
         }
 
     }
-
 }

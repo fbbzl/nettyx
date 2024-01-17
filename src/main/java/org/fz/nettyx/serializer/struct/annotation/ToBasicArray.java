@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.array;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -16,6 +16,7 @@ import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
 
 /**
  * array field must use this to assign array length!!!
@@ -44,6 +45,9 @@ public @interface ToBasicArray {
                 !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : basicElementType;
 
+            Throws.ifNotAssignable(Basic.class, basicElementType,
+                "type [" + basicElementType + "] is not a basic type");
+
             return readBasicArray(basicElementType, annotation.length(), serializer.getByteBuf());
         }
 
@@ -53,6 +57,9 @@ public @interface ToBasicArray {
             Class<? extends Basic<?>> basicElementType =
                 !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : basicElementType;
+
+            Throws.ifNotAssignable(Basic.class, basicElementType,
+                "type [" + basicElementType + "] is not a basic type");
 
             int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(basicElementType);
 
