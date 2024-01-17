@@ -13,10 +13,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.List;
-import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.util.Throws;
 
 /**
  * The interface To linked list.
@@ -55,8 +53,6 @@ public @interface ToLinkedList {
                 (elementType = toLinkedList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
-            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
-
             return newLinkedList(readStructArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
         }
 
@@ -66,8 +62,6 @@ public @interface ToLinkedList {
             Class<?> elementType =
                 (elementType = toLinkedList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
-
-            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
 
