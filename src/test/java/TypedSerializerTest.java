@@ -2,14 +2,18 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Set;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedHashSet;
+import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
+import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
+import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
 import org.fz.nettyx.util.HexBins;
 import org.fz.nettyx.util.TypeRefer;
 
@@ -54,7 +58,7 @@ public class TypedSerializerTest {
             System.err.println("turn :" + turn);
 
 
-
+            System.err.println(turn.equals(user));
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
@@ -96,60 +100,58 @@ public class TypedSerializerTest {
     @Struct
     public static class User<T, W, L> {
 
-//        private Clong4 uid;
-//        private Cchar uname;
-//        private Cint isMarried;
-//        private Cchar sex;
-//        private Cfloat address;
-//        private Cdouble platformId;
-//        private Clong8 description;
-//        private Culong8 interest;
-//        private Bill bill;
-//        private Cchar Cchar;
-//        private Cdouble Cdouble;
-//        private Cfloat Cfloat;
-//        private Cint Cint;
-//        private Clong4 Clong4;
-//        private Clong8 Clong8;
-//        private Clonglong Clonglong;
-//        private Cshort Cshort;
-//        private Cuchar Cuchar;
-//        private Cuint Cuint;
-//        private Culong4 Culong4;
-//        private Culong8 Culong8;
-//        private Culonglong Culonglong;
-//        private Cushort Cushort;
-//        private Cpp8tchar Cpp8tchar;
-//        private Cpp16tchar Cpp16tchar;
-//        private Cpp32tchar Cpp32tchar;
-//        private Cppdouble Cppdouble;
-//        private Cppfloat Cppfloat;
-//        private Cppint Cppint;
-//        private Cpplong4 Cpplong4;
-//        private Cpplong8 Cpplong8;
-//        private Cpplonglong Cpplonglong;
-//        private Cppshort Cppshort;
-//        private Cppuchar Cppuchar;
-//        private Cppuint Cppuint;
-//        private Cppulong4 Cppulong4;
-//        private Cppulong8 Cppulong8;
-//        private Cppulonglong Cppulonglong;
-//        private Cppushort Cppushort;
-//        private CppBool cppBool;
+        private Clong4 uid;
+        private Cchar uname;
+        private Cint isMarried;
+        private Cchar sex;
+        private Cfloat address;
+        private Cdouble platformId;
+        private Clong8 description;
+        private Culong8 interest;
+        private Bill bill;
+        private Cchar Cchar;
+        private Cdouble Cdouble;
+        private Cfloat Cfloat;
+        private Cint Cint;
+        private Clong4 Clong4;
+        private Clong8 Clong8;
+        private Clonglong Clonglong;
+        private Cshort Cshort;
+        private Cuchar Cuchar;
+        private Cuint Cuint;
+        private Culong4 Culong4;
+        private Culong8 Culong8;
+        private Culonglong Culonglong;
+        private Cushort Cushort;
+        private Cpp8tchar Cpp8tchar;
+        private Cpp16tchar Cpp16tchar;
+        private Cpp32tchar Cpp32tchar;
+        private Cppdouble Cppdouble;
+        private Cppfloat Cppfloat;
+        private Cppint Cppint;
+        private Cpplong4 Cpplong4;
+        private Cpplong8 Cpplong8;
+        private Cpplonglong Cpplonglong;
+        private Cppshort Cppshort;
+        private Cppuchar Cppuchar;
+        private Cppuint Cppuint;
+        private Cppulong4 Cppulong4;
+        private Cppulong8 Cppulong8;
+        private Cppulonglong Cppulonglong;
+        private Cppushort Cppushort;
+        private CppBool cppBool;
 
-//        @ToBasicArray(length = 2)
-//        private L[] loginNames;
-//        @ToBasicArray(length = 2)
-//        private Cppushort[] qqNames;
-//        @ToArrayList(size = 2)
-//        private List<W> wifes;
-//        @ToHashSet(size = 1)
-//        private Set<T> sons;
+        @ToBasicArray(length = 2)
+        private L[] loginNames;
+        @ToBasicArray(length = 2)
+        private Cppushort[] qqNames;
+        @ToArrayList(size = 2)
+        private List<W> wifes;
+        private Set<T> sons;
 
-        @ToLinkedHashSet(size = 3)
         private Set<Wife> firstWifes;
-//        @ToLinkedList(size = 1)
-//        private List<Son> bigSons;
+        @ToLinkedList(size = 1)
+        private List<Son> bigSons;
 
     }
 }
