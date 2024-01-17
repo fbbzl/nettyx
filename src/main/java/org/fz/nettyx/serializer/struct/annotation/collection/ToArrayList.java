@@ -13,8 +13,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.List;
+import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.util.Throws;
 
 /**
  * The interface List.
@@ -53,6 +55,8 @@ public @interface ToArrayList {
                 (elementType = toArrayList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
 
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
+
             return newArrayList(readStructArray(elementType, toArrayList.size(), serializer.getByteBuf()));
         }
 
@@ -62,6 +66,8 @@ public @interface ToArrayList {
             Class<?> elementType =
                 (elementType = toArrayList.elementType()) == Object.class ? serializer.getFieldActualType(field)
                     : elementType;
+
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
 
