@@ -33,7 +33,7 @@ public class TypedSerializerTest {
 
             // these bytes may from nio, netty, input-stream, output-stream.....
             User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
-            System.err.println(user);
+            System.err.println("read :" + user);
 
 //            user.setAddress(null);
 //            user.setLoginNames(null);
@@ -44,6 +44,7 @@ public class TypedSerializerTest {
 //            user.setBigSons(null);
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
+
             User<Son, Wife, Cchar> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
             System.err.println("turn :" + turn);
