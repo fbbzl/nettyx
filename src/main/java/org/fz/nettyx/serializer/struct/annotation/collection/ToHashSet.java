@@ -13,7 +13,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
@@ -67,7 +66,7 @@ public @interface ToHashSet {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newHashSet(Arrays.asList(readStructArray(elementType, toHashSet.size(), serializer.getByteBuf())));
+            return newHashSet(readStructArray(elementType, toHashSet.size(), serializer.getByteBuf()));
         }
 
         @Override
