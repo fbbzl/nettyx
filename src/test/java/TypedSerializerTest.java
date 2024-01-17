@@ -12,8 +12,36 @@ import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clonglong;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cshort;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuint;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong4;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culonglong;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cushort;
 import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp16tchar;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp32tchar;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp8tchar;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppdouble;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppfloat;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppint;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpplong4;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpplong8;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpplonglong;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppshort;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppuchar;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppuint;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulong4;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulong8;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulonglong;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 import org.fz.nettyx.util.HexBins;
 import org.fz.nettyx.util.TypeRefer;
 
@@ -147,9 +175,10 @@ public class TypedSerializerTest {
         private Cppushort[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
-        private Set<T> sons;
-
-        private Set<Wife> firstWifes;
+        @ToArrayList(size = 2)
+        private List<T> sons;
+        @ToArrayList(size = 2)
+        private List<Wife> firstWifes;
         @ToLinkedList(size = 1)
         private List<Son> bigSons;
 
