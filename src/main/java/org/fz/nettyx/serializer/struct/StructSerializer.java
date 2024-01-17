@@ -314,7 +314,7 @@ public final class StructSerializer implements Serializer {
         Type fieldType = TypeUtil.getType(field);
         // If it's a Class, it means that no generics are specified
         if (fieldType instanceof Class<?>) {
-            return (Class<T>) Object.class;
+            return (Class<T>) fieldType;
         }
         if (fieldType instanceof TypeVariable) {
             return (Class<T>) TypeUtil.getActualType(this.type, fieldType);
