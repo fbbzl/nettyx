@@ -123,11 +123,20 @@ public final class StructSerializer implements Serializer {
 
     public static <T> ByteBuf write(T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
-        return new StructSerializer(buffer(), struct, struct.getClass()).toByteBuf();
+        return write(struct, struct.getClass());
+    }
+
+    public static <T> ByteBuf write(T struct, Type type) {
+        Throws.ifNull(struct, "struct can not be null when write");
+        return new StructSerializer(buffer(), struct, type).toByteBuf();
     }
 
     public static <T> byte[] writeBytes(T struct) {
-        ByteBuf writeBuf = StructSerializer.write(struct);
+        return writeBytes(struct, struct.getClass());
+    }
+
+    public static <T> byte[] writeBytes(T struct, Type type) {
+        ByteBuf writeBuf = write(struct, type);
         try {
             byte[] bytes = new byte[writeBuf.readableBytes()];
             writeBuf.readBytes(bytes);
@@ -138,11 +147,19 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> ByteBuffer writeNioBuffer(T struct) {
-        return ByteBuffer.wrap(StructSerializer.writeBytes(struct));
+        return writeNioBuffer(struct, struct.getClass());
+    }
+
+    public static <T> ByteBuffer writeNioBuffer(T struct, Type type) {
+        return ByteBuffer.wrap(writeBytes(struct, type));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
         outputStream.write(writeBytes(struct));
+    }
+
+    public static <T> void writeStream(T struct, OutputStream outputStream, Type type) throws IOException {
+        outputStream.write(writeBytes(struct, type));
     }
 
     //*************************************      working code splitter      ******************************************//
