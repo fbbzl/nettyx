@@ -120,7 +120,7 @@ public interface PropertyHandler<A extends Annotation> {
             // default is no nothing
         }
 
-        default void beforeReadThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
+        default void afterReadThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
             // default is no nothing
         }
     }
@@ -156,7 +156,7 @@ public interface PropertyHandler<A extends Annotation> {
             // default is no nothing
         }
 
-        default void beforeWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
+        default void afterWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
             // default is no nothing
         }
 

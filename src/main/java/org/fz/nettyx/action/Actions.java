@@ -3,12 +3,6 @@ package org.fz.nettyx.action;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import java.net.SocketAddress;
-import org.fz.nettyx.action.ChannelBindAction;
-import org.fz.nettyx.action.ChannelConnectAction;
-import org.fz.nettyx.action.ChannelHandlerContextAction;
-import org.fz.nettyx.action.ChannelPromiseAction;
-import org.fz.nettyx.action.ChannelReadAction;
-import org.fz.nettyx.action.ChannelWriteAction;
 
 /**
  * @author fengbinbin

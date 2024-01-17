@@ -125,12 +125,12 @@ public abstract class Basic<V> {
 
     public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass)
         throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        Constructor<? extends Basic<?>> basicConstructor = filterConstructor((Class<? extends Basic<?>>) basicClass,
+        Constructor<? extends Basic<?>> basicConstructor = filterConstructor(basicClass,
             c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
 
         if (basicConstructor == null) {
             throw new IllegalArgumentException(
-                "can not find basic [" + basicClass + "] constructor with bytebuf, please check");
+                "can not find basic type [" + basicClass + "] constructor with bytebuf arg, please check");
         }
 
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
