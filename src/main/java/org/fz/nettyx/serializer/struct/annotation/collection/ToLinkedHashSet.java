@@ -12,7 +12,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.fz.nettyx.exception.ParameterizedTypeException;
@@ -59,8 +58,7 @@ public @interface ToLinkedHashSet {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newLinkedHashSet(
-                Arrays.asList(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
+            return newLinkedHashSet(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf()));
         }
 
         @Override
