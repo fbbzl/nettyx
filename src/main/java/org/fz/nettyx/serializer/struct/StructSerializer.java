@@ -2,12 +2,14 @@ package org.fz.nettyx.serializer.struct;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
+import static org.fz.nettyx.serializer.struct.StructUtils.isBasic;
+import static org.fz.nettyx.serializer.struct.StructUtils.isIgnore;
+import static org.fz.nettyx.serializer.struct.StructUtils.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.useReadHandler;
+import static org.fz.nettyx.serializer.struct.StructUtils.useWriteHandler;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
@@ -19,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -32,8 +33,6 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
-import org.fz.nettyx.serializer.struct.annotation.Ignore;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.TypeRefer;
@@ -276,92 +275,6 @@ public final class StructSerializer implements Serializer {
                 writeHandlerException);
             throw new HandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
-    }
-
-    /**
-     * Is basic boolean.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @return the boolean
-     */
-    public static <T> boolean isBasic(T object) {
-        return isBasic(object.getClass());
-    }
-
-    /**
-     * Is basic boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean isBasic(Field field) {
-        return isBasic(field.getType());
-    }
-
-    /**
-     * Is basic boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
-    public static boolean isBasic(Class<?> clazz) {
-        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-    }
-
-    public static boolean isStruct(Field field) {
-        return isStruct(field.getType());
-    }
-
-    /**
-     * Is struct boolean.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @return the boolean
-     */
-    public static <T> boolean isStruct(T object) {
-        return isStruct(object.getClass());
-    }
-
-    /**
-     * Is struct boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
-    public static boolean isStruct(Class<?> clazz) {
-        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
-    }
-
-    /**
-     * Is ignore boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean isIgnore(Field field) {
-        return AnnotationUtil.hasAnnotation(field, Ignore.class) || StructUtils.isTransient(field);
-    }
-
-    /**
-     * Is read handleable boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((PropertyHandler<?>) StructUtils.getHandler(field));
-    }
-
-    /**
-     * Is write handleable boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((PropertyHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
