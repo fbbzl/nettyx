@@ -3,7 +3,6 @@ import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Set;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
@@ -11,8 +10,6 @@ import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
 import org.fz.nettyx.serializer.struct.annotation.array.ToStructArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToHashSet;
-import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedHashSet;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
@@ -63,25 +60,30 @@ public class TypedSerializerTest {
         long l = System.currentTimeMillis();
         int times = 1;
         for (int i = 0; i < times; i++) {
+            TypeRefer<User<Son, Wife, Cchar, GirlFriend>> typeRefer = new TypeRefer<User<Son, Wife, Cchar, GirlFriend>>() {
+            };
+
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son, Wife, Wife> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes),
-                new TypeRefer<User<Son, Wife, Wife>>() {
-                });
-            System.err.println(user);
-//              user = new User();
-//            user.setUid(new Clong4(1));
-//            user.setUname(null);
-//            user.setIsMarried(null);
-//            user.setSex(null);
+            User<Son, Wife, Cchar, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+
+
+            System.err.println("read :" + user);
 //            user.setAddress(null);
-//            user.setPlatformId(null);
-//            user.setDescription(null);
-//            user.setBill(null);
-//            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
+//            user.setLoginNames(null);
+//            user.setQqNames(null);
+//            user.setWifes(null);
+//            user.setSons(null);
+//            user.setFirstWifes(null);
+//            user.setBigSons(null);
 
-               final ByteBuf userWriteBytes = StructSerializer.write(user);
+            final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
 
-            //  User read = StructSerializer.read(userWriteBytes, User.class);
+            User<Son, Wife, Cchar, GirlFriend> turn = StructSerializer.read(userWriteBytes, typeRefer);
+
+            System.err.println("turn :" + turn);
+
+
+            System.err.println(turn.equals(user));
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
@@ -104,6 +106,14 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
+    public static class GirlFriend {
+
+        @ToString(bufferLength = 2)
+        private String cup;
+    }
+
+    @Data
+    @Struct
     public static class Wife {
 
         @ToString(bufferLength = 2)
@@ -121,7 +131,7 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
-    public static class User<T, W, L> {
+    public static class User<T, W, L, G> {
 
         private Clong4 uid;
         private Cchar uname;
@@ -165,17 +175,17 @@ public class TypedSerializerTest {
         private CppBool cppBool;
 
         @ToBasicArray(length = 2)
-        private Cppushort[] loginNames;
-        @ToStructArray(length = 2)
-        private L[] qqNames;
+        private L[] loginNames;
+        @ToBasicArray(length = 2)
+        private Cppushort[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
-        @ToHashSet(size = 3)
-        private Set<T> sons;
-        @ToLinkedHashSet(size = 3)
-        private Set<Wife> firstWifes;
-        @ToLinkedList(size = 1)
-        private List<Son> bigSons;
+        @ToLinkedList(size = 2)
+        private List<T> sons;
+        @ToStructArray(length = 2)
+        private G[] gfs;
+
+        private W firstWife;
 
     }
 }
