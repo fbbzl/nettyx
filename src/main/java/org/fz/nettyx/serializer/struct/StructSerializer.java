@@ -108,7 +108,14 @@ public final class StructSerializer implements Serializer {
     public static <T> ByteBuf write(T struct, Type type) {
         Throws.ifNull(struct, "struct can not be null when write");
 
-        return new StructSerializer(buffer(), struct, type).toByteBuf();
+        if (type instanceof Class<?>)          return new StructSerializer(buffer(), struct, type).toByteBuf();
+        else
+        if (type instanceof ParameterizedType) return new StructSerializer(buffer(), struct, type).toByteBuf();
+        else
+        if (type instanceof TypeRefer)         return write(buffer(), ((TypeRefer<T>) type).getType());
+        else
+        if (type instanceof TypeReference)     return write(buffer(), ((TypeReference<T>) type).getType());
+        else throw new TypeJudgmentException(type);
     }
 
     public static <T> ByteBuf write(T struct) {
