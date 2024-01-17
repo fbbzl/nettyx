@@ -83,6 +83,7 @@ public final class StructSerializer implements Serializer {
         if (type instanceof TypeRefer)         return identifyClass(((TypeRefer<T>) type).getType());
         else
         if (type instanceof TypeReference)     return identifyClass(((TypeReference<T>) type).getType());
+
         else throw new TypeJudgmentException(type);
     }
 
