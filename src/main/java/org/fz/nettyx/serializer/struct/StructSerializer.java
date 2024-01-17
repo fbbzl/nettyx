@@ -112,8 +112,6 @@ public final class StructSerializer implements Serializer {
 
     public static <T> ByteBuf write(T struct, Type type) {
         Throws.ifNull(struct, "struct can not be null when write");
-
-
         return new StructSerializer(buffer(), struct, type).toByteBuf();
     }
 
