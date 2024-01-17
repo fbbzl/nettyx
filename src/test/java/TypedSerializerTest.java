@@ -8,6 +8,7 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.annotation.array.ToBasicArray;
+import org.fz.nettyx.serializer.struct.annotation.array.ToStructArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
@@ -59,11 +60,11 @@ public class TypedSerializerTest {
         long l = System.currentTimeMillis();
         int times = 1;
         for (int i = 0; i < times; i++) {
-            TypeRefer<User<Son, Wife, Cchar>> typeRefer = new TypeRefer<User<Son, Wife, Cchar>>() {
+            TypeRefer<User<Son, Wife, Cchar, GirlFriend>> typeRefer = new TypeRefer<User<Son, Wife, Cchar, GirlFriend>>() {
             };
 
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+            User<Son, Wife, Cchar, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
 
             System.err.println("read :" + user);
@@ -77,7 +78,7 @@ public class TypedSerializerTest {
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
 
-            User<Son, Wife, Cchar> turn = StructSerializer.read(userWriteBytes, typeRefer);
+            User<Son, Wife, Cchar, GirlFriend> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
             System.err.println("turn :" + turn);
 
@@ -105,6 +106,14 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
+    public static class GirlFriend {
+
+        @ToString(bufferLength = 2)
+        private String cup;
+    }
+
+    @Data
+    @Struct
     public static class Wife {
 
         @ToString(bufferLength = 2)
@@ -122,7 +131,7 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
-    public static class User<T, W, L> {
+    public static class User<T, W, L, G> {
 
         private Clong4 uid;
         private Cchar uname;
@@ -171,11 +180,12 @@ public class TypedSerializerTest {
         private Cppushort[] qqNames;
         @ToArrayList(size = 2)
         private List<W> wifes;
-        @ToArrayList(size = 2)
+        @ToLinkedList(size = 2)
         private List<T> sons;
+        @ToStructArray(length = 2)
+        private G[] gfs;
+
         private W firstWife;
-        @ToLinkedList(size = 1)
-        private List<Son> bigSons;
 
     }
 }
