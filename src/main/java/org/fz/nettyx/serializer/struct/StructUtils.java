@@ -1,7 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
 import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_BYTES_SIZE_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
@@ -36,6 +37,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
@@ -54,6 +56,92 @@ public class StructUtils {
 
     public boolean isTransient(Field field) {
         return TRANSIENT_FIELD_CACHE.contains(field);
+    }
+
+    /**
+     * Is basic boolean.
+     *
+     * @param <T> the type parameter
+     * @param object the object
+     * @return the boolean
+     */
+    public static <T> boolean isBasic(T object) {
+        return isBasic(object.getClass());
+    }
+
+    /**
+     * Is basic boolean.
+     *
+     * @param field the field
+     * @return the boolean
+     */
+    public static boolean isBasic(Field field) {
+        return isBasic(field.getType());
+    }
+
+    /**
+     * Is basic boolean.
+     *
+     * @param clazz the clazz
+     * @return the boolean
+     */
+    public static boolean isBasic(Class<?> clazz) {
+        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    }
+
+    public static boolean isStruct(Field field) {
+        return isStruct(field.getType());
+    }
+
+    /**
+     * Is struct boolean.
+     *
+     * @param <T> the type parameter
+     * @param object the object
+     * @return the boolean
+     */
+    public static <T> boolean isStruct(T object) {
+        return isStruct(object.getClass());
+    }
+
+    /**
+     * Is struct boolean.
+     *
+     * @param clazz the clazz
+     * @return the boolean
+     */
+    public static boolean isStruct(Class<?> clazz) {
+        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
+    }
+
+    /**
+     * Is ignore boolean.
+     *
+     * @param field the field
+     * @return the boolean
+     */
+    public static boolean isIgnore(Field field) {
+        return AnnotationUtil.hasAnnotation(field, Ignore.class) || StructUtils.isTransient(field);
+    }
+
+    /**
+     * Is read handleable boolean.
+     *
+     * @param field the field
+     * @return the boolean
+     */
+    public static boolean useReadHandler(AnnotatedElement field) {
+        return isReadHandler((PropertyHandler<?>) StructUtils.getHandler(field));
+    }
+
+    /**
+     * Is write handleable boolean.
+     *
+     * @param field the field
+     * @return the boolean
+     */
+    public static boolean useWriteHandler(AnnotatedElement field) {
+        return isWriteHandler((PropertyHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
