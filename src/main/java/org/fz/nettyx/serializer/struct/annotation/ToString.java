@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.util.HexBins;
 
 /**
  * The interface Char sequence.
@@ -53,8 +54,10 @@ public @interface ToString {
                     "buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "], field is [" + field
                         + "]");
             }
+            ByteBuf byteBuf1 = byteBuf.readBytes(toString.bufferLength());
 
-            return byteBuf.readBytes(toString.bufferLength()).toString(Charset.forName(charset));
+            System.err.println(ByteBufUtil.hexDump(byteBuf1));
+            return byteBuf1.toString(Charset.forName(charset));
         }
 
         @Override
@@ -62,7 +65,11 @@ public @interface ToString {
             int bufferLength = toString.bufferLength();
             String charset = toString.charset();
 
-            if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
+            if (value != null) {
+                byte[] bytes = value.toString().getBytes(Charset.forName(charset));
+                System.err.println(HexBins.encode(bytes));
+                writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
+            }
             else               writing.writeBytes(new byte[bufferLength]);
 
         }
