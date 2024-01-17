@@ -67,20 +67,19 @@ public class TypedSerializerTest {
             // these bytes may from nio, netty, input-stream, output-stream.....
             User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
             System.err.println(user);
-//              user = new User();
-//            user.setUid(new Clong4(1));
-//            user.setUname(null);
-//            user.setIsMarried(null);
-//            user.setSex(null);
-//            user.setAddress(null);
-//            user.setPlatformId(null);
-//            user.setDescription(null);
-//            user.setBill(null);
-//            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
+
+            user.setAddress(null);
+            user.setLoginNames(null);
+            user.setQqNames(null);
+            user.setWifes(null);
+            user.setSons(null);
+            user.setFirstWifes(null);
+            user.setBigSons(null);
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
+            User read = StructSerializer.read(userWriteBytes, User.class);
 
-            //  User read = StructSerializer.read(userWriteBytes, User.class);
+            System.err.println("turn :" + read);
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
