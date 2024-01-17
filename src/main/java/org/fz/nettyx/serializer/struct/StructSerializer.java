@@ -76,6 +76,24 @@ public final class StructSerializer implements Serializer {
         this.type = type;
     }
 
+    static <T> Class<T> identifyType(Type type) {
+        if (type instanceof Class<?>) {
+            return (Class<T>) type;
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            return (Class<T>) parameterizedType.getRawType();
+        } else if (type instanceof TypeRefer) {
+            TypeRefer<T> typeRefer = (TypeRefer<T>) type;
+            return identifyType(typeRefer.getType());
+        }
+        // also support hutool
+        else if (type instanceof TypeReference) {
+            TypeReference<T> typeReference = (TypeReference<T>) type;
+            return identifyType(typeReference.getType());
+        }
+        else throw new TypeJudgmentException(type);
+    }
+
     public static <T> T read(ByteBuf byteBuf, Type type) {
         if (type instanceof Class<?>) {
             Class<T> clazz = (Class<T>) type;
@@ -121,14 +139,16 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      read write splitter      ********************************************//
 
+    public static <T> ByteBuf write(T struct, Type type) {
+        Throws.ifNull(struct, "struct can not be null when write");
+
+
+        return new StructSerializer(buffer(), struct, type).toByteBuf();
+    }
+
     public static <T> ByteBuf write(T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
         return write(struct, struct.getClass());
-    }
-
-    public static <T> ByteBuf write(T struct, Type type) {
-        Throws.ifNull(struct, "struct can not be null when write");
-        return new StructSerializer(buffer(), struct, type).toByteBuf();
     }
 
     public static <T> byte[] writeBytes(T struct) {
