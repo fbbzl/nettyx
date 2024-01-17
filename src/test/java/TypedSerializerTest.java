@@ -7,7 +7,6 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToString;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
 import org.fz.nettyx.util.HexBins;
 import org.fz.nettyx.util.TypeRefer;
@@ -100,7 +99,7 @@ public class TypedSerializerTest {
     @Struct
     public static class User<T, W, L, G> {
 
-        private Clong4 uid;
+      //  private Clong4 uid;
 //        private Cchar uname;
 //        private Cint isMarried;
 //        private Cchar sex;

@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
 import lombok.Getter;
 import org.fz.nettyx.exception.HandlerException;
@@ -166,7 +167,7 @@ public final class StructSerializer implements Serializer {
     <T> T toObject() {
         for (Field field : getStructFields(getStructType())) {
             try {
-                Object fieldValue;
+                Object fieldValue;            Class<?> fieldActualType = getFieldActualType(field);
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
@@ -193,6 +194,8 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getStructType())) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
+                Class<?> fieldActualType = getFieldActualType(field);
+
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
@@ -313,6 +316,9 @@ public final class StructSerializer implements Serializer {
         if (fieldType instanceof Class<?>) {
             return (Class<T>) Object.class;
         }
+        if (fieldType instanceof TypeVariable) {
+            return (Class<T>) TypeUtil.getActualType(this.type, fieldType);
+        }
         else
         if (this.type instanceof ParameterizedType) {
             Type actualType = TypeUtil.getActualType(this.type, field);
@@ -321,7 +327,7 @@ public final class StructSerializer implements Serializer {
 
             return (Class<T>) actualTypeArguments[0];
         }
-        return (Class<T>) Object.class;
+        else return (Class<T>) Object.class;
     }
 
     public <T> Class<T> getArrayFieldActualType(Field field) {
