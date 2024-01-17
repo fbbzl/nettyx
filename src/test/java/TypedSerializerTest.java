@@ -173,8 +173,7 @@ public class TypedSerializerTest {
         private List<W> wifes;
         @ToArrayList(size = 2)
         private List<T> sons;
-        @ToArrayList(size = 2)
-        private List<Wife> firstWifes;
+        private W firstWife;
         @ToLinkedList(size = 1)
         private List<Son> bigSons;
 
