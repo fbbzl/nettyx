@@ -58,7 +58,8 @@ public @interface ToStructArray {
                 (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
-            Throws.ifTrue(isNotStruct(structElementType), "type [" + structElementType + "] is not a struct, please keep struct class with annotation @Struct");
+            Throws.ifTrue(isNotStruct(structElementType),
+                "type [" + structElementType + "] is not a struct, please keep struct class with annotation @Struct");
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
 
             int declaredLength = annotation.length();
