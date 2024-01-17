@@ -112,9 +112,9 @@ public final class StructSerializer implements Serializer {
         else
         if (type instanceof ParameterizedType) return new StructSerializer(buffer(), struct, type).toByteBuf();
         else
-        if (type instanceof TypeRefer)         return write(buffer(), ((TypeRefer<T>) type).getType());
+        if (type instanceof TypeRefer)         return write(struct, ((TypeRefer<T>) type).getType());
         else
-        if (type instanceof TypeReference)     return write(buffer(), ((TypeReference<T>) type).getType());
+        if (type instanceof TypeReference)     return write(struct, ((TypeReference<T>) type).getType());
         else throw new TypeJudgmentException(type);
     }
 

@@ -62,10 +62,10 @@ public class TypedSerializerTest {
         long l = System.currentTimeMillis();
         int times = 1;
         for (int i = 0; i < times; i++) {
+            TypeRefer<User<Son, Wife, Cchar>> typeRefer = new TypeRefer<User<Son, Wife, Cchar>>() {
+            };
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes),
-                new TypeRefer<User<Son, Wife, Cchar>>() {
-                });
+            User<Son, Wife, Cchar> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
             System.err.println(user);
 //              user = new User();
 //            user.setUid(new Clong4(1));
@@ -78,7 +78,7 @@ public class TypedSerializerTest {
 //            user.setBill(null);
 //            user.setLoginNames(new Cuint[]{new Cuint(1L), new Cuint(1L)});
 
-            final ByteBuf userWriteBytes = StructSerializer.write(user);
+            final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
 
             //  User read = StructSerializer.read(userWriteBytes, User.class);
 
