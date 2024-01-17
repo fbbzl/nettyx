@@ -77,20 +77,14 @@ public final class StructSerializer implements Serializer {
     }
 
     static <T> Class<T> identifyType(Type type) {
-        if (type instanceof Class<?>) {
-            return (Class<T>) type;
-        } else if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            return (Class<T>) parameterizedType.getRawType();
-        } else if (type instanceof TypeRefer) {
-            TypeRefer<T> typeRefer = (TypeRefer<T>) type;
-            return identifyType(typeRefer.getType());
-        }
-        // also support hutool
-        else if (type instanceof TypeReference) {
-            TypeReference<T> typeReference = (TypeReference<T>) type;
-            return identifyType(typeReference.getType());
-        }
+        if (type instanceof Class<?>)          return (Class<T>) type;
+        else
+        if (type instanceof ParameterizedType) return (Class<T>) ((ParameterizedType) type).getRawType();
+        else
+        if (type instanceof TypeRefer)         return identifyType(((TypeRefer<T>) type).getType());
+        else
+        if (type instanceof TypeReference)     return identifyType(((TypeReference<T>) type).getType());
+
         else throw new TypeJudgmentException(type);
     }
 
