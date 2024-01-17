@@ -6,10 +6,9 @@ import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-
-import java.net.SocketAddress;
 
 /**
  * Single channel client

@@ -1,22 +1,27 @@
 package org.fz.nettyx.handler;
 
-import io.netty.channel.*;
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
+
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
+import java.net.SocketAddress;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.exception.ClosingChannelException;
 import org.fz.nettyx.action.ChannelExceptionAction;
+import org.fz.nettyx.exception.ClosingChannelException;
 import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
 import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
-
-import java.net.SocketAddress;
-
-import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
-import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
 
 /**
  * The type Exception handler.
