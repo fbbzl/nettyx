@@ -58,58 +58,50 @@ public class StructUtils {
         return TRANSIENT_FIELD_CACHE.contains(field);
     }
 
-    /**
-     * Is basic boolean.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @return the boolean
-     */
+    public static <T> boolean isNotBasic(T object) {
+        return isNotBasic(object.getClass());
+    }
+
+    public static boolean isNotBasic(Field field) {
+        return isNotBasic(field.getType());
+    }
+
+    public static boolean isNotBasic(Class<?> clazz) {
+        return !isBasic(clazz);
+    }
+
     public static <T> boolean isBasic(T object) {
         return isBasic(object.getClass());
     }
 
-    /**
-     * Is basic boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
     public static boolean isBasic(Field field) {
         return isBasic(field.getType());
     }
 
-    /**
-     * Is basic boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
     public static boolean isBasic(Class<?> clazz) {
         return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    }
+
+    public static boolean isNotStruct(Field field) {
+        return isNotStruct(field.getType());
+    }
+
+    public static <T> boolean isNotStruct(T object) {
+        return isNotStruct(object.getClass());
+    }
+
+    public static boolean isNotStruct(Class<?> clazz) {
+        return !isStruct(clazz);
     }
 
     public static boolean isStruct(Field field) {
         return isStruct(field.getType());
     }
 
-    /**
-     * Is struct boolean.
-     *
-     * @param <T> the type parameter
-     * @param object the object
-     * @return the boolean
-     */
     public static <T> boolean isStruct(T object) {
         return isStruct(object.getClass());
     }
 
-    /**
-     * Is struct boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
     public static boolean isStruct(Class<?> clazz) {
         return AnnotationUtil.hasAnnotation(clazz, Struct.class);
     }
