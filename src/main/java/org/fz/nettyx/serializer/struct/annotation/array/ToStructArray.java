@@ -1,10 +1,15 @@
 package org.fz.nettyx.serializer.struct.annotation.array;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import io.netty.buffer.ByteBuf;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -17,6 +22,9 @@ import org.fz.nettyx.util.Throws;
  * @version 1.0
  * @since 2024/1/16 16:06
  */
+@Documented
+@Target(FIELD)
+@Retention(RUNTIME)
 public @interface ToStructArray {
 
     /**
@@ -32,7 +40,7 @@ public @interface ToStructArray {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToStructArray annotation) {
             Class<?> structElementType =
-                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(
+                (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
@@ -46,7 +54,7 @@ public @interface ToStructArray {
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToStructArray annotation,
             ByteBuf writing) {
             Class<?> structElementType =
-                (structElementType = getComponentType(field)) != Object.class ? serializer.getArrayFieldActualType(
+                (structElementType = getComponentType(field)) == Object.class ? serializer.getArrayFieldActualType(
                     field) : structElementType;
 
             Throws.ifTrue(structElementType == Object.class, new TypeJudgmentException(field));
@@ -60,7 +68,7 @@ public @interface ToStructArray {
             return (T[]) Array.newInstance(componentType, length);
         }
 
-        private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
+        public static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
             S[] structs = newArray(elementType, length);
 
             for (int i = 0; i < structs.length; i++) {
