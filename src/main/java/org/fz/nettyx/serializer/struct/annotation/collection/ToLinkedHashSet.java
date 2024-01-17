@@ -5,7 +5,7 @@ import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.readStructArray;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.writeStructArray;
+import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.writeStructCollection;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -59,7 +59,8 @@ public @interface ToLinkedHashSet {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newLinkedHashSet(Arrays.asList(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
+            return newLinkedHashSet(
+                Arrays.asList(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
@@ -73,7 +74,7 @@ public @interface ToLinkedHashSet {
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newLinkedHashSet());
 
-            writeStructArray(set.toArray(), elementType, toLinkedHashSet.size(), writing);
+            writeStructCollection(set, elementType, toLinkedHashSet.size(), writing);
         }
 
     }
