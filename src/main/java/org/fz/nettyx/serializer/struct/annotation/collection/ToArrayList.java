@@ -7,7 +7,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.readStructArray;
 import static org.fz.nettyx.serializer.struct.annotation.array.ToStructArray.ToStructArrayHandler.writeStructArray;
 
-import cn.hutool.core.collection.ListUtil;
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -58,7 +57,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return ListUtil.toList(readStructArray(elementType, toArrayList.size(), serializer.getByteBuf()));
+            return newArrayList(readStructArray(elementType, toArrayList.size(), serializer.getByteBuf()));
         }
 
         @Override

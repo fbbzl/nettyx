@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct.annotation.collection;
 
-import static cn.hutool.core.collection.CollUtil.newHashSet;
 import static cn.hutool.core.collection.CollUtil.newLinkedHashSet;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
@@ -60,7 +59,7 @@ public @interface ToLinkedHashSet {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newHashSet(Arrays.asList(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
+            return newLinkedHashSet(Arrays.asList(readStructArray(elementType, toLinkedHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
@@ -73,6 +72,7 @@ public @interface ToLinkedHashSet {
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             Set<?> set = (HashSet<?>) defaultIfNull(value, () -> newLinkedHashSet());
+
             writeStructArray(set.toArray(), elementType, toLinkedHashSet.size(), writing);
         }
 

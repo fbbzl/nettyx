@@ -67,7 +67,7 @@ public @interface ToHashSet {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return new HashSet<>(Arrays.asList(readStructArray(elementType, toHashSet.size(), serializer.getByteBuf())));
+            return newHashSet(Arrays.asList(readStructArray(elementType, toHashSet.size(), serializer.getByteBuf())));
         }
 
         @Override
