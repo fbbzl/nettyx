@@ -57,7 +57,7 @@ public class TypedSerializerTest {
         String x = CharSequenceUtil.repeat("1", 1024 * 1024);
 
         byte[] bytes = HexBins.decode(x);
-        // bytes = HexBins.decode("111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
+        // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
         int times = 10_000_000;
         for (int i = 0; i < times; i++) {
