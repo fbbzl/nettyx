@@ -26,7 +26,7 @@ public class ChannelInterceptors {
      * @param channel the channel
      * @return the interceptors
      */
-    public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(Channel channel) {
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(Channel channel) {
         return getInterceptors(channel.pipeline());
     }
 
@@ -37,7 +37,7 @@ public class ChannelInterceptors {
      * @param ctx the ctx
      * @return the interceptors
      */
-    public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(ChannelHandlerContext ctx) {
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelHandlerContext ctx) {
         return getInterceptors(ctx.pipeline());
     }
 
@@ -49,7 +49,7 @@ public class ChannelInterceptors {
      * @return the interceptors
      */
     @SuppressWarnings("unchecked")
-    public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(ChannelPipeline pipeline) {
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelPipeline pipeline) {
         List<T> result = new ArrayList<>(10);
 
         for (Map.Entry<String, ChannelHandler> entry : pipeline) {
