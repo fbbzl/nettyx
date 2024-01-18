@@ -1,50 +1,20 @@
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Data;
+import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.annotation.*;
+import org.fz.nettyx.serializer.struct.basic.c.signed.*;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.*;
+import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
+import org.fz.nettyx.serializer.struct.basic.cpp.signed.*;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.*;
+import org.fz.nettyx.util.HexBins;
+import org.fz.nettyx.util.TypeRefer;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import lombok.Data;
-import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.ToBasicArray;
-import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
-import org.fz.nettyx.serializer.struct.annotation.ToString;
-import org.fz.nettyx.serializer.struct.annotation.ToStructArray;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Cfloat;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Cint;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clonglong;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Cshort;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuint;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong4;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culonglong;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cushort;
-import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp16tchar;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp32tchar;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpp8tchar;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppdouble;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppfloat;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppint;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpplong4;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpplong8;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cpplonglong;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.Cppshort;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppuchar;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppuint;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulong4;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulong8;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulonglong;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
-import org.fz.nettyx.util.HexBins;
-import org.fz.nettyx.util.TypeRefer;
 
 /**
  * @author fengbinbin
@@ -59,7 +29,7 @@ public class TypedSerializerTest {
         byte[] bytes = HexBins.decode(x);
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
-        int times = 10_000_000;
+        int times = 1_00_000;
         for (int i = 0; i < times; i++) {
             TypeRefer<User<Son, Wife, Cchar, GirlFriend>> typeRefer = new TypeRefer<User<Son, Wife, Cchar, GirlFriend>>() {
             };
