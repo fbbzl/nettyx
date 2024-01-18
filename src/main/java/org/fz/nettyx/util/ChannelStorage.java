@@ -1,7 +1,6 @@
 package org.fz.nettyx.util;
 
 import io.netty.channel.Channel;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
- * Used to store channels, using key-value pairs
+ * Used to store channels, using key-length pairs
  *
  * @param <K> the type parameter
  * @author fengbinbin

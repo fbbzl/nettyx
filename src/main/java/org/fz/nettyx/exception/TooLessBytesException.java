@@ -1,26 +1,24 @@
 package org.fz.nettyx.exception;
 
+import lombok.Getter;
+
 /**
  * @author fengbinbin
  * @version 1.0
  * @since 2021/10/20 16:42
  */
+
+@Getter
 public class TooLessBytesException extends RuntimeException {
-    public TooLessBytesException() {
-        super();
-    }
-    public TooLessBytesException(String message) {
-        super(message);
-    }
-    public TooLessBytesException(String message, Throwable cause) {
-        super(message, cause);
-    }
-    public TooLessBytesException(Throwable cause) {
-        super(cause);
-    }
-    protected TooLessBytesException(String message, Throwable cause,
-                                    boolean enableSuppression,
-                                    boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+
+    private final int expectLength;
+
+    private final int provideLength;
+
+    public TooLessBytesException(int expectLength, int provideLength) {
+        super("bytes missing when doing serialization, field expect bytes length is [" + expectLength
+            + "] but the provided readable bytes length is [" + provideLength + "]");
+        this.expectLength = expectLength;
+        this.provideLength = provideLength;
     }
 }

@@ -30,7 +30,7 @@ action                              Contains sufficient functional interfaces to
 annotation
   ---FieldHandler                     When serializing fields, you can specify field serialization/deserialization logic
   ---Ignore                           ignore this field when serializing
-  ---Length                           When serialized/deserialized, fields of array type must use this annotation to specify the length
+  ---Length                           When serialized/deserialized, fields of array type must use this annotation to specify the toArray
   ---Struct                           In serialization, the domain type needs to be annotated, something like @Entity in JPA
 endpoint
   client                              Provide client side basic implementation

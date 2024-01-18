@@ -11,14 +11,6 @@ import io.netty.buffer.ByteBuf;
 public interface Serializer {
 
     /**
-     * Gets domain type.
-     *
-     * @param <T> the type parameter
-     * @return the domain type
-     */
-    <T> Class<T> getDomainType();
-
-    /**
      * get byte buf.
      *
      * @return the byte buf

@@ -2,17 +2,16 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
-import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
+import org.fz.nettyx.endpoint.tcp.client.SingleTcpChannelClient;
 import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 /**
  * @author fengbinbin
