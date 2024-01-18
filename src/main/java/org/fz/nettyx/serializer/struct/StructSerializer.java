@@ -6,7 +6,10 @@ import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -393,7 +396,12 @@ public final class StructSerializer implements Serializer {
         return AnnotationUtil.hasAnnotation(field, Ignore.class) || isTransient(field);
     }
 
-    public static class StructSerializerConfig {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SerializerConfig {
+        private boolean ignoreTransient;
+        private boolean setNullWhenThrow;
 
     }
 
