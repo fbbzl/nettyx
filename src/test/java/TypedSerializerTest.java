@@ -54,7 +54,7 @@ import org.fz.nettyx.util.TypeRefer;
 public class TypedSerializerTest {
 
     public static void main(String[] args) {
-        String x = CharSequenceUtil.repeat("1", 1024 * 1024);
+        String x = CharSequenceUtil.repeat("11", 1024 * 1024);
 
         byte[] bytes = HexBins.decode(x);
         // bytes = HexBins.decode("11");
