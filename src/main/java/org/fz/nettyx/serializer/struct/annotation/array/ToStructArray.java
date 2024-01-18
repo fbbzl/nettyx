@@ -3,8 +3,8 @@ package org.fz.nettyx.serializer.struct.annotation.array;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isNotStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
-import static org.fz.nettyx.serializer.struct.StructUtils.isNotStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import io.netty.buffer.ByteBuf;
