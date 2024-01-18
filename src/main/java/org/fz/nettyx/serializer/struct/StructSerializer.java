@@ -168,13 +168,13 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getStructType())) {
             try {
                 Object fieldValue;
-                Class<?> fieldActualType = getFieldActualType(field);
+                Class<?> fieldActualType;
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
                 if (useReadHandler(field)) fieldValue = readHandled(field, this);
                 else
-                if (isBasic(fieldActualType))  fieldValue = readBasic(field,  this.getByteBuf());
+                if (isBasic(fieldActualType = getFieldActualType(field)))  fieldValue = readBasic(field,  this.getByteBuf());
                 else
                 if (isStruct(fieldActualType)) fieldValue = readStruct(fieldActualType, this.getByteBuf());
                 else                           throw new TypeJudgmentException(field);
@@ -195,14 +195,14 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getStructType())) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
-                Class<?> fieldActualType = getFieldActualType(field);
+                Class<?> fieldActualType ;
 
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
                 if (useWriteHandler(field))    writeHandled(field, fieldValue, this);
                 else
-                if (isBasic(fieldActualType))  writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newEmptyBasic(field)), this.getByteBuf());
+                if (isBasic(fieldActualType = getFieldActualType(field)))  writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> StructUtils.newEmptyBasic(field)), this.getByteBuf());
                 else
                 if (isStruct(fieldActualType)) writeStruct(defaultIfNull(fieldValue, () -> StructUtils.newStruct(field)), this.getByteBuf());
                 else throw new TypeJudgmentException(field);
@@ -358,8 +358,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static boolean isBasic(Field field) {
-        Class<?> fieldType = field.getType();
-        return isBasic(fieldType);
+        return isBasic(field.getType());
     }
 
     public static boolean isBasic(Class<?> clazz) {
