@@ -40,6 +40,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
     /**
      * The type Inbound exception handler.
      */
+    @Setter
     @Slf4j
     @NoArgsConstructor
     @AllArgsConstructor
@@ -50,7 +51,6 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             return true;
         }
 
-        @Setter
         @Accessors(chain = true, fluent = true)
         private ChannelExceptionAction whenExceptionCaught;
 
@@ -85,6 +85,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
     /**
      * The type Outbound exception handler.
      */
+    @Setter
     @Slf4j
     @NoArgsConstructor
     @AllArgsConstructor
@@ -95,7 +96,6 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
             return true;
         }
 
-        @Setter
         @Accessors(chain = true, fluent = true)
         private ChannelExceptionAction whenExceptionCaught;
 
