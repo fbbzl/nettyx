@@ -277,7 +277,7 @@ public class StructUtils {
                     continue;
                 }
 
-                BASIC_BYTES_SIZE_CACHE.put((Class<? extends Basic<?>>) basicClass,
+                BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) basicClass,
                     Basic.reflectForSize((Class<? extends Basic<?>>) basicClass));
             }
         }
