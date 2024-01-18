@@ -52,6 +52,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     @SuppressWarnings("unchecked")
     public static class InboundInterceptor<M> extends ChannelInterceptor implements ChannelInboundHandler {
+
         @Override
         public final void channelRegistered(ChannelHandlerContext ctx) throws Exception {
             if (isFreed()) {
@@ -422,6 +423,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
     }
 
     public static class OutboundInterceptor extends ChannelInterceptor implements ChannelOutboundHandler {
+
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             if (isFreed()) {
