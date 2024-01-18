@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.array;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
