@@ -2,7 +2,6 @@ package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
@@ -231,8 +230,6 @@ public class StructUtils {
      */
     static final class StructCache {
 
-        static final Set<Field> TRANSIENT_FIELD_CACHE = new ConcurrentHashSet<>(512);
-
         /* reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
         static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
@@ -293,10 +290,6 @@ public class StructUtils {
                 Field[] structFields = StructUtils.getStructFields(structClass);
 
                 for (Field field : structFields) {
-                    if (Modifier.isTransient(field.getModifiers())) {
-                        TRANSIENT_FIELD_CACHE.add(field);
-                    }
-
                     PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), structClass);
                     FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor.getReadMethod());
                     FIELD_WRITER_CACHE.putIfAbsent(field, propertyDescriptor.getWriteMethod());
