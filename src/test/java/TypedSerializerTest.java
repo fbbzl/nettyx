@@ -58,7 +58,7 @@ public class TypedSerializerTest {
         byte[] bytes = HexBins.decode(x);
         // bytes = HexBins.decode("111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         long l = System.currentTimeMillis();
-        int times = 1;
+        int times = 10_000;
         for (int i = 0; i < times; i++) {
             TypeRefer<User<Son, Wife, Cchar, GirlFriend>> typeRefer = new TypeRefer<User<Son, Wife, Cchar, GirlFriend>>() {
             };
@@ -66,7 +66,7 @@ public class TypedSerializerTest {
             // these bytes may from nio, netty, input-stream, output-stream.....
             User<Son, Wife, Cchar, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
-            System.err.println("read :" + user);
+          //  System.err.println("read :" + user);
 //            user.setAddress(null);
 //            user.setLoginNames(null);
 //            user.setQqNames(null);
@@ -79,9 +79,9 @@ public class TypedSerializerTest {
 
             User<Son, Wife, Cchar, GirlFriend> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
-            System.err.println("turn :" + turn);
+         //   System.err.println("turn :" + turn);
 
-            System.err.println(turn.equals(user));
+          //  System.err.println(turn.equals(user));
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
