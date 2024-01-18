@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.ModifierUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -29,7 +30,6 @@ import java.nio.ByteBuffer;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.TRANSIENT_FIELD_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
 
 /**
@@ -332,7 +332,7 @@ public final class StructSerializer implements Serializer {
     //******************************************      public end       ***********************************************//
 
     public static boolean isTransient(Field field) {
-        return TRANSIENT_FIELD_CACHE.contains(field);
+        return ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
     public static <T> boolean isNotBasic(T object) {
