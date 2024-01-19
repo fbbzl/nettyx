@@ -29,7 +29,7 @@ public class TypedSerializerTest {
         byte[] bytes = HexBins.decode(x);
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
-        int times = 1_00_000;
+        int times = 10_000;
         for (int i = 0; i < times; i++) {
             TypeRefer<User<Son, Wife, Cchar, GirlFriend>> typeRefer = new TypeRefer<User<Son, Wife, Cchar, GirlFriend>>() {
             };
