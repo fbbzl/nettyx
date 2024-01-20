@@ -62,11 +62,11 @@ public class TypedSerializerTest {
         long l = System.currentTimeMillis();
         int times = 2;
         for (int i = 0; i < times; i++) {
-            TypeRefer<User<Son, Wife, Cchar, GirlFriend, Clong8>> typeRefer = new TypeRefer<User<Son, Wife, Cchar, GirlFriend, Clong8>>() {
+            TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>>() {
             };
 
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son, Wife, Cchar, GirlFriend, Clong8> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
           //  System.err.println("read :" + user);
 //            user.setAddress(null);
@@ -79,7 +79,7 @@ public class TypedSerializerTest {
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
 
-            User<Son, Wife, Cchar, GirlFriend, Clong8> turn = StructSerializer.read(userWriteBytes, typeRefer);
+            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> turn = StructSerializer.read(userWriteBytes, typeRefer);
             turn = new User<>();
 
             byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
@@ -126,10 +126,11 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
-    public static class Son {
+    public static class Son<B, Y> {
 
-        @ToString(bufferLength = 2)
-        private String name;
+
+        private B name;
+        private Y sonOrder;
 
     }
 
