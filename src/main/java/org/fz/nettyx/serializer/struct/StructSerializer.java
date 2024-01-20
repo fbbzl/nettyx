@@ -310,20 +310,23 @@ public final class StructSerializer implements Serializer {
 
     public <T> Class<T> getFieldActualType(Field field) {
         Type fieldType = TypeUtil.getType(field);
-        // If it's a Class, it means that no generics are specified
-        if (fieldType instanceof Class<?>) {
-            return (Class<T>) fieldType;
-        }
-        if (fieldType instanceof TypeVariable) {
-            return (Class<T>) TypeUtil.getActualType(this.type, fieldType);
-        }
-        else
-        if (this.type instanceof ParameterizedType) {
-            Type actualType = TypeUtil.getActualType(this.type, field);
-            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
-            if (actualTypeArguments.length == 0) return (Class<T>) Object.class;
+        return getActualType(this.getType(), fieldType);
+    }
 
-            return (Class<T>) actualTypeArguments[0];
+    public <T> Class<T> getActualType(Type root, Type type) {
+        // If it's a Class, it means that no generics are specified
+        if (type instanceof Class<?>) {
+            return (Class<T>) type;
+        }
+        if (type instanceof TypeVariable) {
+            return (Class<T>) TypeUtil.getActualType(root, type);
+        } else if (root instanceof ParameterizedType) {
+            Type actualType = TypeUtil.getActualType(root, type);
+            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
+            if (actualTypeArguments.length == 0) {
+                return (Class<T>) Object.class;
+            }
+            return getActualType(root, actualTypeArguments[0]);
         }
         else return (Class<T>) Object.class;
     }
