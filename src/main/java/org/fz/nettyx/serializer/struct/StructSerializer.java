@@ -173,15 +173,17 @@ public final class StructSerializer implements Serializer {
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
-                if (useReadHandler(field)) fieldValue = readHandled(field, this);
-                else
-                if (isBasic(fieldActualType = getFieldActualType(field)))  fieldValue = readBasic(field,  this.getByteBuf());
-                else
-                if (isStruct(fieldActualType)) fieldValue = readStruct(fieldActualType, this.getByteBuf());
-                else                           throw new TypeJudgmentException(field);
+                if (useReadHandler(field)) {
+                    fieldValue = readHandled(field, this);
+                } else if (isBasic(fieldActualType = getFieldActualType(field))) {
+                    fieldValue = readBasic(fieldActualType, this.getByteBuf());
+                } else if (isStruct(fieldActualType)) {
+                    fieldValue = readStruct(fieldActualType, this.getByteBuf());
+                }
+                else throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
             } catch (Exception exception) {
-                throw new SerializeException("field read exception, field is[" + field + "]", exception);
+                throw new SerializeException("field read exception, field is [" + field + "]", exception);
             }
         }
         return (T) struct;
@@ -193,38 +195,35 @@ public final class StructSerializer implements Serializer {
      * @return the byte buf
      */
     ByteBuf toByteBuf() {
+        ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getStructType())) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
                 Class<?> fieldActualType ;
-
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
-                if (useWriteHandler(field))    writeHandled(field, fieldValue, this);
-                else
-                if (isBasic(fieldActualType = getFieldActualType(field)))  writeBasic((Basic<?>) defaultIfNull(fieldValue, () -> newEmptyBasic(
-                    fieldActualType)), this.getByteBuf());
-                else
-                if (isStruct(fieldActualType)) writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), this.getByteBuf());
+                if (useWriteHandler(field)) {
+                    writeHandled(field, fieldValue, this);
+                } else if (isBasic(fieldActualType = getFieldActualType(field))) {
+                    writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
+                } else if (isStruct(fieldActualType)) {
+                    writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
+                }
                 else throw new TypeJudgmentException(field);
             } catch (Exception exception) {
                 throw new SerializeException("field write exception, field [" + field + "]", exception);
             }
         }
-        return getByteBuf();
+        return writing;
     }
 
-    /**
-     * read buf into basic field
-     *
-     * @param <B>        the type parameter
-     * @param basicField the basic field
-     * @param byteBuf    the byte buf
-     * @return the b
-     */
     public static <B extends Basic<?>> B readBasic(Field basicField, ByteBuf byteBuf) {
         return StructUtils.newBasic(basicField, byteBuf);
+    }
+
+    public static <B extends Basic<?>> B readBasic(Type basicType, ByteBuf byteBuf) {
+        return StructUtils.newBasic((Class<?>) basicType, byteBuf);
     }
 
     public static <S> S readStruct(Field structField, ByteBuf byteBuf) {
@@ -254,8 +253,8 @@ public final class StructSerializer implements Serializer {
     /**
      * write basic bytes
      */
-    public static <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(basicValue.getBytes());
+    public static <B extends Basic<?>> void writeBasic(Object basicValue, ByteBuf writingBuf) {
+        writingBuf.writeBytes(((B) (basicValue)).getBytes());
     }
 
     /**
