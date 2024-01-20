@@ -1,12 +1,15 @@
 package org.fz.nettyx.endpoint;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
-import lombok.extern.slf4j.Slf4j;
-
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultChannelPromise;
+import io.netty.channel.EventLoopGroup;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The generic NioTcpClient.
