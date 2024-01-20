@@ -193,26 +193,27 @@ public final class StructSerializer implements Serializer {
      * @return the byte buf
      */
     ByteBuf toByteBuf() {
+        ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getStructType())) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
                 Class<?> fieldActualType ;
-
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
                 if (useWriteHandler(field))    writeHandled(field, fieldValue, this);
                 else
                 if (isBasic(fieldActualType = getFieldActualType(field)))  writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(
-                    fieldActualType)), this.getByteBuf());
+                    fieldActualType)), writing);
                 else
-                if (isStruct(fieldActualType)) writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), this.getByteBuf());
+                if (isStruct(fieldActualType)) writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)),
+                    writing);
                 else throw new TypeJudgmentException(field);
             } catch (Exception exception) {
                 throw new SerializeException("field write exception, field [" + field + "]", exception);
             }
         }
-        return getByteBuf();
+        return writing;
     }
 
     public static <B extends Basic<?>> B readBasic(Field basicField, ByteBuf byteBuf) {
