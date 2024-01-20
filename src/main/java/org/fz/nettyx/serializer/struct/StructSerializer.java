@@ -175,7 +175,7 @@ public final class StructSerializer implements Serializer {
 
                 if (useReadHandler(field)) fieldValue = readHandled(field, this);
                 else
-                if (isBasic(fieldActualType = getFieldActualType(field)))  fieldValue = readBasic(field,  this.getByteBuf());
+                if (isBasic(fieldActualType = getFieldActualType(field)))  fieldValue = readBasic(fieldActualType,  this.getByteBuf());
                 else
                 if (isStruct(fieldActualType)) fieldValue = readStruct(fieldActualType, this.getByteBuf());
                 else                           throw new TypeJudgmentException(field);
@@ -215,16 +215,12 @@ public final class StructSerializer implements Serializer {
         return getByteBuf();
     }
 
-    /**
-     * read buf into basic field
-     *
-     * @param <B>        the type parameter
-     * @param basicField the basic field
-     * @param byteBuf    the byte buf
-     * @return the b
-     */
     public static <B extends Basic<?>> B readBasic(Field basicField, ByteBuf byteBuf) {
         return StructUtils.newBasic(basicField, byteBuf);
+    }
+
+    public static <B extends Basic<?>> B readBasic(Type basicType, ByteBuf byteBuf) {
+        return StructUtils.newBasic((Class<?>) basicType, byteBuf);
     }
 
     public static <S> S readStruct(Field structField, ByteBuf byteBuf) {
