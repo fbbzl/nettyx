@@ -3,12 +3,11 @@ package org.fz.nettyx.handler.actionable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ChannelExceptionAction;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * The type Actionable write timeout handler.
