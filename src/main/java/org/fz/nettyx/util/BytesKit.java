@@ -3,7 +3,7 @@ package org.fz.nettyx.util;
 import static java.lang.Integer.min;
 import static org.apache.logging.log4j.util.Constants.EMPTY_BYTE_ARRAY;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.PrimitiveArrayUtil;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -125,10 +125,10 @@ public class BytesKit {
             int numberBytesLength = numberBytes.length;
 
             if (numberBytesLength > assignBytesLength) {
-                numberBytes = ArrayUtil.sub(numberBytes, numberBytesLength - assignBytesLength, numberBytesLength);
+                numberBytes = PrimitiveArrayUtil.sub(numberBytes, numberBytesLength - assignBytesLength, numberBytesLength);
             }
             if (numberBytesLength < assignBytesLength) {
-                numberBytes = ArrayUtil.addAll(new byte[assignBytesLength - numberBytesLength], numberBytes);
+                numberBytes = PrimitiveArrayUtil.addAll(new byte[assignBytesLength - numberBytesLength], numberBytes);
             }
 
             return numberBytes;
