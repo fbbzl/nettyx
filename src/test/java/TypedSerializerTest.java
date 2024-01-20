@@ -128,7 +128,6 @@ public class TypedSerializerTest {
     @Struct
     public static class Son<B, Y> {
 
-
         private B name;
         private Y sonOrder;
 
