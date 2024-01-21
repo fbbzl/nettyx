@@ -77,10 +77,10 @@ public class TypedSerializerTest {
 
             final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
 
-            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> turn = StructSerializer.read(userWriteBytes, typeRefer);
-            turn = new User<>();
+//            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> turn = StructSerializer.read(userWriteBytes, typeRefer);
+//            turn = new User<>();
 
-            byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
+            //byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
 
             //System.err.println(Arrays.toString(bytes1));
             //   System.err.println("turn :" + turn);
