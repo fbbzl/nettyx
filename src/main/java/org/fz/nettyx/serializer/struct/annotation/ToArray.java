@@ -69,10 +69,11 @@ public @interface ToArray {
                 !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : elementType;
 
-            Throws.ifNotAssignable(Basic.class, elementType,
-                "type [" + elementType + "] is not a basic type");
+            Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
-            int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(elementType);
+
+            int declaredLength = annotation.length();
+            int elementBytesSize = StructUtils.findBasicSize(elementType);
 
             Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
 
