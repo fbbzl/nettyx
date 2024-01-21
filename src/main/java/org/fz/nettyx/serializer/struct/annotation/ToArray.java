@@ -4,6 +4,7 @@ import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
@@ -17,6 +18,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
@@ -46,15 +48,15 @@ public @interface ToArray {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
-            Class<? extends Basic<?>> elementType =
+            Class<?> elementType =
                 !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
                     : elementType;
 
-            Throws.ifNotAssignable(Basic.class, elementType,
-                "type [" + elementType + "] is not a basic type");
+            Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
-            if (isBasic(elementType)) return readBasicArray(elementType, annotation.length(), serializer.getByteBuf());
-            else                      return readStructArray(elementType, annotation.length(), serializer.getByteBuf());
+            if (isBasic(elementType))       return readBasicArray(elementType, annotation.length(), serializer.getByteBuf());
+            else if (isStruct(elementType)) return readStructArray(elementType, annotation.length(), serializer.getByteBuf());
+            else                            throw new TypeJudgmentException(field);
         }
 
         @Override
@@ -92,7 +94,7 @@ public @interface ToArray {
             return filledArray;
         }
 
-        private static <B extends Basic<?>> B[] readBasicArray(Class<B> elementType, int declaredLength,
+        private static <B extends Basic<?>> B[] readBasicArray(Class<?> elementType, int declaredLength,
             ByteBuf arrayBuf) {
             B[] basics = newArray(elementType, declaredLength);
 
