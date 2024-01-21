@@ -58,7 +58,7 @@ public class TypedSerializerTest {
         byte[] bytes = HexBins.decode(x);
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
-        int times = 100_000;
+        int times = 1_000_000;
         for (int i = 0; i < times; i++) {
             TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>>() {
             };
