@@ -1,4 +1,4 @@
-package org.fz.nettyx.util;
+package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.util.TypeUtil;
 import java.lang.reflect.Type;
