@@ -56,10 +56,7 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            if (isBasic(elementType))       return readBasicArray(elementType, length, serializer.getByteBuf());
-            else
-            if (isStruct(elementType))      return readStructArray(elementType, length, serializer.getByteBuf());
-            else                            throw new TypeJudgmentException(field);
+            return readArray(serializer, field, elementType, length);
         }
 
         @Override
@@ -75,6 +72,15 @@ public @interface ToArray {
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
             writeArray(field, arrayValue, writing, elementType, elementBytesSize, length);
+        }
+
+        private static Object[] readArray(StructSerializer serializer, Field field, Class<?> elementType, int length) {
+            if (isBasic(elementType))
+                return readBasicArray(elementType, length, serializer.getByteBuf());
+            else
+            if (isStruct(elementType))
+                return readStructArray(elementType, length, serializer.getByteBuf());
+            else                            throw new TypeJudgmentException(field);
         }
 
         public static void writeArray(Field field, Object arrayValue, ByteBuf writing, Class<?> elementType,
