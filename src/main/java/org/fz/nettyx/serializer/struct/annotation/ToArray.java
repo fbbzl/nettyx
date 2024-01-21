@@ -71,7 +71,6 @@ public @interface ToArray {
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
-
             int declaredLength = annotation.length();
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
