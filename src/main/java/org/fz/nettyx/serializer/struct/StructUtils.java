@@ -129,8 +129,8 @@ public class StructUtils {
         return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize((Class<B>)basicClass)]));
     }
 
-    public static <B extends Basic<?>> int findBasicSize(Class<B> basicClass) {
-        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
+    public static int findBasicSize(Class<?> basicClass) {
+        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(Basic::reflectForSize));
     }
 
     /**
