@@ -156,7 +156,7 @@ public class TypedSerializerTest {
 //        private List<W> wifes;
         @ToLinkedList(size = 2)
         private List<T> sons;
-//        @ToStructArray(length = 2)
+//        @ToArray(length = 2)
 //        private G[] gfs;
 
         private R firstWife;
