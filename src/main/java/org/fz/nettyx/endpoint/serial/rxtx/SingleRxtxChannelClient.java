@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.ReferenceCountUtil;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
  **/
 
 @Slf4j
-@Getter
 @SuppressWarnings("deprecation")
 public abstract class SingleRxtxChannelClient extends RxtxClient {
 
@@ -33,6 +31,10 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
             this.channel.close().sync();
         }
         this.channel = channel;
+    }
+
+    public Channel getChannel() {
+        return this.channel;
     }
 
     public void closeChannel() {
