@@ -93,17 +93,12 @@ serializer                             Serialization tool
      ---PropertyHandler                top property handler interface
      ---StructSerializer               core struct serializer tool
      ---StructUtils                    struct serializer tool
-     ---TypeRefer                       struct serializer type util
+     ---TypeRefer                      struct serializer type util
   xml
      ---XmlSerializer
   yml
      ---YmlSerializer
-  ---ctype                             internal C basic type
-  ---typed
-    ---Basic                              base type when serialized deserialized by type
-    ---TypedByteBufSerializer             type based serializer
-  ---ByteBufSerializer                    serialize deserialize top level abstractions
-  ---Serializers.java                     universal serialization tool
+  ---Serializer.java                   top level serializer interface
 ssl
   ---OpenSslContextFactory           OpenSSL context factory
   ---SslContextFactory               SSL context factory
