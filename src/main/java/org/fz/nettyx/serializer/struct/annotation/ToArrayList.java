@@ -58,7 +58,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), ArrayList::new);
+            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), new ArrayList<>(10));
         }
 
         @Override

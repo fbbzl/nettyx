@@ -58,7 +58,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return readCollection(serializer.getByteBuf(), elementType, toLinkedList.size(), LinkedList::new);
+            return readCollection(serializer.getByteBuf(), elementType, toLinkedList.size(), new LinkedList<>());
         }
 
         @Override
