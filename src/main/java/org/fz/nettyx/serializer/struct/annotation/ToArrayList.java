@@ -4,6 +4,7 @@ import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
 import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeStructCollection;
 
 import io.netty.buffer.ByteBuf;
@@ -56,7 +57,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newArrayList(readStructArray(elementType, toArrayList.size(), serializer.getByteBuf()));
+            return newArrayList(readArray(elementType, toArrayList.size(), serializer.getByteBuf()));
         }
 
         @Override

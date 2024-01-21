@@ -56,7 +56,11 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            return readArray(serializer, field, elementType, length);
+            try {
+                return readArray(serializer.getByteBuf(), elementType, length);
+            } catch (TypeJudgmentException typeJudgmentException) {
+                throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
+            }
         }
 
         @Override
@@ -71,19 +75,22 @@ public @interface ToArray {
             int length = annotation.length();
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
-            writeArray(field, arrayValue, writing, elementType, elementBytesSize, length);
+            try {
+                writeArray(arrayValue, writing, elementType, elementBytesSize, length);
+            } catch (TypeJudgmentException typeJudgmentException) {
+                throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
+            }
         }
 
-        public static Object[] readArray(StructSerializer serializer, Field field, Class<?> elementType, int length) {
-            if (isBasic(elementType))
-                return readBasicArray(elementType, length, serializer.getByteBuf());
-            else
-            if (isStruct(elementType))
-                return readStructArray(elementType, length, serializer.getByteBuf());
-            else                            throw new TypeJudgmentException(field);
+        public static Object[] readArray(ByteBuf buf, Class<?> elementType, int length) {
+            if (isBasic(elementType)) {
+                return readBasicArray(elementType, length, buf);
+            } else if (isStruct(elementType)) {
+                return readStructArray(elementType, length, buf);
+            } else throw new TypeJudgmentException();
         }
 
-        public static void writeArray(Field field, Object arrayValue, ByteBuf writing, Class<?> elementType,
+        public static void writeArray(Object arrayValue, ByteBuf writing, Class<?> elementType,
             int elementBytesSize, int length) {
             if (isBasic(elementType)) {
                 Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
@@ -100,7 +107,7 @@ public @interface ToArray {
             } else if (isStruct(elementType)) {
                 writeStructArray(arrayValue, elementType, length, writing);
             }
-            else throw new TypeJudgmentException(field);
+            else throw new TypeJudgmentException();
         }
 
         public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
