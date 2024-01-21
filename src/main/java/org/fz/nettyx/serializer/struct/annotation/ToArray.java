@@ -5,6 +5,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.findBasicSize;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
@@ -100,6 +101,7 @@ public @interface ToArray {
                     return;
                 }
                 if (basicArray.length < length) {
+                    // TODO
                     basicArray = fillArray(basicArray, (Class<Basic<?>>) elementType, length);
                 }
 
@@ -124,19 +126,9 @@ public @interface ToArray {
             Iterator<?> iterator = collection.iterator();
 
             if (isBasic(elementType)) {
-                for (int i = 0; i < length; i++) {
-                    // TODO
-                }
+                writeBasicCollection(collection, findBasicSize(elementType), writing);
             } else if (isStruct(elementType)) {
-                // TODO
-                for (int i = 0; i < length; i++) {
-                    if (iterator.hasNext()) {
-                        writing.writeBytes(
-                            StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
-                    } else {
-                        writing.writeBytes(StructSerializer.write(newStruct(elementType)));
-                    }
-                }
+                writeStructCollection(collection, elementType, length, writing);
             } else {
                 throw new TypeJudgmentException();
             }
@@ -185,25 +177,36 @@ public @interface ToArray {
             return (Collection<T>) CollUtil.addAll(collSup.get(), readStructArray(elementType, length, arrayBuf));
         }
 
-        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writing) {
+        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, ByteBuf writing) {
             for (Basic<?> basic : basicArray) {
                 if (basic == null) {
-                    writing.writeBytes(new byte[elementBytesLength]);
+                    writing.writeBytes(new byte[elementBytesSize]);
                 } else {
                     writing.writeBytes(basic.getBytes());
                 }
             }
         }
 
-        private static void writeBasicCollection(Collection<?> collection, int elementBytesLength, ByteBuf writing) {
+        private static void writeBasicCollection(Collection<?> collection, int elementBytesSize, int length,
+            ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
+
+            for (Basic<?> basic : (Collection<Basic<?>>) collection) {
+                if (basic == null) {
+                    writing.writeBytes(new byte[elementBytesSize]);
+                } else {
+                    writing.writeBytes(basic.getBytes());
+                }
+            }
+                /////
 
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
-                    Basic<?> basic = (Basic<?>) iterator.next();
-                    writing.writeBytes(defaultIfNull(basic, () -> newEmptyBasic(elementType)).getByteBuf());
+                    Object next = iterator.next();
+                    if (next == null) writing.writeBytes(new byte[elementBytesSize]);
+                    else writing.writeBytes(StructSerializer.write(next));
                 } else {
-                    writing.writeBytes(newEmptyBasic(elementType).getByteBuf());
+                    writing.writeBytes(new byte[elementBytesSize]);
                 }
             }
         }
