@@ -115,23 +115,23 @@ public @interface ToArray {
             Collection<T> collection = collSupplier.get();
 
             if (isBasic(elementType)) {
-                return CollUtil.addAll(collection, readBasicArray(elementType, length, buf));
+                return (Collection<T>) readBasicCollection(buf, elementType, length, collection);
             } else if (isStruct(elementType)) {
-                return CollUtil.addAll(collection, readStructArray(elementType, length, buf));
+                return readStructCollection(buf, elementType, length, collection);
             } else
                 throw new TypeJudgmentException();
         }
 
-        public static void writeCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+        public static void writeCollection(Collection<?> collection, Class<?> elementType, int length,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
 
             if (isBasic(elementType)) {
-                for (int i = 0; i < declaredLength; i++) {
-
+                for (int i = 0; i < length; i++) {
+                    //TODO
                 }
             } else if (isStruct(elementType)) {
-                for (int i = 0; i < declaredLength; i++) {
+                for (int i = 0; i < length; i++) {
                     if (iterator.hasNext()) {
                         writing.writeBytes(
                             StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
@@ -156,15 +156,20 @@ public @interface ToArray {
             return filledArray;
         }
 
-        private static <B extends Basic<?>> B[] readBasicArray(Class<?> elementType, int declaredLength,
+        private static <B extends Basic<?>> B[] readBasicArray(Class<?> elementType, int length,
             ByteBuf arrayBuf) {
-            B[] basics = newArray(elementType, declaredLength);
+            B[] basics = newArray(elementType, length);
 
             for (int i = 0; i < basics.length; i++) {
                 basics[i] = newBasic(elementType, arrayBuf);
             }
 
             return basics;
+        }
+
+        private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
+            Collection<?> collection) {
+            return (Collection<B>) CollUtil.addAll(collection, readBasicArray(elementType, length, arrayBuf));
         }
 
         private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
@@ -177,6 +182,11 @@ public @interface ToArray {
             return structs;
         }
 
+        private static <T> Collection<T> readStructCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
+            Collection<T> collection) {
+            return CollUtil.addAll(collection, readStructArray(elementType, length, arrayBuf));
+        }
+
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
                 if (basic == null) {
@@ -187,15 +197,15 @@ public @interface ToArray {
             }
         }
 
-        private static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int declaredLength,
+        private static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int length,
             ByteBuf writing) {
             T[] array = (T[]) arrayValue;
 
             if (array == null) {
-                array = newArray(elementType, declaredLength);
+                array = newArray(elementType, length);
             }
 
-            for (int i = 0; i < declaredLength; i++) {
+            for (int i = 0; i < length; i++) {
                 if (i > array.length - 1) {
                     writing.writeBytes(StructSerializer.write(newStruct(elementType)));
                 } else {
@@ -204,11 +214,11 @@ public @interface ToArray {
             }
         }
 
-        private static void writeBasicCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+        private static void writeBasicCollection(Collection<?> collection, Class<?> elementType, int length,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
 
-            for (int i = 0; i < declaredLength; i++) {
+            for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
                     Basic<?> basic = (Basic<?>) iterator.next();
                     writing.writeBytes(defaultIfNull(basic, () -> newEmptyBasic(elementType)).getByteBuf());
@@ -218,11 +228,11 @@ public @interface ToArray {
             }
         }
 
-        private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+        private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int length,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
 
-            for (int i = 0; i < declaredLength; i++) {
+            for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
                     writing.writeBytes(
                         StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
