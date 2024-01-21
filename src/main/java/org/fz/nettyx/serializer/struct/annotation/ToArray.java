@@ -44,7 +44,7 @@ public @interface ToArray {
     int length();
 
     @SuppressWarnings("unchecked")
-    class ToBasicArrayHandler implements PropertyHandler.ReadWriteHandler<ToArray> {
+    class ToArrayHandler implements PropertyHandler.ReadWriteHandler<ToArray> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
@@ -71,27 +71,34 @@ public @interface ToArray {
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
-            int declaredLength = annotation.length();
+            int length = annotation.length();
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
-            Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
+            if (isBasic(elementType)) {
+                Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
 
-            if (basicArray == null) {
-                writing.writeBytes(new byte[elementBytesSize * declaredLength]);
-                return;
-            }
-            if (basicArray.length < declaredLength) {
-                basicArray = fillArray(basicArray, (Class<Basic<?>>) elementType, declaredLength);
-            }
+                if (basicArray == null) {
+                    writing.writeBytes(new byte[elementBytesSize * length]);
+                    return;
+                }
+                if (basicArray.length < length) {
+                    basicArray = fillArray(basicArray, (Class<Basic<?>>) elementType, length);
+                }
 
-            writeBasicArray(basicArray, declaredLength, writing);
+                writeBasicArray(basicArray, length, writing);
+            } else if (isStruct(elementType)) {
+                writeStructArray(arrayValue, elementType, length, writing);
+            }
+            else throw new TypeJudgmentException(field);
         }
 
-        public static <T> T[] newArray(Class<?> componentType, int length) {
+        //**************************************         private start         ***************************************//
+
+        private static <T> T[] newArray(Class<?> componentType, int length) {
             return (T[]) Array.newInstance(componentType, length);
         }
 
-        public static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
+        private static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
             T[] filledArray = (T[]) Array.newInstance(elementType, length);
             System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
             return filledArray;
@@ -108,6 +115,16 @@ public @interface ToArray {
             return basics;
         }
 
+        private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
+            S[] structs = newArray(elementType, length);
+
+            for (int i = 0; i < structs.length; i++) {
+                structs[i] = StructSerializer.read(arrayBuf, elementType);
+            }
+
+            return structs;
+        }
+
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
             for (Basic<?> basic : basicArray) {
                 if (basic == null) {
@@ -118,17 +135,7 @@ public @interface ToArray {
             }
         }
 
-        public static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
-            S[] structs = newArray(elementType, length);
-
-            for (int i = 0; i < structs.length; i++) {
-                structs[i] = StructSerializer.read(arrayBuf, elementType);
-            }
-
-            return structs;
-        }
-
-        public static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int declaredLength,
+        private static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int declaredLength,
             ByteBuf writing) {
             T[] array = (T[]) arrayValue;
 
@@ -144,6 +151,8 @@ public @interface ToArray {
                 }
             }
         }
+
+        //**************************************         private end           ***************************************//
 
         public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
             ByteBuf writing) {

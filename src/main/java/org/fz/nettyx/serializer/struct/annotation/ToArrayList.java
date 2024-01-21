@@ -4,8 +4,7 @@ import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.ToStructArray.ToStructArrayHandler.readStructArray;
-import static org.fz.nettyx.serializer.struct.annotation.ToStructArray.ToStructArrayHandler.writeStructCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeStructCollection;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
