@@ -111,13 +111,11 @@ public @interface ToArray {
             else throw new TypeJudgmentException();
         }
 
-        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, Supplier<Collection<T>> collSupplier) {
-            Collection<T> collection = collSupplier.get();
-
+        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, Supplier<Collection<?>> collSupplier) {
             if (isBasic(elementType)) {
-                return (Collection<T>) readBasicCollection(buf, elementType, length, collection);
+                return (Collection<T>) readBasicCollection(buf, elementType, length, collSupplier);
             } else if (isStruct(elementType)) {
-                return readStructCollection(buf, elementType, length, collection);
+                return readStructCollection(buf, elementType, length, collSupplier);
             } else
                 throw new TypeJudgmentException();
         }
@@ -168,8 +166,8 @@ public @interface ToArray {
         }
 
         private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
-            Collection<?> collection) {
-            return (Collection<B>) CollUtil.addAll(collection, readBasicArray(elementType, length, arrayBuf));
+            Supplier<Collection<?>> collSup) {
+            return (Collection<B>) CollUtil.addAll(collSup.get(), readBasicArray(elementType, length, arrayBuf));
         }
 
         private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
@@ -183,8 +181,8 @@ public @interface ToArray {
         }
 
         private static <T> Collection<T> readStructCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
-            Collection<T> collection) {
-            return CollUtil.addAll(collection, readStructArray(elementType, length, arrayBuf));
+            Supplier<Collection<?>> collSup) {
+            return (Collection<T>) CollUtil.addAll(collSup.get(), readStructArray(elementType, length, arrayBuf));
         }
 
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
