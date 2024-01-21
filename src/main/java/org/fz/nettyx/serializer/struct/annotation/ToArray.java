@@ -74,7 +74,7 @@ public @interface ToArray {
             writeArray(field, arrayValue, writing, elementType, elementBytesSize, length);
         }
 
-        private static Object[] readArray(StructSerializer serializer, Field field, Class<?> elementType, int length) {
+        public static Object[] readArray(StructSerializer serializer, Field field, Class<?> elementType, int length) {
             if (isBasic(elementType))
                 return readBasicArray(elementType, length, serializer.getByteBuf());
             else
