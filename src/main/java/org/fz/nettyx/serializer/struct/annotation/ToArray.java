@@ -119,11 +119,10 @@ public @interface ToArray {
 
         public static void writeCollection(Collection<?> collection, Class<?> elementType, int length,
             ByteBuf writing) {
-            if (isBasic(elementType)) {
-                writeBasicCollection(collection, findBasicSize(elementType), length, writing);
-            } else if (isStruct(elementType)) {
-                writeStructCollection(collection, elementType, length, writing);
-            } else throw new TypeJudgmentException();
+            if (isBasic(elementType))  writeBasicCollection(collection, findBasicSize(elementType), length, writing);
+            else
+            if (isStruct(elementType)) writeStructCollection(collection, elementType, length, writing);
+            else                       throw new TypeJudgmentException();
         }
 
         //**************************************         private start         ***************************************//
