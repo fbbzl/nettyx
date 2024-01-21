@@ -126,13 +126,21 @@ public @interface ToArray {
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
 
-            for (int i = 0; i < declaredLength; i++) {
-                if (iterator.hasNext()) {
-                    writing.writeBytes(
-                        StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
-                } else {
-                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+            if (isBasic(elementType)) {
+                for (int i = 0; i < declaredLength; i++) {
+
                 }
+            } else if (isStruct(elementType)) {
+                for (int i = 0; i < declaredLength; i++) {
+                    if (iterator.hasNext()) {
+                        writing.writeBytes(
+                            StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+                    } else {
+                        writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+                    }
+                }
+            } else {
+                throw new TypeJudgmentException();
             }
         }
 
