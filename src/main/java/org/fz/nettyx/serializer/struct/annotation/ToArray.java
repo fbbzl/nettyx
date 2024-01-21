@@ -175,12 +175,21 @@ public @interface ToArray {
             return (Collection<T>) CollUtil.addAll(collSup.get(), readStructArray(elementType, length, arrayBuf));
         }
 
-        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, ByteBuf writing) {
-            for (Basic<?> basic : basicArray) {
-                if (basic == null) {
-                    writing.writeBytes(new byte[elementBytesSize]);
-                } else {
-                    writing.writeBytes(basic.getBytes());
+        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
+            if (basicArray == null) {
+                writing.writeBytes(new byte[elementBytesSize * length]);
+            } else {
+                for (int i = 0; i < length; i++) {
+                    if (i > basicArray.length - 1) {
+                        writing.writeBytes(new byte[elementBytesSize]);
+                    } else {
+                        Basic<?> basic = basicArray[i];
+                        if (basic == null) {
+                            writing.writeBytes(new byte[elementBytesSize]);
+                        } else {
+                            writing.writeBytes(basicArray[i].getBytes());
+                        }
+                    }
                 }
             }
         }
@@ -204,9 +213,7 @@ public @interface ToArray {
             ByteBuf writing) {
             T[] array = (T[]) arrayValue;
 
-            if (array == null) {
-                array = newArray(elementType, length);
-            }
+            if (array == null) array = newArray(elementType, length);
 
             for (int i = 0; i < length; i++) {
                 if (i > array.length - 1) {
