@@ -20,7 +20,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.Supplier;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -110,13 +109,12 @@ public @interface ToArray {
             else throw new TypeJudgmentException();
         }
 
-        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, Supplier<Collection<?>> collSupplier) {
+        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, Collection<?> coll) {
             if (isBasic(elementType)) {
-                return (Collection<T>) readBasicCollection(buf, elementType, length, collSupplier);
+                return (Collection<T>) readBasicCollection(buf, elementType, length, coll);
             } else if (isStruct(elementType)) {
-                return readStructCollection(buf, elementType, length, collSupplier);
-            } else
-                throw new TypeJudgmentException();
+                return readStructCollection(buf, elementType, length, coll);
+            } else throw new TypeJudgmentException();
         }
 
         public static void writeCollection(Collection<?> collection, Class<?> elementType, int length,
@@ -125,9 +123,7 @@ public @interface ToArray {
                 writeBasicCollection(collection, findBasicSize(elementType), length, writing);
             } else if (isStruct(elementType)) {
                 writeStructCollection(collection, elementType, length, writing);
-            } else {
-                throw new TypeJudgmentException();
-            }
+            } else throw new TypeJudgmentException();
         }
 
         //**************************************         private start         ***************************************//
