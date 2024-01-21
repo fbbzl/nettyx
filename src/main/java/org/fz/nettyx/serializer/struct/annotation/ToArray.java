@@ -101,7 +101,8 @@ public @interface ToArray {
                 }
 
                 writeBasicArray(basicArray, elementBytesSize, length, writing);
-            } else if (isStruct(elementType)) {
+            } else
+            if (isStruct(elementType)) {
                 Object[] structArray = (Object[]) arrayValue;
                 writeStructArray(defaultIfNull(structArray, () -> newArray(elementType, length)), elementType, length,
                     writing);
