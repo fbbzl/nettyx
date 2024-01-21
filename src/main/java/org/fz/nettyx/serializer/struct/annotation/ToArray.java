@@ -10,6 +10,7 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newEmptyBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -110,16 +111,15 @@ public @interface ToArray {
             else throw new TypeJudgmentException();
         }
 
-        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, ByteBuf writing, Supplier<Collection<?>> collSupplier) {
-            Collection<?> collection = collSupplier.get();
+        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, Supplier<Collection<T>> collSupplier) {
+            Collection<T> collection = collSupplier.get();
 
             if (isBasic(elementType)) {
-
-
-                return readBasicArray(elementType, length, buf);
+                return CollUtil.addAll(collection, readBasicArray(elementType, length, buf));
             } else if (isStruct(elementType)) {
-                return readStructArray(elementType, length, buf);
-            } else throw new TypeJudgmentException();
+                return CollUtil.addAll(collection, readStructArray(elementType, length, buf));
+            } else
+                throw new TypeJudgmentException();
         }
 
         public static void writeCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
