@@ -74,6 +74,11 @@ public @interface ToArray {
             int length = annotation.length();
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
+            readArray(field, arrayValue, writing, elementType, elementBytesSize, length);
+        }
+
+        public static void readArray(Field field, Object arrayValue, ByteBuf writing, Class<?> elementType,
+            int elementBytesSize, int length) {
             if (isBasic(elementType)) {
                 Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
 
@@ -90,6 +95,20 @@ public @interface ToArray {
                 writeStructArray(arrayValue, elementType, length, writing);
             }
             else throw new TypeJudgmentException(field);
+        }
+
+        public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+            ByteBuf writing) {
+            Iterator<?> iterator = collection.iterator();
+
+            for (int i = 0; i < declaredLength; i++) {
+                if (iterator.hasNext()) {
+                    writing.writeBytes(
+                        StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+                } else {
+                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+                }
+            }
         }
 
         //**************************************         private start         ***************************************//
@@ -153,20 +172,6 @@ public @interface ToArray {
         }
 
         //**************************************         private end           ***************************************//
-
-        public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
-            ByteBuf writing) {
-            Iterator<?> iterator = collection.iterator();
-
-            for (int i = 0; i < declaredLength; i++) {
-                if (iterator.hasNext()) {
-                    writing.writeBytes(
-                        StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
-                } else {
-                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
-                }
-            }
-        }
 
     }
 
