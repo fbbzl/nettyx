@@ -163,8 +163,8 @@ public @interface ToArray {
         }
 
         private static <T> Collection<T> readStructCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
-            Supplier<Collection<?>> collSup) {
-            return (Collection<T>) CollUtil.addAll(collSup.get(), readStructArray(elementType, length, arrayBuf));
+            Collection<?> collSup) {
+            return (Collection<T>) CollUtil.addAll(collSup, readStructArray(elementType, length, arrayBuf));
         }
 
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
