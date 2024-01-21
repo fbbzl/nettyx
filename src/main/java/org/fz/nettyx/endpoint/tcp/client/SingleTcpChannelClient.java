@@ -7,7 +7,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
 import java.net.SocketAddress;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2021 /5/6 15:22
  */
 @Slf4j
-@Getter
 public abstract class SingleTcpChannelClient extends TcpClient {
 
     /**
@@ -47,6 +45,15 @@ public abstract class SingleTcpChannelClient extends TcpClient {
             this.channel.close().sync();
         }
         this.channel = channel;
+    }
+
+    /**
+     * Gets channel.
+     *
+     * @return the channel
+     */
+    public Channel getChannel() {
+        return this.channel;
     }
 
     /**
