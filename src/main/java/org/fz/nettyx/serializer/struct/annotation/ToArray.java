@@ -196,7 +196,6 @@ public @interface ToArray {
         private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int length,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
-
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
                 else                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
