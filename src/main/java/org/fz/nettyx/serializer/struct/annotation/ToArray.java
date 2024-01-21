@@ -65,14 +65,14 @@ public @interface ToArray {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
             ByteBuf writing) {
-            Class<? extends Basic<?>> basicElementType =
-                !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
-                    : basicElementType;
+            Class<?> elementType =
+                !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
+                    : elementType;
 
-            Throws.ifNotAssignable(Basic.class, basicElementType,
-                "type [" + basicElementType + "] is not a basic type");
+            Throws.ifNotAssignable(Basic.class, elementType,
+                "type [" + elementType + "] is not a basic type");
 
-            int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(basicElementType);
+            int declaredLength = annotation.length(), elementBytesSize = StructUtils.findBasicSize(elementType);
 
             Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
 
@@ -81,7 +81,7 @@ public @interface ToArray {
                 return;
             }
             if (basicArray.length < declaredLength) {
-                basicArray = fillArray(basicArray, (Class<Basic<?>>) basicElementType, declaredLength);
+                basicArray = fillArray(basicArray, (Class<Basic<?>>) elementType, declaredLength);
             }
 
             writeBasicArray(basicArray, declaredLength, writing);
