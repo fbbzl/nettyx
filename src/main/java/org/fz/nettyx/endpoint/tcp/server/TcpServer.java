@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -17,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
  * @version 1.0
  * @since 2021/5/13 9:10
  */
+
 @Slf4j
+@Getter
 @SuppressWarnings("unchecked")
 public abstract class TcpServer {
 
@@ -43,14 +46,6 @@ public abstract class TcpServer {
 
     protected EventLoopGroup childEventLoopGroup() {
         return new NioEventLoopGroup();
-    }
-
-    public EventLoopGroup getParentEventLoopGroup() {
-        return this.parentEventLoopGroup;
-    }
-
-    public EventLoopGroup getChildEventLoopGroup() {
-        return this.childEventLoopGroup;
     }
 
     protected ServerBootstrap newServerBootstrap() {
