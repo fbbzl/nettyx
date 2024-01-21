@@ -100,14 +100,12 @@ public @interface ToArray {
                     writing.writeBytes(new byte[elementBytesSize * length]);
                     return;
                 }
-                if (basicArray.length < length) {
-                    // TODO
-                    basicArray = fillArray(basicArray, (Class<Basic<?>>) elementType, length);
-                }
 
-                writeBasicArray(basicArray, length, writing);
+                writeBasicArray(basicArray, elementBytesSize, length, writing);
             } else if (isStruct(elementType)) {
-                writeStructArray(arrayValue, elementType, length, writing);
+                Object[] structArray = (Object[]) arrayValue;
+                writeStructArray(defaultIfNull(structArray, () -> newArray(elementType, length)), elementType, length,
+                    writing);
             }
             else throw new TypeJudgmentException();
         }
@@ -138,12 +136,6 @@ public @interface ToArray {
             return (T[]) Array.newInstance(componentType, length);
         }
 
-        private static <T> T[] fillArray(T[] arrayValue, Class<T> elementType, int length) {
-            T[] filledArray = (T[]) Array.newInstance(elementType, length);
-            System.arraycopy(arrayValue, 0, filledArray, 0, arrayValue.length);
-            return filledArray;
-        }
-
         private static <B extends Basic<?>> B[] readBasicArray(Class<?> elementType, int length,
             ByteBuf arrayBuf) {
             B[] basics = newArray(elementType, length);
@@ -157,6 +149,7 @@ public @interface ToArray {
 
         private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
             Supplier<Collection<?>> collSup) {
+            // TODO remove supplier
             return (Collection<B>) CollUtil.addAll(collSup.get(), readBasicArray(elementType, length, arrayBuf));
         }
 
@@ -176,20 +169,13 @@ public @interface ToArray {
         }
 
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
-            if (basicArray == null) {
-                writing.writeBytes(new byte[elementBytesSize * length]);
-            } else {
-                for (int i = 0; i < length; i++) {
-                    if (i > basicArray.length - 1) {
-                        writing.writeBytes(new byte[elementBytesSize]);
-                    } else {
-                        Basic<?> basic = basicArray[i];
-                        if (basic == null) {
-                            writing.writeBytes(new byte[elementBytesSize]);
-                        } else {
-                            writing.writeBytes(basicArray[i].getBytes());
-                        }
-                    }
+            for (int i = 0; i < length; i++) {
+                if (i > basicArray.length - 1) {
+                    writing.writeBytes(new byte[elementBytesSize]);
+                } else {
+                    Basic<?> basic = basicArray[i];
+                    if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
+                    else               writing.writeBytes(basicArray[i].getBytes());
                 }
             }
         }
@@ -209,17 +195,13 @@ public @interface ToArray {
             }
         }
 
-        private static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int length,
+        private static <T> void writeStructArray(Object[] structArray, Class<T> elementType, int length,
             ByteBuf writing) {
-            T[] array = (T[]) arrayValue;
-
-            if (array == null) array = newArray(elementType, length);
-
             for (int i = 0; i < length; i++) {
-                if (i > array.length - 1) {
+                if (i > structArray.length - 1) {
                     writing.writeBytes(StructSerializer.write(newStruct(elementType)));
                 } else {
-                    writing.writeBytes(StructSerializer.write(defaultIfNull(array[i], () -> newStruct(elementType))));
+                    writing.writeBytes(StructSerializer.write(defaultIfNull(structArray[i], () -> newStruct(elementType))));
                 }
             }
         }
