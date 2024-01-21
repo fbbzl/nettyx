@@ -192,8 +192,8 @@ public @interface ToArray {
         private static <T> void writeStructArray(Object[] structArray, Class<T> elementType, int length,
             ByteBuf writing) {
             for (int i = 0; i < length; i++) {
-                if (i > structArray.length - 1) writing.writeBytes(StructSerializer.write(newStruct(elementType)));
-                else                            writing.writeBytes(StructSerializer.write(defaultIfNull(structArray[i], () -> newStruct(elementType))));
+                if (i < structArray.length) writing.writeBytes(StructSerializer.write(defaultIfNull(structArray[i], () -> newStruct(elementType))));
+                else                        writing.writeBytes(StructSerializer.write(newStruct(elementType)));
             }
         }
 
