@@ -55,7 +55,8 @@ public @interface ToArray {
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
             if (isBasic(elementType))       return readBasicArray(elementType, annotation.length(), serializer.getByteBuf());
-            else if (isStruct(elementType)) return readStructArray(elementType, annotation.length(), serializer.getByteBuf());
+            else
+            if (isStruct(elementType)) return readStructArray(elementType, annotation.length(), serializer.getByteBuf());
             else                            throw new TypeJudgmentException(field);
         }
 
