@@ -1,9 +1,12 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
+import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
@@ -12,6 +15,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
@@ -27,7 +32,7 @@ import org.fz.nettyx.util.Throws;
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToBasicArray {
+public @interface ToArray {
 
     /**
      * array length
@@ -37,22 +42,23 @@ public @interface ToBasicArray {
     int length();
 
     @SuppressWarnings("unchecked")
-    class ToBasicArrayHandler implements PropertyHandler.ReadWriteHandler<ToBasicArray> {
+    class ToBasicArrayHandler implements PropertyHandler.ReadWriteHandler<ToArray> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToBasicArray annotation) {
-            Class<? extends Basic<?>> basicElementType =
-                !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
-                    : basicElementType;
+        public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
+            Class<? extends Basic<?>> elementType =
+                !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
+                    : elementType;
 
-            Throws.ifNotAssignable(Basic.class, basicElementType,
-                "type [" + basicElementType + "] is not a basic type");
+            Throws.ifNotAssignable(Basic.class, elementType,
+                "type [" + elementType + "] is not a basic type");
 
-            return readBasicArray(basicElementType, annotation.length(), serializer.getByteBuf());
+            if (isBasic(elementType)) return readBasicArray(elementType, annotation.length(), serializer.getByteBuf());
+            else                      return readStructArray(elementType, annotation.length(), serializer.getByteBuf());
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToBasicArray annotation,
+        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
             ByteBuf writing) {
             Class<? extends Basic<?>> basicElementType =
                 !ClassUtil.isAssignable(Basic.class, (basicElementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
@@ -106,6 +112,48 @@ public @interface ToBasicArray {
                 }
             }
         }
+
+        public static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
+            S[] structs = newArray(elementType, length);
+
+            for (int i = 0; i < structs.length; i++) {
+                structs[i] = StructSerializer.read(arrayBuf, elementType);
+            }
+
+            return structs;
+        }
+
+        public static <T> void writeStructArray(Object arrayValue, Class<T> elementType, int declaredLength,
+            ByteBuf writing) {
+            T[] array = (T[]) arrayValue;
+
+            if (array == null) {
+                array = newArray(elementType, declaredLength);
+            }
+
+            for (int i = 0; i < declaredLength; i++) {
+                if (i > array.length - 1) {
+                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+                } else {
+                    writing.writeBytes(StructSerializer.write(defaultIfNull(array[i], () -> newStruct(elementType))));
+                }
+            }
+        }
+
+        public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+            ByteBuf writing) {
+            Iterator<?> iterator = collection.iterator();
+
+            for (int i = 0; i < declaredLength; i++) {
+                if (iterator.hasNext()) {
+                    writing.writeBytes(
+                        StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+                } else {
+                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+                }
+            }
+        }
+
     }
 
 }
