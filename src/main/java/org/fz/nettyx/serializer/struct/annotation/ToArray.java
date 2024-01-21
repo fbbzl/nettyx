@@ -191,20 +191,11 @@ public @interface ToArray {
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
 
-            for (Basic<?> basic : (Collection<Basic<?>>) collection) {
-                if (basic == null) {
-                    writing.writeBytes(new byte[elementBytesSize]);
-                } else {
-                    writing.writeBytes(basic.getBytes());
-                }
-            }
-                /////
-
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
                     Object next = iterator.next();
                     if (next == null) writing.writeBytes(new byte[elementBytesSize]);
-                    else writing.writeBytes(StructSerializer.write(next));
+                    else              writing.writeBytes(StructSerializer.write(next));
                 } else {
                     writing.writeBytes(new byte[elementBytesSize]);
                 }
