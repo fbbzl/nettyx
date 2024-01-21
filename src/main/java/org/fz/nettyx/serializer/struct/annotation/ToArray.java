@@ -48,9 +48,8 @@ public @interface ToArray {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
-            Class<?> elementType =
-                !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
-                    : elementType;
+            Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
+                ? serializer.getArrayFieldActualType(field) : elementType;
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
@@ -66,9 +65,8 @@ public @interface ToArray {
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
             ByteBuf writing) {
-            Class<?> elementType =
-                !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field))) ? serializer.getArrayFieldActualType(field)
-                    : elementType;
+            Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
+                ? serializer.getArrayFieldActualType(field) : elementType;
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
