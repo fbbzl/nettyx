@@ -7,6 +7,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
+import static org.fz.nettyx.serializer.struct.StructUtils.newEmptyBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import cn.hutool.core.util.ClassUtil;
@@ -108,7 +109,7 @@ public @interface ToArray {
             else throw new TypeJudgmentException();
         }
 
-        public static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+        public static void writeCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
 
@@ -178,6 +179,33 @@ public @interface ToArray {
                     writing.writeBytes(StructSerializer.write(newStruct(elementType)));
                 } else {
                     writing.writeBytes(StructSerializer.write(defaultIfNull(array[i], () -> newStruct(elementType))));
+                }
+            }
+        }
+
+        private static void writeBasicCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+            ByteBuf writing) {
+            Iterator<?> iterator = collection.iterator();
+
+            for (int i = 0; i < declaredLength; i++) {
+                if (iterator.hasNext()) {
+                    Basic<?> basic = (Basic<?>) iterator.next();
+                    writing.writeBytes(defaultIfNull(basic, () -> newEmptyBasic(elementType)).getByteBuf());
+                } else {
+                    writing.writeBytes(newEmptyBasic(elementType).getByteBuf());
+                }
+            }
+        }
+        private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
+            ByteBuf writing) {
+            Iterator<?> iterator = collection.iterator();
+
+            for (int i = 0; i < declaredLength; i++) {
+                if (iterator.hasNext()) {
+                    writing.writeBytes(
+                        StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+                } else {
+                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
                 }
             }
         }
