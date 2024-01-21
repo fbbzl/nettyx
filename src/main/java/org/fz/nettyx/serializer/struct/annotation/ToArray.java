@@ -183,7 +183,6 @@ public @interface ToArray {
         private static void writeBasicCollection(Collection<?> collection, int elementBytesSize, int length,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
-
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
                     Object next = iterator.next();
