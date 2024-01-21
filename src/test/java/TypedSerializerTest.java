@@ -59,14 +59,15 @@ public class TypedSerializerTest {
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
         int times = 1_000_000;
+        TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>>() {
+        };
         for (int i = 0; i < times; i++) {
-            TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>>() {
-            };
 
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> user = StructSerializer.read(
+                Unpooled.wrappedBuffer(bytes), typeRefer);
 
-          //  System.err.println("read :" + user);
+            //  System.err.println("read :" + user);
 //            user.setAddress(null);
 //            user.setLoginNames(null);
 //            user.setQqNames(null);
@@ -85,7 +86,7 @@ public class TypedSerializerTest {
             //System.err.println(Arrays.toString(bytes1));
             //   System.err.println("turn :" + turn);
 
-          //  System.err.println(turn.equals(user));
+            //  System.err.println(turn.equals(user));
 
         }
         BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
@@ -144,7 +145,7 @@ public class TypedSerializerTest {
         private Clong8 description;
         private Culong8 interest;
         private Bill bill;
-        private Cchar  cchar;
+        private Cchar cchar;
         private Cdouble cdouble;
         private Cfloat cfloat;
         private Cint cint;
