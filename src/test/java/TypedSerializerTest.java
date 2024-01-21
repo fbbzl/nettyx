@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
@@ -44,7 +45,6 @@ import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulong8;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppulonglong;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 import org.fz.nettyx.util.HexBins;
-import org.fz.nettyx.util.TypeRefer;
 
 /**
  * @author fengbinbin
