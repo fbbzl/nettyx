@@ -7,7 +7,6 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.getComponentType;
 import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
-import static org.fz.nettyx.serializer.struct.StructUtils.newEmptyBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 
 import cn.hutool.core.collection.CollUtil;
@@ -126,9 +125,10 @@ public @interface ToArray {
 
             if (isBasic(elementType)) {
                 for (int i = 0; i < length; i++) {
-                    //TODO
+                    // TODO
                 }
             } else if (isStruct(elementType)) {
+                // TODO
                 for (int i = 0; i < length; i++) {
                     if (iterator.hasNext()) {
                         writing.writeBytes(
@@ -185,12 +185,25 @@ public @interface ToArray {
             return (Collection<T>) CollUtil.addAll(collSup.get(), readStructArray(elementType, length, arrayBuf));
         }
 
-        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writingBuf) {
+        private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesLength, ByteBuf writing) {
             for (Basic<?> basic : basicArray) {
                 if (basic == null) {
-                    writingBuf.writeBytes(new byte[elementBytesLength]);
+                    writing.writeBytes(new byte[elementBytesLength]);
                 } else {
-                    writingBuf.writeBytes(basic.getBytes());
+                    writing.writeBytes(basic.getBytes());
+                }
+            }
+        }
+
+        private static void writeBasicCollection(Collection<?> collection, int elementBytesLength, ByteBuf writing) {
+            Iterator<?> iterator = collection.iterator();
+
+            for (int i = 0; i < length; i++) {
+                if (iterator.hasNext()) {
+                    Basic<?> basic = (Basic<?>) iterator.next();
+                    writing.writeBytes(defaultIfNull(basic, () -> newEmptyBasic(elementType)).getByteBuf());
+                } else {
+                    writing.writeBytes(newEmptyBasic(elementType).getByteBuf());
                 }
             }
         }
@@ -208,20 +221,6 @@ public @interface ToArray {
                     writing.writeBytes(StructSerializer.write(newStruct(elementType)));
                 } else {
                     writing.writeBytes(StructSerializer.write(defaultIfNull(array[i], () -> newStruct(elementType))));
-                }
-            }
-        }
-
-        private static void writeBasicCollection(Collection<?> collection, Class<?> elementType, int length,
-            ByteBuf writing) {
-            Iterator<?> iterator = collection.iterator();
-
-            for (int i = 0; i < length; i++) {
-                if (iterator.hasNext()) {
-                    Basic<?> basic = (Basic<?>) iterator.next();
-                    writing.writeBytes(defaultIfNull(basic, () -> newEmptyBasic(elementType)).getByteBuf());
-                } else {
-                    writing.writeBytes(newEmptyBasic(elementType).getByteBuf());
                 }
             }
         }
