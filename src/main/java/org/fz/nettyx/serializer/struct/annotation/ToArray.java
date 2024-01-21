@@ -74,10 +74,10 @@ public @interface ToArray {
             int length = annotation.length();
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
-            readArray(field, arrayValue, writing, elementType, elementBytesSize, length);
+            writeArray(field, arrayValue, writing, elementType, elementBytesSize, length);
         }
 
-        public static void readArray(Field field, Object arrayValue, ByteBuf writing, Class<?> elementType,
+        public static void writeArray(Field field, Object arrayValue, ByteBuf writing, Class<?> elementType,
             int elementBytesSize, int length) {
             if (isBasic(elementType)) {
                 Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
