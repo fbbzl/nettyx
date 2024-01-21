@@ -59,12 +59,12 @@ public class TypedSerializerTest {
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
         int times = 1_000_000;
-        TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8>>() {
+        TypeRefer<User<Son<Clong4, Clong4>, Wife, Wife, GirlFriend, Wife>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Wife, GirlFriend, Wife>>() {
         };
         for (int i = 0; i < times; i++) {
 
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> user = StructSerializer.read(
+            User<Son<Clong4, Clong4>, Wife, Wife, GirlFriend, Wife> user = StructSerializer.read(
                 Unpooled.wrappedBuffer(bytes), typeRefer);
 
             //  System.err.println("read :" + user);
