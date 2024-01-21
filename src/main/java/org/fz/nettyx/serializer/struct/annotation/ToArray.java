@@ -82,10 +82,10 @@ public @interface ToArray {
         }
 
         public static <T> T[] readArray(ByteBuf buf, Class<?> elementType, int length) {
-            if (isBasic(elementType))       return (T[]) readBasicArray(elementType, length, buf);
+            if (isBasic(elementType))  return (T[]) readBasicArray(elementType, length, buf);
             else
-            if (isStruct(elementType))      return (T[]) readStructArray(elementType, length, buf);
-            else                            throw new TypeJudgmentException();
+            if (isStruct(elementType)) return (T[]) readStructArray(elementType, length, buf);
+            else                       throw new TypeJudgmentException();
         }
 
         public static void writeArray(Object arrayValue, Class<?> elementType, int length, ByteBuf writing) {
