@@ -167,9 +167,8 @@ public @interface ToArray {
                     Basic<?> basic = basicArray[i];
                     if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
                     else               writing.writeBytes(basicArray[i].getBytes());
-                } else {
-                    writing.writeBytes(new byte[elementBytesSize]);
                 }
+                else writing.writeBytes(new byte[elementBytesSize]);
             }
         }
 
@@ -181,9 +180,8 @@ public @interface ToArray {
                     Basic<?> basic = (Basic<?>) iterator.next();
                     if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
                     else               writing.writeBytes(basic.getBytes());
-                } else {
-                    writing.writeBytes(new byte[elementBytesSize]);
                 }
+                else writing.writeBytes(new byte[elementBytesSize]);
             }
         }
 
