@@ -12,6 +12,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
@@ -57,7 +58,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size()));
+            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), ArrayList::new);
         }
 
         @Override
