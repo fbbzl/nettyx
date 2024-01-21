@@ -196,6 +196,7 @@ public @interface ToArray {
                 }
             }
         }
+
         private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
             ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
