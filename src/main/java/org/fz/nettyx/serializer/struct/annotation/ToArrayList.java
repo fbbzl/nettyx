@@ -4,8 +4,8 @@ import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeStructCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
 
 import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Documented;
@@ -57,7 +57,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newArrayList(readArray(serializer.getByteBuf(), elementType, toArrayList.size()));
+            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size()));
         }
 
         @Override
@@ -71,7 +71,7 @@ public @interface ToArrayList {
 
             List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
 
-            writeStructCollection(list, elementType, toArrayList.size(), writing);
+            writeCollection(list, elementType, toArrayList.size(), writing);
         }
     }
 }

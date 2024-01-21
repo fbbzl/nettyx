@@ -19,6 +19,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Supplier;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.PropertyHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -107,6 +108,18 @@ public @interface ToArray {
                 writeStructArray(arrayValue, elementType, length, writing);
             }
             else throw new TypeJudgmentException();
+        }
+
+        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, ByteBuf writing, Supplier<Collection<?>> collSupplier) {
+            Collection<?> collection = collSupplier.get();
+
+            if (isBasic(elementType)) {
+
+
+                return readBasicArray(elementType, length, buf);
+            } else if (isStruct(elementType)) {
+                return readStructArray(elementType, length, buf);
+            } else throw new TypeJudgmentException();
         }
 
         public static void writeCollection(Collection<?> collection, Class<?> elementType, int declaredLength,
