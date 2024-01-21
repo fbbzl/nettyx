@@ -4,6 +4,7 @@ import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readArray;
 import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeStructCollection;
 
 import io.netty.buffer.ByteBuf;
@@ -56,7 +57,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return newLinkedList(readStructArray(elementType, toLinkedList.size(), serializer.getByteBuf()));
+            return newLinkedList(readArray(serializer.getByteBuf(), elementType, toLinkedList.size()));
         }
 
         @Override
