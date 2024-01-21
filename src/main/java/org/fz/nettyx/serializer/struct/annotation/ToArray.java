@@ -147,10 +147,9 @@ public @interface ToArray {
             return basics;
         }
 
-        private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
-            Supplier<Collection<?>> collSup) {
-            // TODO remove supplier
-            return (Collection<B>) CollUtil.addAll(collSup.get(), readBasicArray(elementType, length, arrayBuf));
+        private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType,
+            int length, Collection<?> collSup) {
+            return (Collection<B>) CollUtil.addAll(collSup, readBasicArray(elementType, length, arrayBuf));
         }
 
         private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
@@ -185,9 +184,9 @@ public @interface ToArray {
             Iterator<?> iterator = collection.iterator();
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
-                    Object next = iterator.next();
-                    if (next == null) writing.writeBytes(new byte[elementBytesSize]);
-                    else              writing.writeBytes(StructSerializer.write(next));
+                    Basic<?> basic = (Basic<?>) iterator.next();
+                    if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
+                    else              writing.writeBytes(basic.getBytes());
                 } else {
                     writing.writeBytes(new byte[elementBytesSize]);
                 }
