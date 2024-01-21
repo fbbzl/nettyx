@@ -148,9 +148,9 @@ public class TypedSerializerTest {
 //        private Cppushort cppushort;
 //        private CppBool cppBool;
 
-//        @ToBasicArray(length = 2)
+//        @ToArray(length = 2)
 //        private L[] loginNames;
-//        @ToBasicArray(length = 2)
+//        @ToArray(length = 2)
 //        private Cppushort[] qqNames;
 //        @ToArrayList(size = 2)
 //        private List<W> wifes;
