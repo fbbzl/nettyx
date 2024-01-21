@@ -3,7 +3,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -83,7 +82,7 @@ public class TypedSerializerTest {
 
             byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
 
-            System.err.println(Arrays.toString(bytes1));
+            //System.err.println(Arrays.toString(bytes1));
             //   System.err.println("turn :" + turn);
 
           //  System.err.println(turn.equals(user));
