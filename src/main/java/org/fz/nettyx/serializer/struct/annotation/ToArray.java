@@ -165,12 +165,12 @@ public @interface ToArray {
 
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
             for (int i = 0; i < length; i++) {
-                if (i > basicArray.length - 1) {
-                    writing.writeBytes(new byte[elementBytesSize]);
-                } else {
+                if (i < basicArray.length) {
                     Basic<?> basic = basicArray[i];
                     if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
                     else               writing.writeBytes(basicArray[i].getBytes());
+                } else {
+                    writing.writeBytes(new byte[elementBytesSize]);
                 }
             }
         }
