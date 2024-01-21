@@ -15,8 +15,8 @@
 ```
 ## api
 ```
-action                              包含了充足的函数式接口, 为nettyx函数式编程提供支持   
-  ---Actions                        Action通用工具类                                          
+action                              包含足够的功能接口来支持nettyx函数式编程
+  ---Actions                        操作泛型实用程序                                           
   ---ChannelAction                      
   ---ChannelBindAction
   ---ChannelConnectAction
@@ -27,66 +27,89 @@ action                              包含了充足的函数式接口, 为nettyx
   ---ChannelPromiseAction
   ---ChannelReadAction
   ---ChannelWriteAction
-annotation
-  ---FieldHandler                     在序列化字段时，可以指定字段序列化/反序列化逻辑
-  ---Ignore                           序列化时忽略此字段
-  ---Length                           在序列化/反序列化时，数组类型的字段必须使用此注释来指定长度
-  ---Struct                           在序列化中，需要对域类型进行注释，就像JPA中的@Entity一样
+codec                              提供了一些基本的编解码器
+  ---DelimiterBasedFrameCodec          基于分隔符编解码器
+  ---EscapeCodec                       协议敏感字替换，例如转义
+  ---StartEndFlagFrameCodec            Start End Flag 编解码器，用于根据开始和结束标志对消息进行解码
+  ---StringMessageCodec                字符串编解码器
 endpoint
-  client                              提供client端基础实现
-    ---Client                            顶级Client抽象  
-    ---rxtx                           串口封装
-       ---RxtxClient                     串口通信顶级父类
-       ---MultiRxtxChannelClient         多channel串口通信, 使用key检索对应channel
-       ---SingleRxtxChannelClient        单channel串口通信
-    ---tcp                            tcp封装
-       ---TcpClient                      tcp通信顶级父类
-       ---MultiTcpChannelClient          多Channel的Client, 使用key检索对应channel
-       ---SingleTcpChannelClient         单Channel的Client
-    ---upd 未完成
-    ---jsc                               简单的基于jsc的java串口通信实现
-  server
-    ---Server                          提供server端基础实现
-codec                               提供了一些基础的编解码器
-  ---DelimiterBasedFrameCodec          基于分隔符codec
-  ---EscapeCodec                       协议敏感字替换
-  ---StartEndFlagFrameCodec            起止符codec
-  ---StringMessageCodec                字符串Codec
-envet                                对netty事件提供支持
-  ---ChannelEvent                      Channel事件对象, 建议配合Spring容器事件使用
-  ---ChannelEvents                     Channel事件对象工具
+  serial
+      jsc                               基于JSC的Java串行通信的简单实现
+         ---rxtx                           串行 rxtx 封装
+         ---RxtxClient                     串行通信顶级父类
+         ---MultiRxtxChannelClient         多通道串口通讯，使用键检索对应通道
+         ---SingleRxtxChannelClient        单通道串行通信
+  tcp                                    TCP 封装
+     client                              提供客户端基本实现
+       ---TcpClient                      TCP 封装
+       ---MultiTcpChannelClient          具有多个通道的客户端，使用 key 检索相应的通道
+       ---SingleTcpChannelClient         单通道客户端
+     server
+       ---Server                       提供服务器端基本实现
+  ---Client                            顶级客户端抽象
+envet                                为网络事件提供支持
+  ---ChannelEvent                     Channel 事件对象，建议与 Spring 容器事件结合使用
+  ---ChannelEvents                    通道事件对象工具
 exception                           异常扩展
-  ---ClosingChannelException           配合channel advice, 可以通过抛出该异常子类来关闭channel
-handler                             提供了一些基础的channel handler实现
+  ---ClosingChannelException           结合通道建议，可以通过抛出异常子类来关闭通道
+  ---HandlerException
+  ---NoSuchPortException
+  ---ParameterizedTypeException
+  ---SerializeException
+  ---TooLessBytesException
+  ---TypeJudgmentException
+handler                             提供了一些基本的通道处理程序实现
   actionable
-     ---ActionableIdleStateHandler     可操作闲置处理器
-     ---ActionableReadTimeoutHandler   可操作读取超时处理器
-     ---ActionableWriteTimeoutHandler  可操作写超时处理器
+     ---ActionableIdleStateHandler     可操作的空闲状态处理程序
+     ---ActionableReadTimeoutHandler   可操作的 读取超时 处理程序
+     ---ActionableWriteTimeoutHandler  可操作的 写超时 处理程序
   advice
      ---InboundAdvice                  入站建言
      ---OutboundAdvice                 出站建言
   interceptor
-     ---ChannelInterceptor             Channel拦截器, 适用于通信前的握手动作等前置操作
-     ---ChannelInterceptors            Channel拦截器工具类
-  ---AdvisableChannelInitializer       channel建言初始化器
-  ---ExceptionHandler                  异常处理器
-  ---HeartBeater                       tcp心跳器
-  ---LoggerHandler                     出入站消息日志
-  ---MessageStealer                    用来忽略一些消息
+     ---ChannelInterceptor                信道拦截器，适用于通信前握手等预操作
+     ---ChannelInterceptors               通道拦截器实用程序
+  ---AdvisableChannelInitializer       通道建议初始值设定项
+  ---ExceptionHandler                  异常处理程序
+  ---HeartBeater                       TCP 心跳设备
+  ---LoggerHandler                     进入和退出消息日志
+  ---MessageStealer                    用于丢弃消息
 listener
-  ---ActionableChannelFutureListener   可操作channel future监听器
+  ---ActionableChannelFutureListener   可操作的频道未来侦听器
 serializer                             序列化工具
-  ---ctype                             内置C基础类型
-  ---typed
-    ---Basic                              序列化时的基类型by type
-    ---TypedByteBufSerializer             基于类型的序列化器
-  ---ByteBufSerializer                    序列化/反序列化顶级抽象
-  ---Serializers.java                     通用序列化工具
+  struct
+     annotation
+        ---Ignore                      序列化时忽略此字段
+        ---Struct                      在序列化中，需要对域类型进行注释，类似于 JPA 中的 @Entity
+        ---ToArray                     数组序列化器
+        ---ToArrayList                 ArrayList序列化器
+        ---ToLinkedList                ToLinkedList序列化器
+        ---ToNamedEnum                 Named Enum序列化器
+        ---ToString                    String序列化器
+     basic
+        c                              内置的C基础类型
+        cpp                            内置的Cpp基础类型
+        ---Basic                       基础类型顶级父类
+     ---PropertyHandler                字段处理器
+     ---StructSerializer               核心结构体序列化器
+     ---StructUtils                    序列化工具
+     ---TypeRefer                      结构泛型类型应用
+  xml
+     ---XmlSerializer
+  yml
+     ---YmlSerializer
+  ---Serializer.java                    顶级序列化器接口
 ssl
-  ---OpenSslContextFactory           openssl工厂
-  ---SslContextFactory               ssl context工厂
-util                              基础工具类
-  ---ChannelStorage                  存储channel, 内部使用KV对存储
+  ---OpenSslContextFactory           OpenSSL 上下文工厂
+  ---SslContextFactory               SSL 上下文工厂
+util                                 基础工具
+  ---ChannelStorage                  存储通道，内部使用 KV 对进行存储
   ---HexBins                         16进制工具
+  ---Bins                            二进制工具
+  ---BytesKit                        字节工具           
+  ---CommPorts                       串口工具
+  ---Exceptions                      异常工具
+  ---Throws                          建言工具
+  ---Try                             lambda受检异常工具
   
 ```
