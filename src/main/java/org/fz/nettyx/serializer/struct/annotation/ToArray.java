@@ -148,8 +148,8 @@ public @interface ToArray {
         }
 
         private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType,
-            int length, Collection<?> collSup) {
-            return (Collection<B>) CollUtil.addAll(collSup, readBasicArray(elementType, length, arrayBuf));
+            int length, Collection<?> coll) {
+            return (Collection<B>) CollUtil.addAll(coll, readBasicArray(elementType, length, arrayBuf));
         }
 
         private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
@@ -163,8 +163,8 @@ public @interface ToArray {
         }
 
         private static <T> Collection<T> readStructCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
-            Collection<?> collSup) {
-            return (Collection<T>) CollUtil.addAll(collSup, readStructArray(elementType, length, arrayBuf));
+            Collection<?> coll) {
+            return (Collection<T>) CollUtil.addAll(coll, readStructArray(elementType, length, arrayBuf));
         }
 
         private static void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
@@ -186,7 +186,7 @@ public @interface ToArray {
                 if (iterator.hasNext()) {
                     Basic<?> basic = (Basic<?>) iterator.next();
                     if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
-                    else              writing.writeBytes(basic.getBytes());
+                    else               writing.writeBytes(basic.getBytes());
                 } else {
                     writing.writeBytes(new byte[elementBytesSize]);
                 }
