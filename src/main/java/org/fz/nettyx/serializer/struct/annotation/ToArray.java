@@ -76,7 +76,7 @@ public @interface ToArray {
             int elementBytesSize = StructUtils.findBasicSize(elementType);
 
             try {
-                writeArray(arrayValue, writing, elementType, length, elementBytesSize);
+                writeArray(arrayValue, elementType, length, elementBytesSize, writing);
             } catch (TypeJudgmentException typeJudgmentException) {
                 throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
@@ -90,8 +90,8 @@ public @interface ToArray {
             } else throw new TypeJudgmentException();
         }
 
-        public static void writeArray(Object arrayValue, ByteBuf writing, Class<?> elementType, int length,
-            int elementBytesSize) {
+        public static void writeArray(Object arrayValue, Class<?> elementType, int length, int elementBytesSize,
+            ByteBuf writing) {
             if (isBasic(elementType)) {
                 Basic<?>[] basicArray = (Basic<?>[]) arrayValue;
 
