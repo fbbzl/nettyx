@@ -1,21 +1,17 @@
 package org.fz.nettyx.serializer.struct;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
-import static org.fz.nettyx.serializer.struct.StructSerializer.readBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.readStruct;
-import static org.fz.nettyx.serializer.struct.StructSerializer.writeBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.writeStruct;
-
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.serializer.struct.basic.Basic;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructSerializer.*;
 
 /**
  * The top-level parent class of all custom serialization processors
