@@ -2,7 +2,6 @@ package org.fz.nettyx.action;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-
 import java.net.SocketAddress;
 
 /**

@@ -1,5 +1,14 @@
 package org.fz.nettyx.serializer.struct;
 
+import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.ANNOTATION_HANDLER_MAPPING_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.BASIC_BYTES_SIZE_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_READER_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.FIELD_WRITER_CACHE;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.exceptions.NotInitedException;
@@ -11,25 +20,25 @@ import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
-
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
-
-import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
 
 
 /**
@@ -116,12 +125,12 @@ public class StructUtils {
         return newEmptyBasic((Class<B>) basicField.getType());
     }
 
-    public static <B extends Basic<?>> B newEmptyBasic(Class<B> basicClass) {
-        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
+    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
+        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize((Class<B>)basicClass)]));
     }
 
-    public static <B extends Basic<?>> int findBasicSize(Class<B> basicClass) {
-        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(Basic::reflectForSize));
+    public static int findBasicSize(Class<?> basicClass) {
+        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(Basic::reflectForSize));
     }
 
     /**
@@ -133,7 +142,7 @@ public class StructUtils {
      * @return the t
      */
     public static <B extends Basic<?>> B newBasic(Field basicField, ByteBuf buf) {
-        return newBasic((Class<B>) basicField.getType(), buf);
+        return newBasic(basicField.getType(), buf);
     }
 
     /**
@@ -144,9 +153,9 @@ public class StructUtils {
      * @param buf the buf
      * @return the t
      */
-    public static <B extends Basic<?>> B newBasic(Class<B> basicClass, ByteBuf buf) {
+    public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
-            return ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
+            return (B) ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException invocationException) {
             Throwable cause = invocationException.getCause();
             if (cause instanceof TooLessBytesException) {
@@ -159,9 +168,9 @@ public class StructUtils {
         }
     }
 
-    public static <B extends Basic<?>> Constructor<B> filterConstructor(Class<B> basicClass,
+    public static <B extends Basic<?>> Constructor<B> filterConstructor(Class<?> basicClass,
         Predicate<Constructor<B>> filter) {
-        Constructor<B>[] constructors = ReflectUtil.getConstructors(basicClass);
+        Constructor<B>[] constructors = (Constructor<B>[]) ReflectUtil.getConstructors(basicClass);
         return Arrays.stream(constructors).filter(filter).findFirst().orElse(null);
     }
 

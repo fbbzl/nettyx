@@ -10,7 +10,7 @@ Based on [netty4.1.101. Final], ultra-lightweight packaging has been carried out
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.8-RELEASE</version>
+    <version>2.1.0-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -27,36 +27,37 @@ action                              Contains sufficient functional interfaces to
   ---ChannelPromiseAction
   ---ChannelReadAction
   ---ChannelWriteAction
-annotation
-  ---FieldHandler                     When serializing fields, you can specify field serialization/deserialization logic
-  ---Ignore                           ignore this field when serializing
-  ---Length                           When serialized/deserialized, fields of array type must use this annotation to specify the toArray
-  ---Struct                           In serialization, the domain type needs to be annotated, something like @Entity in JPA
-endpoint
-  client                              Provide client side basic implementation
-    ---Client                            Top-level client abstraction  
-    ---rxtx                           Serial rxtx packaging
-       ---RxtxClient                     Serial communication top-level parent class
-       ---MultiRxtxChannelClient         Multi channel serial communication, using key to retrieve corresponding channels
-       ---SingleRxtxChannelClient        Single channel serial communication
-    ---tcp                            TCP encapsulation
-       ---TcpClient                      TCP encapsulation
-       ---MultiTcpChannelClient          Client with multiple channels, using key to retrieve corresponding channels
-       ---SingleTcpChannelClient         Single Channel Client
-    ---upd (incomplete)
-    ---jsc                               A Simple Implementation of Java Serial Communication Based on JSC
-  server
-    ---Server                          Provide server-side basic implementation
 codec                               Provided some basic codecs
   ---DelimiterBasedFrameCodec          Based on the delimiter codec
   ---EscapeCodec                       Protocol sensitive word replacement, such as escape
   ---StartEndFlagFrameCodec            Start End Flag Codec, use to decoe message based on start and end flag
   ---StringMessageCodec                String Codec
+endpoint
+  serial
+      jsc                               A Simple Implementation of Java Serial Communication Based on JSC
+         ---rxtx                           Serial rxtx packaging
+         ---RxtxClient                     Serial communication top-level parent class
+         ---MultiRxtxChannelClient         Multi channel serial communication, using key to retrieve corresponding channels
+         ---SingleRxtxChannelClient        Single channel serial communication
+  tcp                                    TCP encapsulation
+     client                              Provide client side basic implementation
+       ---TcpClient                      TCP encapsulation
+       ---MultiTcpChannelClient          Client with multiple channels, using key to retrieve corresponding channels
+       ---SingleTcpChannelClient         Single Channel Client
+     server
+       ---Server                          Provide server-side basic implementation
+  ---Client                            Top-level client abstraction  
 envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
 exception                           Abnormal extension
   ---ClosingChannelException           In conjunction with channel advice, the channel can be closed by throwing the abnormal subclass
+  ---HandlerException
+  ---NoSuchPortException
+  ---ParameterizedTypeException
+  ---SerializeException
+  ---TooLessBytesException
+  ---TypeJudgmentException
 handler                             Provided some basic channel handler implementations
   actionable
      ---ActionableIdleStateHandler     Actionable Idle State Handler
@@ -76,17 +77,39 @@ handler                             Provided some basic channel handler implemen
 listener
   ---ActionableChannelFutureListener   Actionable channel future listener
 serializer                             Serialization tool
-  ---ctype                             internal C basic type
-  ---typed
-    ---Basic                              base type when serialized deserialized by type
-    ---TypedByteBufSerializer             type based serializer
-  ---ByteBufSerializer                    serialize deserialize top level abstractions
-  ---Serializers.java                     universal serialization tool
+  struct
+     annotation
+        ---Ignore                      ignore this field when serializing
+        ---Struct                      In serialization, the domain type needs to be annotated, something like @Entity in JPA
+        ---ToArray                     Array serializer
+        ---ToArrayList                 ArrayList serializer
+        ---ToLinkedList                ToLinkedList serializer
+        ---ToNamedEnum                 Named Enum serializer
+        ---ToString                    String serializer
+     basic
+        c                              internal c basic types
+        cpp                            internal cpp basic types
+        ---Basic                       basic type
+     ---PropertyHandler                top property handler interface
+     ---StructSerializer               core struct serializer tool
+     ---StructUtils                    struct serializer tool
+     ---TypeRefer                      struct serializer type util
+  xml
+     ---XmlSerializer
+  yml
+     ---YmlSerializer
+  ---Serializer.java                   top level serializer interface
 ssl
   ---OpenSslContextFactory           OpenSSL context factory
   ---SslContextFactory               SSL context factory
 util                              Basic tool class
   ---ChannelStorage                  Storage channel, internally using KV pairs for storage
   ---HexBins                         Hexadecimal tool
+  ---Bins                            binary util
+  ---BytesKit                        bytes tool           
+  ---CommPorts                       commport util
+  ---Exceptions                      exceptioin util
+  ---Throws                          assert util
+  ---Try                             lambda exception
   
 ```
