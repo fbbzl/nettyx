@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class HandlerException extends RuntimeException {
 
-    private final Field field;
+    private final transient Field field;
 
     private final Class<?> handlerClass;
 

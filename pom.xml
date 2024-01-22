@@ -6,7 +6,7 @@
 
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.0.8-RELEASE</version>
+    <version>2.1.0-RELEASE</version>
 
     <name>nettyx</name>
     <description>a tool about netty</description>
@@ -57,7 +57,7 @@
         <jSerialComm.version>2.9.3</jSerialComm.version>
         <netty-transport-jserialcomm.version>1.0.0</netty-transport-jserialcomm.version>
 
-        <hutool-core.version>5.8.24</hutool-core.version>
+        <hutool-core.version>5.8.25</hutool-core.version>
     </properties>
 
     <dependencies>
