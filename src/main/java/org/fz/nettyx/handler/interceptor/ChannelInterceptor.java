@@ -1,8 +1,11 @@
 package org.fz.nettyx.handler.interceptor;
 
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
+import io.netty.channel.ChannelOutboundHandler;
+import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
-
 import java.net.SocketAddress;
 
 /**
@@ -129,9 +132,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre channel registered.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void preChannelRegistered(ChannelHandlerContext ctx) throws Exception {
+        protected void preChannelRegistered(ChannelHandlerContext ctx) {
             ctx.fireChannelRegistered();
         }
 
@@ -139,9 +141,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre channel unregistered.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void preChannelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        protected void preChannelUnregistered(ChannelHandlerContext ctx) {
             ctx.fireChannelUnregistered();
         }
 
@@ -149,9 +150,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre channel active.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void preChannelActive(ChannelHandlerContext ctx) throws Exception {
+        protected void preChannelActive(ChannelHandlerContext ctx) {
             ctx.fireChannelActive();
         }
 
@@ -159,9 +159,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre channel inactive.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void preChannelInactive(ChannelHandlerContext ctx) throws Exception {
+        protected void preChannelInactive(ChannelHandlerContext ctx) {
             ctx.fireChannelInactive();
         }
 
@@ -170,9 +169,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx the ctx
          * @param msg the msg
-         * @throws Exception the exception
          */
-        protected void preChannelRead(ChannelHandlerContext ctx, M msg) throws Exception {
+        protected void preChannelRead(ChannelHandlerContext ctx, M msg) {
             ctx.fireChannelRead(msg);
         }
 
@@ -180,9 +178,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre channel read complete.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void preChannelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        protected void preChannelReadComplete(ChannelHandlerContext ctx) {
             ctx.fireChannelReadComplete();
         }
 
@@ -191,9 +188,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx the ctx
          * @param evt the evt
-         * @throws Exception the exception
          */
-        protected void preUserEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        protected void preUserEventTriggered(ChannelHandlerContext ctx, Object evt) {
             ctx.fireUserEventTriggered(evt);
         }
 
@@ -201,9 +197,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre channel writability changed.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void preChannelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        protected void preChannelWritabilityChanged(ChannelHandlerContext ctx) {
             ctx.fireChannelWritabilityChanged();
         }
 
@@ -212,9 +207,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx   the ctx
          * @param cause the cause
-         * @throws Exception the exception
          */
-        protected void preExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        protected void preExceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             ctx.fireExceptionCaught(cause);
         }
 
@@ -425,7 +419,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
     public static class OutboundInterceptor extends ChannelInterceptor implements ChannelOutboundHandler {
 
         @Override
-        public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
             if (isFreed()) {
                 ctx.bind(localAddress, promise);
             } else this.preBind(ctx, localAddress, promise);
@@ -439,7 +433,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
             if (isFreed()) {
                 ctx.disconnect(promise);
             } else this.preDisconnect(ctx, promise);
@@ -453,7 +447,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             if (isFreed()) {
                 ctx.deregister(promise);
             } else this.preDeregister(ctx, promise);
@@ -474,7 +468,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void flush(ChannelHandlerContext ctx) throws Exception {
+        public final void flush(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.flush();
             } else this.preFlush(ctx);
@@ -486,9 +480,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * @param ctx          the ctx
          * @param localAddress the local address
          * @param promise      the promise
-         * @throws Exception the exception
          */
-        public final void preBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        public final void preBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
             ctx.bind(localAddress, promise);
         }
 
@@ -499,9 +492,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * @param remoteAddress the remote address
          * @param localAddress  the local address
          * @param promise       the promise
-         * @throws Exception the exception
          */
-        public final void preConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        public final void preConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
             ctx.connect(remoteAddress, localAddress, promise);
         }
 
@@ -510,9 +502,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx     the ctx
          * @param promise the promise
-         * @throws Exception the exception
          */
-        public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
             ctx.disconnect(promise);
         }
 
@@ -521,9 +512,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx     the ctx
          * @param promise the promise
-         * @throws Exception the exception
          */
-        public final void preClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public final void preClose(ChannelHandlerContext ctx, ChannelPromise promise) {
             ctx.close(promise);
         }
 
@@ -532,9 +522,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx     the ctx
          * @param promise the promise
-         * @throws Exception the exception
          */
-        public final void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        public final void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             ctx.deregister(promise);
         }
 
@@ -542,9 +531,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre read.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        public final void preRead(ChannelHandlerContext ctx) throws Exception {
+        public final void preRead(ChannelHandlerContext ctx) {
             ctx.read();
         }
 
@@ -554,9 +542,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * @param ctx     the ctx
          * @param msg     the msg
          * @param promise the promise
-         * @throws Exception the exception
          */
-        public final void preWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        public final void preWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
             ctx.write(msg, promise);
         }
 
@@ -564,9 +551,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Pre flush.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        public final void preFlush(ChannelHandlerContext ctx) throws Exception {
+        public final void preFlush(ChannelHandlerContext ctx) {
             ctx.flush();
         }
 
@@ -602,9 +588,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx     the ctx
          * @param promise the promise
-         * @throws Exception the exception
          */
-        protected void freeAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        protected void freeAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.free();
             this.disconnect(ctx, promise);
         }
@@ -626,9 +611,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx     the ctx
          * @param promise the promise
-         * @throws Exception the exception
          */
-        protected void freeAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        protected void freeAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.free();
             this.deregister(ctx, promise);
         }
@@ -661,9 +645,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Free and flush.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void freeAndFlush(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFlush(ChannelHandlerContext ctx) {
             this.free();
             this.flush(ctx);
         }
@@ -674,9 +657,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * @param ctx          the ctx
          * @param localAddress the local address
          * @param promise      the promise
-         * @throws Exception the exception
          */
-        protected void resetAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
+        protected void resetAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
             this.reset();
             this.bind(ctx, localAddress, promise);
         }
@@ -724,9 +706,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          *
          * @param ctx     the ctx
          * @param promise the promise
-         * @throws Exception the exception
          */
-        protected void resetAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        protected void resetAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.reset();
             this.deregister(ctx, promise);
         }
@@ -759,9 +740,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
          * Reset and flush.
          *
          * @param ctx the ctx
-         * @throws Exception the exception
          */
-        protected void resetAndFlush(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFlush(ChannelHandlerContext ctx) {
             this.reset();
             this.flush(ctx);
         }

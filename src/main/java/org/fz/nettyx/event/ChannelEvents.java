@@ -1,10 +1,12 @@
 package org.fz.nettyx.event;
 
+import static io.netty.handler.timeout.IdleState.ALL_IDLE;
+import static io.netty.handler.timeout.IdleState.READER_IDLE;
+import static io.netty.handler.timeout.IdleState.WRITER_IDLE;
+
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.experimental.UtilityClass;
-
-import static io.netty.handler.timeout.IdleState.*;
 
 /**
  * Channel Event tool
