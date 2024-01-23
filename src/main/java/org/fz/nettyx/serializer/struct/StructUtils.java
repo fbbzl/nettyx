@@ -25,6 +25,7 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
@@ -113,11 +114,11 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Field basicField) {
-        return newEmptyBasic((Class<B>) basicField.getType());
+        return newEmptyBasic(basicField.getType());
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
-        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize((Class<B>)basicClass)]));
+        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
     public static int findBasicSize(Class<?> basicClass) {
@@ -237,61 +238,67 @@ public class StructUtils {
         static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();
 
         /* mapping handler and annotation */
-        static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new WeakConcurrentMap<>();
+        static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>();
 
         static {
             try {
-                scanAllHandlers();
-                scanAllBasics();
-                scanAllStructs();
+                Set<Class<?>> classes = ClassScanner.scanAllPackage();
+
+                scanAllHandlers(classes);
+                scanAllBasics(classes);
+                scanAllStructs(classes);
             } catch (Exception e) {
                 throw new NotInitedException("init serializer context failed please check", e);
             }
         }
 
-        private static final String ALL_PACKAGE = "";
+        private static synchronized void scanAllHandlers(Set<Class<?>> classes) {
+            for (Class<?> clazz : classes) {
+                boolean isPropertyHandler = PropertyHandler.class.isAssignableFrom(clazz) && !PropertyHandler.class.equals(clazz);
+                if (isPropertyHandler) {
+                    Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
+                    if (targetAnnotationType != null) {
+                        ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(targetAnnotationType,
+                                (Class<? extends PropertyHandler<? extends Annotation>>) clazz);
 
-        private static synchronized void scanAllHandlers() {
-            Set<Class<?>> handlerClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, PropertyHandler.class);
-
-            for (Class<?> handlerClass : handlerClasses) {
-                Class<Annotation> targetAnnotationType = getTargetAnnotationType(handlerClass);
-                if (targetAnnotationType != null) {
-                    ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(targetAnnotationType,
-                        (Class<? extends PropertyHandler<? extends Annotation>>) handlerClass);
-
-                    ReflectUtil.getConstructor(handlerClass);
+                        ReflectUtil.getConstructor(clazz);
+                    }
                 }
             }
         }
 
-        private static synchronized void scanAllBasics()
-            throws InvocationTargetException, InstantiationException, IllegalAccessException {
-            Set<Class<?>> basicClasses = ClassScanner.scanAllPackageBySuper(ALL_PACKAGE, Basic.class);
-            for (Class<?> basicClass : basicClasses) {
-                int mod = basicClass.getModifiers();
-                if (basicClass.isEnum() || Modifier.isAbstract(mod) || Modifier.isInterface(mod)) {
-                    continue;
+        private static synchronized void scanAllBasics(Set<Class<?>> classes)
+                throws InvocationTargetException, InstantiationException, IllegalAccessException {
+            for (Class<?> clazz : classes) {
+                int mod;
+                boolean isBasic =
+                        Basic.class.isAssignableFrom(clazz)
+                        && !Basic.class.equals(clazz)
+                        && !clazz.isEnum()
+                        && !Modifier.isAbstract((mod = clazz.getModifiers()))
+                        && !Modifier.isInterface(mod);
+                if (isBasic) {
+                    BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
+                            Basic.reflectForSize((Class<? extends Basic<?>>) clazz));
                 }
-
-                BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) basicClass,
-                    Basic.reflectForSize((Class<? extends Basic<?>>) basicClass));
             }
         }
 
-        private static synchronized void scanAllStructs() throws IntrospectionException {
-            Set<Class<?>> structClasses = ClassScanner.scanAllPackageByAnnotation(ALL_PACKAGE, Struct.class);
-            for (Class<?> structClass : structClasses) {
-                ReflectUtil.getConstructor(structClass);
+        private static synchronized void scanAllStructs(Set<Class<?>> classes) throws IntrospectionException {
+            for (Class<?> clazz : classes) {
+                if (clazz.isAnnotationPresent(Struct.class)) {
 
-                Field[] structFields = StructUtils.getStructFields(structClass);
+                    ReflectUtil.getConstructor(clazz);
 
-                for (Field field : structFields) {
-                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), structClass);
-                    FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor.getReadMethod());
-                    FIELD_WRITER_CACHE.putIfAbsent(field, propertyDescriptor.getWriteMethod());
+                    Field[] structFields = StructUtils.getStructFields(clazz);
 
-                    AnnotationUtil.getAnnotations(field, false);
+                    for (Field field : structFields) {
+                        PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), clazz);
+                        FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor.getReadMethod());
+                        FIELD_WRITER_CACHE.putIfAbsent(field, propertyDescriptor.getWriteMethod());
+
+                        AnnotationUtil.getAnnotations(field, false);
+                    }
                 }
             }
         }
