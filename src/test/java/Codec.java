@@ -74,7 +74,7 @@ public class Codec {
     public static void main(String[] args) throws Exception {
         TestClient testClient = new TestClient();
 
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 8081);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
         testClient.connect(inetSocketAddress).sync();
 
         System.err.println("ok");
