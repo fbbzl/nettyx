@@ -1,9 +1,10 @@
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -12,6 +13,12 @@ import org.fz.nettyx.endpoint.tcp.client.SingleTcpChannelClient;
 import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
+import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.TypeRefer;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 /**
  * @author fengbinbin
@@ -43,10 +50,21 @@ public class Codec {
                             // ▼   ▲  remove start and end flag
                             .addLast(new StartEndFlagFrameCodec(false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
                             .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("5566", "7783")))
+                            .addLast()
                             // ▼   ▲  deal control character and recover application data
                             .addLast(new LoggerHandler.InboundLogger(log));
                 }
             };
+        }
+    }
+
+    public static class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
+        TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>>() {
+        };
+        @Override
+        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+            Object read = StructSerializer.read(msg, typeRefer);
+            System.err.println(read);
         }
     }
 
