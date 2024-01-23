@@ -1,9 +1,6 @@
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +47,7 @@ public class Codec {
                             // ▼   ▲  remove start and end flag
                             .addLast(new StartEndFlagFrameCodec(false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
                             .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("5566", "7783")))
-                            .addLast()
+                            .addLast(new UserCodec())
                             // ▼   ▲  deal control character and recover application data
                             .addLast(new LoggerHandler.InboundLogger(log));
                 }
@@ -58,12 +55,13 @@ public class Codec {
         }
     }
 
-    public static class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
+    public static class UserCodec extends ChannelInboundHandlerAdapter {
         TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>>() {
         };
+
         @Override
-        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-            Object read = StructSerializer.read(msg, typeRefer);
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            Object read = StructSerializer.read((ByteBuf) msg, typeRefer);
             System.err.println(read);
         }
     }
