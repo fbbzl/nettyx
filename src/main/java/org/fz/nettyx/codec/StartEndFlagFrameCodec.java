@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameDecoder;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
@@ -155,10 +156,13 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         @Override
         public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
-
-            if (decodedByteBuf != null && decodedByteBuf.readableBytes() > 0) {
-                if (stripStartEndDelimiter) return decodedByteBuf;
-                return Unpooled.wrappedBuffer(startFlag.retainedDuplicate(), decodedByteBuf, endFlag.retainedDuplicate());
+            if (decodedByteBuf != null) {
+                if (decodedByteBuf.readableBytes() > 0) {
+                    if (stripStartEndDelimiter) return decodedByteBuf;
+                    return Unpooled.wrappedBuffer(startFlag.retainedDuplicate(), decodedByteBuf, endFlag.retainedDuplicate());
+                } else {
+                    ReferenceCountUtil.release(decodedByteBuf);
+                }
             }
 
             return null;
