@@ -114,11 +114,11 @@ public class StructUtils {
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Field basicField) {
-        return newEmptyBasic((Class<B>) basicField.getType());
+        return newEmptyBasic(basicField.getType());
     }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
-        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize((Class<B>)basicClass)]));
+        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
     public static int findBasicSize(Class<?> basicClass) {
