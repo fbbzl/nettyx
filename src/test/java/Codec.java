@@ -1,6 +1,9 @@
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -62,14 +65,16 @@ public class Codec {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             Object read = StructSerializer.read((ByteBuf) msg, typeRefer);
-            System.err.println(read);
+            System.err.println("user:" + read);
+
+            super.channelRead(ctx, msg);
         }
     }
 
     public static void main(String[] args) throws Exception {
         TestClient testClient = new TestClient();
 
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1",8081);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 8081);
         testClient.connect(inetSocketAddress).sync();
 
         System.err.println("ok");
