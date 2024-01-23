@@ -1,9 +1,6 @@
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +22,7 @@ import java.net.SocketAddress;
  * @version 1.0
  * @since 2023/5/23 21:35
  */
+@Slf4j
 public class Codec {
 
     @Slf4j
@@ -52,25 +50,24 @@ public class Codec {
                             .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("7e", "7d5e")))
                             .addLast(new UserCodec())
                             // ▼   ▲  deal control character and recover application data
-                            .addLast(new LoggerHandler.InboundLogger(log));
+                            .addLast(new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR));
                 }
             };
         }
     }
 
-    public static class UserCodec extends ChannelInboundHandlerAdapter {
+    public static class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>>() {
         };
 
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            Object read = StructSerializer.read((ByteBuf) msg, typeRefer);
-            super.channelRead(ctx, msg);
+        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+            Object read = StructSerializer.read(msg, typeRefer);
+            log.error("{}", read);
         }
     }
 
     public static void main(String[] args) throws Exception {
-
         TestClient testClient = new TestClient();
 
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
