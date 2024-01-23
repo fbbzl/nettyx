@@ -50,7 +50,7 @@ public class Codec {
                     channel.pipeline()
                             // in  out
                             // ▼   ▲  remove start and end flag
-                            .addLast(new StartEndFlagFrameCodec(false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
+                            .addLast(new StartEndFlagFrameCodec(1024*1024*1024,false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
                             .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("7e", "7d5e")))
                             .addLast(new UserCodec())
                             // ▼   ▲  deal control character and recover application data

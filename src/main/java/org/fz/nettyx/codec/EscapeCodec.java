@@ -6,13 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
+import io.netty.util.ReferenceCountUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexBins;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 /**
  * used to escape messages
@@ -61,11 +59,12 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+            ByteBuf escaped;
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = doEscape(in, bufEntry.getValue(), bufEntry.getKey(), escapeMap.getExcludes(bufEntry.getValue()));
+                escaped = doEscape(in, bufEntry.getValue(), bufEntry.getKey(), escapeMap.getExcludes(bufEntry.getValue()));
             }
 
-            out.add(in);
+            out.add(escaped);
         }
     }
 
@@ -287,15 +286,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int readIndex = 0;
-        ByteBuf budgetBuffer = msgBuf.alloc().buffer(real.readableBytes());
+        ByteBuf budget = msgBuf.alloc().buffer(real.readableBytes());
         while (msgBuf.readableBytes() >= real.readableBytes()) {
             if (hasSimilarBytes(readIndex, msgBuf, real)) {
                 // prepare for reset
                 msgBuf.markReaderIndex();
 
-                msgBuf.readBytes(budgetBuffer);
+                msgBuf.readBytes(budget);
 
-                if (budgetBuffer.equals(real) && !equalsAny(readIndex, msgBuf, excludes)) {
+                if (budget.equals(real) && !equalsAny(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
                     readIndex += real.readableBytes();
@@ -307,12 +306,14 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     readIndex++;
                 }
 
-                budgetBuffer.clear();
+                budget.clear();
             } else {
                 result.writeByte(msgBuf.readByte());
                 readIndex++;
             }
         }
+
+        ReferenceCountUtil.release(budget);
 
         // write the left buffer
         if (msgBuf.readableBytes() > 0) {

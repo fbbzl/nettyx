@@ -160,6 +160,56 @@ public class TypedSerializerTest {
         private G[] gfs;
 
         private R firstWife;
+        private R firstWife1;
+        private R firstWife2;
+        private R firstWif213e;
+        private R fi213rstWife1;
+        private R first23Wife2;
+        private R f23irstWife;
+        private R figfrstWife1;
+        private R firsasdftWife2;
+        private R firsasdftWife;
+        private R firstWifasdfe1;
+        private R firstffWife2;
+        private R firstfWife;
+        private R asdf;
+        private R firstdsfWife2;
+        private R firstdfWife;
+        private R firstasdfWife1;
+        private R firstsdWife2;
+        private R firstWdfdfife;
+        private R firstdfdfWife1;
+        private R firstzxcvWife2;
+        private R firsmtWife;
+        private R firstWhhife1;
+        private R firsmnbmtWife2;
 
+        private R fitrstfWife;
+        private R ashdf;
+        private R first324fgdsfWife2;
+        private R firstdfd45fWife;
+        private R firstasdffWife1;
+        private R firstsdasdfWife2;
+        private R firstWdasdffdfife;
+        private R firstdasdffdfWife1;
+        private R firstzasdfxcvWife2;
+        private R firsmtasdfWife;
+        private R firstWhhasdfife1;
+        private R firsmnbmasdftWife2;
+
+        @ToArray(length = 50)
+        private R[] firstasdfsdasdfWife2;
+        @ToArray(length = 50)
+        private R[] firstfdsfgWdasdffdfife;
+        @ToArray(length = 50)
+        private R[] firstdasererdffdfWife1;
+        @ToArray(length = 50)
+        private R[] firstzaefesdfxcvWife2;
+        @ToArray(length = 50)
+        private R[] firsmtasderdffWife;
+        @ToArray(length = 50)
+        private R[] firstWhhasdfdfdfife1;
+        @ToArray(length = 50)
+        private R[] firsmnbdfmasdftWife2;
     }
 }
