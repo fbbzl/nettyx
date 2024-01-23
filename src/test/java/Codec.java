@@ -1,4 +1,3 @@
-import cn.hutool.core.date.StopWatch;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -20,7 +19,6 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author fengbinbin
@@ -50,7 +48,7 @@ public class Codec {
                     channel.pipeline()
                             // in  out
                             // ▼   ▲  remove start and end flag
-                            .addLast(new StartEndFlagFrameCodec(1024*1024*1024,false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
+                            .addLast(new StartEndFlagFrameCodec(1024*1024,false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
                             .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("7e", "7d5e")))
                             .addLast(new UserCodec())
                             // ▼   ▲  deal control character and recover application data
@@ -66,18 +64,13 @@ public class Codec {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            StopWatch stopWatch = StopWatch.create("time");
-            stopWatch.start("parsing");
             Object read = StructSerializer.read((ByteBuf) msg, typeRefer);
-            stopWatch.stop();
-            System.err.println(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-            System.err.println("user:" + read);
-
             super.channelRead(ctx, msg);
         }
     }
 
     public static void main(String[] args) throws Exception {
+
         TestClient testClient = new TestClient();
 
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
