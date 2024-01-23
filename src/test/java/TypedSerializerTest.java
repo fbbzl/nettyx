@@ -197,19 +197,19 @@ public class TypedSerializerTest {
         private R firstWhhasdfife1;
         private R firsmnbmasdftWife2;
 
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firstasdfsdasdfWife2;
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firstfdsfgWdasdffdfife;
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firstdasererdffdfWife1;
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firstzaefesdfxcvWife2;
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firsmtasderdffWife;
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firstWhhasdfdfdfife1;
-        @ToArray(length = 50)
+        @ToArray(length = 100)
         private R[] firsmnbdfmasdftWife2;
     }
 }
