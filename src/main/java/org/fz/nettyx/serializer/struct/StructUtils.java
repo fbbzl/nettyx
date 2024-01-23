@@ -286,8 +286,7 @@ public class StructUtils {
 
         private static synchronized void scanAllStructs(Set<Class<?>> classes) throws IntrospectionException {
             for (Class<?> clazz : classes) {
-                if (clazz.isAnnotationPresent(Struct.class)) {
-
+                if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                     ReflectUtil.getConstructor(clazz);
 
                     Field[] structFields = StructUtils.getStructFields(clazz);
