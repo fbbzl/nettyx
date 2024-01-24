@@ -6,9 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -20,6 +17,10 @@ import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author fengbinbin
@@ -50,7 +51,7 @@ public class Codec {
                     channel.pipeline()
                             // in  out
                             // ▼   ▲  remove start and end flag
-                            .addLast(new StartEndFlagFrameCodec(1024*1024,false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
+                            .addLast(new StartEndFlagFrameCodec(1024 * 1024, false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
                             .addLast(new EscapeCodec(EscapeCodec.EscapeMap.mapHex("7e", "7d5e")))
                             .addLast(new UserCodec())
                             // ▼   ▲  deal control character and recover application data
