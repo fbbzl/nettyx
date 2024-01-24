@@ -1,5 +1,17 @@
 package org.fz.nettyx.serializer.struct;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
+import static cn.hutool.core.util.ClassUtil.isEnum;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructScanner.ANNOTATION_HANDLER_MAPPING_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructScanner.BASIC_BYTES_SIZE_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructScanner.FIELD_READER_CACHE;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructScanner.FIELD_WRITER_CACHE;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.exceptions.NotInitedException;
@@ -11,29 +23,26 @@ import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
-
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
-import static cn.hutool.core.util.ClassUtil.isEnum;
-import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
 
 
 /**
@@ -232,7 +241,7 @@ public class StructUtils {
     /**
      * The type Struct cache.
      */
-    static final class StructCache {
+    static final class StructScanner {
 
         /** reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
@@ -302,7 +311,7 @@ public class StructUtils {
             }
         }
 
-        private StructCache() {
+        private StructScanner() {
             throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
         }
     }
