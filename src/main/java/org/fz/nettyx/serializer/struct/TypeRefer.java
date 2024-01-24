@@ -38,9 +38,8 @@ public abstract class TypeRefer<T> implements Type {
     }
 
     public static <T> Class<T> getActualType(Type root, Type type) {
-        if (!(root instanceof ParameterizedType) || type instanceof Class || type instanceof WildcardType)
-            return (Class<T>) type;
-
+        if (type instanceof Class) return (Class<T>) type;
+        if (!(root instanceof ParameterizedType) || type instanceof WildcardType) return (Class<T>) Object.class;
 
         if (type instanceof TypeVariable) return getActualType(root, TypeUtil.getActualType(root, type));
         if (type instanceof ParameterizedType) {
