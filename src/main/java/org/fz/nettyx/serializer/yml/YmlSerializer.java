@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.Serializer;
 
 /**
+ * the location of the yml file that was scanned
  * @author fengbinbin
  * @version 1.0
  * @since 2024/1/4 16:45
