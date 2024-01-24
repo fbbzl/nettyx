@@ -252,7 +252,6 @@ public class StructUtils {
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
                 scanAllStructs(classes);
-                System.err.println(System.currentTimeMillis() - l);
             } catch (Exception e) {
                 throw new NotInitedException("init serializer context failed please check", e);
             }
