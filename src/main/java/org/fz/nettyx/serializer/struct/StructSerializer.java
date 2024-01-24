@@ -303,10 +303,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getActualType(Type root, Type type) {
-        if (!(root instanceof ParameterizedType)) return (Class<T>) type;
+        if (!(root instanceof ParameterizedType) || type instanceof Class) return (Class<T>) type;
 
-        if (type instanceof Class<?>)     return (Class<T>) type;
-        if (type instanceof TypeVariable) return (Class<T>) TypeUtil.getActualType(root, type);
+        if (type instanceof TypeVariable) return getActualType(root, TypeUtil.getActualType(root, type));
         if (type instanceof ParameterizedType) {
             Type actualType = TypeUtil.getActualType(root, type);
             Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
@@ -315,15 +314,15 @@ public final class StructSerializer implements Serializer {
             }
             return getActualType(root, actualTypeArguments[0]);
         }
-
-        return (Class<T>) Object.class;
-    }
-
-    public <T> Class<T> getArrayFieldActualType(Field field) {
-        if (this.rootType instanceof ParameterizedType) {
-            GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.rootType, field);
-            return (Class<T>) TypeUtil.getActualType(this.rootType, actualType.getGenericComponentType());
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
         }
+        if (type instanceof GenericArrayType) {
+            GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);
+            Type actualType1 = TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
+            return (Class<T>) actualType1;
+        }
+
         return (Class<T>) Object.class;
     }
 
