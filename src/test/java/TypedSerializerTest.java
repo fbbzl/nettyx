@@ -159,7 +159,7 @@ public class TypedSerializerTest {
         @ToArray(length = 2)
         private W[] wifes121212;
 
-        private T sons11111111;
+        private T sonsbaba;
         @ToLinkedList(size = 2)
         private List<T> sons;
         @ToArray(length = 2)
