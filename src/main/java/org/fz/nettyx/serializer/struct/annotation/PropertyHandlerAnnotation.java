@@ -8,7 +8,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * top serializer annotation, every property serializer annotation must add with this annotation
+ * top serializer meta annotation, every property serializer annotation must add with this annotation
  *
  * @author fengbinbin
  * @version 1.0
@@ -18,5 +18,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(TYPE)
 @Retention(RUNTIME)
-public @interface SerializerAnnotation {
+public @interface PropertyHandlerAnnotation {
 }

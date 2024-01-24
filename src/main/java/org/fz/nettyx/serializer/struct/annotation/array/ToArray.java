@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation;
+package org.fz.nettyx.serializer.struct.annotation.array;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
