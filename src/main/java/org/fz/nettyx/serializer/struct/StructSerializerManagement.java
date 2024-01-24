@@ -13,6 +13,5 @@ public class StructSerializerManagement {
     public StructSerializerManagement(String... scanStructPackages) {
         this.scanStructPackages = scanStructPackages;
 
-
     }
 }
