@@ -209,7 +209,7 @@ public class TypedSerializerTest {
         private R[] firsmtasderdffWife;
         @ToArray(length = 100)
         private R[] firstWhhasdfdfdfife1;
-        @ToArray(length = 100)
-        private R[] firsmnbdfmasdftWife2;
+        @ToArrayList(size = 100)
+        private List<R> firsmnbdfmasdftWife2;
     }
 }
