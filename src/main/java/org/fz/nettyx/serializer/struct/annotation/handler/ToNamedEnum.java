@@ -23,7 +23,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Retention(RUNTIME)
 @HandlerAnnotation
-@SuppressWarnings("all")
 public @interface ToNamedEnum {
 
     /**
@@ -50,6 +49,7 @@ public @interface ToNamedEnum {
     /**
      * The type To named enum handler.
      */
+    @SuppressWarnings("all")
     class ToNamedEnumHandler implements PropertyHandler.ReadWriteHandler<ToNamedEnum> {
 
         @Override
