@@ -73,7 +73,7 @@ public final class StructSerializer implements Serializer {
     public static <T> T read(ByteBuf byteBuf, Type type) {
         if (type instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) type), type).toObject();
         else
-        if (type instanceof ParameterizedType) return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) type).getRawType()), type).toObject();
+        if (type instanceof ParameterizedType) return read(byteBuf, ((ParameterizedType) type).getRawType());
         else
         if (type instanceof TypeRefer)         return read(byteBuf, ((TypeRefer<T>) type).getType());
         else
