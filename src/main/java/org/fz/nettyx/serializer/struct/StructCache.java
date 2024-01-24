@@ -40,9 +40,9 @@ final class StructCache {
     /* mapping handler and annotation */
     static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>();
 
-    void scan() {
+    static void doScan(String packageName) {
         try {
-            Set<Class<?>> classes = ClassScanner.scanAllPackage();
+            Set<Class<?>> classes = ClassScanner.scanPackage(packageName);
 
             scanAllHandlers(classes);
             scanAllBasics(classes);
@@ -52,7 +52,7 @@ final class StructCache {
         }
     }
 
-    synchronized void scanAllHandlers(Set<Class<?>> classes) {
+    static synchronized void scanAllHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             boolean isPropertyHandler = PropertyHandler.class.isAssignableFrom(clazz) && !PropertyHandler.class.equals(clazz);
             if (isPropertyHandler) {
@@ -67,7 +67,7 @@ final class StructCache {
         }
     }
 
-    synchronized void scanAllBasics(Set<Class<?>> classes)
+    static synchronized void scanAllBasics(Set<Class<?>> classes)
             throws InvocationTargetException, InstantiationException, IllegalAccessException {
         for (Class<?> clazz : classes) {
             int mod;
@@ -84,7 +84,7 @@ final class StructCache {
         }
     }
 
-    synchronized void scanAllStructs(Set<Class<?>> classes) throws IntrospectionException {
+    static synchronized void scanAllStructs(Set<Class<?>> classes) throws IntrospectionException {
         for (Class<?> clazz : classes) {
             if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                 ReflectUtil.getConstructor(clazz);
