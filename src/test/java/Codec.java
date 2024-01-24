@@ -1,7 +1,14 @@
+import cn.hutool.core.date.StopWatch;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -13,9 +20,6 @@ import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 /**
  * @author fengbinbin
@@ -62,7 +66,12 @@ public class Codec {
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+            StopWatch watch = StopWatch.create("parse");
+            watch.start("parse");
             Object read = StructSerializer.read(msg, typeRefer);
+            watch.stop();
+            System.err.println(watch.prettyPrint(TimeUnit.MILLISECONDS));
+
             log.error("{}", read);
         }
     }
