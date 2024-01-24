@@ -64,38 +64,38 @@ public final class StructSerializer implements Serializer {
      * @param byteBuf the byte buf
      * @param struct  the struct
      */
-    StructSerializer(ByteBuf byteBuf, Object struct, Type type) {
+    StructSerializer(ByteBuf byteBuf, Object struct, Type rootType) {
         this.byteBuf = byteBuf;
         this.struct = struct;
-        this.type = type;
+        this.type = rootType;
     }
 
-    public static <T> T read(ByteBuf byteBuf, Type type) {
-        if (type instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) type), type).toObject();
+    public static <T> T read(ByteBuf byteBuf, Type rootType) {
+        if (rootType instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).toObject();
         else
-        if (type instanceof ParameterizedType) return read(byteBuf, ((ParameterizedType) type).getRawType());
+        if (rootType instanceof ParameterizedType) return read(byteBuf, ((ParameterizedType) rootType).getRawType());
         else
-        if (type instanceof TypeRefer)         return read(byteBuf, ((TypeRefer<T>) type).getType());
+        if (rootType instanceof TypeRefer)         return read(byteBuf, ((TypeRefer<T>) rootType).getType());
         else
-        if (type instanceof TypeReference)     return read(byteBuf, ((TypeReference<T>) type).getType());
-        else throw new TypeJudgmentException(type);
+        if (rootType instanceof TypeReference)     return read(byteBuf, ((TypeReference<T>) rootType).getType());
+        else throw new TypeJudgmentException(rootType);
     }
 
     public static <T> T read(byte[] bytes, Type type) {
         return read(Unpooled.wrappedBuffer(bytes), type);
     }
 
-    public static <T> T read(ByteBuffer byteBuffer, Type type) {
-        return read(Unpooled.wrappedBuffer(byteBuffer), type);
+    public static <T> T read(ByteBuffer byteBuffer, Type rootType) {
+        return read(Unpooled.wrappedBuffer(byteBuffer), rootType);
     }
 
-    public static <T> T read(InputStream is, Type type) throws IOException {
+    public static <T> T read(InputStream is, Type rootType) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (int b = is.read(); b >= 0; b = is.read()) {
             baos.write(b);
         }
         is.close();
-        return read(baos.toByteArray(), type);
+        return read(baos.toByteArray(), rootType);
     }
 
     //*************************************      read write splitter      ********************************************//
@@ -120,8 +120,8 @@ public final class StructSerializer implements Serializer {
         return writeBytes(struct, struct.getClass());
     }
 
-    public static <T> byte[] writeBytes(T struct, Type type) {
-        ByteBuf writeBuf = write(struct, type);
+    public static <T> byte[] writeBytes(T struct, Type rootType) {
+        ByteBuf writeBuf = write(struct, rootType);
         try {
             byte[] bytes = new byte[writeBuf.readableBytes()];
             writeBuf.readBytes(bytes);
@@ -135,16 +135,16 @@ public final class StructSerializer implements Serializer {
         return writeNioBuffer(struct, struct.getClass());
     }
 
-    public static <T> ByteBuffer writeNioBuffer(T struct, Type type) {
-        return ByteBuffer.wrap(writeBytes(struct, type));
+    public static <T> ByteBuffer writeNioBuffer(T struct, Type rootType) {
+        return ByteBuffer.wrap(writeBytes(struct, rootType));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
         outputStream.write(writeBytes(struct));
     }
 
-    public static <T> void writeStream(T struct, OutputStream outputStream, Type type) throws IOException {
-        outputStream.write(writeBytes(struct, type));
+    public static <T> void writeStream(T struct, OutputStream outputStream, Type rootType) throws IOException {
+        outputStream.write(writeBytes(struct, rootType));
     }
 
     //*************************************      working code splitter      ******************************************//
