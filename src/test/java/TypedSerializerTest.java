@@ -160,7 +160,8 @@ public class TypedSerializerTest {
         private G[] gfs;
 
         private R firstWife;
-        private R firstWife1;
+        @ToArray(length = 2)
+        private T[] sons11;
         private R firstWife2;
         private R firstWif213e;
         private R fi213rstWife1;
