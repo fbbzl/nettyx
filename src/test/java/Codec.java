@@ -1,4 +1,3 @@
-import cn.hutool.core.date.StopWatch;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -20,7 +19,6 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author fengbinbin
@@ -67,11 +65,11 @@ public class Codec {
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-            StopWatch watch = StopWatch.create("parse");
-            watch.start("parse");
+
+            long l = System.currentTimeMillis();
             Object read = StructSerializer.read(msg, typeRefer);
-            watch.stop();
-            System.err.println(watch.prettyPrint(TimeUnit.MILLISECONDS));
+
+            System.err.println(System.currentTimeMillis()-l);
 
             log.error("{}", read);
         }
