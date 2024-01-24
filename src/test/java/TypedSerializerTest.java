@@ -24,7 +24,7 @@ import java.util.List;
 public class TypedSerializerTest {
 
     public static void main(String[] args) {
-        String x = CharSequenceUtil.repeat("11", 1024 * 1024);
+        String x = CharSequenceUtil.repeat("11", 1024 * 1024*1024);
 
         byte[] bytes = HexBins.decode(x);
         // bytes = HexBins.decode("11");
@@ -152,18 +152,18 @@ public class TypedSerializerTest {
         private Cppushort[] qqNames;
 
         private T sonsbaba;
-        @ToLinkedList(size = 2)
+        @ToLinkedList(size = 200)
         private List<T> sons;
-        @ToArray(length = 2)
+        @ToArray(length = 200)
         private T[] sons11;
 
         private W wwife;
-        @ToArrayList(size = 2)
+        @ToArrayList(size = 200)
         private List<W> wifes;
-        @ToArray(length = 2)
+        @ToArray(length = 200)
         private W[] wifes121212;
 
-        @ToArray(length = 2)
+        @ToArray(length = 200)
         private G[] gfs;
     }
 }
