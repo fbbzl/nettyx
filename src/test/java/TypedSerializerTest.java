@@ -151,18 +151,18 @@ public class TypedSerializerTest {
         private Cppushort[] qqNames;
 
         private T sonsbaba;
-        @ToLinkedList(size = 20)
+        @ToLinkedList(size = 100)
         private List<T> sons;
-        @ToArray(length = 20)
+        @ToArray(length = 100)
         private T[] sons11;
 
         private W wwife;
-        @ToArrayList(size = 20)
+        @ToArrayList(size = 100)
         private List<W> wifes;
-        @ToArray(length = 20)
+        @ToArray(length = 100)
         private W[] wifes121212;
 
-        @ToArray(length = 20)
+        @ToArray(length = 100)
         private G[] gfs;
     }
 }
