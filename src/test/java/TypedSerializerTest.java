@@ -1,4 +1,3 @@
-import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Data;
@@ -10,10 +9,10 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.*;
 import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
 import org.fz.nettyx.serializer.struct.basic.cpp.signed.*;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.*;
-import org.fz.nettyx.util.HexBins;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,9 +23,9 @@ import java.util.List;
 public class TypedSerializerTest {
 
     public static void main(String[] args) {
-        String x = CharSequenceUtil.repeat("11", 1024 * 1024);
 
-        byte[] bytes = HexBins.decode(x);
+        byte[] bytes = new byte[1024 * 1024];
+        Arrays.fill(bytes, (byte) 1);
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
         int times = 10_000;
