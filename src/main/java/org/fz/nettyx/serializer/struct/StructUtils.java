@@ -33,7 +33,7 @@ import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
 import static cn.hutool.core.util.ClassUtil.isEnum;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
-import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
+import static org.fz.nettyx.serializer.struct.StructUtils.StructScanner.*;
 
 
 /**
@@ -232,7 +232,7 @@ public class StructUtils {
     /**
      * The type Struct cache.
      */
-    static final class StructCache {
+    static final class StructScanner {
 
         /** reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
@@ -244,13 +244,24 @@ public class StructUtils {
         static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>();
 
         static {
-            try {
-                Set<Class<?>> classes =
-                        ClassScanner.scanPackage(EMPTY, clazz -> !isEnum(clazz) && !isAbstractOrInterface(clazz));
+            doScan(EMPTY);
+        }
 
-                scanAllHandlers(classes);
-                scanAllBasics(classes);
-                scanAllStructs(classes);
+        /**
+         *
+         * scan assigned packages
+         * @param packageNames the packages with struct or basic
+         */
+        public static void doScan(String... packageNames) {
+            try {
+                for (String packageName : packageNames) {
+                    Set<Class<?>> classes =
+                            ClassScanner.scanPackage(packageName, clazz -> !isEnum(clazz) && !isAbstractOrInterface(clazz));
+
+                    scanAllHandlers(classes);
+                    scanAllBasics(classes);
+                    scanAllStructs(classes);
+                }
             } catch (Exception e) {
                 throw new NotInitedException("init serializer context failed please check", e);
             }
@@ -302,7 +313,7 @@ public class StructUtils {
             }
         }
 
-        private StructCache() {
+        private StructScanner() {
             throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
         }
     }
