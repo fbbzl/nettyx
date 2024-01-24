@@ -242,7 +242,7 @@ public class StructUtils {
 
         static {
             try {
-                Set<Class<?>> classes = ClassScanner.scanAllPackage();
+                Set<Class<?>> classes = ClassScanner.scanPackage();
 
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
