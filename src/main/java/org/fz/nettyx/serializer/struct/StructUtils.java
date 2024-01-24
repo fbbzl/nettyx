@@ -248,7 +248,7 @@ public class StructUtils {
 
                 Set<Class<?>> classes = ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum()
                         && !ClassUtil.isAbstractOrInterface(clazz));
-                System.err.println(classes.contains(PropertyHandler.class));
+
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
                 scanAllStructs(classes);
