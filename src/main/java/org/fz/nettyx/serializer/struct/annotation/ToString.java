@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.handler;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -26,7 +26,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-@HandlerAnnotation
 public @interface ToString {
 
     /**
