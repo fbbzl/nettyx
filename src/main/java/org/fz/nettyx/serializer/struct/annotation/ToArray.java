@@ -24,6 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
 
 /**
  * array field must use this to assign array length!!!
@@ -49,7 +50,7 @@ public @interface ToArray {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
             Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
-                ? serializer.getFieldActualType(field) : elementType;
+                    ? getFieldActualType(serializer.getRootType(), field) : elementType;
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
@@ -64,9 +65,9 @@ public @interface ToArray {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
-            ByteBuf writing) {
+                            ByteBuf writing) {
             Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
-                ? serializer.getFieldActualType(field) : elementType;
+                    ? getFieldActualType(serializer.getStructType(), field) : elementType;
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
