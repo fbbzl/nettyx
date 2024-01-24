@@ -1,16 +1,17 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import cn.hutool.core.util.EnumUtil;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.serializer.struct.PropertyHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import org.fz.nettyx.serializer.struct.PropertyHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * find enum by enum name
@@ -19,9 +20,9 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
  * @version 1.0
  * @since 2024 /1/10 16:43
  */
+@SuppressWarnings("all")
 @Target(FIELD)
 @Retention(RUNTIME)
-@SuppressWarnings("all")
 public @interface ToNamedEnum {
 
     /**
