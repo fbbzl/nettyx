@@ -7,6 +7,7 @@ import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
@@ -242,11 +244,15 @@ public class StructUtils {
 
         static {
             try {
-                Set<Class<?>> classes = ClassScanner.scanPackage();
+                long l = System.currentTimeMillis();
+
+                Set<Class<?>> classes = ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum()
+                        && !ClassUtil.isAbstractOrInterface(clazz));
 
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
                 scanAllStructs(classes);
+                System.err.println(System.currentTimeMillis() - l);
             } catch (Exception e) {
                 throw new NotInitedException("init serializer context failed please check", e);
             }
@@ -270,13 +276,9 @@ public class StructUtils {
         private static synchronized void scanAllBasics(Set<Class<?>> classes)
                 throws InvocationTargetException, InstantiationException, IllegalAccessException {
             for (Class<?> clazz : classes) {
-                int mod;
                 boolean isBasic =
                         Basic.class.isAssignableFrom(clazz)
-                        && !Basic.class.equals(clazz)
-                        && !clazz.isEnum()
-                        && !Modifier.isAbstract((mod = clazz.getModifiers()))
-                        && !Modifier.isInterface(mod);
+                        && !Basic.class.equals(clazz);
 
                 if (isBasic) {
                     BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
