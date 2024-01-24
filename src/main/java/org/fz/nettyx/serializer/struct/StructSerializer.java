@@ -305,17 +305,10 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getActualType(Type root, Type type) {
-        if (!(root instanceof ParameterizedType)) {
-            return (Class<T>) type;
-        }
+        if (!(root instanceof ParameterizedType)) return (Class<T>) type;
 
-        // If it's a Class, it means that no generics are specified
-        if (type instanceof Class<?>) {
-            return (Class<T>) type;
-        }
-        if (type instanceof TypeVariable) {
-            return (Class<T>) TypeUtil.getActualType(root, type);
-        }
+        if (type instanceof Class<?>)     return (Class<T>) type;
+        if (type instanceof TypeVariable) return (Class<T>) TypeUtil.getActualType(root, type);
         if (type instanceof ParameterizedType) {
             Type actualType = TypeUtil.getActualType(root, type);
             Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
