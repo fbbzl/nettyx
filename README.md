@@ -10,7 +10,7 @@ Based on [netty4.1.101. Final], ultra-lightweight packaging has been carried out
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.1.0-RELEASE</version>
+    <version>2.1.2-RELEASE</version>
 </dependency>
 ```
 ## api
