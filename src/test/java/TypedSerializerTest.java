@@ -152,16 +152,24 @@ public class TypedSerializerTest {
         private L[] loginNames;
         @ToArray(length = 2)
         private Cppushort[] qqNames;
+
+        private W wwife;
         @ToArrayList(size = 2)
         private List<W> wifes;
+        @ToArray(length = 2)
+        private W[] wifes121212;
+
+        private T sons11111111;
         @ToLinkedList(size = 2)
         private List<T> sons;
+        @ToArray(length = 2)
+        private T[] sons11;
+
         @ToArray(length = 2)
         private G[] gfs;
 
         private R firstWife;
-        @ToArray(length = 2)
-        private T[] sons11;
+
         private R firstWife2;
         private R firstWif213e;
         private R fi213rstWife1;
