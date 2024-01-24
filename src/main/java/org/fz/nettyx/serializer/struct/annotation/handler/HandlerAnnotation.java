@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation;
+package org.fz.nettyx.serializer.struct.annotation.handler;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -18,5 +18,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(TYPE)
 @Retention(RUNTIME)
-public @interface PropertyHandlerAnnotation {
+public @interface HandlerAnnotation {
 }

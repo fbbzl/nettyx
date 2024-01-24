@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.collection;
+package org.fz.nettyx.serializer.struct.annotation.handler;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
@@ -18,8 +18,8 @@ import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
+import static org.fz.nettyx.serializer.struct.annotation.handler.ToArray.ToArrayHandler.readCollection;
+import static org.fz.nettyx.serializer.struct.annotation.handler.ToArray.ToArrayHandler.writeCollection;
 
 /**
  * The interface To linked list.
@@ -28,9 +28,11 @@ import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.
  * @version 1.0
  * @since 2024 /1/8 13:15
  */
+
+@Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-@Documented
+@HandlerAnnotation
 public @interface ToLinkedList {
 
     /**
