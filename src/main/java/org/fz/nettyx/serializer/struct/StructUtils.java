@@ -248,7 +248,7 @@ public class StructUtils {
 
                 Set<Class<?>> classes = ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum()
                         && !ClassUtil.isAbstractOrInterface(clazz));
-
+                System.err.println(classes.contains(PropertyHandler.class));
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
                 scanAllStructs(classes);
@@ -260,7 +260,8 @@ public class StructUtils {
 
         private static synchronized void scanAllHandlers(Set<Class<?>> classes) {
             for (Class<?> clazz : classes) {
-                boolean isPropertyHandler = PropertyHandler.class.isAssignableFrom(clazz) && !PropertyHandler.class.equals(clazz);
+                boolean isPropertyHandler = PropertyHandler.class.isAssignableFrom(clazz);
+
                 if (isPropertyHandler) {
                     Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                     if (targetAnnotationType != null) {
@@ -276,9 +277,7 @@ public class StructUtils {
         private static synchronized void scanAllBasics(Set<Class<?>> classes)
                 throws InvocationTargetException, InstantiationException, IllegalAccessException {
             for (Class<?> clazz : classes) {
-                boolean isBasic =
-                        Basic.class.isAssignableFrom(clazz)
-                        && !Basic.class.equals(clazz);
+                boolean isBasic = Basic.class.isAssignableFrom(clazz);
 
                 if (isBasic) {
                     BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
