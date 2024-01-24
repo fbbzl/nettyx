@@ -151,17 +151,17 @@ public class TypedSerializerTest {
         @ToArray(length = 2)
         private Cppushort[] qqNames;
 
-        private W wwife;
-        @ToArrayList(size = 2)
-        private List<W> wifes;
-        @ToArray(length = 2)
-        private W[] wifes121212;
-
         private T sonsbaba;
         @ToLinkedList(size = 2)
         private List<T> sons;
         @ToArray(length = 2)
         private T[] sons11;
+
+        private W wwife;
+        @ToArrayList(size = 2)
+        private List<W> wifes;
+        @ToArray(length = 2)
+        private W[] wifes121212;
 
         @ToArray(length = 2)
         private G[] gfs;
