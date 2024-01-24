@@ -8,6 +8,7 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import java.lang.reflect.*;
 
 /**
+ * type parameter at the time of serialization
  * @author fengbinbin
  * @version 1.0
  * @since 2024/1/15 11:24
