@@ -24,13 +24,13 @@ public abstract class TypeRefer<T> implements Type {
         return this.type.toString();
     }
 
-    public Class<?> getRawType() {
-        if (this.type instanceof Class<?>) {
-            return (Class<T>) this.type;
-        } else if (this.type instanceof ParameterizedType) {
-            return (Class<T>) ((ParameterizedType) this.type).getRawType();
+    public static <T> Class<T> getRawType(Type type) {
+        if (type instanceof Class<?>) {
+            return (Class<T>) type;
+        } else if (type instanceof ParameterizedType) {
+            return (Class<T>) ((ParameterizedType) type).getRawType();
         }
-        throw new TypeJudgmentException(this.type);
+        throw new TypeJudgmentException(type);
     }
 
     public static <T> Class<T> getFieldActualType(Type rootType, Field field) {
