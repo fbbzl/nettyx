@@ -18,8 +18,8 @@ import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.array.ToArray.ToArrayHandler.writeCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
 
 /**
  * The interface List.
