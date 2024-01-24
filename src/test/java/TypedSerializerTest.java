@@ -4,7 +4,7 @@ import lombok.Data;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.annotation.*;
-import org.fz.nettyx.serializer.struct.annotation.array.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.collection.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.*;
