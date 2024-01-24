@@ -7,7 +7,6 @@ import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -30,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
+import static cn.hutool.core.util.EnumUtil.isEnum;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
@@ -245,7 +246,7 @@ public class StructUtils {
         static {
             try {
                 Set<Class<?>> classes =
-                        ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum() && !ClassUtil.isAbstractOrInterface(clazz));
+                        ClassScanner.scanPackage(EMPTY, clazz -> !isEnum(clazz) && !isAbstractOrInterface(clazz));
 
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
