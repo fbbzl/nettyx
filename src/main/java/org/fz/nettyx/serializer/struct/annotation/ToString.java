@@ -1,18 +1,20 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import org.fz.nettyx.serializer.struct.PropertyHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
+
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
-import org.fz.nettyx.serializer.struct.PropertyHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The interface Char sequence.
@@ -21,6 +23,7 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
  * @version 1.0
  * @since 2023 /12/27 10:40
  */
+@Documented
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ToString {
