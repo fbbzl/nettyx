@@ -28,6 +28,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
+import static cn.hutool.core.util.ClassUtil.isEnum;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
@@ -231,18 +234,19 @@ public class StructUtils {
      */
     static final class StructCache {
 
-        /* reflection cache */
+        /** reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
         static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
 
         static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();
 
-        /* mapping handler and annotation */
+        /** mapping handler and annotation */
         static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>();
 
         static {
             try {
-                Set<Class<?>> classes = ClassScanner.scanAllPackage();
+                Set<Class<?>> classes =
+                        ClassScanner.scanPackage(EMPTY, clazz -> !isEnum(clazz) && !isAbstractOrInterface(clazz));
 
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
@@ -254,7 +258,8 @@ public class StructUtils {
 
         private static synchronized void scanAllHandlers(Set<Class<?>> classes) {
             for (Class<?> clazz : classes) {
-                boolean isPropertyHandler = PropertyHandler.class.isAssignableFrom(clazz) && !PropertyHandler.class.equals(clazz);
+                boolean isPropertyHandler = PropertyHandler.class.isAssignableFrom(clazz);
+
                 if (isPropertyHandler) {
                     Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                     if (targetAnnotationType != null) {
@@ -270,13 +275,8 @@ public class StructUtils {
         private static synchronized void scanAllBasics(Set<Class<?>> classes)
                 throws InvocationTargetException, InstantiationException, IllegalAccessException {
             for (Class<?> clazz : classes) {
-                int mod;
-                boolean isBasic =
-                        Basic.class.isAssignableFrom(clazz)
-                        && !Basic.class.equals(clazz)
-                        && !clazz.isEnum()
-                        && !Modifier.isAbstract((mod = clazz.getModifiers()))
-                        && !Modifier.isInterface(mod);
+                boolean isBasic = Basic.class.isAssignableFrom(clazz);
+
                 if (isBasic) {
                     BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
                             Basic.reflectForSize((Class<? extends Basic<?>>) clazz));

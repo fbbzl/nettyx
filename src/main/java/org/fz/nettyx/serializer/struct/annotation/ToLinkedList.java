@@ -28,9 +28,10 @@ import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.
  * @version 1.0
  * @since 2024 /1/8 13:15
  */
+
+@Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-@Documented
 public @interface ToLinkedList {
 
     /**
