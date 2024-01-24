@@ -38,7 +38,7 @@ public class TypedSerializerTest {
             User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(
                 Unpooled.wrappedBuffer(bytes), typeRefer);
 
-            //  System.err.println("read :" + user);
+             System.err.println("read :" + user);
 //            user.setAddress(null);
 //            user.setLoginNames(null);
 //            user.setQqNames(null);
