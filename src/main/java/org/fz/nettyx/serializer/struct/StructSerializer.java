@@ -167,9 +167,13 @@ public final class StructSerializer implements Serializer {
 
                 if (useReadHandler(field)) {
                     fieldValue = readHandled(field, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                }
+                else
+                if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
                     fieldValue = readBasic(fieldActualType, this.getByteBuf());
-                } else if (isStruct(fieldActualType)) {
+                }
+                else
+                if (isStruct(fieldActualType)) {
                     fieldValue = readStruct(fieldActualType, this.getByteBuf());
                 }
                 else throw new TypeJudgmentException(field);
