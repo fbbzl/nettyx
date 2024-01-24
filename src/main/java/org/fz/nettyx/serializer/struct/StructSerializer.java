@@ -303,7 +303,8 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getActualType(Type root, Type type) {
-        if (!(root instanceof ParameterizedType) || type instanceof Class) return (Class<T>) type;
+        if (!(root instanceof ParameterizedType) || type instanceof Class || type instanceof WildcardType) return (Class<T>) type;
+
 
         if (type instanceof TypeVariable) return getActualType(root, TypeUtil.getActualType(root, type));
         if (type instanceof ParameterizedType) {
@@ -313,9 +314,6 @@ public final class StructSerializer implements Serializer {
                 return (Class<T>) Object.class;
             }
             return getActualType(root, actualTypeArguments[0]);
-        }
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
         }
         if (type instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);
