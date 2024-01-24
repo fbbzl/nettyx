@@ -231,13 +231,13 @@ public class StructUtils {
      */
     static final class StructCache {
 
-        /* reflection cache */
+        /** reflection cache */
         static final Map<Field, Method> FIELD_READER_CACHE = new WeakConcurrentMap<>();
         static final Map<Field, Method> FIELD_WRITER_CACHE = new WeakConcurrentMap<>();
 
         static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();
 
-        /* mapping handler and annotation */
+        /** mapping handler and annotation */
         static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>();
 
         static {
@@ -277,6 +277,7 @@ public class StructUtils {
                         && !clazz.isEnum()
                         && !Modifier.isAbstract((mod = clazz.getModifiers()))
                         && !Modifier.isInterface(mod);
+
                 if (isBasic) {
                     BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
                             Basic.reflectForSize((Class<? extends Basic<?>>) clazz));
