@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation;
+package org.fz.nettyx.serializer.struct.annotation.handler;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
@@ -35,6 +35,7 @@ import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
+@HandlerAnnotation
 public @interface ToArray {
 
     /**
