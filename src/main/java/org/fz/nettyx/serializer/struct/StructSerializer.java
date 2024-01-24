@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -24,12 +23,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -165,7 +167,7 @@ public final class StructSerializer implements Serializer {
 
                 if (useReadHandler(field)) {
                     fieldValue = readHandled(field, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(field))) {
+                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
                     fieldValue = readBasic(fieldActualType, this.getByteBuf());
                 } else if (isStruct(fieldActualType)) {
                     fieldValue = readStruct(fieldActualType, this.getByteBuf());
@@ -195,7 +197,7 @@ public final class StructSerializer implements Serializer {
 
                 if (useWriteHandler(field)) {
                     writeHandled(field, fieldValue, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(field))) {
+                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
                     writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
                 } else if (isStruct(fieldActualType)) {
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
@@ -296,31 +298,6 @@ public final class StructSerializer implements Serializer {
             return (Class<T>) ((ParameterizedType) this.rootType).getRawType();
         }
         throw new TypeJudgmentException(this.rootType);
-    }
-
-    public <T> Class<T> getFieldActualType(Field field) {
-        return getActualType(this.getRootType(), TypeUtil.getType(field));
-    }
-
-    public <T> Class<T> getActualType(Type root, Type type) {
-        if (!(root instanceof ParameterizedType) || type instanceof Class || type instanceof WildcardType) return (Class<T>) type;
-
-
-        if (type instanceof TypeVariable) return getActualType(root, TypeUtil.getActualType(root, type));
-        if (type instanceof ParameterizedType) {
-            Type actualType = TypeUtil.getActualType(root, type);
-            Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
-            if (actualTypeArguments.length == 0) {
-                return (Class<T>) Object.class;
-            }
-            return getActualType(root, actualTypeArguments[0]);
-        }
-        if (type instanceof GenericArrayType) {
-            GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);
-            return getActualType(root, TypeUtil.getActualType(root, genericArrayType.getGenericComponentType()));
-        }
-
-        return (Class<T>) Object.class;
     }
 
     //******************************************      public end       ***********************************************//
