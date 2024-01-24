@@ -244,8 +244,6 @@ public class StructUtils {
 
         static {
             try {
-                long l = System.currentTimeMillis();
-
                 Set<Class<?>> classes = ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum()
                         && !ClassUtil.isAbstractOrInterface(clazz));
 
