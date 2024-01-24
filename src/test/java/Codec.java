@@ -61,7 +61,7 @@ public class Codec {
     }
 
     public static class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
-        TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend, TypedSerializerTest.Wife>>() {
+        TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend>>() {
         };
 
         @Override

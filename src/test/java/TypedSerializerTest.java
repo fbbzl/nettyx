@@ -30,12 +30,12 @@ public class TypedSerializerTest {
         // bytes = HexBins.decode("11");
         long l = System.currentTimeMillis();
         int times = 10_000;
-        TypeRefer<User<Son<Clong4, Clong4>, Wife, Wife, GirlFriend, Wife>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, Wife, GirlFriend, Wife>>() {
+        TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
         };
         for (int i = 0; i < times; i++) {
 
             // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<Clong4, Clong4>, Wife, Wife, GirlFriend, Wife> user = StructSerializer.read(
+            User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(
                 Unpooled.wrappedBuffer(bytes), typeRefer);
 
             //  System.err.println("read :" + user);
@@ -105,7 +105,7 @@ public class TypedSerializerTest {
 
     @Data
     @Struct
-    public static class User<T, W, L, G, R> {
+    public static class User<T, W, G> {
 
         private Clong4 uid;
         private Cchar uname;
@@ -149,8 +149,6 @@ public class TypedSerializerTest {
         private CppBool cppBool;
 
         @ToArray(length = 2)
-        private L[] loginNames;
-        @ToArray(length = 2)
         private Cppushort[] qqNames;
 
         private W wwife;
@@ -167,58 +165,5 @@ public class TypedSerializerTest {
 
         @ToArray(length = 2)
         private G[] gfs;
-
-        private R firstWife;
-
-        private R firstWife2;
-        private R firstWif213e;
-        private R fi213rstWife1;
-        private R first23Wife2;
-        private R f23irstWife;
-        private R figfrstWife1;
-        private R firsasdftWife2;
-        private R firsasdftWife;
-        private R firstWifasdfe1;
-        private R firstffWife2;
-        private R firstfWife;
-        private R asdf;
-        private R firstdsfWife2;
-        private R firstdfWife;
-        private R firstasdfWife1;
-        private R firstsdWife2;
-        private R firstWdfdfife;
-        private R firstdfdfWife1;
-        private R firstzxcvWife2;
-        private R firsmtWife;
-        private R firstWhhife1;
-        private R firsmnbmtWife2;
-
-        private R fitrstfWife;
-        private R ashdf;
-        private R first324fgdsfWife2;
-        private R firstdfd45fWife;
-        private R firstasdffWife1;
-        private R firstsdasdfWife2;
-        private R firstWdasdffdfife;
-        private R firstdasdffdfWife1;
-        private R firstzasdfxcvWife2;
-        private R firsmtasdfWife;
-        private R firstWhhasdfife1;
-        private R firsmnbmasdftWife2;
-
-        @ToArray(length = 100)
-        private R[] firstasdfsdasdfWife2;
-        @ToArray(length = 100)
-        private R[] firstfdsfgWdasdffdfife;
-        @ToArray(length = 100)
-        private R[] firstdasererdffdfWife1;
-        @ToArray(length = 100)
-        private R[] firstzaefesdfxcvWife2;
-        @ToArray(length = 100)
-        private R[] firsmtasderdffWife;
-        @ToArray(length = 100)
-        private R[] firstWhhasdfdfdfife1;
-        @ToArrayList(size = 100)
-        private List<R> firsmnbdfmasdftWife2;
     }
 }
