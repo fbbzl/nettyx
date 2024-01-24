@@ -67,7 +67,7 @@ public @interface ToArray {
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
                             ByteBuf writing) {
             Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
-                    ? getFieldActualType(serializer.getStructType(), field) : elementType;
+                    ? getFieldActualType(serializer.getRootType(), field) : elementType;
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
