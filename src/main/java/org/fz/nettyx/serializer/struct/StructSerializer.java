@@ -48,10 +48,10 @@ public final class StructSerializer implements Serializer {
     private final ByteBuf byteBuf;
 
     /**
-     * type of struct
+     * rootType of struct
      */
     @Getter
-    private final Type type;
+    private final Type rootType;
 
     /**
      * an object ready for serialization/deserialization
@@ -67,7 +67,7 @@ public final class StructSerializer implements Serializer {
     StructSerializer(ByteBuf byteBuf, Object struct, Type rootType) {
         this.byteBuf = byteBuf;
         this.struct = struct;
-        this.type = rootType;
+        this.rootType = rootType;
     }
 
     public static <T> T read(ByteBuf byteBuf, Type rootType) {
@@ -290,16 +290,16 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getStructType() {
-        if (this.type instanceof Class<?>) {
-            return (Class<T>) this.type;
-        } else if (this.type instanceof ParameterizedType) {
-            return (Class<T>) ((ParameterizedType) this.type).getRawType();
+        if (this.rootType instanceof Class<?>) {
+            return (Class<T>) this.rootType;
+        } else if (this.rootType instanceof ParameterizedType) {
+            return (Class<T>) ((ParameterizedType) this.rootType).getRawType();
         }
-        throw new TypeJudgmentException(this.type);
+        throw new TypeJudgmentException(this.rootType);
     }
 
     public <T> Class<T> getFieldActualType(Field field) {
-        return getActualType(this.getType(), TypeUtil.getType(field));
+        return getActualType(this.getRootType(), TypeUtil.getType(field));
     }
 
     public <T> Class<T> getActualType(Type root, Type type) {
@@ -320,9 +320,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getArrayFieldActualType(Field field) {
-        if (this.type instanceof ParameterizedType) {
-            GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.type, field);
-            return (Class<T>) TypeUtil.getActualType(this.type, actualType.getGenericComponentType());
+        if (this.rootType instanceof ParameterizedType) {
+            GenericArrayType actualType = (GenericArrayType) TypeUtil.getActualType(this.rootType, field);
+            return (Class<T>) TypeUtil.getActualType(this.rootType, actualType.getGenericComponentType());
         }
         return (Class<T>) Object.class;
     }
