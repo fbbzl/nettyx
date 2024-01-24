@@ -32,6 +32,7 @@ import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
 import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -158,7 +159,7 @@ public final class StructSerializer implements Serializer {
      * @return the t
      */
     <T> T toObject() {
-        for (Field field : getStructFields(getStructType())) {
+        for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue;
                 Class<?> fieldActualType;
@@ -192,7 +193,7 @@ public final class StructSerializer implements Serializer {
      */
     ByteBuf toByteBuf() {
         ByteBuf writing = this.getByteBuf();
-        for (Field field : getStructFields(getStructType())) {
+        for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
                 Class<?> fieldActualType ;
@@ -297,15 +298,6 @@ public final class StructSerializer implements Serializer {
      */
     public <T> T earlyStruct() {
         return (T) this.struct;
-    }
-
-    public <T> Class<T> getStructType() {
-        if (this.rootType instanceof Class<?>) {
-            return (Class<T>) this.rootType;
-        } else if (this.rootType instanceof ParameterizedType) {
-            return (Class<T>) ((ParameterizedType) this.rootType).getRawType();
-        }
-        throw new TypeJudgmentException(this.rootType);
     }
 
     //******************************************      public end       ***********************************************//
