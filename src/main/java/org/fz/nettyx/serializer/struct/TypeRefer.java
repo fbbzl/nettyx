@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.util.TypeUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.fz.nettyx.exception.TypeJudgmentException;
 
 import java.lang.reflect.*;
 
@@ -21,6 +22,15 @@ public abstract class TypeRefer<T> implements Type {
 
     public String toString() {
         return this.type.toString();
+    }
+
+    public Class<?> getRawType() {
+        if (this.type instanceof Class<?>) {
+            return (Class<T>) this.type;
+        } else if (this.type instanceof ParameterizedType) {
+            return (Class<T>) ((ParameterizedType) this.type).getRawType();
+        }
+        throw new TypeJudgmentException(this.type);
     }
 
     public static <T> Class<T> getFieldActualType(Type rootType, Field field) {
