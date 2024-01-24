@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
-import static cn.hutool.core.util.EnumUtil.isEnum;
+import static cn.hutool.core.util.ClassUtil.isEnum;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.*;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.StructCache.*;
