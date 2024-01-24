@@ -11,11 +11,11 @@ import static cn.hutool.core.util.ArrayUtil.distinct;
  */
 
 @Getter
-public class StructManagement {
+public class StructManager {
 
     private final String[] scanStructPackages;
 
-    public StructManagement(String... scanStructPackages) {
+    public StructManager(String... scanStructPackages) {
         this.scanStructPackages = scanStructPackages;
 
         for (String scanStructPackage : distinct(this.scanStructPackages )) {
