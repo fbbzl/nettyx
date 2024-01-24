@@ -22,7 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
 
 /**
- * The type Struct cache.
+ * The Struct cache.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2023 /12/26 9:28
  */
 @SuppressWarnings("all")
 final class StructCache {
