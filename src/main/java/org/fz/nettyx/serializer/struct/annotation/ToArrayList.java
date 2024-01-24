@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.handler;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
@@ -10,30 +10,28 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import static cn.hutool.core.collection.CollUtil.newLinkedList;
+import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
-import static org.fz.nettyx.serializer.struct.annotation.handler.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.handler.ToArray.ToArrayHandler.writeCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
 
 /**
- * The interface To linked list.
+ * The interface List.
  *
  * @author fengbinbin
  * @version 1.0
- * @since 2024 /1/8 13:15
+ * @since 2023 /12/27 10:26
  */
-
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-@HandlerAnnotation
-public @interface ToLinkedList {
+public @interface ToArrayList {
 
     /**
      * Element type class.
@@ -43,41 +41,40 @@ public @interface ToLinkedList {
     Class<?> elementType() default Object.class;
 
     /**
-     * list size int.
+     * list size
      *
      * @return the int
      */
     int size();
 
     /**
-     * The type To linked list handler.
+     * The type Array list handler.
      */
-    class ToLinkedListHandler implements PropertyHandler.ReadWriteHandler<ToLinkedList> {
+    class ToArrayListHandler implements PropertyHandler.ReadWriteHandler<ToArrayList> {
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
+        public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
+                    (elementType = toArrayList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
                             : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return readCollection(serializer.getByteBuf(), elementType, toLinkedList.size(), new LinkedList<>());
+            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), new ArrayList<>(10));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
                             ByteBuf writing) {
             Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
+                    (elementType = toArrayList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
                             : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
+            List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
 
-            writeCollection(list, elementType, toLinkedList.size(), writing);
+            writeCollection(list, elementType, toArrayList.size(), writing);
         }
     }
-
 }

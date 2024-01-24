@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.annotation.handler;
+package org.fz.nettyx.serializer.struct.annotation;
 
 import cn.hutool.core.util.EnumUtil;
 import io.netty.buffer.ByteBuf;
@@ -23,7 +23,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @SuppressWarnings("all")
 @Target(FIELD)
 @Retention(RUNTIME)
-@HandlerAnnotation
 public @interface ToNamedEnum {
 
     /**
