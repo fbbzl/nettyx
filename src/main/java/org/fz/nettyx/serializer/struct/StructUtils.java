@@ -244,8 +244,8 @@ public class StructUtils {
 
         static {
             try {
-                Set<Class<?>> classes = ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum()
-                        && !ClassUtil.isAbstractOrInterface(clazz));
+                Set<Class<?>> classes =
+                        ClassScanner.scanPackage(EMPTY, clazz -> !clazz.isEnum() && !ClassUtil.isAbstractOrInterface(clazz));
 
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
