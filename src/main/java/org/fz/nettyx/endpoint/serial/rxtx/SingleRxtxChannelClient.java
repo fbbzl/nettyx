@@ -29,7 +29,7 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
 
     @SneakyThrows
     protected void storeChannel(Channel channel) {
-        if (active(this.channel)) {
+        if (isActive(this.channel)) {
             this.channel.close().sync();
         }
         this.channel = channel;
@@ -54,14 +54,14 @@ public abstract class SingleRxtxChannelClient extends RxtxClient {
     public abstract ChannelFuture connect(RxtxDeviceAddress address) throws Exception;
 
     public ChannelPromise send(Object message) {
-        if (this.inActive(channel)) {
+        if (this.notActive(channel)) {
             log.debug("comm channel not in active status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
             return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
         }
 
         try {
-            if (unWritable(channel)) {
+            if (notWritable(channel)) {
                 log.debug("comm channel [{}] is not writable", channel);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
