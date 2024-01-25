@@ -6,10 +6,11 @@ import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
-import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import java.net.SocketAddress;
 
 /**
  * Single channel client
@@ -43,7 +44,7 @@ public abstract class SingleTcpChannelClient extends TcpClient {
      */
     @SneakyThrows
     protected void storeChannel(Channel channel) {
-        if (active(this.channel)) {
+        if (isActive(this.channel)) {
             this.channel.close().sync();
         }
         this.channel = channel;
@@ -97,14 +98,14 @@ public abstract class SingleTcpChannelClient extends TcpClient {
      * @return the channel promise
      */
     public ChannelPromise send(Object message) {
-        if (this.inActive(channel)) {
+        if (this.notActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
             return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
         try {
-            if (unWritable(channel)) {
+            if (notWritable(channel)) {
                 log.debug("channel [{}] is not writable", channel);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "channel: [" + channel + "] is not writable");

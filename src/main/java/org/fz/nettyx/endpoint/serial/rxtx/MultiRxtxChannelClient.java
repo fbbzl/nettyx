@@ -57,7 +57,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
         Channel oldChannel = channelStorage.get(key);
-        if (active(oldChannel)) {
+        if (isActive(oldChannel)) {
             oldChannel.close().sync();
             channelStorage.remove(key);
         }
@@ -99,14 +99,14 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     public ChannelPromise send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
-        if (inActive(channel)) {
+        if (notActive(channel)) {
             log.debug("comm channel not in active status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
             return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
         }
 
         try {
-            if (unWritable(channel)) {
+            if (notWritable(channel)) {
                 log.debug("comm channel [{}] is not writable, channel key [{}]", channel, channelKey);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
