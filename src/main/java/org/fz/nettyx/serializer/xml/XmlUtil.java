@@ -15,7 +15,7 @@ public class XmlUtil {
 
     static final class XmlScanner {
 
-        static final String DEFAULT_PATH = "classpath:xml";
+        static final String DEFAULT_PATH = "xml/";
 
         static {
             ClassPathResource classPathResource = new ClassPathResource(DEFAULT_PATH);
