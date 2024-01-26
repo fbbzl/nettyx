@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -15,19 +16,24 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Config {
+public class XmlSerializerConfig {
 
     private Bytes[] bytes;
 
     @Data
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class Bytes {
+        @XmlAttribute
         private int index;
+        @XmlAttribute
         private int length;
 
-        private Bits bits;
+        private Bits[] bits;
+
     }
 
     @Data
+    @XmlAccessorType(XmlAccessType.FIELD)
     public static class Bits {
 
         private boolean[] value;
