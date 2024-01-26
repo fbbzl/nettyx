@@ -3,28 +3,30 @@ package org.fz.nettyx.ssl;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import lombok.Setter;
+import lombok.experimental.UtilityClass;
+
+import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
-import javax.net.ssl.SSLException;
-import lombok.Setter;
-import lombok.experimental.UtilityClass;
 
 /**
  * For details about how to generate openssl files, see {@link ./support/openssl}.
  * you may use like the following code:
+ *
  * this.sslContext = OpenSslContextFactory.getClientSslContext(openSsl);
  * SslHandler sslHandler = sslContext.newHandler(channel.alloc());
  * sslHandler.setHandshakeTimeout(openSsl.handshakeTimeoutSeconds(), TimeUnit.SECONDS);
+ *
  * GenericFutureListener<Promise<Channel>> handshakeListener =
  * future -> {
- * if (future.isSuccess())  log.info("ssl handshake success, remote address is [{}]", remoteAddress);
- * if (!future.isSuccess()) log.error("ssl handshake failure, remote address is [{}], exception is: [{}]", remoteAddress, future.cause().getMessage());
+ *    if (future.isSuccess())  log.info("ssl handshake success, remote address is [{}]", remoteAddress);
+ *    if (!future.isSuccess()) log.error("ssl handshake failure, remote address is [{}], exception is: [{}]", remoteAddress, future.cause().getMessage());
  * };
+ *
  * sslHandler.handshakeFuture().addListener(handshakeListener);
  * return sslHandler;
- * }
- * else return null;
  *
  * @author fengbinbin
  * @version 1.0
@@ -66,8 +68,8 @@ public class OpenSslContextFactory {
      */
     public static SslContext getServerSslContext(String certChainPath, String keyPath, String rootPath) throws SSLException {
         File certChainFile = new File(certChainPath),
-            keyFile       = new File(keyPath),
-            rootFile      = new File(rootPath);
+            keyFile        = new File(keyPath),
+            rootFile       = new File(rootPath);
 
         return SslContextBuilder.forServer(certChainFile, keyFile).trustManager(rootFile).clientAuth(ClientAuth.REQUIRE).build();
     }
@@ -84,8 +86,8 @@ public class OpenSslContextFactory {
      */
     public static SslContext getServerSslContext(String certChainPath, String keyPath, String keypass,String rootPath) throws SSLException {
         File certChainFile = new File(certChainPath),
-            keyFile       = new File(keyPath),
-            rootFile      = new File(rootPath);
+            keyFile        = new File(keyPath),
+            rootFile       = new File(rootPath);
 
         return SslContextBuilder.forServer(certChainFile, keyFile, keypass).trustManager(rootFile).clientAuth(ClientAuth.REQUIRE).build();
     }
@@ -182,8 +184,8 @@ public class OpenSslContextFactory {
      */
     public static SslContext getClientSslContext(String certChainPath, String keyPath, String rootPath) throws SSLException {
         File certChainFile = new File(certChainPath),
-            keyFile       = new File(keyPath),
-            rootFile      = new File(rootPath);
+            keyFile        = new File(keyPath),
+            rootFile       = new File(rootPath);
 
         return SslContextBuilder.forClient().keyManager(certChainFile, keyFile).trustManager(rootFile).build();
     }
@@ -200,8 +202,8 @@ public class OpenSslContextFactory {
      */
     public static SslContext getClientSslContext(String certChainPath, String keyPath, String keypass,String rootPath) throws SSLException {
         File certChainFile = new File(certChainPath),
-            keyFile       = new File(keyPath),
-            rootFile      = new File(rootPath);
+            keyFile        = new File(keyPath),
+            rootFile       = new File(rootPath);
 
         return SslContextBuilder.forClient().keyManager(certChainFile, keyFile, keypass).trustManager(rootFile).build();
     }

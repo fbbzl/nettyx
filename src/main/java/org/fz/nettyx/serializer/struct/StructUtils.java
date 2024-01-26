@@ -252,7 +252,7 @@ public class StructUtils {
          * scan assigned packages
          * @param packageNames the packages with struct or basic
          */
-        public static void doScan(String... packageNames) {
+        public static synchronized void doScan(String... packageNames) {
             try {
                 for (String packageName : packageNames) {
                     Set<Class<?>> classes =
