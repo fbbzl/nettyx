@@ -1,5 +1,8 @@
 package org.fz.nettyx.serializer.xml;
 
+import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.io.resource.ResourceUtil;
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -12,18 +15,17 @@ public class XmlUtil {
 
     static final class XmlScanner {
 
-
+        static final String DEFAULT_PATH = "classpath:xml";
 
         static {
+            ClassPathResource classPathResource = new ClassPathResource(DEFAULT_PATH);
 
+            ResourceUtil.getResource(classPathResource.getPath());
         }
 
-        public void doScan(String... paths) {
-            for (String path : paths) {
-
-            }
+        public static void main(String[] args) {
+            System.err.println(1);
         }
-
 
 
 
