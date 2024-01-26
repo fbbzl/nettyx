@@ -20,7 +20,6 @@ public class Config {
     @Data
     public static class Bytes {
 
-
     }
 
     @Data
