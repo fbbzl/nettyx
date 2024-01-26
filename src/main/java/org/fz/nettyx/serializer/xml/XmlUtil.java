@@ -7,4 +7,26 @@ package org.fz.nettyx.serializer.xml;
  */
 public class XmlUtil {
 
+
+
+
+    static final class XmlScanner {
+
+
+
+        static {
+
+        }
+
+        public void doScan(String... paths) {
+            for (String path : paths) {
+
+            }
+        }
+
+
+
+
+    }
+
 }
