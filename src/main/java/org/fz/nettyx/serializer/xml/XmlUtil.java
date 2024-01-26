@@ -23,8 +23,8 @@ public class XmlUtil {
             ResourceUtil.getResource(classPathResource.getPath());
         }
 
-        public static void main(String[] args) {
-            System.err.println(1);
+        public void scanHandler() {
+
         }
 
 
