@@ -11,11 +11,11 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class ExpressionElement extends Element {
+public class ExpElement extends Element {
 
     public final String exp;
 
-    public ExpressionElement(org.dom4j.Element element, String exp) {
+    public ExpElement(org.dom4j.Element element, String exp) {
         super(element);
         this.exp = exp;
     }
