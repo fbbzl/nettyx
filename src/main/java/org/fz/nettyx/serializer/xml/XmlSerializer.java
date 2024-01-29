@@ -3,12 +3,13 @@ package org.fz.nettyx.serializer.xml;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.Serializer;
 
-import javax.xml.bind.JAXB;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -26,8 +27,17 @@ public class XmlSerializer implements Serializer {
 
     private final File xml;
 
-    public static void main(String[] args) {
-        Map<String, Object> unmarshal = JAXB.unmarshal("C:\\Users\\fengbinbin\\Desktop\\ff.txt", HashMap.class);
-        System.err.println(unmarshal);
+    public static void main(String[] args) throws DocumentException {
+        SAXReader reader = SAXReader.createDefault();
+        Document document = reader.read(new File("C:\\Users\\fengbinbin\\Desktop\\bytes.txt"));
+        Element rootElement = document.getRootElement();
+        for (Element element : rootElement.elements()) {
+            System.err.println(element.attribute("type").getValue());
+
+        }
+
+
+        System.err.println(document.getStringValue());
+        System.err.println(document);
     }
 }
