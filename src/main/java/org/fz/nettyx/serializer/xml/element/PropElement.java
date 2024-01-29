@@ -19,7 +19,7 @@ public class PropElement {
     public final String size;
     public final String type;
 
-    protected PropElement(Element element) {
+    public PropElement(Element element) {
         try {
             this.name = element.attribute(ATTR_NAME).getValue();
             this.offset = element.attribute(ATTR_OFFSET).getValue();
