@@ -30,18 +30,4 @@ public class PropElement {
         }
     }
 
-    public static ArrayPropElement arrayPropElement(Element element) {
-        String type = element.attribute("type").getValue();
-
-        return new ArrayPropElement(element, 1);
-    }
-
-    public static ExpPropElement expPropElement(Element element) {
-        return new ExpPropElement(element);
-    }
-
-    public static HandlePropElement handlePropElement(Element element) {
-        return new HandlePropElement(element);
-    }
-
 }
