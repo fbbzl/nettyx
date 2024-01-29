@@ -31,8 +31,9 @@ public class XmlSerializer implements Serializer {
         SAXReader reader = SAXReader.createDefault();
         Document document = reader.read(new File("C:\\Users\\fengbinbin\\Desktop\\bytes.txt"));
         Element rootElement = document.getRootElement();
+        System.err.println(rootElement.attribute("ref").getValue());
         for (Element element : rootElement.elements()) {
-            System.err.println(element.attribute("type").getValue());
+            System.err.println(element.attribute("name").getValue());
 
         }
 
