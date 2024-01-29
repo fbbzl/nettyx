@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0
  * @since 2024/1/25 16:54
  */
-public class XmlUtil {
+public class XmlUtils {
 
 
 

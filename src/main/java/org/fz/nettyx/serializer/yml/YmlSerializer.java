@@ -5,6 +5,11 @@ import org.fz.nettyx.serializer.Serializer;
 
 /**
  * the location of the yml file that was scanned
+ *
+ * name:
+ *   offset: 0
+ *   length: 3
+ *   formatter: short
  * @author fengbinbin
  * @version 1.0
  * @since 2024/1/4 16:45
