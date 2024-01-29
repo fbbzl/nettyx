@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class XmlSerializerContext {
 
     private static final Map<String, Set<String>> ENUMS = new ConcurrentHashMap<>();
-
+    private static final Map<String, Set<String>> SWITCHES = new ConcurrentHashMap<>();
     private String[] path;
 
     public XmlSerializerContext(String... paths) {
