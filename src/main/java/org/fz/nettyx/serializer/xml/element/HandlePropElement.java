@@ -14,10 +14,12 @@ import org.dom4j.Element;
 @EqualsAndHashCode(callSuper = false)
 public class HandlePropElement extends PropElement {
 
+    public static final String ATTR_HANDLER = "handler";
+
     private final String handler;
 
-    public HandlePropElement(Element element, String handler) {
+    public HandlePropElement(Element element) {
         super(element);
-        this.handler = handler;
+        this.handler = element.attribute(ATTR_HANDLER).getValue();
     }
 }
