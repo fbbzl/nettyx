@@ -1,6 +1,12 @@
 package org.fz.nettyx.serializer.xml;
 
+import static org.fz.nettyx.serializer.xml.element.PropElement.NAMESPACE;
+
 import io.netty.buffer.ByteBuf;
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
@@ -9,13 +15,6 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.PropElement;
-
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.fz.nettyx.serializer.xml.element.PropElement.NAMESPACE;
 
 
 /**
@@ -37,7 +36,7 @@ public class XmlSerializer implements Serializer {
         Map<String, List<PropElement>> config = new LinkedHashMap<>(64);
 
         SAXReader reader = SAXReader.createDefault();
-        Document document = reader.read(new File("C:\\Users\\fengbinbin\\Desktop\\bytes.txt"));
+        Document document = reader.read(new File("C:\\Users\\pc\\Desktop\\bytes.txt"));
         Element rootElement = document.getRootElement();
         System.err.println(rootElement.attribute(NAMESPACE).getValue());
 

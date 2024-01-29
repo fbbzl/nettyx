@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.xml;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 /**
  * @author fengbinbin
@@ -22,19 +24,20 @@ public class XmlSerializerContext {
 
     public static class XmlScanner {
 
-        void scanEnum() {
+        void scanEnum(Element rootElement) {
+
 
         }
 
-        void scanSwitch() {
+        void scanSwitch(Document document) {
 
         }
 
-        void scanModel() {
+        void scanModel(Document document) {
 
         }
 
-        void scanMapping() {
+        void scanMapping(Document document) {
         }
 
     }
