@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.PropElement;
@@ -42,7 +43,7 @@ public class XmlSerializer implements Serializer {
         System.err.println(rootElement.attribute(REF).getValue());
 
 
-        for (org.dom4j.Element element : rootElement.elements()) {
+        for (Element element : rootElement.elements()) {
 
             System.err.println(element.attribute(NAME).getValue());
 
