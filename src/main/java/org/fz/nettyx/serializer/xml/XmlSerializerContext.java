@@ -13,7 +13,6 @@ public class XmlSerializerContext {
         // scan xml
     }
 
-
     public static class XmlScanner {
 
         void scanEnum() {
