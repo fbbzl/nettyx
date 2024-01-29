@@ -19,7 +19,7 @@ public class PropElement {
     public final String size;
     public final String type;
 
-    public PropElement(Element element) {
+    private PropElement(Element element) {
         try {
             this.name = element.attribute(NAME).getValue();
             this.offset = element.attribute(OFFSET).getValue();
@@ -28,6 +28,17 @@ public class PropElement {
         } catch (NullPointerException exception) {
             throw new IllegalArgumentException("[" + NAME + ", " + OFFSET + ", " + SIZE + ", " + TYPE + "] all of them can not be null");
         }
+    }
+
+    public static ArrayPropElement arrayPropElement(Element element) {
+
+    }
+
+    public static ArrayPropElement expPropElement(Element element) {
+
+    }
+
+    public static ArrayPropElement handlePropElement(Element element) {
 
     }
 
