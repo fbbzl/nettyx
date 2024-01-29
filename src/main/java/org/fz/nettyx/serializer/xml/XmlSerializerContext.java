@@ -1,6 +1,8 @@
 package org.fz.nettyx.serializer.xml;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author fengbinbin
@@ -9,7 +11,7 @@ import java.util.Map;
  */
 public class XmlSerializerContext {
 
-    private static final Map<String, >
+    private static final Map<String, Set<String>> ENUMS = new ConcurrentHashMap<>();
 
     private String[] path;
 
@@ -31,7 +33,8 @@ public class XmlSerializerContext {
 
         }
 
-        void scanMapping() {}
+        void scanMapping() {
+        }
 
     }
 }
