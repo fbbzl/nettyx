@@ -27,5 +27,7 @@ public class XmlSerializerContext {
 
         }
 
+        void scanMapping() {}
+
     }
 }
