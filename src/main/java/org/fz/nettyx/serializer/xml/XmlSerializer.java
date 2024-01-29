@@ -7,7 +7,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.xml.element.Element;
+import org.fz.nettyx.serializer.xml.element.PropElement;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -34,7 +34,7 @@ public class XmlSerializer implements Serializer {
     private final File xml;
 
     public static void main(String[] args) throws DocumentException {
-        Map<String, List<Element>> config = new LinkedHashMap<>(64);
+        Map<String, List<PropElement>> config = new LinkedHashMap<>(64);
 
         SAXReader reader = SAXReader.createDefault();
         Document document = reader.read(new File("C:\\Users\\fengbinbin\\Desktop\\bytes.txt"));
