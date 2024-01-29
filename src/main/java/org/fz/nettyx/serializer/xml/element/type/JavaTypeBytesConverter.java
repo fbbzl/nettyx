@@ -5,7 +5,7 @@ package org.fz.nettyx.serializer.xml.element.type;
  * @version 1.0
  * @since 2024/1/29 14:44
  */
-public enum JavaType {
+public enum JavaTypeBytesConverter {
 
     STRING,
     INT,
