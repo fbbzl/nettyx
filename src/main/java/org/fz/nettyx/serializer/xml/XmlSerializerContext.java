@@ -7,8 +7,11 @@ package org.fz.nettyx.serializer.xml;
  */
 public class XmlSerializerContext {
 
+    private String[] path;
 
-
+    public XmlSerializerContext(String... paths) {
+        // scan xml
+    }
 
 
     public static class XmlScanner {
