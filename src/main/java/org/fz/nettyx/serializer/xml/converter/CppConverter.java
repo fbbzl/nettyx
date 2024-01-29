@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.xml.element.converter;
+package org.fz.nettyx.serializer.xml.converter;
 
 /**
  * @author fengbinbin
