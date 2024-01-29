@@ -15,5 +15,18 @@ public class XmlSerializerContext {
 
 
     public static class XmlScanner {
+
+        void scanEnum() {
+
+        }
+
+        void scanSwitch() {
+
+        }
+
+        void scanModel() {
+
+        }
+
     }
 }
