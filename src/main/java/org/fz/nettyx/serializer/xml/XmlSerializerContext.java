@@ -10,7 +10,7 @@ public class XmlSerializerContext {
     private String[] path;
 
     public XmlSerializerContext(String... paths) {
-        // scan xml
+        // invoke scan
     }
 
     public static class XmlScanner {
