@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.fz.nettyx.serializer.xml.Dtd.NAME;
 import static org.fz.nettyx.serializer.xml.Dtd.REF;
 
 
@@ -44,8 +43,9 @@ public class XmlSerializer implements Serializer {
 
 
         for (Element element : rootElement.elements()) {
+            PropElement propElement = new PropElement(element);
 
-            System.err.println(element.attribute(NAME).getValue());
+            System.err.println(propElement);
 
         }
 

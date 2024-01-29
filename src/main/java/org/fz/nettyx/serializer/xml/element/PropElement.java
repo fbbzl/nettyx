@@ -20,10 +20,15 @@ public class PropElement {
     public final String type;
 
     public PropElement(Element element) {
-        this.name = element.attribute(NAME).getValue();
-        this.offset = element.attribute(OFFSET).getValue();
-        this.size = element.attribute(SIZE).getValue();
-        this.type = element.attribute(TYPE).getValue();
+        try {
+            this.name = element.attribute(NAME).getValue();
+            this.offset = element.attribute(OFFSET).getValue();
+            this.size = element.attribute(SIZE).getValue();
+            this.type = element.attribute(TYPE).getValue();
+        } catch (NullPointerException exception) {
+            throw new IllegalArgumentException("[" + NAME + ", " + OFFSET + ", " + SIZE + ", " + TYPE + "] all of them can not be null");
+        }
+
     }
 
 }
