@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.xml.element;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.dom4j.Element;
 
 /**
  * @author fengbinbin
@@ -15,7 +16,7 @@ public class ExpPropElement extends PropElement {
 
     public final String exp;
 
-    public ExpPropElement(org.dom4j.Element element, String exp) {
+    public ExpPropElement(Element element, String exp) {
         super(element);
         this.exp = exp;
     }

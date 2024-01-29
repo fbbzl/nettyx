@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.xml.element;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.dom4j.Element;
 
 /**
  * @author fengbinbin
@@ -15,7 +16,7 @@ public class ArrayPropElement extends PropElement {
 
     private final String length;
 
-    public ArrayPropElement(org.dom4j.Element element, String length) {
+    public ArrayPropElement(Element element, String length) {
         super(element);
         this.length = length;
     }

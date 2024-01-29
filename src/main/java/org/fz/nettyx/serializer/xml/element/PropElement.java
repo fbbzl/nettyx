@@ -1,6 +1,7 @@
 package org.fz.nettyx.serializer.xml.element;
 
 import lombok.Data;
+import org.dom4j.Element;
 
 import static org.fz.nettyx.serializer.xml.Dtd.*;
 
@@ -18,7 +19,7 @@ public class PropElement {
     public final String size;
     public final String type;
 
-    public PropElement(org.dom4j.Element element) {
+    public PropElement(Element element) {
         this.name = element.attribute(NAME).getValue();
         this.offset = element.attribute(OFFSET).getValue();
         this.size = element.attribute(SIZE).getValue();
