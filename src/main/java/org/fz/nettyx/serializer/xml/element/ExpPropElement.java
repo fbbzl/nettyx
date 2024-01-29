@@ -14,10 +14,12 @@ import org.dom4j.Element;
 @EqualsAndHashCode(callSuper = false)
 public class ExpPropElement extends PropElement {
 
+    public static final String ATTR_EXP = "exp";
+
     public final String exp;
 
-    public ExpPropElement(Element element, String exp) {
+    public ExpPropElement(Element element) {
         super(element);
-        this.exp = exp;
+        this.exp = element.attribute(ATTR_EXP).getValue();
     }
 }

@@ -14,9 +14,9 @@ import org.dom4j.Element;
 @EqualsAndHashCode(callSuper = false)
 public class ArrayPropElement extends PropElement {
 
-    private final String length;
+    private final int length;
 
-    public ArrayPropElement(Element element, String length) {
+    public ArrayPropElement(Element element, int length) {
         super(element);
         this.length = length;
     }

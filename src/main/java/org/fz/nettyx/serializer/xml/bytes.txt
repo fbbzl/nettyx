@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<root>
+
+  <enums>
+    <enum ref="country">
+     CHINA,
+     USA,
+     JAPAN
+    </enum>
+    <enum ref="gender">
+     FEMAIL,
+     MAIl
+    </enum>
+    <enum ref="course">
+     NATURAL,
+     MEDICINE
+    </enum>
+  </enums>
+
+  <model ref="user">
+	<prop name="id"      offset="0"  length="2"  type="string"/>
+	<prop name="gender"  offset="2"  length="1"  type="enum.gender.ordinary"/>
+	<prop name="name"    offset="3"  length="2"  type="number" exp="*100" />
+	<prop name="wives"   offset="5"  length="20" type="number[5]" />
+	<prop name="country" offset="25" length="2"  type="enum.country.name"/>
+	<prop name="course"  offset="27" length="1"  type="enum.course.bitposition"/>
+  <model>
+   
+  <model>
+    
+	
+  </model>
+   
+</root>
+
+
+
+ 
+
+ 
