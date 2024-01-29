@@ -41,7 +41,7 @@ public class TypedSerializerTest {
 //            user.setAddress(null);
 //            user.setLoginNames(null);
 //            user.setQqNames(null);
-//            user.setWifes(null);
+//            user.setWives(null);
 //            user.setSons(null);
 //            user.setFirstWifes(null);
 //            user.setBigSons(null);
@@ -158,9 +158,9 @@ public class TypedSerializerTest {
 
         private W wwife;
         @ToArrayList(size = 50)
-        private List<W> wifes;
+        private List<W> wives;
         @ToArray(length = 50)
-        private W[] wifes121212;
+        private W[] wives121212;
 
         @ToArray(length = 100)
         private G[] gfs;
