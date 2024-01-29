@@ -6,18 +6,17 @@ import lombok.Getter;
 /**
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/29 14:11
+ * @since 2024/1/29 14:17
  */
 
 @Getter
 @EqualsAndHashCode(callSuper = false)
-public class ArrayElement extends Element {
+public class HandlePropElement extends PropElement {
 
-    private final String length;
+    private final String handler;
 
-    public ArrayElement(org.dom4j.Element element, String length) {
+    public HandlePropElement(org.dom4j.Element element, String handler) {
         super(element);
-        this.length = length;
+        this.handler = handler;
     }
-
 }

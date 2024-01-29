@@ -11,14 +11,14 @@ import static org.fz.nettyx.serializer.xml.Dtd.*;
  */
 
 @Data
-public class Element {
+public class PropElement {
 
     public final String name;
     public final String offset;
     public final String size;
     public final String type;
 
-    public Element(org.dom4j.Element element) {
+    public PropElement(org.dom4j.Element element) {
         this.name = element.attribute(NAME).getValue();
         this.offset = element.attribute(OFFSET).getValue();
         this.size = element.attribute(SIZE).getValue();
