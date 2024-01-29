@@ -49,15 +49,20 @@
         <maven-source-plugin-version>2.2.1</maven-source-plugin-version>
         <nexus-staging-maven-plugin-version>1.6.7</nexus-staging-maven-plugin-version>
 
-        <netty-all.version>4.1.101.Final</netty-all.version>
-
+        <!--log support-->
         <log4j-slf4j-series.version>2.17.1</log4j-slf4j-series.version>
         <jul-to-slf4j.version>1.7.36</jul-to-slf4j.version>
+
+        <netty-all.version>4.1.101.Final</netty-all.version>
 
         <jSerialComm.version>2.9.3</jSerialComm.version>
         <netty-transport-jserialcomm.version>1.0.0</netty-transport-jserialcomm.version>
 
+        <!--common util-->
         <hutool-core.version>5.8.25</hutool-core.version>
+
+        <!-- file frames -->
+        <dom4j.version>2.1.4</dom4j.version>
     </properties>
 
     <dependencies>
@@ -120,6 +125,12 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>${dom4j.version}</version>
         </dependency>
 
     </dependencies>

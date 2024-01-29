@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<root namespace="school">
+	
+	<mappings>
+	  <mapping type="number" offset="0" length="2" target-value="2">{{student}}</mapping>
+	  <mapping type="string" offset="3" length="4" target-value="TEAC">{{teacher}}</mapping>
+	</mapings>
+		
+    <enum ref="country">
+     CHINA,
+     USA,
+     JAPAN
+    </enum>
+    <enum ref="gender">
+     FEMAIL,
+     MAIl
+    </enum>
+	<enum ref="bank">
+     CCB,
+     ICBC,
+	 PBC,
+	 BOC
+    </enum>
+	<switch ref="course">
+     NATURAL,
+     MEDICINE
+    </switch>
+
+  <model ref="student" offset-type=relative>
+	<prop name="id"   offset="0" length="2" type="string"/>
+	<prop name="name" offset="3" length="2" type="number" exp="*100" />
+	
+	<prop name="gender"     offset="2"  length="1" type="{{gender}}"  match="ordinary"/>
+	<prop name="country"    offset="25" length="2" type="{{country}}" match="name"/>
+	<prop name="maincourse" offset="27" length="1" type="{{course}}"  />
+	
+	<prop name="phonenum"         offset="28" length="22" type="string[2]" />
+	<prop name="bankcards"        offset="50" length="22" type="{{bankcark}}[3]" />
+	<prop name="secondarycourses" offset="72" length="20" type="{{course}}[2]" match="name"/>
+  </model>
+   
+  <model ref="teacher" offset-type=absolute>
+  	<prop name="id"   offset="0" length="2" type="string"/>
+	<prop name="name" offset="3" length="2" type="number" exp="*100" />
+  </model>
+   
+  <model ref="bankcark">
+	<prop name="bankname" offset="0" length="2" type="{{bank}}" match="ordinary"/>
+  </model>
+   
+</root>
+
+
+
+ 
+
+ 
