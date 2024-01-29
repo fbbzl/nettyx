@@ -6,9 +6,17 @@ import cn.hutool.core.io.resource.ResourceUtil;
 /**
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/25 16:54
+ * @since 2024/1/29 18:03
  */
-public class XmlUtil {
+public class Model {
+
+    private String namespace;
+
+
+
+
+
+
 
 
 
