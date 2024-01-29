@@ -12,6 +12,9 @@ import org.dom4j.Element;
 @Data
 public class PropElement {
 
+    public static final String REF = "ref";
+    public static final String NAMESPACE = "namespace";
+
     public static final String ATTR_NAME = "name", ATTR_OFFSET = "offset", ATTR_SIZE = "size", ATTR_TYPE = "type";
 
     public final String name;
@@ -26,7 +29,7 @@ public class PropElement {
             this.size = element.attribute(ATTR_SIZE).getValue();
             this.type = element.attribute(ATTR_TYPE).getValue();
         } catch (NullPointerException exception) {
-            throw new IllegalArgumentException("[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
+            throw new IllegalArgumentException(element + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
         }
     }
 
