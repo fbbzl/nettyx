@@ -15,8 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.fz.nettyx.serializer.xml.Dtd.REF;
-
 
 /**
  * the location of the xml file is scanned
@@ -38,9 +36,7 @@ public class XmlSerializer implements Serializer {
 
         SAXReader reader = SAXReader.createDefault();
         Document document = reader.read(new File("C:\\Users\\fengbinbin\\Desktop\\bytes.txt"));
-        org.dom4j.Element rootElement = document.getRootElement();
-        System.err.println(rootElement.attribute(REF).getValue());
-
+        Element rootElement = document.getRootElement();
 
         for (Element element : rootElement.elements()) {
             PropElement propElement = new PropElement(element);
