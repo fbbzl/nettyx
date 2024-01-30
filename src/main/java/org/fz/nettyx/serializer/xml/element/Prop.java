@@ -1,10 +1,15 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_EXP;
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_NAME;
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_SIZE;
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_TYPE;
+
 import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
-
-import static org.fz.nettyx.serializer.xml.Dtd.*;
 
 /**
  * @author fengbinbin
@@ -14,8 +19,6 @@ import static org.fz.nettyx.serializer.xml.Dtd.*;
 
 @Data
 public class Prop {
-
-
 
     public final String name;
     public final String offset;

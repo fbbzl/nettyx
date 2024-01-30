@@ -23,6 +23,11 @@ import static org.fz.nettyx.serializer.xml.Dtd.ATTR_REF;
 @UtilityClass
 public class XmlUtils {
 
+    public static String textTrim(Element element) {
+        if (element == null) return EMPTY;
+        return element.getTextTrim();
+    }
+
     public static String attrValue(Element element, String name) {
         Attribute attribute;
         if (element == null || (attribute = element.attribute(name)) == null) return EMPTY;

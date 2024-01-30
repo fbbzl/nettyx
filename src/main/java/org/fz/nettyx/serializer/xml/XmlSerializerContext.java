@@ -28,13 +28,14 @@ import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
  */
 public class XmlSerializerContext {
 
+    private static final Map<Namespace, Map<String, Model>> MODEL_MAPPINGS = new ConcurrentHashMap<>();
     private static final Map<String, Set<String>> ENUMS = new ConcurrentHashMap<>();
     private static final Map<String, Set<String>> SWITCHES = new ConcurrentHashMap<>();
-
     /**
      * first key is namespace, second key is model-ref, the value is model and prop
      */
     private static final Map<Namespace, Map<String, Model>> MODELS = new ConcurrentHashMap<>();
+
     private final Path[] paths;
 
     public XmlSerializerContext(File... files) {
@@ -91,6 +92,8 @@ public class XmlSerializerContext {
         if (mappings == null) return;
 
         for (Element mapping : mappings.elements(EL_MAPPING)) {
+            String value = XmlUtils.attrValue(mapping, ATTR_VALUE);
+            String refString = XmlUtils.textTrim(mapping);
 
         }
 
