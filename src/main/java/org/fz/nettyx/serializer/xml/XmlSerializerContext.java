@@ -10,11 +10,12 @@ import org.fz.nettyx.serializer.xml.element.Model;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
+import static java.util.stream.Collectors.toMap;
 import static org.fz.nettyx.serializer.xml.Dtd.*;
 import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
 
@@ -78,15 +79,9 @@ public class XmlSerializerContext {
         Element models = rootElement.element(EL_MODELS);
         Namespace namespace = rootElement.getNamespace();
 
-        Map<String, Model> modelMap = new HashMap<>(16);
-        for (Element model : XmlUtils.elements(models, EL_MODEL)) {
-
-            String modelRef = XmlUtils.attrValue(model, ATTR_REF);
-
-            modelMap.put(modelRef, new Model(model, namespace));
-        }
-
-
+        Map<String, Model> modelMap = XmlUtils.elements(models, EL_MODEL).stream()
+                .map(el -> new Model(el, namespace))
+                .collect(toMap(Model::getRef, Function.identity()));
 
         MODELS.putIfAbsent(namespace, modelMap);
     }
