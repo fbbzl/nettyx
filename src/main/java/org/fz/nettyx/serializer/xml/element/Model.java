@@ -22,7 +22,7 @@ public class Model {
 
     private Namespace namespace;
     private String ref;
-    private CounterType counterType;
+    private OffsetType offsetType;
     private List<Prop> props;
 
     public Model(Element modelEl, Namespace namespace) {
@@ -32,11 +32,11 @@ public class Model {
 
     public Model(Element modelEl) {
         this.ref = XmlUtils.attrValue(modelEl, ATTR_REF);
-        this.counterType = EnumUtil.fromString(CounterType.class, XmlUtils.attrValue(modelEl, ATTR_COUNTER_TYPE).toUpperCase(), CounterType.RELATIVE);
+        this.offsetType = EnumUtil.fromString(OffsetType.class, XmlUtils.attrValue(modelEl, ATTR_COUNTER_TYPE).toUpperCase(), OffsetType.RELATIVE);
         this.props = XmlUtils.elements(modelEl, EL_PROP).stream().map(Prop::new).collect(Collectors.toList());
     }
 
-    public enum CounterType {
+    public enum OffsetType {
         RELATIVE,
         ABSOLUTE,
         ;
