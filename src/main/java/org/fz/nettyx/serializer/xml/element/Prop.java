@@ -4,6 +4,8 @@ import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
 
+import static org.fz.nettyx.serializer.xml.Dtd.*;
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -13,15 +15,7 @@ import org.fz.nettyx.serializer.xml.XmlUtils;
 @Data
 public class Prop {
 
-    public static final String NAMESPACE = "namespace";
-    public static final String
-            ATTR_REF = "ref",
-            ATTR_NAME = "name",
-            ATTR_OFFSET = "offset",
-            ATTR_SIZE = "size",
-            ATTR_TYPE = "type",
-            ATTR_EXP = "exp",
-            ATTR_HANDLER = "handler";
+
 
     public final String name;
     public final String offset;

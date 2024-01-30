@@ -3,18 +3,20 @@ package org.fz.nettyx.serializer.xml;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
-import org.fz.nettyx.serializer.xml.element.Prop;
+import org.fz.nettyx.serializer.xml.element.Model;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.fz.nettyx.serializer.xml.Dtd.*;
 import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
-import static org.fz.nettyx.serializer.xml.element.Prop.ATTR_REF;
 
 /**
  * application must config this
@@ -29,20 +31,18 @@ public class XmlSerializerContext {
     private static final Map<String, Set<String>> SWITCHES = new ConcurrentHashMap<>();
 
     /**
-     * first key is namespace, second key is model-ref, the value is prop
+     * first key is namespace, second key is model-ref, the value is model and prop
      */
-    private static final Map<String, org.fz.nettyx.serializer.xml.element.Model> MODELS = new ConcurrentHashMap<>();
+    private static final Map<Namespace, Map<String, Model>> MODELS = new ConcurrentHashMap<>();
     private final Path[] paths;
 
     public XmlSerializerContext(File... files) {
         this.paths = Arrays.stream(files).map(File::toPath).toArray(Path[]::new);
-
         this.refresh();
     }
 
     public XmlSerializerContext(Path... paths) {
         this.paths = paths;
-
         this.refresh();
     }
 
@@ -67,30 +67,35 @@ public class XmlSerializerContext {
     }
 
     static void scanEnum(Element rootElement) {
-        putConst(rootElement, "enums", "enum", ENUMS);
+        putConst(rootElement, EL_ENUMS, EL_ENUM, ENUMS);
     }
 
     static void scanSwitch(Element rootElement) {
-        putConst(rootElement, "switches", "switch", SWITCHES);
+        putConst(rootElement, EL_SWITCHES, EL_SWITCH, SWITCHES);
     }
 
     static void scanModel(Element rootElement) {
-        Element models = rootElement.element("models");
+        Element models = rootElement.element(EL_MODELS);
+        Namespace namespace = rootElement.getNamespace();
 
-        for (Element model : XmlUtils.elements(models, "model")) {
+        Map<String, Model> modelMap = new HashMap<>(16);
+        for (Element model : XmlUtils.elements(models, EL_MODEL)) {
+
             String modelRef = XmlUtils.attrValue(model, ATTR_REF);
-            for (Element prop : XmlUtils.elements(model, "prop")) {
-                Prop propElement = new Prop(prop);
 
-            }
+            modelMap.put(modelRef, new Model(model, namespace));
         }
+
+
+
+        MODELS.putIfAbsent(namespace, modelMap);
     }
 
     static void scanMapping(Element rootElement) {
-        Element mappings = rootElement.element("mappings");
+        Element mappings = rootElement.element(EL_MAPPINGS);
         if (mappings == null) return;
 
-        for (Element mapping : mappings.elements("mapping")) {
+        for (Element mapping : mappings.elements(EL_MAPPING)) {
 
         }
 
