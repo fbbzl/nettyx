@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
+import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.fz.nettyx.serializer.xml.Dtd.*;
 import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
@@ -81,7 +81,7 @@ public class XmlSerializerContext {
 
         Map<String, Model> modelMap = XmlUtils.elements(models, EL_MODEL).stream()
                 .map(el -> new Model(el, namespace))
-                .collect(toMap(Model::getRef, Function.identity()));
+                .collect(toMap(Model::getRef, identity()));
 
         MODELS.putIfAbsent(namespace, modelMap);
     }
