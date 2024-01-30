@@ -14,7 +14,6 @@
             JAPAN
         </enum>
         <enum ref="gender">
-
             FEMAIL,
             MAIl
         </enum>
