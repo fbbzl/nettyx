@@ -47,8 +47,8 @@
         </model>
 
         <model ref="teacher" offset-type="absolute">
-            <prop name="id" offset="0" length="2" type="string"/>
-            <prop name="name" offset="3" length="2" type="number" exp="*100"/>
+            <prop name="id" offset="92" length="2" type="string"/>
+            <prop name="name" offset="94" length="2" type="number" exp="*100"/>
         </model>
 
         <model ref="bankcark" offset-type="absolute">
