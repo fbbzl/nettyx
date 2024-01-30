@@ -3,8 +3,8 @@
 <root namespace="school">
 
     <mappings>
-        <mapping type="number" offset="0" length="2" target-value="2">{{student}}</mapping>
-        <mapping type="string" offset="3" length="4" target-value="TEAC">{{teacher}}</mapping>
+        <mapping type="number" offset="0" length="2" exp="$v == 2||$v == {{gender}}.MAIl">{{student}}</mapping>
+        <mapping type="string" offset="3" length="4" exp="$v =='2'">{{teacher}}</mapping>
     </mappings>
 
     <enums>
