@@ -1,12 +1,27 @@
 package org.fz.nettyx.serializer.xml;
 
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.io.SAXReader;
+import org.fz.nettyx.serializer.xml.element.Model;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.dom4j.Document;
-import org.dom4j.Element;
+
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
+import static org.fz.nettyx.serializer.xml.Dtd.*;
+import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
 
 /**
+ * application must config this
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/1/29 11:16
@@ -15,30 +30,71 @@ public class XmlSerializerContext {
 
     private static final Map<String, Set<String>> ENUMS = new ConcurrentHashMap<>();
     private static final Map<String, Set<String>> SWITCHES = new ConcurrentHashMap<>();
-    private static final Map<String, Set<String>> MODELS = new ConcurrentHashMap<>();
-    private String[] path;
 
-    public XmlSerializerContext(String... paths) {
-        // invoke scan
+    /**
+     * first key is namespace, second key is model-ref, the value is model and prop
+     */
+    private static final Map<Namespace, Map<String, Model>> MODELS = new ConcurrentHashMap<>();
+    private final Path[] paths;
+
+    public XmlSerializerContext(File... files) {
+        this.paths = Arrays.stream(files).map(File::toPath).toArray(Path[]::new);
+        this.refresh();
     }
 
-    public static class XmlScanner {
+    public XmlSerializerContext(Path... paths) {
+        this.paths = paths;
+        this.refresh();
+    }
 
-        void scanEnum(Element rootElement) {
+    public void refresh() {
+        SAXReader reader = SAXReader.createDefault();
+        for (Path path : this.paths) {
+            Document doc;
+            try {
+                doc = reader.read(path.toFile());
+            } catch (DocumentException exception) {
+                throw new IllegalArgumentException("can not read [" + path + "]", exception);
+            }
 
+            Element root = doc.getRootElement();
 
+            scanEnum(root);
+            scanSwitch(root);
+            scanModel(root);
+            scanMapping(root);
+            System.err.println();
         }
+    }
 
-        void scanSwitch(Document document) {
+    static void scanEnum(Element rootElement) {
+        putConst(rootElement, EL_ENUMS, EL_ENUM, ENUMS);
+    }
 
-        }
+    static void scanSwitch(Element rootElement) {
+        putConst(rootElement, EL_SWITCHES, EL_SWITCH, SWITCHES);
+    }
 
-        void scanModel(Document document) {
+    static void scanModel(Element rootElement) {
+        Element models = rootElement.element(EL_MODELS);
+        Namespace namespace = rootElement.getNamespace();
 
-        }
+        Map<String, Model> modelMap = XmlUtils.elements(models, EL_MODEL).stream()
+                .map(el -> new Model(el, namespace))
+                .collect(toMap(Model::getRef, identity()));
 
-        void scanMapping(Document document) {
+        MODELS.putIfAbsent(namespace, modelMap);
+    }
+
+    static void scanMapping(Element rootElement) {
+        Element mappings = rootElement.element(EL_MAPPINGS);
+        if (mappings == null) return;
+
+        for (Element mapping : mappings.elements(EL_MAPPING)) {
+
         }
 
     }
+
+
 }
