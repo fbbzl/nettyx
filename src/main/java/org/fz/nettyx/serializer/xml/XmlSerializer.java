@@ -20,7 +20,6 @@ import java.io.File;
 public class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
-
     private final File xml;
 
     public static void main(String[] args) {
