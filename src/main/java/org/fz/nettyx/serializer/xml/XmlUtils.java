@@ -11,7 +11,8 @@ import java.util.function.Predicate;
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
 import static java.util.stream.Collectors.toCollection;
-import static org.fz.nettyx.serializer.xml.element.Prop.ATTR_REF;
+import static org.fz.nettyx.serializer.xml.Dtd.ATTR_REF;
+
 
 /**
  * @author fengbinbin
