@@ -26,6 +26,7 @@ public class Dtd {
 
     public static final String
             ATTR_REF = "ref",
+            ATTR_VALUE ="value",
             ATTR_NAME = "name",
             ATTR_OFFSET = "offset",
             ATTR_SIZE = "size",
