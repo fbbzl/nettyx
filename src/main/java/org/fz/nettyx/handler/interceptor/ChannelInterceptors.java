@@ -4,18 +4,18 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
+import lombok.experimental.UtilityClass;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 
 /**
  * tool class used with ChannelInterceptor
  *
  * @see ChannelInterceptor
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@UtilityClass
 public class ChannelInterceptors {
 
     /**
