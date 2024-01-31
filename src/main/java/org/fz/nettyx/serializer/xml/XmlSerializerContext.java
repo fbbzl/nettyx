@@ -105,8 +105,6 @@ public class XmlSerializerContext {
     //************************************          private start            *****************************************//
 
     private Model findModel(String refString) {
-
-
         boolean accordNameSpace = CharSequenceUtil.contains(refString, NAMESPACE_SYMBOL);
         if (accordNameSpace) {
 
