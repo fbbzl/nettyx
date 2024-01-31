@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.xml;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -28,11 +29,14 @@ import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
  */
 public class XmlSerializerContext {
 
+    /**
+     * first key is namespace, second key is target-value, the value is model
+     */
     private static final Map<Namespace, Map<String, Model>> MODEL_MAPPINGS = new ConcurrentHashMap<>();
     private static final Map<String, Set<String>> ENUMS = new ConcurrentHashMap<>();
     private static final Map<String, Set<String>> SWITCHES = new ConcurrentHashMap<>();
     /**
-     * first key is namespace, second key is model-ref, the value is model and prop
+     * first key is namespace, second key is model-ref, the value is model
      */
     private static final Map<Namespace, Map<String, Model>> MODELS = new ConcurrentHashMap<>();
 
@@ -96,8 +100,29 @@ public class XmlSerializerContext {
             String refString = XmlUtils.textTrim(mapping);
 
         }
-
     }
 
+    //************************************          private start            *****************************************//
+
+    private Model findModel(String refString) {
+
+
+        boolean accordNameSpace = CharSequenceUtil.contains(refString, NAMESPACE_SYMBOL);
+        if (accordNameSpace) {
+
+
+        }
+        else
+        {
+
+        }
+
+
+        return null;
+    }
+
+
+
+    //************************************           private end             *****************************************//
 
 }
