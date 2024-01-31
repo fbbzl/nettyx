@@ -2,10 +2,10 @@
 
 <root namespace="school">
 
-    <mappings>
-        <mapping type="number" offset="0" length="2" condition="$v == 2||$v == {{gender}}.MAIl">{{student}}</mapping>
-        <mapping type="string" offset="3" length="4" condition="$v == 'vtw:'">{{teacher}}</mapping>
-    </mappings>
+    <model-mappings>
+        <model-mapping value="1">{{student}}</model-mapping>
+        <model-mapping value="MAIl">{{teacher}}</model-mapping>
+    </model-mappings>
 
     <enums>
         <enum ref="country">
