@@ -34,6 +34,7 @@ public class Dtd {
     }
 
     public static boolean isRefString(String text) {
+        if (text == null) return false;
         return REF_PATTERN.matcher(text).matches();
     }
 
