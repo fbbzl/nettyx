@@ -92,29 +92,22 @@ public class XmlSerializerContext {
     }
 
     static void scanMapping(Element rootElement) {
-        Element mappings = rootElement.element(EL_MAPPINGS);
+        Element mappings = rootElement.element(EL_MODEL_MAPPINGS);
         if (mappings == null) return;
 
-        for (Element mapping : mappings.elements(EL_MAPPING)) {
+        for (Element mapping : mappings.elements(EL_MODEL_MAPPING)) {
             String value = XmlUtils.attrValue(mapping, ATTR_VALUE);
-            String refString = XmlUtils.textTrim(mapping);
+            String typeRef = XmlUtils.attrValue(mapping, ATTR_TYPE);
+
+            Model model = findModel(rootElement, typeRef);
 
         }
     }
 
     //************************************          private start            *****************************************//
 
-    private Model findModel(String refString) {
-        boolean accordNameSpace = CharSequenceUtil.contains(refString, NAMESPACE_SYMBOL);
-        if (accordNameSpace) {
-
-
-        }
-        else
-        {
-
-        }
-
+    private static Model findModel(Element rootElement, String typeRef) {
+        String nameSpace = CharSequenceUtil.blankToDefault(XmlUtils.findNameSpace(typeRef), XmlUtils.attrValue(rootElement, NAMESPACE));
 
         return null;
     }

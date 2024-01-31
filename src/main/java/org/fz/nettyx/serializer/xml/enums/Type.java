@@ -7,4 +7,7 @@ package org.fz.nettyx.serializer.xml.enums;
  */
 public enum Type {
 
+    STRING,
+    NUMBER
+
 }

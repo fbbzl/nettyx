@@ -3,8 +3,8 @@
 <root namespace="school">
 
     <model-mappings>
-        <model-mapping value="1">{{student}}</model-mapping>
-        <model-mapping value="MAIl">{{teacher}}</model-mapping>
+        <model-mapping value="1" type="{{student}}" />
+        <model-mapping value="MAIl" type="{{teacher}}"/>
     </model-mappings>
 
     <enums>
