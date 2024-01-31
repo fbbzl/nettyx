@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
+import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ReflectUtil;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
@@ -16,7 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
@@ -39,7 +39,7 @@ final class StructScanner {
     /**
      * mapping handler and annotation
      */
-    static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>();
+    static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new SafeConcurrentHashMap<>();
 
     static {
         doScan(EMPTY);
