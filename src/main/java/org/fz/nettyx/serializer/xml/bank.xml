@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<root namespace="bank">
+
+    <model-mappings>
+        <model-mapping value="bank" type="{{bankcard}}"/>
+    </model-mappings>
+
+    <enums>
+        <enum ref="bank">
+            CCB,
+            ICBC,
+            PBC,
+            BOC
+        </enum>
+    </enums>
+
+    <models>
+        <model ref="bankcard" offset-type="absolute">
+            <prop name="bankname" offset="0" length="2" type="{{bank}}" match="ordinary"/>
+        </model>
+    </models>
+</root>
+
+
+
+ 
+
+ 

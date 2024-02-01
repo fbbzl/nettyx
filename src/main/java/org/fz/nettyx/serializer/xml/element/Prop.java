@@ -1,15 +1,13 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import static org.fz.nettyx.serializer.xml.Dtd.ATTR_EXP;
-import static org.fz.nettyx.serializer.xml.Dtd.ATTR_HANDLER;
-import static org.fz.nettyx.serializer.xml.Dtd.ATTR_NAME;
-import static org.fz.nettyx.serializer.xml.Dtd.ATTR_OFFSET;
-import static org.fz.nettyx.serializer.xml.Dtd.ATTR_SIZE;
-import static org.fz.nettyx.serializer.xml.Dtd.ATTR_TYPE;
-
+import cn.hutool.core.util.EnumUtil;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
+import org.fz.nettyx.serializer.xml.element.Model.OffsetType;
+
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * @author fengbinbin
@@ -21,26 +19,42 @@ import org.fz.nettyx.serializer.xml.XmlUtils;
 public class Prop {
 
     public final String name;
-    public final String offset;
-    public final String size;
-    public final String type;
+    public final Counter offset;
+    public final Integer size;
+    public final Type type;
 
     public String exp;
     private String handler;
 
-    public Prop(Element el) {
+    public Prop(Element propEl) {
         try {
-            this.name = XmlUtils.attrValue(el, ATTR_NAME);
-            this.offset = XmlUtils.attrValue(el, ATTR_OFFSET);
-            this.size = XmlUtils.attrValue(el, ATTR_SIZE);
-            this.type = XmlUtils.attrValue(el, ATTR_TYPE);
-        } catch (NullPointerException exception) {
-            throw new IllegalArgumentException(el + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
+            this.name = XmlUtils.attrValue(propEl, ATTR_NAME);
+            this.offset = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
+            this.size = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
+            this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
+        } catch (Exception exception) {
+            throw new IllegalArgumentException(propEl + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
         }
 
         /* ext prop */
-        this.exp = XmlUtils.attrValue(el, ATTR_EXP);
-        this.handler = XmlUtils.attrValue(el, ATTR_HANDLER);
+        this.exp = XmlUtils.attrValue(propEl, ATTR_EXP);
+        this.handler = XmlUtils.attrValue(propEl, ATTR_HANDLER);
+    }
+
+    //**************************************           private start              ************************************//
+
+    OffsetType getModelOffsetType(Element propEl) {
+        Element parentModel = propEl.getParent();
+        String offsetType = XmlUtils.attrValue(parentModel, ATTR_OFFSET_TYPE);
+        return EnumUtil.fromString(OffsetType.class, offsetType, OffsetType.RELATIVE);
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class Counter {
+        // todo 相对绝对
+        private int index;
+        private OffsetType offsetType;
     }
 
 }

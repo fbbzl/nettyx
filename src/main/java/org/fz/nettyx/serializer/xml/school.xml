@@ -3,8 +3,8 @@
 <root namespace="school">
 
     <model-mappings>
-        <model-mapping value="1">{{student}}</model-mapping>
-        <model-mapping value="MAIl">{{teacher}}</model-mapping>
+        <model-mapping value="1" type="{{student}}" />
+        <model-mapping value="MAIl" type="{{teacher}}"/>
     </model-mappings>
 
     <enums>
@@ -16,12 +16,6 @@
         <enum ref="gender">
             FEMAIL,
             MAIl
-        </enum>
-        <enum ref="bank">
-            CCB,
-            ICBC,
-            PBC,
-            BOC
         </enum>
     </enums>
 
@@ -42,17 +36,13 @@
             <prop name="maincourse" offset="27" length="1" type="{{course}}"/>
 
             <prop name="phonenum" offset="28" length="22" type="utf8string[2]"/>
-            <prop name="bankcards" offset="50" length="22" type="{{bankcark}}[3]"/>
+            <prop name="bankcards" offset="50" length="22" type="{{bank.bankcard}}[3]"/>
             <prop name="secondarycourses" offset="72" length="20" type="{{course}}[2]" match="name"/>
         </model>
 
         <model ref="teacher" offset-type="absolute">
             <prop name="id" offset="92" length="2" type="asciistring"/>
             <prop name="name" offset="94" length="2" type="number" exp="*100"/>
-        </model>
-
-        <model ref="bankcark" offset-type="absolute">
-            <prop name="bankname" offset="0" length="2" type="{{bank}}" match="ordinary"/>
         </model>
     </models>
 </root>
