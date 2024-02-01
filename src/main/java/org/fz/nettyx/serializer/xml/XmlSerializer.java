@@ -23,9 +23,9 @@ public class XmlSerializer implements Serializer {
     private final File xml;
 
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\\\fengbinbin\\Desktop\\bytes.xml");
-
-        XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file);
+        File file = new File("C:\\Users\\\\fengbinbin\\Desktop\\school.xml");
+        File file2 = new File("C:\\Users\\\\fengbinbin\\Desktop\\bank.xml");
+        XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
 
     }
