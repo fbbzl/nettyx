@@ -3,12 +3,11 @@ package org.fz.nettyx.handler.actionable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.fz.nettyx.function.ChannelExceptionAction;
-
-import java.util.concurrent.TimeUnit;
+import org.fz.nettyx.action.ChannelExceptionAction;
 
 /**
  * The type Actionable read timeout handler.
