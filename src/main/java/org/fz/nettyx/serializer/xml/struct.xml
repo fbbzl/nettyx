@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<root namespace="com.fz.frame" type="byoffset">
+
+  <struct type="datexrecord">
+    <ref type="header" name="hdr"/>
+    <ref type="subrecord[4]" name="rcrd" handler="com.fz.module.user.SetArrayLength0Handler"/>
+  </struct>
+
+  <struct type="header">
+    <short name="rLen"/>
+    <short name="rNbr"/>
+    <word name="pligunId"/>
+    <byte name="rTime"/>
+    <ref type="srdesc[2]" name="srdescs"/>
+  </struct>
+
+  <struct type="srdesc">
+    <short name="srOffset"/>
+    <short name="srType"/>
+  </struct>
+
+</root>
+
+ 
+
+
+ 
+
+ 
