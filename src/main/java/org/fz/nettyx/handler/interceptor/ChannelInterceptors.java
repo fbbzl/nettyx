@@ -4,12 +4,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 /**
  * tool class used with ChannelInterceptor
@@ -26,7 +25,7 @@ public class ChannelInterceptors {
      * @param channel the channel
      * @return the interceptors
      */
-    public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(Channel channel) {
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(Channel channel) {
         return getInterceptors(channel.pipeline());
     }
 
@@ -37,7 +36,7 @@ public class ChannelInterceptors {
      * @param ctx the ctx
      * @return the interceptors
      */
-    public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(ChannelHandlerContext ctx) {
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelHandlerContext ctx) {
         return getInterceptors(ctx.pipeline());
     }
 
@@ -48,7 +47,8 @@ public class ChannelInterceptors {
      * @param pipeline the pipeline
      * @return the interceptors
      */
-    public static <T extends ChannelInterceptor<?>> List<T> getInterceptors(ChannelPipeline pipeline) {
+    @SuppressWarnings("unchecked")
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelPipeline pipeline) {
         List<T> result = new ArrayList<>(10);
 
         for (Map.Entry<String, ChannelHandler> entry : pipeline) {

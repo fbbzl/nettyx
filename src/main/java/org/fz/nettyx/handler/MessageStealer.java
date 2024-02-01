@@ -1,10 +1,12 @@
 package org.fz.nettyx.handler;
 
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPromise;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The type Message stealer.Can be used to filter parts of the message you don't need
@@ -22,14 +24,14 @@ public class MessageStealer extends ChannelDuplexHandler {
      */
     private final boolean quiet;
 
-    private final AtomicBoolean stealable;
+    private boolean stealable;
 
     /**
      * Instantiates a new Message stealer.
      */
     public MessageStealer() {
         this.quiet = false;
-        this.stealable = new AtomicBoolean(false);
+        this.stealable = false;
     }
 
     /**
@@ -40,7 +42,7 @@ public class MessageStealer extends ChannelDuplexHandler {
      */
     public MessageStealer(boolean quiet, boolean stealable) {
         this.quiet = quiet;
-        this.stealable = new AtomicBoolean(stealable);
+        this.stealable = stealable;
     }
 
     /**
@@ -49,30 +51,21 @@ public class MessageStealer extends ChannelDuplexHandler {
      * @return the boolean
      */
     public boolean stealable() {
-        return stealable.get();
+        return stealable;
     }
 
     /**
      * End steal.
      */
     public void endSteal() {
-        stealable.set(true);
+        stealable = false;
     }
 
     /**
      * Start steal.
      */
     public void startSteal() {
-        stealable.set(true);
-    }
-
-    /**
-     * Opposite.
-     */
-    public void opposite() {
-        synchronized (this) {
-            stealable.set(!stealable.get());
-        }
+        stealable = true;
     }
 
     /**
@@ -81,7 +74,7 @@ public class MessageStealer extends ChannelDuplexHandler {
      * @param channel the channel
      * @return the stealer
      */
-    public MessageStealer getStealer(Channel channel) {
+    public static MessageStealer getStealer(Channel channel) {
         return getStealer(channel.pipeline());
     }
 
@@ -91,13 +84,13 @@ public class MessageStealer extends ChannelDuplexHandler {
      * @param pipeline the pipeline
      * @return the stealer
      */
-    public MessageStealer getStealer(ChannelPipeline pipeline) {
+    public static MessageStealer getStealer(ChannelPipeline pipeline) {
         return pipeline.get(MessageStealer.class);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (stealable.get()) {
+        if (stealable) {
             // import to release msg
             ReferenceCountUtil.release(msg);
             if (!quiet) {
@@ -112,7 +105,7 @@ public class MessageStealer extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (stealable.get()) {
+        if (stealable) {
             promise.setFailure(new OutboundStolenException(msg));
 
             // import to release msg
