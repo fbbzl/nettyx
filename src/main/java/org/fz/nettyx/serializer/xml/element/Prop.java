@@ -20,7 +20,7 @@ public class Prop {
 
     public final String name;
     public final Counter counter;
-    public final Integer size;
+    public final Integer length;
     public final Type type;
 
     public String exp;
@@ -30,7 +30,7 @@ public class Prop {
         try {
             this.name = XmlUtils.attrValue(propEl, ATTR_NAME);
             this.counter = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
-            this.size = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
+            this.length = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
             this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
         } catch (Exception exception) {
             throw new IllegalArgumentException(propEl.getName() + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
