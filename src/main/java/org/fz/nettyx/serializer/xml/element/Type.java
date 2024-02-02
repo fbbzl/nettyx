@@ -1,12 +1,13 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import cn.hutool.core.lang.Pair;
-import cn.hutool.core.text.CharSequenceUtil;
-import lombok.Data;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
+import static cn.hutool.core.text.CharSequenceUtil.contains;
+import static cn.hutool.core.text.CharSequenceUtil.subAfter;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE_SYMBOL;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
+
+import cn.hutool.core.text.CharSequenceUtil;
+import lombok.Data;
 
 /**
  * @author fengbinbin
@@ -17,43 +18,58 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
 @Data
 public class Type {
 
-    private final String typeText;
+    private final String namespace;
 
+    /** the type value, if it's a ref it will without {{}} */
+    private final String typeValue;
 
-    public Pair<String, String> findNamespaceModelPair(String defaultNamespace) {
-        String refValue = getRefValue();
-        if (!startWith(refValue, NAMESPACE_SYMBOL)) {
-            refValue = defaultNamespace + NAMESPACE_SYMBOL + refValue;
+    public Type(String namespace, String typeText) {
+        if (isTypeRef(typeText)) {
+            typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
+
+            // use namespace ref
+            if (contains(typeText, NAMESPACE_SYMBOL)) {
+                this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
+                this.typeValue = subAfter(typeText, NAMESPACE_SYMBOL, true);
+            } else {
+                // use own namespace
+                this.namespace = namespace;
+                this.typeValue = typeText;
+            }
+        } else {
+            // basic type
+            this.namespace = null;
+            this.typeValue = typeText;
         }
-
-        String namespace = subBefore(refValue, NAMESPACE_SYMBOL, false),
-                model = subAfter(refValue, NAMESPACE_SYMBOL, true);
-
-        return Pair.of(namespace, model);
     }
 
-    public boolean containsNamespace() {
-        return CharSequenceUtil.contains(typeText, NAMESPACE_SYMBOL);
-    }
+    public Model getAsModel() {
 
-    public String getRefValue() {
-        if (!isTypeRef()) return EMPTY;
-        return CharSequenceUtil.subBetween(typeText, "{{", "}}");
-    }
-
-    public TypeEnum findTypeEnum() {
         return null;
     }
 
-    public boolean isTypeRef() {
-        if (typeText == null) return false;
+    public Model getAsString() {
+        return null;
+    }
+
+    public Model getAsNumber() {
+        return null;
+    }
+
+    public Model getAsEnum() {
+        return null;
+    }
+
+    public boolean isTypeRef(String typeText) {
+        if (typeText == null) {
+            return false;
+        }
         return REF_PATTERN.matcher(typeText).matches();
     }
 
     public enum TypeEnum {
 
-        STRING,
-        NUMBER
+        STRING, NUMBER
 
     }
 }

@@ -34,8 +34,9 @@ codec                               Provided some basic codecs
   ---StringMessageCodec                String Codec
 endpoint
   serial
-      jsc                               A Simple Implementation of Java Serial Communication Based on JSC
-         ---rxtx                           Serial rxtx packaging
+      jsc                            A Simple Implementation of Java Serial Communication Based on JSC
+         ---JSerialCommClient           simple jsc client    
+      rxtx                           Serial rxtx packaging
          ---RxtxClient                     Serial communication top-level parent class
          ---MultiRxtxChannelClient         Multi channel serial communication, using key to retrieve corresponding channels
          ---SingleRxtxChannelClient        Single channel serial communication

@@ -3,7 +3,7 @@
 <root namespace="bank">
 
     <model-mappings>
-        <model-mapping value="bank" type="{{bankcard}}"/>
+        <model-mapping value="bank" >{{bankcard}}</model-mapping>
     </model-mappings>
 
     <enums>
