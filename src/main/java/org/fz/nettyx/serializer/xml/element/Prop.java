@@ -33,7 +33,7 @@ public class Prop {
             this.size = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
             this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
         } catch (Exception exception) {
-            throw new IllegalArgumentException(propEl + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
+            throw new IllegalArgumentException(propEl.getName() + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
         }
 
         /* ext prop */
