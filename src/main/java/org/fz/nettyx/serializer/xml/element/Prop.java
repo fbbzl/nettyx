@@ -19,7 +19,7 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 public class Prop {
 
     public final String name;
-    public final Counter offset;
+    public final Counter counter;
     public final Integer size;
     public final Type type;
 
@@ -29,7 +29,7 @@ public class Prop {
     public Prop(Element propEl) {
         try {
             this.name = XmlUtils.attrValue(propEl, ATTR_NAME);
-            this.offset = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
+            this.counter = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
             this.size = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
             this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
         } catch (Exception exception) {
