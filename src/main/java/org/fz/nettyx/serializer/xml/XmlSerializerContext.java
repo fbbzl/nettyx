@@ -67,6 +67,7 @@ public class XmlSerializerContext {
             scanSwitches(root);
             scanModels(root);
             scanMappings(root);
+            System.err.println();
         }
     }
 
