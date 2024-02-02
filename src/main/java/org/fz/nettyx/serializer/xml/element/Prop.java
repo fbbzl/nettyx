@@ -1,13 +1,20 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_NAME;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+
 import cn.hutool.core.util.EnumUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
 import org.fz.nettyx.serializer.xml.element.Model.OffsetType;
-
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * @author fengbinbin
@@ -19,8 +26,8 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 public class Prop {
 
     public final String name;
-    public final Counter offset;
-    public final Integer size;
+    public final Counter counter;
+    public final Integer length;
     public final Type type;
 
     public String exp;
@@ -29,11 +36,11 @@ public class Prop {
     public Prop(Element propEl) {
         try {
             this.name = XmlUtils.attrValue(propEl, ATTR_NAME);
-            this.offset = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
-            this.size = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
-            this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
+            this.counter = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
+            this.length = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_LENGTH));
+            this.type = new Type(XmlUtils.attrValue(propEl.getDocument().getRootElement(), NAMESPACE), XmlUtils.attrValue(propEl, ATTR_TYPE));
         } catch (Exception exception) {
-            throw new IllegalArgumentException(propEl + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
+            throw new IllegalArgumentException(propEl.getName() + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_LENGTH + ", " + ATTR_TYPE + "] all of them can not be null");
         }
 
         /* ext prop */

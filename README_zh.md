@@ -34,8 +34,9 @@ codec                              提供了一些基本的编解码器
   ---StringMessageCodec                字符串编解码器
 endpoint
   serial
-      jsc                               基于JSC的Java串行通信的简单实现
-         ---rxtx                           串行 rxtx 封装
+     jsc                            基于JSC的Java串行通信的简单实现
+         ---JSerialCommClient       简单的基于jsc的客户端 
+     rxtx                           串行 rxtx 封装
          ---RxtxClient                     串行通信顶级父类
          ---MultiRxtxChannelClient         多通道串口通讯，使用键检索对应通道
          ---SingleRxtxChannelClient        单通道串行通信
