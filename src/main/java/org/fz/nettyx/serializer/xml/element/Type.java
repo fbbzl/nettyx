@@ -33,6 +33,8 @@ public class Type {
     }
 
     public Type(String typeText) {
+
+
         this.namespace = namespace;
     }
 
@@ -45,6 +47,10 @@ public class Type {
     }
 
     public Model getAsNumber() {
+        return null;
+    }
+
+    public Model getAsEnum() {
         return null;
     }
 
