@@ -33,9 +33,27 @@ public class Type {
     }
 
     public Type(String typeText) {
+        if (isTypeRef(typeText)) typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
 
 
-        this.namespace = namespace;
+
+        if (isTypeRef(typeText)) {
+            typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
+
+            // use namespace ref
+            if (contains(typeText, NAMESPACE_SYMBOL)) {
+                this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
+                this.typeValue = subAfter(typeText, NAMESPACE_SYMBOL, true);
+            } else {
+                // use own ref
+                this.namespace = null;
+                this.typeValue = typeText;
+            }
+        } else {
+            // basic type
+            namespace = null;
+            typeValue = typeText;
+        }
     }
 
     public Model getAsModel() {
@@ -54,10 +72,6 @@ public class Type {
         return null;
     }
 
-    public boolean containsNamespace() {
-        return CharSequenceUtil.contains(typeText, NAMESPACE_SYMBOL);
-    }
-
     public String getRefValue() {
         if (!isTypeRef()) return EMPTY;
         return CharSequenceUtil.subBetween(typeText, "{{", "}}");
@@ -67,7 +81,7 @@ public class Type {
         return null;
     }
 
-    public boolean isTypeRef() {
+    public boolean isTypeRef(String typeText) {
         if (typeText == null) return false;
         return REF_PATTERN.matcher(typeText).matches();
     }
