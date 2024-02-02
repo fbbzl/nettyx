@@ -5,6 +5,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.xml.element.Model;
+import org.fz.nettyx.serializer.xml.element.Type;
 import org.fz.nettyx.util.Try;
 
 import java.io.File;
@@ -102,9 +103,10 @@ public class XmlSerializerContext {
 
         Map<String, Model> modelMapping = new HashMap<>(64);
         for (Element mapping : mappings.elements(EL_MODEL_MAPPING)) {
-            String targetValue = XmlUtils.attrValue(mapping, ATTR_VALUE),
-                    mappingType = XmlUtils.attrValue(mapping, ATTR_TYPE);
-            Model model = MODELS.getOrDefault(namespace, emptyMap()).get(mappingType);
+            String targetValue = XmlUtils.attrValue(mapping, ATTR_VALUE);
+            Type type = new Type(XmlUtils.attrValue(mapping, ATTR_TYPE));
+
+            Model model = MODELS.getOrDefault(namespace, emptyMap()).get(type.getRefValue());
 
             modelMapping.putIfAbsent(targetValue, model);
         }
