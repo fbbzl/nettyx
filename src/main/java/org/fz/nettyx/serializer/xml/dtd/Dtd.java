@@ -33,7 +33,7 @@ public class Dtd {
             ATTR_VALUE ="value",
             ATTR_NAME = "name",
             ATTR_OFFSET = "offset",
-            ATTR_SIZE = "length",
+            ATTR_LENGTH = "length",
             ATTR_TYPE = "type",
             ATTR_EXP = "exp",
             ATTR_OFFSET_TYPE = "offset-type",
