@@ -54,7 +54,7 @@ public class XmlSerializerContext {
 
     public void refresh() {
         SAXReader reader = SAXReader.createDefault();
-
+        // first add the doc mapping
         List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read)).collect(toList());
 
         // first scan namespaces
