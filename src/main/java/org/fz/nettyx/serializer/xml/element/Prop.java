@@ -30,10 +30,10 @@ public class Prop {
         try {
             this.name = XmlUtils.attrValue(propEl, ATTR_NAME);
             this.counter = new Counter(Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET)), this.getModelOffsetType(propEl));
-            this.length = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_SIZE));
+            this.length = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_LENGTH));
             this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
         } catch (Exception exception) {
-            throw new IllegalArgumentException(propEl.getName() + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_SIZE + ", " + ATTR_TYPE + "] all of them can not be null");
+            throw new IllegalArgumentException(propEl.getName() + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_LENGTH + ", " + ATTR_TYPE + "] all of them can not be null");
         }
 
         /* ext prop */
