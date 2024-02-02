@@ -17,8 +17,8 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
 @Data
 public class Type {
 
-    private final String typeText;
-
+    private final String namespace;
+    private final String typeValue;
 
     public Pair<String, String> findNamespaceModelPair(String defaultNamespace) {
         String refValue = getRefValue();
@@ -30,6 +30,22 @@ public class Type {
                 model = subAfter(refValue, NAMESPACE_SYMBOL, true);
 
         return Pair.of(namespace, model);
+    }
+
+    public Type(String typeText) {
+        this.namespace = namespace;
+    }
+
+    public Model getAsModel() {
+        return null;
+    }
+
+    public Model getAsString() {
+        return null;
+    }
+
+    public Model getAsNumber() {
+        return null;
     }
 
     public boolean containsNamespace() {
