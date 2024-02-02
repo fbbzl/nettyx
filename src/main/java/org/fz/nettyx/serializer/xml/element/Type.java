@@ -21,15 +21,17 @@ public class Type {
     private final String typeValue;
 
     public Pair<String, String> findNamespaceModelPair(String defaultNamespace) {
-        String refValue = getRefValue();
-        if (!startWith(refValue, NAMESPACE_SYMBOL)) {
-            refValue = defaultNamespace + NAMESPACE_SYMBOL + refValue;
-        }
+//        String refValue = getRefValue();
+//        if (!startWith(refValue, NAMESPACE_SYMBOL)) {
+//            refValue = defaultNamespace + NAMESPACE_SYMBOL + refValue;
+//        }
+//
+//        String namespace = subBefore(refValue, NAMESPACE_SYMBOL, false),
+//                model = subAfter(refValue, NAMESPACE_SYMBOL, true);
+//
+//        return Pair.of(namespace, model);
 
-        String namespace = subBefore(refValue, NAMESPACE_SYMBOL, false),
-                model = subAfter(refValue, NAMESPACE_SYMBOL, true);
-
-        return Pair.of(namespace, model);
+        return null;
     }
 
     public Type(String typeText) {
@@ -72,10 +74,7 @@ public class Type {
         return null;
     }
 
-    public String getRefValue() {
-        if (!isTypeRef()) return EMPTY;
-        return CharSequenceUtil.subBetween(typeText, "{{", "}}");
-    }
+
 
     public TypeEnum findTypeEnum() {
         return null;
