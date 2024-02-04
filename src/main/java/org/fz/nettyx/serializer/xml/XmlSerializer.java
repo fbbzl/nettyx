@@ -37,7 +37,18 @@ public final class XmlSerializer implements Serializer {
     Model parseDoc() {
         for (Prop prop : getModel().getProps()) {
             Type type = prop.getType();
+            if (type.isNumber()) {
 
+            }
+            if (type.isString()) {
+
+            }
+            if (type.isModel()) {
+
+            }
+            if (type.isArray()) {
+
+            }
 
         }
 
