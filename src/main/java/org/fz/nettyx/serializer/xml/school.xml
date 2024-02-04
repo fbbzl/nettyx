@@ -34,7 +34,7 @@
             <prop name="address" offset="0" length="2" type="utf8string"/>
             <prop name="name" offset="3" length="2" type="number" exp="*100"/>
             <prop name="mainteacher" offset="2" length="2" type="{{teacher}}">
-                <!--map转的json-->
+                <!--json-->
                 {id=1,name=bb}
             </prop>
             <prop name="otherteachers" offset="2" length="2" type="{{teacher}}[2]">
