@@ -2,8 +2,6 @@ package org.fz.nettyx.serializer.xml.dtd;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.regex.Pattern;
-
 /**
  * @author fengbinbin
  * @version 1.0
@@ -13,8 +11,6 @@ import java.util.regex.Pattern;
 public class Dtd {
 
     public static final String NAMESPACE = "namespace", NAMESPACE_SYMBOL = ".";
-
-    public static final Pattern REF_PATTERN = Pattern.compile("^\\{\\{(.*)}}$");
 
     public static final String
             EL_MODELS = "models",

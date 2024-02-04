@@ -1,13 +1,9 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import static cn.hutool.core.text.CharSequenceUtil.contains;
-import static cn.hutool.core.text.CharSequenceUtil.subAfter;
-import static cn.hutool.core.text.CharSequenceUtil.subBefore;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE_SYMBOL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
-
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Data;
+
+import java.util.regex.Pattern;
 
 /**
  * @author fengbinbin
@@ -18,58 +14,35 @@ import lombok.Data;
 @Data
 public class Type {
 
-    private final String namespace;
+    public static final Pattern MODEL_REF_PATTERN = Pattern.compile("^\\{\\{(\\S+)}}$");
 
-    /** the type value, if it's a ref it will without {{}} */
-    private final String typeValue;
+    public static final Pattern ARRAY_PATTERN = Pattern.compile("^(.+)\\[\\d+]$");
 
-    public Type(String namespace, String typeText) {
-        if (isTypeRef(typeText)) {
-            typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
+    /**
+     * the type value, if it's a ref it will without {{}}
+     */
+    private final String typeText;
 
-            // use namespace ref
-            if (contains(typeText, NAMESPACE_SYMBOL)) {
-                this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
-                this.typeValue = subAfter(typeText, NAMESPACE_SYMBOL, true);
-            } else {
-                // use own namespace
-                this.namespace = namespace;
-                this.typeValue = typeText;
-            }
-        } else {
-            // basic type
-            this.namespace = null;
-            this.typeValue = typeText;
-        }
+    public Type(  String typeText) {
+        this.typeText = typeText;
     }
 
-    public Model getAsModel() {
-
-        return null;
+    public boolean isString() {
+        // TODO 根据字符前面的编码集进行判断
+        return CharSequenceUtil.endWithIgnoreCase(typeText, "string");
     }
 
-    public Model getAsString() {
-        return null;
+    public boolean isNumber() {
+        // TODO 根据length和小数 字符规则进行判断
+        return CharSequenceUtil.startWithIgnoreCase(typeText, "number");
     }
 
-    public Model getAsNumber() {
-        return null;
+    public boolean isModel() {
+        return MODEL_REF_PATTERN.matcher(typeText).matches();
     }
 
-    public Model getAsEnum() {
-        return null;
+    public boolean isArray() {
+        return ARRAY_PATTERN.matcher(typeText).matches();
     }
 
-    public boolean isTypeRef(String typeText) {
-        if (typeText == null) {
-            return false;
-        }
-        return REF_PATTERN.matcher(typeText).matches();
-    }
-
-    public enum TypeEnum {
-
-        STRING, NUMBER
-
-    }
 }
