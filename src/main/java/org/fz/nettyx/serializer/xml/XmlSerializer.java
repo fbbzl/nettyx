@@ -52,7 +52,7 @@ public final class XmlSerializer implements Serializer {
             }
             else
             if (type.isModel()) {
-
+                // 转为json字符串
             }
             else
             if (type.isArray()) {
