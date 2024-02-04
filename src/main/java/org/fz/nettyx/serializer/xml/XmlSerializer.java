@@ -8,6 +8,8 @@ import org.fz.nettyx.serializer.Serializer;
 
 import java.io.File;
 
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+
 
 /**
  * a xml bytebuf serializer
@@ -33,7 +35,9 @@ public final class XmlSerializer implements Serializer {
      * @return
      */
     Document parseDoc() {
+        String namespace = XmlUtils.attrValue(getDoc().getRootElement(), NAMESPACE);
 
+        XmlSerializerContext.findModel()
 
         return null;
     }
