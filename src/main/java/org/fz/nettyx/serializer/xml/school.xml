@@ -46,7 +46,9 @@
             <prop name="maincourse" offset="27" length="1" type="{{course}}"/>
 
             <prop name="phonenums" offset="28" length="22" type="utf8string[2]"/>
-            <prop name="bankcards" offset="50" length="22" type="{{bank.bankcard}}[3]"/>
+            <prop name="bankcards" offset="50" length="22" type="{{bank.bankcard}}[3]">
+                {bankname=CCB, cardnumber=284127486124}
+            </prop>
             <prop name="secondarycourses" offset="72" length="20" type="{{course}}[2]" match="name"/>
         </model>
 
