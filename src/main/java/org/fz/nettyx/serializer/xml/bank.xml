@@ -18,6 +18,7 @@
     <models>
         <model ref="bankcard" offset-type="absolute">
             <prop name="bankname" offset="0" length="2" type="{{bank}}" match="ordinary"/>
+            <prop name="cardnumber" offset="2" length="10" type="number"/>
         </model>
     </models>
 </root>
