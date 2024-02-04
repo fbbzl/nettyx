@@ -27,15 +27,11 @@ public class Model {
     private OffsetType offsetType;
     private List<Prop> props;
 
-    public Model(Element modelEl, String namespace) {
-        this(modelEl);
-        this.namespace = namespace;
-    }
-
     public Model(Element modelEl) {
+        this.namespace = XmlUtils.attrValue(modelEl.getDocument().getRootElement(), NAMESPACE);
         this.ref = XmlUtils.attrValue(modelEl, ATTR_REF);
         this.offsetType = EnumUtil.fromString(OffsetType.class,
-            XmlUtils.attrValue(modelEl, ATTR_OFFSET_TYPE).toUpperCase(), RELATIVE);
+                XmlUtils.attrValue(modelEl, ATTR_OFFSET_TYPE).toUpperCase(), RELATIVE);
         this.props = XmlUtils.elements(modelEl, EL_PROP).stream().map(Prop::new).collect(Collectors.toList());
     }
 

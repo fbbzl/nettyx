@@ -6,7 +6,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.xml.element.Model;
-import org.fz.nettyx.serializer.xml.element.Type;
 import org.fz.nettyx.util.Try;
 
 import java.io.File;
@@ -14,9 +13,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static java.util.Collections.emptyMap;
-import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
@@ -91,8 +88,8 @@ public class XmlSerializerContext {
         Element models = rootElement.element(EL_MODELS);
         String namespace = XmlUtils.attrValue(rootElement, NAMESPACE);
 
-        Map<String, Model> modelMap = XmlUtils.elements(models, EL_MODEL).stream().map(el -> new Model(el, namespace))
-            .collect(toMap(Model::getRef, identity()));
+        Map<String, Model> modelMap = new LinkedHashMap<>(16);
+        XmlUtils.elements(models, EL_MODEL).stream().map(el -> new Model(el)).forEach();
 
         MODELS.putIfAbsent(namespace, modelMap);
     }
@@ -122,12 +119,8 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
-    public static Model findModels(Type type) {
-        return MODELS.getOrDefault(type.getNamespace(), emptyMap()).get(type.getTypeValue());
-    }
-
-    public static Model findModel(Type type) {
-        return MODELS.getOrDefault(type.getNamespace(), emptyMap()).get(type.getTypeValue());
+    public static Model findModels(String namespace) {
+        return MODELS.getOrDefault(namespace, emptyMap());
     }
 
     public static Model findModel(String namespace, String modelRef) {
