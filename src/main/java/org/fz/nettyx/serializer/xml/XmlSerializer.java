@@ -37,7 +37,7 @@ public final class XmlSerializer implements Serializer {
     Document parseDoc() {
         String namespace = XmlUtils.attrValue(getDoc().getRootElement(), NAMESPACE);
 
-        XmlSerializerContext.findModels()
+        XmlSerializerContext.findModels();
 
         return null;
     }
@@ -54,8 +54,8 @@ public final class XmlSerializer implements Serializer {
     }
 
     public static void main(String[] args) {
-        File file = new File("C:\\Users\\\\pc\\Desktop\\school.xml");
-        File file2 = new File("C:\\Users\\\\pc\\Desktop\\bank.xml");
+        File file = new File("C:\\Users\\pc\\Desktop\\school.xml");
+        File file2 = new File("C:\\Users\\pc\\Desktop\\bank.xml");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
 
