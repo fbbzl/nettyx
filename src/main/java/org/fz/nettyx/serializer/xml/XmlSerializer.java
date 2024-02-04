@@ -32,8 +32,7 @@ public class XmlSerializer implements Serializer {
      *
      * @return
      */
-    public Document parseDoc() {
-        
+    Document parseDoc() {
 
 
         return null;
@@ -44,7 +43,7 @@ public class XmlSerializer implements Serializer {
      *
      * @return
      */
-    public ByteBuf toByteBuf() {
+    ByteBuf toByteBuf() {
 
 
         return null;
