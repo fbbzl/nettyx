@@ -35,10 +35,10 @@
             <prop name="name" offset="3" length="2" type="number" exp="*100"/>
             <prop name="mainteacher" offset="2" length="2" type="{{teacher}}">
                 <!--map转的json-->
-                {id=1,name='1'}
+                {id=1,name=bb}
             </prop>
-            <prop name="otherteachers" offset="2" length="2" type="{{teacher}}[4">
-                [{id=1,name='zl'}, {id=2,ame='bb'}]
+            <prop name="otherteachers" offset="2" length="2" type="{{teacher}}[4]">
+                [{id=1,name=zl}, {id=2,ame=bb}]
             </prop>
 
             <prop name="gender" offset="2" length="1" type="{{gender}}" match="ordinary"/>
