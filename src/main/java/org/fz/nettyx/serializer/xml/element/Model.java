@@ -20,7 +20,7 @@ import static org.fz.nettyx.serializer.xml.element.Model.OffsetType.RELATIVE;
 @Data
 public class Model {
 
-    private static final OffsetType DEFAULT_OFFSET_TYPE = RELATIVE;
+    private static final OffsetType DEFAULT_OFFSET_TYPE = OffsetType.ABSOLUTE;
 
     private String namespace;
     private String ref;
