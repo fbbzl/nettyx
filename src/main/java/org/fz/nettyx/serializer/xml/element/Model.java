@@ -1,6 +1,7 @@
 package org.fz.nettyx.serializer.xml.element;
 
 import cn.hutool.core.util.EnumUtil;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
@@ -39,4 +40,13 @@ public class Model {
         RELATIVE, ABSOLUTE,
         ;
     }
+
+    @Data
+    @AllArgsConstructor
+    public static class Counter {
+        // todo 相对绝对
+        private int index;
+        private OffsetType offsetType;
+    }
+
 }
