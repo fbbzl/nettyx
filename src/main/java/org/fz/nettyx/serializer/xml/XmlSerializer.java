@@ -1,15 +1,16 @@
 package org.fz.nettyx.serializer.xml;
 
 import io.netty.buffer.ByteBuf;
-import java.io.File;
-import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.dom4j.Document;
 import org.fz.nettyx.serializer.Serializer;
+
+import java.io.File;
 
 
 /**
- * the location of the xml file is scanned
+ * a xml bytebuf serializer
  *
  * @author fengbinbin
  * @version 1.0
@@ -20,18 +21,35 @@ import org.fz.nettyx.serializer.Serializer;
 public class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
+    private final Document doc;
 
-    public static Map<String, Object> read(ByteBuf byteBuf) {
-        return new XmlSerializer(byteBuf).toMap();
+    public static Document read(ByteBuf byteBuf, Document doc) {
+        return new XmlSerializer(byteBuf, doc).parseDoc();
     }
 
-    public Map<String, Object> toMap() {
-
-
+    /**
+     * 将没有值的xml根据配置填写上值
+     *
+     * @return
+     */
+    public Document parseDoc() {
+        
 
 
         return null;
     }
+
+    /**
+     * 将有值的xml转化成bytebuf
+     *
+     * @return
+     */
+    public ByteBuf toByteBuf() {
+
+
+        return null;
+    }
+
 
     public static void main(String[] args) {
         File file = new File("C:\\Users\\\\pc\\Desktop\\school.xml");

@@ -1,36 +1,24 @@
 package org.fz.nettyx.serializer.xml;
 
-import static java.util.Collections.emptyMap;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_VALUE;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUMS;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODELS;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL_MAPPING;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL_MAPPINGS;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCHES;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
-
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Type;
 import org.fz.nettyx.util.Try;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+
+import static java.util.Collections.emptyMap;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * application must config this
@@ -82,7 +70,6 @@ public class XmlSerializerContext {
             scanSwitches(root);
             scanModels(root);
             scanMappings(root);
-            System.err.println();
         }
     }
 
