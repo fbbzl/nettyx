@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.EnumUtil;
 import lombok.Data;
 import org.dom4j.Element;
@@ -17,12 +18,11 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 @Data
 public class Prop {
 
-    public final String name;
-    public final Integer length;
-    public final Type type;
-
-    public String exp;
-    private String handler;
+    private final String name;
+    private final Integer length;
+    private final Type type;
+    private final String exp;
+    private final String handler;
 
     public Prop(Element propEl) {
         try {
@@ -37,6 +37,10 @@ public class Prop {
         // 根据attr出现的顺序来决定哪个先执行
         this.exp = XmlUtils.attrValue(propEl, ATTR_EXP);
         this.handler = XmlUtils.attrValue(propEl, ATTR_HANDLER);
+    }
+
+    public boolean useHandler() {
+        return CharSequenceUtil.isNotBlank(getHandler());
     }
 
     //**************************************           private start              ************************************//
