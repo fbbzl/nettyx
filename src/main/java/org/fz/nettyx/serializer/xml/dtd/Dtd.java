@@ -14,7 +14,9 @@ public class Dtd {
 
     public static final String NAMESPACE = "namespace", NAMESPACE_SYMBOL = ".";
 
-    public static final Pattern REF_PATTERN = Pattern.compile("^\\{\\{(.*)}}$");
+    public static final Pattern MODEL_REF_PATTERN = Pattern.compile("^\\{\\{(\\S+)}}$");
+
+    public static final Pattern ARRAY_PATTERN = Pattern.compile("^(.+)\\[\\d+]$");
 
     public static final String
             EL_MODELS = "models",

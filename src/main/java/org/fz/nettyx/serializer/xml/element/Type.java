@@ -3,9 +3,7 @@ package org.fz.nettyx.serializer.xml.element;
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Data;
 
-import static cn.hutool.core.text.CharSequenceUtil.*;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE_SYMBOL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.MODEL_REF_PATTERN;
 
 /**
  * @author fengbinbin
@@ -16,6 +14,9 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
 @Data
 public class Type {
 
+    /**
+     *
+     */
     private final String namespace;
 
     /**
@@ -24,23 +25,24 @@ public class Type {
     private final String typeText;
 
     public Type(String namespace, String typeText) {
-        if (isTypeRef(typeText)) {
-            typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
-
-            // use namespace ref
-            if (contains(typeText, NAMESPACE_SYMBOL)) {
-                this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
-                this.typeText = subAfter(typeText, NAMESPACE_SYMBOL, true);
-            } else {
-                // use own namespace
-                this.namespace = namespace;
-                this.typeText = typeText;
-            }
-        } else {
-            // basic type
-            this.namespace = null;
-            this.typeText = typeText;
-        }
+//        if (isTypeRef(typeText)) {
+//            typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
+//
+//            // use namespace ref
+//            if (contains(typeText, NAMESPACE_SYMBOL)) {
+//                this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
+//                this.typeText = subAfter(typeText, NAMESPACE_SYMBOL, true);
+//            } else {
+//                // use own namespace
+//                this.namespace = namespace;
+//                this.typeText = typeText;
+//            }
+//        } else {
+//            // basic type
+//
+//        }
+        this.namespace = null;
+        this.typeText = typeText;
     }
 
     public boolean isString() {
@@ -49,12 +51,12 @@ public class Type {
     }
 
     public boolean isNumber() {
-        // TODO 根据length和字符规则进行判断
+        // TODO 根据length和小数 字符规则进行判断
         return CharSequenceUtil.startWithIgnoreCase(typeText, "number");
     }
 
     public boolean isModel() {
-        return false;
+        return MODEL_REF_PATTERN.matcher(typeText).matches();
     }
 
     public boolean isArray() {
@@ -62,10 +64,5 @@ public class Type {
     }
 
 
-    public boolean isTypeRef(String typeText) {
-        if (typeText == null) {
-            return false;
-        }
-        return REF_PATTERN.matcher(typeText).matches();
-    }
+
 }
