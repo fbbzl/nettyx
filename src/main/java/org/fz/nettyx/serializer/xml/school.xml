@@ -33,6 +33,7 @@
             <prop name="id" offset="0" length="2" type="utf8string"/>
             <prop name="address" offset="0" length="2" type="utf8string"/>
             <prop name="name" offset="3" length="2" type="number" exp="*100"/>
+            <prop name="mainteacher" offset="2" length="2" type="{{teacher}}"/>
 
             <prop name="gender" offset="2" length="1" type="{{gender}}" match="ordinary"/>
             <prop name="country" offset="25" length="2" type="{{country}}" match="name"/>

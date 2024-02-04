@@ -122,6 +122,10 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
+    public static Model findModels(Type type) {
+        return MODELS.getOrDefault(type.getNamespace(), emptyMap()).get(type.getTypeValue());
+    }
+
     public static Model findModel(Type type) {
         return MODELS.getOrDefault(type.getNamespace(), emptyMap()).get(type.getTypeValue());
     }
