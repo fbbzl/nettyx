@@ -55,7 +55,7 @@ public class XmlSerializerContext {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
         List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
-            .collect(toList());
+                .collect(toList());
 
         // first scan namespaces
         docs.forEach(XmlSerializerContext::scanNamespaces);
@@ -89,7 +89,7 @@ public class XmlSerializerContext {
         String namespace = XmlUtils.attrValue(rootElement, NAMESPACE);
 
         Map<String, Model> modelMap = new LinkedHashMap<>(16);
-        XmlUtils.elements(models, EL_MODEL).stream().map(el -> new Model(el)).forEach();
+        XmlUtils.elements(models, EL_MODEL).stream().map(Model::new).forEach(m -> modelMap.put(m.getRef(), m));
 
         MODELS.putIfAbsent(namespace, modelMap);
     }
@@ -105,7 +105,7 @@ public class XmlSerializerContext {
         Map<String, Model> modelMapping = new HashMap<>(64);
         for (Element mapping : mappings.elements(EL_MODEL_MAPPING)) {
             String targetValue = XmlUtils.attrValue(mapping, ATTR_VALUE), modelRef = CharSequenceUtil.subBetween(
-                XmlUtils.textTrim(mapping), "{{", "}}");
+                    XmlUtils.textTrim(mapping), "{{", "}}");
 
             Model model = findModel(namespace, modelRef);
 
@@ -119,8 +119,8 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
-    public static Model findModels(String namespace) {
-        return MODELS.getOrDefault(namespace, emptyMap());
+    public static Collection<Model> findModels(String namespace) {
+        return MODELS.getOrDefault(namespace, emptyMap()).values();
     }
 
     public static Model findModel(String namespace, String modelRef) {
