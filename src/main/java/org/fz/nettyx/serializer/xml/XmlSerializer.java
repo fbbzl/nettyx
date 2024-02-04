@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
+import org.fz.nettyx.serializer.xml.element.Type;
 
 import java.io.File;
 
@@ -35,7 +36,7 @@ public final class XmlSerializer implements Serializer {
      */
     Model parseDoc() {
         for (Prop prop : getModel().getProps()) {
-
+            Type type = prop.getType();
 
 
         }
