@@ -1,12 +1,13 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import cn.hutool.core.lang.Pair;
-import cn.hutool.core.text.CharSequenceUtil;
-import lombok.Data;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
+import static cn.hutool.core.text.CharSequenceUtil.contains;
+import static cn.hutool.core.text.CharSequenceUtil.subAfter;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE_SYMBOL;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
+
+import cn.hutool.core.text.CharSequenceUtil;
+import lombok.Data;
 
 /**
  * @author fengbinbin
@@ -18,27 +19,11 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
 public class Type {
 
     private final String namespace;
+
+    /** the type value, if it's a ref it will without {{}} */
     private final String typeValue;
 
-    public Pair<String, String> findNamespaceModelPair(String defaultNamespace) {
-//        String refValue = getRefValue();
-//        if (!startWith(refValue, NAMESPACE_SYMBOL)) {
-//            refValue = defaultNamespace + NAMESPACE_SYMBOL + refValue;
-//        }
-//
-//        String namespace = subBefore(refValue, NAMESPACE_SYMBOL, false),
-//                model = subAfter(refValue, NAMESPACE_SYMBOL, true);
-//
-//        return Pair.of(namespace, model);
-
-        return null;
-    }
-
-    public Type(String typeText) {
-        if (isTypeRef(typeText)) typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
-
-
-
+    public Type(String namespace, String typeText) {
         if (isTypeRef(typeText)) {
             typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
 
@@ -47,18 +32,19 @@ public class Type {
                 this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
                 this.typeValue = subAfter(typeText, NAMESPACE_SYMBOL, true);
             } else {
-                // use own ref
-                this.namespace = null;
+                // use own namespace
+                this.namespace = namespace;
                 this.typeValue = typeText;
             }
         } else {
             // basic type
-            namespace = null;
-            typeValue = typeText;
+            this.namespace = null;
+            this.typeValue = typeText;
         }
     }
 
     public Model getAsModel() {
+
         return null;
     }
 
@@ -74,21 +60,16 @@ public class Type {
         return null;
     }
 
-
-
-    public TypeEnum findTypeEnum() {
-        return null;
-    }
-
     public boolean isTypeRef(String typeText) {
-        if (typeText == null) return false;
+        if (typeText == null) {
+            return false;
+        }
         return REF_PATTERN.matcher(typeText).matches();
     }
 
     public enum TypeEnum {
 
-        STRING,
-        NUMBER
+        STRING, NUMBER
 
     }
 }
