@@ -18,7 +18,7 @@ import java.io.File;
  */
 @Getter
 @RequiredArgsConstructor
-public class XmlSerializer implements Serializer {
+public final class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
     private final Document doc;
