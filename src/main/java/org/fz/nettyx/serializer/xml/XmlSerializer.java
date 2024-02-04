@@ -3,12 +3,11 @@ package org.fz.nettyx.serializer.xml;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dom4j.Document;
 import org.fz.nettyx.serializer.Serializer;
+import org.fz.nettyx.serializer.xml.element.Model;
+import org.fz.nettyx.serializer.xml.element.Prop;
 
 import java.io.File;
-
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
 
 /**
@@ -23,10 +22,10 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 public final class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
-    private final Document doc;
+    private final Model model;
 
-    public static Document read(ByteBuf byteBuf, Document doc) {
-        return new XmlSerializer(byteBuf, doc).parseDoc();
+    public static Model read(ByteBuf byteBuf, Model model) {
+        return new XmlSerializer(byteBuf, model).parseDoc();
     }
 
     /**
@@ -34,10 +33,14 @@ public final class XmlSerializer implements Serializer {
      *
      * @return
      */
-    Document parseDoc() {
-        String namespace = XmlUtils.attrValue(getDoc().getRootElement(), NAMESPACE);
+    Model parseDoc() {
+        for (Prop prop : getModel().getProps()) {
 
-        XmlSerializerContext.findModels();
+
+
+        }
+
+
 
         return null;
     }
