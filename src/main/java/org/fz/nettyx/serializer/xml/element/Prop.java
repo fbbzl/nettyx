@@ -39,18 +39,6 @@ public class Prop {
         this.handler = XmlUtils.attrValue(propEl, ATTR_HANDLER);
     }
 
-    public boolean isString() {
-        return false;
-    }
-
-    public Number isNumber() {
-        return null;
-    }
-
-    public boolean isModel() {
-        return false;
-    }
-
     //**************************************           private start              ************************************//
 
     OffsetType getModelOffsetType(Element propEl) {
