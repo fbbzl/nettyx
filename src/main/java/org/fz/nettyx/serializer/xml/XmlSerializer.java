@@ -1,14 +1,13 @@
 package org.fz.nettyx.serializer.xml;
 
 import io.netty.buffer.ByteBuf;
+import java.io.File;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Type;
-
-import java.io.File;
 
 
 /**
@@ -35,6 +34,7 @@ public final class XmlSerializer implements Serializer {
      * @return
      */
     Model parseDoc() {
+        //生成一个只带有Model的xml document文件最好是
         for (Prop prop : getModel().getProps()) {
             System.err.println(prop.getLength());
             Type type = prop.getType();
