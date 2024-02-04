@@ -38,7 +38,7 @@
                 {id=1,name='1'}
             </prop>
             <prop name="otherteachers" offset="2" length="2" type="{{teacher}}[4">
-                [ {id=1,name='zl'}, {id=2,ame='bb'}]
+                [{id=1,name='zl'}, {id=2,ame='bb'}]
             </prop>
 
             <prop name="gender" offset="2" length="1" type="{{gender}}" match="ordinary"/>
