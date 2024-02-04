@@ -1,36 +1,21 @@
 package org.fz.nettyx.serializer.xml;
 
-import static java.util.Collections.emptyMap;
-import static java.util.function.UnaryOperator.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_VALUE;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUMS;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODELS;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL_MAPPING;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL_MAPPINGS;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCHES;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
-
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.xml.element.Model;
-import org.fz.nettyx.serializer.xml.element.Type;
 import org.fz.nettyx.util.Try;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * application must config this
@@ -70,7 +55,7 @@ public class XmlSerializerContext {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
         List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
-            .collect(toList());
+                .collect(toList());
 
         // first scan namespaces
         docs.forEach(XmlSerializerContext::scanNamespaces);
@@ -82,7 +67,6 @@ public class XmlSerializerContext {
             scanSwitches(root);
             scanModels(root);
             scanMappings(root);
-            System.err.println();
         }
     }
 
@@ -104,8 +88,8 @@ public class XmlSerializerContext {
         Element models = rootElement.element(EL_MODELS);
         String namespace = XmlUtils.attrValue(rootElement, NAMESPACE);
 
-        Map<String, Model> modelMap = XmlUtils.elements(models, EL_MODEL).stream().map(el -> new Model(el, namespace))
-            .collect(toMap(Model::getRef, identity()));
+        Map<String, Model> modelMap = new LinkedHashMap<>(16);
+        XmlUtils.elements(models, EL_MODEL).stream().map(Model::new).forEach(m -> modelMap.put(m.getRef(), m));
 
         MODELS.putIfAbsent(namespace, modelMap);
     }
@@ -121,7 +105,7 @@ public class XmlSerializerContext {
         Map<String, Model> modelMapping = new HashMap<>(64);
         for (Element mapping : mappings.elements(EL_MODEL_MAPPING)) {
             String targetValue = XmlUtils.attrValue(mapping, ATTR_VALUE), modelRef = CharSequenceUtil.subBetween(
-                XmlUtils.textTrim(mapping), "{{", "}}");
+                    XmlUtils.textTrim(mapping), "{{", "}}");
 
             Model model = findModel(namespace, modelRef);
 
@@ -135,8 +119,8 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
-    public static Model findModel(Type type) {
-        return MODELS.getOrDefault(type.getNamespace(), emptyMap()).get(type.getTypeValue());
+    public static Collection<Model> findModels(String namespace) {
+        return MODELS.getOrDefault(namespace, emptyMap()).values();
     }
 
     public static Model findModel(String namespace, String modelRef) {
