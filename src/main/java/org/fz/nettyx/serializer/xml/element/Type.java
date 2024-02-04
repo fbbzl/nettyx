@@ -1,13 +1,11 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import static cn.hutool.core.text.CharSequenceUtil.contains;
-import static cn.hutool.core.text.CharSequenceUtil.subAfter;
-import static cn.hutool.core.text.CharSequenceUtil.subBefore;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE_SYMBOL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
-
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Data;
+
+import static cn.hutool.core.text.CharSequenceUtil.*;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE_SYMBOL;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.REF_PATTERN;
 
 /**
  * @author fengbinbin
@@ -48,15 +46,15 @@ public class Type {
         return null;
     }
 
-    public Model getAsString() {
+    public String getAsString() {
         return null;
     }
 
-    public Model getAsNumber() {
+    public Number getAsNumber() {
         return null;
     }
 
-    public Model getAsEnum() {
+    public <E extends Enum<E>> E getAsEnum() {
         return null;
     }
 

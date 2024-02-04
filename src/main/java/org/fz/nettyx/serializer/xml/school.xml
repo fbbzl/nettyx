@@ -19,23 +19,26 @@
         </enum>
     </enums>
 
+    <!--建议使用专门的xml来保存协议中所有开关-->
     <switches>
         <switch ref="course">
             NATURAL,
-            MEDICINE
+            MEDICINE,
+            NOTUSED
         </switch>
     </switches>
 
     <models>
         <model ref="student" offset-type="relative">
             <prop name="id" offset="0" length="2" type="utf8string"/>
+            <prop name="address" offset="0" length="2" type="utf8string"/>
             <prop name="name" offset="3" length="2" type="number" exp="*100"/>
 
             <prop name="gender" offset="2" length="1" type="{{gender}}" match="ordinary"/>
             <prop name="country" offset="25" length="2" type="{{country}}" match="name"/>
             <prop name="maincourse" offset="27" length="1" type="{{course}}"/>
 
-            <prop name="phonenum" offset="28" length="22" type="utf8string[2]"/>
+            <prop name="phonenums" offset="28" length="22" type="utf8string[2]"/>
             <prop name="bankcards" offset="50" length="22" type="{{bank.bankcard}}[3]"/>
             <prop name="secondarycourses" offset="72" length="20" type="{{course}}[2]" match="name"/>
         </model>
