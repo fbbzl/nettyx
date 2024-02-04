@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.xml.element;
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Data;
 
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.MODEL_REF_PATTERN;
+import java.util.regex.Pattern;
 
 /**
  * @author fengbinbin
@@ -14,9 +14,10 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.MODEL_REF_PATTERN;
 @Data
 public class Type {
 
-    /**
-     *
-     */
+    public static final Pattern MODEL_REF_PATTERN = Pattern.compile("^\\{\\{(\\S+)}}$");
+
+    public static final Pattern ARRAY_PATTERN = Pattern.compile("^(.+)\\[\\d+]$");
+
     private final String namespace;
 
     /**
@@ -60,9 +61,7 @@ public class Type {
     }
 
     public boolean isArray() {
-        return false;
+        return ARRAY_PATTERN.matcher(typeText).matches();
     }
-
-
 
 }
