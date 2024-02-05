@@ -3,7 +3,7 @@
 <root namespace="bank">
 
     <model-mappings>
-        <model-mapping value="bank" >{{bankcard}}</model-mapping>
+        <model-mapping value="bank">bankcard</model-mapping>
     </model-mappings>
 
     <enums>
@@ -16,10 +16,10 @@
     </enums>
 
     <models>
-        <model ref="bankcard" offset-type="absolute">
-            <prop name="bankname" offset="0" length="2" type="{{bank}}" match="ordinary"/>
-            <prop name="cardnumber" offset="2" length="10" type="number"/>
-        </model>
+        <bankcard>
+            <bankname :offset="0" :length="2" :enum="{{bank}}(ordinary)"/>
+            <cardnumber :offset="2" :length="10" :type="number(12,0)"/>
+        </bankcard>
     </models>
 </root>
 
