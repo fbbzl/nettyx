@@ -38,15 +38,17 @@ public final class XmlSerializer implements Serializer {
     }
 
     /**
-     * 将没有值的xml根据配置填写上值
+     * return a document with a model
      *
      * @return
      */
     Document parseDoc() {
         SAXWriter saxWriter = new SAXWriter();
         Document document = new DOMDocument();
-        Element root = new DOMElement(EL_MODEL);
-        document.setRootElement(root);
+        Element model = new DOMElement(EL_MODEL);
+
+        document.setRootElement(model);
+
         // 生成一个只带有Model的xml document文件最好是
         for (Prop prop : getModel().getProps()) {
             Type type = prop.getType();
@@ -55,7 +57,7 @@ public final class XmlSerializer implements Serializer {
                 // new handler and invoke method
 
             } else if (type.isNumber()) {
-
+                addNumberEl(model);
             } else if (type.isString()) {
 
             } else if (type.isArray()) {
@@ -65,7 +67,6 @@ public final class XmlSerializer implements Serializer {
 
         return null;
     }
-
 
     /**
      * 将有值的xml转化成bytebuf
@@ -80,7 +81,7 @@ public final class XmlSerializer implements Serializer {
 
     //*******************************           private start             ********************************************//
 
-    private void addNumberEl(Element el) {
+    private void addNumberEl(Prop prop, Element model) {
 
     }
 
