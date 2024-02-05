@@ -12,9 +12,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.XmlUtils.putConst;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
@@ -27,23 +27,27 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 public class XmlSerializerContext {
 
     /**
-     * first key is namespace, second key is target-value, the value is model
+     * first key is target-value, second key is namespace, the value is model
      */
-    private static final Map<String, Map<String, Model>> MODEL_MAPPINGS = new SafeConcurrentHashMap<>(64);
-    private static final Map<String, Set<String>> ENUMS = new SafeConcurrentHashMap<>(64);
-    private static final Map<String, Set<String>> SWITCHES = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, Model> MODEL_MAPPINGS = new SafeConcurrentHashMap<>(64);
     private static final Map<String, Document> NAMESPACES_DOCS = new SafeConcurrentHashMap<>(64);
-
     /**
-     * first key is namespace, second key is model-ref, the value is model
+     * first key is namespace, second key is enum name, the value is the enum
+     */
+    private static final Map<String, Map<String, List<String>>> ENUMS = new SafeConcurrentHashMap<>(64);
+    /**
+     * first key is namespace, second key is switch name, the value is the switch
+     */
+    private static final Map<String, Map<String, List<String>>> SWITCHES = new SafeConcurrentHashMap<>(64);
+    /**
+     * first key is namespace, second key is model name, the value is model
      */
     private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(64);
 
     private final Path[] paths;
 
     public XmlSerializerContext(File... files) {
-        this.paths = Arrays.stream(files).map(File::toPath).toArray(Path[]::new);
-        this.refresh();
+        this(Arrays.stream(files).map(File::toPath).toArray(Path[]::new));
     }
 
     public XmlSerializerContext(Path... paths) {
@@ -77,21 +81,36 @@ public class XmlSerializerContext {
     }
 
     private static void scanEnums(Element rootElement) {
-        putConst(rootElement, EL_ENUMS, EL_ENUM, ENUMS);
+        Map<String, List<String>> enums = new HashMap<>(8);
+        for (Element el : rootElement.elements(EL_ENUMS)) {
+            enums.put(XmlUtils.name(el), Arrays.stream(splitToArray(XmlUtils.textTrim(el), ","))
+                    .map(CharSequenceUtil::removeAllLineBreaks)
+                    .map(CharSequenceUtil::cleanBlank)
+                    .collect(toList()));
+        }
+
+        ENUMS.put(XmlUtils.namespace(rootElement), enums);
     }
 
     private static void scanSwitches(Element rootElement) {
-        putConst(rootElement, EL_SWITCHES, EL_SWITCH, SWITCHES);
+        Map<String, List<String>> switches = new HashMap<>(8);
+        for (Element el : rootElement.elements(EL_SWITCHES)) {
+            switches.put(XmlUtils.name(el), Arrays.stream(splitToArray(XmlUtils.textTrim(el), ","))
+                    .map(CharSequenceUtil::removeAllLineBreaks)
+                    .map(CharSequenceUtil::cleanBlank)
+                    .collect(toList()));
+        }
+
+        SWITCHES.put(XmlUtils.namespace(rootElement), switches);
     }
 
     private static void scanModels(Element rootElement) {
         Element models = rootElement.element(EL_MODELS);
-        String namespace = XmlUtils.attrValue(rootElement, NAMESPACE);
 
         Map<String, Model> modelMap = new LinkedHashMap<>(16);
-        XmlUtils.elements(models, EL_MODEL).stream().map(Model::new).forEach(m -> modelMap.put(m.getRef(), m));
+        XmlUtils.elements(models).stream().map(Model::new).forEach(m -> modelMap.put(m.getName(), m));
 
-        MODELS.putIfAbsent(namespace, modelMap);
+        MODELS.putIfAbsent(XmlUtils.attrValue(rootElement, NAMESPACE), modelMap);
     }
 
     private static void scanMappings(Element rootElement) {
@@ -102,29 +121,20 @@ public class XmlSerializerContext {
 
         String namespace = XmlUtils.attrValue(rootElement, NAMESPACE);
 
-        Map<String, Model> modelMapping = new HashMap<>(64);
-        for (Element mapping : mappings.elements(EL_MODEL_MAPPING)) {
-            String targetValue = XmlUtils.attrValue(mapping, ATTR_VALUE), modelRef = CharSequenceUtil.subBetween(
-                    XmlUtils.textTrim(mapping), "{{", "}}");
+        for (Element mapping : mappings.elements()) {
+            String mappingValue = XmlUtils.textTrim(mapping);
+            Model model = MODELS.getOrDefault(namespace, emptyMap()).get(XmlUtils.name(mapping));
 
-            Model model = findModel(namespace, modelRef);
-
-            modelMapping.putIfAbsent(targetValue, model);
+            MODEL_MAPPINGS.putIfAbsent(mappingValue, model);
         }
-
-        MODEL_MAPPINGS.putIfAbsent(namespace, modelMapping);
     }
 
     //************************************           private end             *****************************************//
 
     //************************************          public start            *****************************************//
 
-    public static Collection<Model> findModels(String namespace) {
-        return MODELS.getOrDefault(namespace, emptyMap()).values();
-    }
-
-    public static Model findModel(String namespace, String modelRef) {
-        return MODELS.getOrDefault(namespace, emptyMap()).get(modelRef);
+    public static Model findModel(String mappingValue) {
+        return MODEL_MAPPINGS.get(mappingValue);
     }
 
     //************************************          public start            *****************************************//
