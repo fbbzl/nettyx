@@ -3,8 +3,8 @@
 <root namespace="school">
 
     <model-mappings>
-        <model-mapping value="1">{{student}}</model-mapping>
-        <model-mapping value="MAIl">{{teacher}}</model-mapping>
+        <model-mapping value="1">student</model-mapping>
+        <model-mapping value="MAIl">teacher</model-mapping>
     </model-mappings>
 
     <enums>
@@ -29,33 +29,22 @@
     </switches>
 
     <models>
-        <model ref="student" offset-type="relative">
-            <prop name="id" offset="0" length="2" type="utf8string"/>
-            <prop name="address" offset="0" length="2" type="utf8string"/>
-            <prop name="name" offset="3" length="2" type="number" exp="*100"/>
-            <prop name="mainteacher" offset="2" length="2" type="{{teacher}}">
-                <!--json-->
-                {id=1,name=bb}
-            </prop>
-            <prop name="otherteachers" offset="2" length="2" type="{{teacher}}[2]">
-                [{id=2,name=zl}, {id=3,ame=ff}]
-            </prop>
+        <student>
+            <id :offset="0" :length="2" :type="string(utf8)"/>
+            <age :offset="0" :length="2" :type="number(2,0)"/>
+            <name :offset="3" :length="2" :type="string(utf8)" :exp="*100"/>
+            <gender :offset="2" :length="1" :enum="{{gender}}(ordinary)"/>
+            <country :offset="25" :length="2" :enum="{{country}}(name)"/>
+            <maincourse :offset="27" :length="1" :switch="{{course}}(ordinary)"/>
+            <phonenums :offset="28" :length="22" :type="string(utf8)[2]"/>
+            <secondarycourses :offset="72" :length="20" :switch="{{course}}[2](name)"/>
+            <address :offset="0" :length="2" :type="string(utf8)"/>
+        </student>
 
-            <prop name="gender" offset="2" length="1" type="{{gender}}" match="ordinary"/>
-            <prop name="country" offset="25" length="2" type="{{country}}" match="name"/>
-            <prop name="maincourse" offset="27" length="1" type="{{course}}"/>
-
-            <prop name="phonenums" offset="28" length="22" type="utf8string[2]"/>
-            <prop name="bankcards" offset="50" length="22" type="{{bank.bankcard}}[3]">
-                {bankname=CCB, cardnumber=284127486124}
-            </prop>
-            <prop name="secondarycourses" offset="72" length="20" type="{{course}}[2]" match="name"/>
-        </model>
-
-        <model ref="teacher" offset-type="absolute">
-            <prop name="id" offset="92" length="2" type="asciistring"/>
-            <prop name="name" offset="94" length="2" type="number" exp="*100"/>
-        </model>
+        <teacher>
+            <id :offset="92" :length="2" :type="asciistring"/>
+            <name :offset="94" :length="2" :type="number(2,0)" :exp="*100"/>
+        </teacher>
     </models>
 </root>
 

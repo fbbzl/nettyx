@@ -18,31 +18,12 @@ public class Type {
 
     public static final Pattern ARRAY_PATTERN = Pattern.compile("^(.+)\\[\\d+]$");
 
-    private final String namespace;
-
     /**
      * the type value, if it's a ref it will without {{}}
      */
     private final String typeText;
 
-    public Type(String namespace, String typeText) {
-//        if (isTypeRef(typeText)) {
-//            typeText = CharSequenceUtil.subBetween(typeText, "{{", "}}");
-//
-//            // use namespace ref
-//            if (contains(typeText, NAMESPACE_SYMBOL)) {
-//                this.namespace = subBefore(typeText, NAMESPACE_SYMBOL, false);
-//                this.typeText = subAfter(typeText, NAMESPACE_SYMBOL, true);
-//            } else {
-//                // use own namespace
-//                this.namespace = namespace;
-//                this.typeText = typeText;
-//            }
-//        } else {
-//            // basic type
-//
-//        }
-        this.namespace = null;
+    public Type(  String typeText) {
         this.typeText = typeText;
     }
 
