@@ -27,8 +27,6 @@ public class JSerialCommClient {
      */
     private SerialPort serialPort;
 
-
-
     /**
      * Find the serial port available on the current machine
      *
