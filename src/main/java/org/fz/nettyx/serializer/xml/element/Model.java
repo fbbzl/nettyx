@@ -1,16 +1,18 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_REF;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_PROP;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+import static org.fz.nettyx.serializer.xml.element.Model.OffsetType.RELATIVE;
+
 import cn.hutool.core.util.EnumUtil;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
-import static org.fz.nettyx.serializer.xml.element.Model.OffsetType.RELATIVE;
 
 /**
  * @author fengbinbin
@@ -23,6 +25,7 @@ public class Model {
 
     private static final OffsetType DEFAULT_OFFSET_TYPE = OffsetType.ABSOLUTE;
 
+    private String name;
     private String namespace;
     private String ref;
     private OffsetType offsetType;
