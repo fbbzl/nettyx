@@ -14,6 +14,7 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXWriter;
 import org.fz.nettyx.serializer.Serializer;
+import org.fz.nettyx.serializer.xml.element.BufferedElement;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Type;
@@ -74,7 +75,7 @@ public final class XmlSerializer implements Serializer {
      * @return
      */
     ByteBuf toByteBuf() {
-
+        new BufferedElement(null)
 
         return null;
     }
