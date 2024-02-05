@@ -1,13 +1,20 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_NAME;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.EnumUtil;
 import lombok.Data;
 import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.xml.XmlUtils;
 import org.fz.nettyx.serializer.xml.element.Model.OffsetType;
-
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * @author fengbinbin
@@ -41,6 +48,10 @@ public class Prop {
 
     public boolean useHandler() {
         return CharSequenceUtil.isNotBlank(getHandler());
+    }
+
+    public Element toElement() {
+        return new DOMElement(getName());
     }
 
     //**************************************           private start              ************************************//
