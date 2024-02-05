@@ -1,7 +1,11 @@
 package org.fz.nettyx.serializer.xml;
 
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.File;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
@@ -13,11 +17,6 @@ import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Type;
-
-import java.io.File;
-import java.util.Arrays;
-
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
 
 
 /**
@@ -54,6 +53,7 @@ public final class XmlSerializer implements Serializer {
 
             if (prop.useHandler()) {
                 // new handler and invoke method
+
             } else if (type.isNumber()) {
 
             } else if (type.isString()) {
