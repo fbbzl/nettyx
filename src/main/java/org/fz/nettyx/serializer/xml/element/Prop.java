@@ -1,11 +1,11 @@
 package org.fz.nettyx.serializer.xml.element;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.EnumUtil;
 import lombok.Data;
 import org.dom4j.Element;
 import org.fz.nettyx.serializer.xml.XmlUtils;
-import org.fz.nettyx.serializer.xml.element.Model.OffsetType;
+
+import java.util.regex.Pattern;
 
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
@@ -19,22 +19,17 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 public class Prop {
 
     private final String name;
-    private final Integer length;
+    private final int offset;
+    private final int length;
     private final Type type;
     private final String exp;
     private final String handler;
 
     public Prop(Element propEl) {
-        try {
-            this.name = XmlUtils.attrValue(propEl, ATTR_NAME);
-            this.length = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_LENGTH));
-            this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
-        } catch (Exception exception) {
-            throw new IllegalArgumentException(propEl.getName() + "[" + ATTR_NAME + ", " + ATTR_OFFSET + ", " + ATTR_LENGTH + ", " + ATTR_TYPE + "] all of them can not be null");
-        }
-
-        /* ext prop */
-        // 根据attr出现的顺序来决定哪个先执行
+        this.name = XmlUtils.name(propEl);
+        this.offset = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_OFFSET));
+        this.length = Integer.parseInt(XmlUtils.attrValue(propEl, ATTR_LENGTH));
+        this.type = new Type(XmlUtils.attrValue(propEl, ATTR_TYPE));
         this.exp = XmlUtils.attrValue(propEl, ATTR_EXP);
         this.handler = XmlUtils.attrValue(propEl, ATTR_HANDLER);
     }
@@ -45,11 +40,36 @@ public class Prop {
 
     //**************************************           private start              ************************************//
 
-    OffsetType getModelOffsetType(Element propEl) {
-        Element parentModel = propEl.getParent();
-        String offsetType = XmlUtils.attrValue(parentModel, ATTR_OFFSET_TYPE);
-        return EnumUtil.fromString(OffsetType.class, offsetType, OffsetType.RELATIVE);
-    }
-
     //**************************************           private end                ************************************//
+
+    @Data
+    public static class Type {
+
+        public static final Pattern MODEL_REF_PATTERN = Pattern.compile("^\\{\\{(\\S+)}}$");
+
+        public static final Pattern ARRAY_PATTERN = Pattern.compile("^(.+)\\[\\d+]$");
+
+        private final String typeText;
+
+        public boolean isNumber() {
+            return CharSequenceUtil.startWithIgnoreCase(getTypeText(), "number");
+        }
+
+        public boolean isString() {
+            return CharSequenceUtil.startWithIgnoreCase(getTypeText(), "string");
+        }
+
+        public boolean isEnum() {
+            return CharSequenceUtil.startWithIgnoreCase(getTypeText(), "enum");
+        }
+
+        public boolean isSwitch() {
+            return CharSequenceUtil.startWithIgnoreCase(getTypeText(), "switch");
+        }
+
+        public boolean isArray() {
+            return ARRAY_PATTERN.matcher(getTypeText()).matches();
+        }
+
+    }
 }

@@ -13,26 +13,17 @@ public class Dtd {
     public static final String NAMESPACE = "namespace", NAMESPACE_SYMBOL = ".";
 
     public static final String
-            EL_MODELS = "models",
-            EL_MODEL = "model",
-            EL_PROP = "prop",
-            EL_ENUMS = "enums",
-            EL_ENUM = "enum",
-            EL_SWITCHES = "switches",
-            EL_SWITCH = "switch",
-            EL_MODEL_MAPPINGS = "model-mappings",
-            EL_MODEL_MAPPING = "model-mapping";
+            EL_MODELS = "model",
+            EL_ENUMS = "enum",
+            EL_SWITCHES = "switch",
+            EL_MODEL_MAPPINGS = "model-mapping";
 
 
     public static final String
-            ATTR_REF = "ref",
-            ATTR_VALUE ="value",
-            ATTR_NAME = "name",
-            ATTR_OFFSET = "offset",
-            ATTR_LENGTH = "length",
-            ATTR_TYPE = "type",
-            ATTR_EXP = "exp",
-            ATTR_OFFSET_TYPE = "offset-type",
-            ATTR_HANDLER = "handler";
+            ATTR_OFFSET = ":offset",
+            ATTR_LENGTH = ":length",
+            ATTR_TYPE = ":type",
+            ATTR_EXP = ":exp",
+            ATTR_HANDLER = ":handler";
 
 }

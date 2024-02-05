@@ -27,8 +27,6 @@ public class JSerialCommClient {
      */
     private SerialPort serialPort;
 
-
-
     /**
      * Find the serial port available on the current machine
      *
@@ -107,7 +105,7 @@ public class JSerialCommClient {
      * @param msgBuf the msg buf
      * @apiNote when you send message under higher baud-rate, and then you always lose bytes, please try this method
      */
-    public void sendSync(ByteBuf msgBuf) {
+    public void sendAndReleaseSync(ByteBuf msgBuf) {
         try {
             byte[] bytes = new byte[msgBuf.readableBytes()];
             msgBuf.readBytes(bytes);
@@ -125,7 +123,7 @@ public class JSerialCommClient {
      *
      * @param msgBuf the msg buf
      */
-    public void send(ByteBuf msgBuf) {
+    public void sendAndRelease(ByteBuf msgBuf) {
         try {
             byte[] bytes = new byte[msgBuf.readableBytes()];
             msgBuf.readBytes(bytes);
