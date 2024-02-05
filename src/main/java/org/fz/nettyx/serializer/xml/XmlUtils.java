@@ -1,17 +1,22 @@
 package org.fz.nettyx.serializer.xml;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import lombok.experimental.UtilityClass;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-
-import java.util.*;
-import java.util.function.Predicate;
-
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
 import static java.util.stream.Collectors.toCollection;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_REF;
+
+import cn.hutool.core.text.CharSequenceUtil;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import lombok.experimental.UtilityClass;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 
 
 /**
@@ -22,6 +27,13 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_REF;
 
 @UtilityClass
 public class XmlUtils {
+
+    public static String name(Element element) {
+        if (element == null) {
+            return EMPTY;
+        }
+        return element.getName();
+    }
 
     public static String textTrim(Element element) {
         if (element == null) {
