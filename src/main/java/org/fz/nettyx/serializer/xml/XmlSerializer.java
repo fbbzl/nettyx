@@ -57,7 +57,7 @@ public final class XmlSerializer implements Serializer {
                 // new handler and invoke method
 
             } else if (type.isNumber()) {
-                addNumberEl(model);
+                addNumberEl(prop, model);
             } else if (type.isString()) {
 
             } else if (type.isArray()) {
