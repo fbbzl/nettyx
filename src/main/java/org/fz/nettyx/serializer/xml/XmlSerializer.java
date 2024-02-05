@@ -75,7 +75,7 @@ public final class XmlSerializer implements Serializer {
      * @return
      */
     ByteBuf toByteBuf() {
-        new BufferedElement(null)
+        BufferedElement bufferedElement = new BufferedElement("");
 
         return null;
     }
