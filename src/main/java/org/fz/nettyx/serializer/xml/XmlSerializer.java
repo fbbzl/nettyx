@@ -1,23 +1,25 @@
 package org.fz.nettyx.serializer.xml;
 
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import java.io.File;
-import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
-import org.dom4j.io.SAXWriter;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.xml.element.BufferedElement;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
-import org.fz.nettyx.serializer.xml.element.Type;
+import org.fz.nettyx.serializer.xml.element.Prop.Type;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Arrays;
 
 
 /**
@@ -41,32 +43,35 @@ public final class XmlSerializer implements Serializer {
     /**
      * return a document with a model
      *
-     * @return
      */
     Document parseDoc() {
-        SAXWriter saxWriter = new SAXWriter();
-        Document document = new DOMDocument();
-        Element model = new DOMElement(EL_MODEL);
-
-        document.setRootElement(model);
+        Element rootModel = new DOMElement(model.getName());
+        Document document = DocumentHelper.createDocument(rootModel);
 
         // 生成一个只带有Model的xml document文件最好是
         for (Prop prop : getModel().getProps()) {
+            Element propEl = new DOMElement(prop.getName());
             Type type = prop.getType();
 
             if (prop.useHandler()) {
                 // new handler and invoke method
 
             } else if (type.isNumber()) {
-                addNumberEl(prop, model);
+                propEl.setText("isNumber");
             } else if (type.isString()) {
-
+                propEl.setText("isString");
+            } else if (type.isEnum()) {
+                propEl.setText("isEnum");
+            } else if (type.isSwitch()) {
+                propEl.setText("isSwitch");
             } else if (type.isArray()) {
-
+                propEl.setText("isArray");
             }
+
+            rootModel.add(propEl);
         }
 
-        return null;
+        return document;
     }
 
     /**
@@ -75,26 +80,40 @@ public final class XmlSerializer implements Serializer {
      * @return
      */
     ByteBuf toByteBuf() {
-        BufferedElement bufferedElement = new BufferedElement("");
+
 
         return null;
     }
 
     //*******************************           private start             ********************************************//
 
-    private void addNumberEl(Prop prop, Element model) {
+    private static void writeXml(Writer writer, Document doc) throws IOException {
+        OutputFormat format = OutputFormat.createPrettyPrint();
+
+        XMLWriter xmlWriter = new XMLWriter(writer, format);
+
+        xmlWriter.write(doc);
+
+        xmlWriter.close();
 
     }
 
     //*******************************           private end             ********************************************//
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         File file = new File("C:\\Users\\fengbinbin\\Desktop\\school.xml");
         File file2 = new File("C:\\Users\\fengbinbin\\Desktop\\bank.xml");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
         byte[] bytes = new byte[100];
         Arrays.fill(bytes, (byte) 1);
-        XmlSerializer.read(Unpooled.wrappedBuffer(bytes), XmlSerializerContext.findModel("bank", "bankcard"));
+        Model model1 = XmlSerializerContext.findModel("bkca");
+        Document doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
+
+        FileWriter fileWriter = new FileWriter("C:\\Users\\fengbinbin\\Desktop\\asdfasdf.xml");
+        writeXml(fileWriter, doc);
+        System.err.println();
     }
+
+
 }
