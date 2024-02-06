@@ -2,50 +2,51 @@
 
 <root namespace="school">
 
-    <model-mappings>
-        <model-mapping value="1">student</model-mapping>
-        <model-mapping value="MAIl">teacher</model-mapping>
-    </model-mappings>
+    <model-mapping>
+        <student>stu</student>
+        <teacher>teac</teacher>
+    </model-mapping>
 
-    <enums>
-        <enum ref="country">
+    <enum>
+        <country>
             CHINA,
             USA,
             JAPAN
-        </enum>
+        </country>
+
         <enum ref="gender">
             FEMAIL,
             MAIl
         </enum>
-    </enums>
+    </enum>
 
     <!--建议使用专门的xml来保存协议中所有开关-->
-    <switches>
-        <switch ref="course">
+    <switch>
+        <course>
             NATURAL,
             MEDICINE,
             NOTUSED
-        </switch>
-    </switches>
+        </course>
+    </switch>
 
-    <models>
+    <model>
         <student>
             <id :offset="0" :length="2" :type="string(utf8)"/>
-            <age :offset="0" :length="2" :type="number(2,0)"/>
+            <age :offset="2" :length="1" :type="number(2,0)"/>
             <name :offset="3" :length="2" :type="string(utf8)" :exp="*100"/>
-            <gender :offset="2" :length="1" :enum="{{gender}}(ordinary)"/>
-            <country :offset="25" :length="2" :enum="{{country}}(name)"/>
-            <maincourse :offset="27" :length="1" :switch="{{course}}(ordinary)"/>
-            <phonenums :offset="28" :length="22" :type="string(utf8)[2]"/>
-            <secondarycourses :offset="72" :length="20" :switch="{{course}}[2](name)"/>
-            <address :offset="0" :length="2" :type="string(utf8)"/>
+            <gender :offset="5" :length="1" :type="enum(gender)"/>
+            <country :offset="6" :length="2" :type="enum(country)"/>
+            <maincourse :offset="8" :length="1" :type="switch(course)"/>
+            <phonenums :offset="9" :length="4" :type="string(utf8)[2]"/>
+            <secondarycourses :offset="13" :length="8" :type="switch(course)[2]"/>
+            <address :offset="21" :length="2" :type="string(utf8)"/>
         </student>
 
         <teacher>
             <id :offset="92" :length="2" :type="asciistring"/>
             <name :offset="94" :length="2" :type="number(2,0)" :exp="*100"/>
         </teacher>
-    </models>
+    </model>
 </root>
 
 

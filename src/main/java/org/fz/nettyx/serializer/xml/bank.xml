@@ -2,25 +2,33 @@
 
 <root namespace="bank">
 
-    <model-mappings>
-        <model-mapping value="bank">bankcard</model-mapping>
-    </model-mappings>
+    <model-mapping>
+        <bankcard>bkca</bankcard>
+    </model-mapping>
 
-    <enums>
-        <enum ref="bank">
+    <enum>
+        <bank>
             CCB,
             ICBC,
             PBC,
             BOC
-        </enum>
-    </enums>
+        </bank>
+    </enum>
 
-    <models>
+    <switch>
+        <status>
+            TRUE,
+            FALSE
+        </status>
+    </switch>
+
+    <model>
         <bankcard>
-            <bankname :offset="0" :length="2" :enum="{{bank}}(ordinary)"/>
+            <bankname :offset="0" :length="2" :type="enum(bank)"/>
             <cardnumber :offset="2" :length="10" :type="number(12,0)"/>
+            <maincourse :offset="12" :length="1" :type="switch(status)"/>
         </bankcard>
-    </models>
+    </model>
 </root>
 
 

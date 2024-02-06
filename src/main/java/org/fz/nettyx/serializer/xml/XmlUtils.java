@@ -1,22 +1,15 @@
 package org.fz.nettyx.serializer.xml;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
-import static java.util.stream.Collectors.toCollection;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_REF;
-
-import cn.hutool.core.text.CharSequenceUtil;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
 
 /**
@@ -27,6 +20,11 @@ import org.dom4j.Element;
 
 @UtilityClass
 public class XmlUtils {
+
+
+    public static String namespace(Element root) {
+        return XmlUtils.attrValue(root, NAMESPACE);
+    }
 
     public static String name(Element element) {
         if (element == null) {
@@ -67,21 +65,11 @@ public class XmlUtils {
         return element.elements(name);
     }
 
-    public static void putConst(Element rootElement, String boundary, String name, Map<String, Set<String>> map) {
-        for (Iterator<Element> it = rootElement.elementIterator(boundary); it.hasNext(); ) {
-            for (Element enumEl : it.next().elements(name)) {
-                if (enumEl == null) {
-                    continue;
-                }
-
-                String enumRef = enumEl.attribute(ATTR_REF).getValue();
-
-                map.putIfAbsent(enumRef,
-                    Arrays.stream(splitToArray(enumEl.getTextTrim(), ",")).map(CharSequenceUtil::removeAllLineBreaks)
-                        .map(CharSequenceUtil::cleanBlank).collect(toCollection(LinkedHashSet::new)));
-            }
+    public static List<Element> elements(Element element) {
+        if (element == null) {
+            return Collections.emptyList();
         }
+        return element.elements();
     }
-
 
 }
