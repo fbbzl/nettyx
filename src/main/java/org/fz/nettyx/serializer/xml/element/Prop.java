@@ -3,18 +3,15 @@ package org.fz.nettyx.serializer.xml.element;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_NAME;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET_TYPE;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import java.util.regex.Pattern;
 import lombok.Data;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.xml.XmlUtils;
-
-import java.util.regex.Pattern;
 
 /**
  * @author fengbinbin
