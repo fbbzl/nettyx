@@ -8,17 +8,13 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
-import org.fz.nettyx.serializer.xml.element.Prop.Type;
+import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Arrays;
 
 
@@ -42,16 +38,14 @@ public final class XmlSerializer implements Serializer {
 
     /**
      * return a document with a model
-     *
      */
     Document parseDoc() {
         Element rootModel = new DOMElement(model.getName());
         Document document = DocumentHelper.createDocument(rootModel);
 
-        // 生成一个只带有Model的xml document文件最好是
         for (Prop prop : getModel().getProps()) {
             Element propEl = new DOMElement(prop.getName());
-            Type type = prop.getType();
+            PropType type = prop.getType();
 
             if (prop.useHandler()) {
                 // new handler and invoke method
@@ -66,6 +60,8 @@ public final class XmlSerializer implements Serializer {
                 propEl.setText("isSwitch");
             } else if (type.isArray()) {
                 propEl.setText("isArray");
+            } else {
+                throw new IllegalArgumentException("can not handle type [" + type + "]");
             }
 
             rootModel.add(propEl);
@@ -81,21 +77,18 @@ public final class XmlSerializer implements Serializer {
      */
     ByteBuf toByteBuf() {
 
-
         return null;
     }
 
     //*******************************           private start             ********************************************//
 
-    private static void writeXml(Writer writer, Document doc) throws IOException {
-        OutputFormat format = OutputFormat.createPrettyPrint();
+    private String toNumber(Prop prop) {
+        byte[] bytes = new byte[prop.getLength()];
+        getByteBuf().readBytes(bytes);
 
-        XMLWriter xmlWriter = new XMLWriter(writer, format);
 
-        xmlWriter.write(doc);
 
-        xmlWriter.close();
-
+        return null;
     }
 
     //*******************************           private end             ********************************************//
@@ -110,10 +103,7 @@ public final class XmlSerializer implements Serializer {
         Model model1 = XmlSerializerContext.findModel("bkca");
         Document doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
 
-        FileWriter fileWriter = new FileWriter("C:\\Users\\fengbinbin\\Desktop\\asdfasdf.xml");
-        writeXml(fileWriter, doc);
-        System.err.println();
+        System.err.println(doc.asXML());
     }
-
 
 }
