@@ -1,18 +1,8 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
-import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
-
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.CombinedChannelDuplexHandler;
+import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
-import java.net.SocketAddress;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,8 +10,15 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelExceptionAction;
 import org.fz.nettyx.exception.ClosingChannelException;
+import org.fz.nettyx.handler.ExceptionHandler.SimpleInboundExceptionHandler;
+import org.fz.nettyx.handler.ExceptionHandler.SimpleOutboundExceptionHandler;
 import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
 import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
+
+import java.net.SocketAddress;
+
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.READ_TIME_OUT;
+import static org.fz.nettyx.handler.AdvisableChannelInitializer.WRITE_TIME_OUT;
 
 /**
  * The type Exception handler.
@@ -30,7 +27,7 @@ import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
  * @version 1.0
  * @since 2 /9/2022 1:18 PM
  */
-public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHandler.InboundExceptionHandler, ExceptionHandler.OutboundExceptionHandler> {
+public class ExceptionHandler extends CombinedChannelDuplexHandler<SimpleInboundExceptionHandler, SimpleOutboundExceptionHandler> {
 
     /**
      * Instantiates a new Exception handler.
@@ -38,7 +35,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
      * @param inboundHandler  the inbound handler
      * @param outboundHandler the outbound handler
      */
-    public ExceptionHandler(InboundExceptionHandler inboundHandler, OutboundExceptionHandler outboundHandler) {
+    public ExceptionHandler(SimpleInboundExceptionHandler inboundHandler, SimpleOutboundExceptionHandler outboundHandler) {
         super(inboundHandler, outboundHandler);
     }
 
@@ -49,7 +46,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
     @Slf4j
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class InboundExceptionHandler extends ChannelInboundHandlerAdapter {
+    public static class SimpleInboundExceptionHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public boolean isSharable() {
@@ -94,7 +91,7 @@ public class ExceptionHandler extends CombinedChannelDuplexHandler<ExceptionHand
     @Slf4j
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
+    public static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
 
         @Override
         public boolean isSharable() {

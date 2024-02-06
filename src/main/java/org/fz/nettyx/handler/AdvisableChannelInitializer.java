@@ -7,8 +7,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.Getter;
-import org.fz.nettyx.handler.ExceptionHandler.InboundExceptionHandler;
-import org.fz.nettyx.handler.ExceptionHandler.OutboundExceptionHandler;
+import org.fz.nettyx.handler.ExceptionHandler.SimpleInboundExceptionHandler;
+import org.fz.nettyx.handler.ExceptionHandler.SimpleOutboundExceptionHandler;
 import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.handler.advice.OutboundAdvice;
@@ -60,8 +60,8 @@ public abstract class AdvisableChannelInitializer<C extends Channel> extends Cha
 
     private final InboundAdvice inboundAdvice;
     private final OutboundAdvice outboundAdvice;
-    private final InboundExceptionHandler    inboundExceptionHandler  = new InboundExceptionHandler();
-    private final OutboundExceptionHandler   outboundExceptionHandler = new OutboundExceptionHandler();
+    private final SimpleInboundExceptionHandler inboundExceptionHandler  = new SimpleInboundExceptionHandler();
+    private final SimpleOutboundExceptionHandler outboundExceptionHandler = new SimpleOutboundExceptionHandler();
     private ActionableIdleStateHandler readIdleStateHandler, writeIdleStateHandler;
     private       ReadTimeoutHandler         readTimeoutHandler;
     private       WriteTimeoutHandler        writeTimeoutHandler;
