@@ -12,16 +12,10 @@ public class Dtd {
 
     public static final String NAMESPACE = "namespace", NAMESPACE_SYMBOL = ".";
 
-    public static final String
-            EL_MODELS = "model",
-            EL_ENUMS = "enum",
-            EL_SWITCHES = "switch",
-            EL_MODEL_MAPPINGS = "model-mapping";
-
-
-    public static final String
-            LE = "le",
-            BE = "be";
+    public static final String EL_MODEL = "model",
+            EL_ENUM = "enum",
+            EL_SWITCH = "switch",
+            EL_MODEL_MAPPING = "model-mapping";
 
     public static final String
             ATTR_OFFSET = ":offset",

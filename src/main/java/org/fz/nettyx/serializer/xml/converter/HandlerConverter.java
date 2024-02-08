@@ -5,15 +5,16 @@ import org.fz.nettyx.serializer.xml.element.Prop;
 
 /**
  * TODO
- *
  * @author fengbinbin
  * @version 1.0
- * @since 2024/2/6 22:30
+ * @since 2024/2/14 8:06
  */
-public class ArrayConverter implements TypeConverter<String[]> {
+public class HandlerConverter implements TypeConverter<String> {
 
     @Override
-    public String[] convert(Prop prop, ByteBuf byteBuf) {
+    public String convert(Prop prop, ByteBuf byteBuf) {
+
+
         return null;
     }
 }
