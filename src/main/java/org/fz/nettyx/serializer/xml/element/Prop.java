@@ -1,18 +1,26 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
+import static cn.hutool.core.text.CharSequenceUtil.subBetween;
+import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
+import static org.fz.nettyx.serializer.xml.XmlUtils.name;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
+
 import cn.hutool.core.text.CharSequenceUtil;
+import java.util.regex.Pattern;
 import lombok.Data;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.fz.nettyx.serializer.xml.converter.NumberConverter;
 import org.fz.nettyx.util.BytesKit;
 import org.fz.nettyx.util.BytesKit.Endian;
-
-import java.util.regex.Pattern;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
-import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
-import static org.fz.nettyx.serializer.xml.XmlUtils.name;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 
 /**
@@ -62,35 +70,31 @@ public class Prop {
         public static final Pattern TYPE_ARGS_PATTERN = Pattern.compile("^(.+)\\(.+\\)$");
 
         private final String[] typeArgs;
-        private final String type;
+        private final String value;
+        private boolean isArray;
 
         public PropType(String typeText) {
             boolean hasTypeArgs = TYPE_ARGS_PATTERN.matcher(typeText).matches();
 
             this.typeArgs = hasTypeArgs ? splitToArray(subBetween(typeText, "(", ")"), ",") : new String[0];
-
-            this.type = subBefore(typeText, "(", false);
+            this.value = subBefore(typeText, "(", false);
+            this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
         }
 
         public boolean isNumber() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "number");
+            return NumberConverter.convertible(getValue()) && !isArray();
         }
 
         public boolean isString() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "string");
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
         }
 
         public boolean isEnum() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "enum");
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "enum") && !isArray();
         }
 
         public boolean isSwitch() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "switch");
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "switch") && !isArray();
         }
-
-        public boolean isArray() {
-            return ARRAY_PATTERN.matcher(getType()).matches();
-        }
-
     }
 }
