@@ -7,6 +7,13 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
-import org.fz.nettyx.util.HexBins;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
+import org.fz.nettyx.util.Hexs;
 
 /**
  * used to escape messages
@@ -123,8 +126,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
          * @return Buffer after escaped
          */
         public static EscapeMap mapEachHex(String[] realHexes, String[] replacementHexes) {
-            ByteBuf[] realBuffers = Stream.of(realHexes).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacementHexes).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
+            ByteBuf[] realBuffers = Stream.of(realHexes).map(Hexs::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
+                    replacementBuffers = Stream.of(replacementHexes).map(Hexs::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -192,7 +195,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
          * @return the escape map
          */
         public static EscapeMap mapHex(String realHex, String replacementHex) {
-            return map(HexBins.decode(realHex), HexBins.decode(replacementHex));
+            return map(Hexs.decode(realHex), Hexs.decode(replacementHex));
         }
 
         /**
