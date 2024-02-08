@@ -21,7 +21,23 @@ public class NumberConverter implements TypeConverter {
         Endian endianKit = prop.getEndianKit();
 
 
+
         return null;
     }
+
+    //************************************            private start              *************************************//
+
+    private int getIntes() {
+
+    }
+
+
+    private int getIntes() {
+
+    }
+
+
+
+    //************************************            private end                *************************************//
 
 }
