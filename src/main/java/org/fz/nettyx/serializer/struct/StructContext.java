@@ -1,14 +1,15 @@
 package org.fz.nettyx.serializer.struct;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
+import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -17,16 +18,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.util.ClassUtil.isAbstractOrInterface;
-import static cn.hutool.core.util.ClassUtil.isEnum;
-import static org.fz.nettyx.serializer.struct.PropertyHandler.getTargetAnnotationType;
+import lombok.experimental.UtilityClass;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The type Struct cache.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2021 /10/22 13:18
  */
-final class StructScanner {
+@UtilityClass
+@SuppressWarnings("all")
+final class StructContext {
 
     /**
      * reflection cache
@@ -39,9 +44,10 @@ final class StructScanner {
     /**
      * mapping handler and annotation
      */
-    static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new SafeConcurrentHashMap<>();
+    static final Map<Class<? extends Annotation>, Class<? extends PropertyHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
 
     static {
+        // TODO 在构造函数中进行扫描, 虽然会增加使用难度, 但是效率高了很多,且使用统一的使用方式
         doScan(EMPTY);
     }
 
@@ -53,8 +59,7 @@ final class StructScanner {
     public static synchronized void doScan(String... packageNames) {
         try {
             for (String packageName : packageNames) {
-                Set<Class<?>> classes =
-                        ClassScanner.scanPackage(packageName, clazz -> !isEnum(clazz) && !isAbstractOrInterface(clazz));
+                Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
                 scanAllHandlers(classes);
                 scanAllBasics(classes);
@@ -72,7 +77,7 @@ final class StructScanner {
             if (isPropertyHandler) {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                 if (targetAnnotationType != null) {
-                    ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(targetAnnotationType,
+                    ANNOTATION_HANDLER_MAPPING.putIfAbsent(targetAnnotationType,
                             (Class<? extends PropertyHandler<? extends Annotation>>) clazz);
 
                     ReflectUtil.getConstructor(clazz);
@@ -111,7 +116,4 @@ final class StructScanner {
         }
     }
 
-    private StructScanner() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
 }

@@ -14,10 +14,10 @@
             JAPAN
         </country>
 
-        <enum ref="gender">
+        <gender>
             FEMAIL,
             MAIl
-        </enum>
+        </gender>
     </enum>
 
     <!--建议使用专门的xml来保存协议中所有开关-->
@@ -31,20 +31,20 @@
 
     <model>
         <student>
-            <id :offset="0" :length="2" :type="string(utf8)"/>
-            <age :offset="2" :length="1" :type="number(2,0)"/>
-            <name :offset="3" :length="2" :type="string(utf8)" :exp="*100"/>
+            <id :offset="0" :length="2" :type="string(utf-8)"/>
+            <age :offset="2" :length="1" :type="byte"/>
+            <name :offset="3" :length="2" :type="string(utf-8)" :exp="$v/100"/>
             <gender :offset="5" :length="1" :type="enum(gender)"/>
             <country :offset="6" :length="2" :type="enum(country)"/>
             <maincourse :offset="8" :length="1" :type="switch(course)"/>
-            <phonenums :offset="9" :length="4" :type="string(utf8)[2]"/>
+            <phonenums :offset="9" :length="4" :type="string(utf-8)[2]"/>
             <secondarycourses :offset="13" :length="8" :type="switch(course)[2]"/>
-            <address :offset="21" :length="2" :type="string(utf8)"/>
+            <address :offset="21" :length="2" :type="string(utf-8)"/>
         </student>
 
         <teacher>
-            <id :offset="92" :length="2" :type="asciistring"/>
-            <name :offset="94" :length="2" :type="number(2,0)" :exp="*100"/>
+            <id :offset="92" :length="2" :type="string(us-ascii)"/>
+            <name :offset="94" :length="2" :type="int" :exp="$v*100"/>
         </teacher>
     </model>
 </root>
