@@ -4,12 +4,29 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.element.Prop;
 
 /**
+ * The interface Type converter.
+ *
  * @author fengbinbin
  * @version 1.0
- * @since 2024/2/7 10:51
+ * @since 2024 /2/7 10:51
  */
+@SuppressWarnings("unchecked")
 public interface TypeConverter {
 
+    /**
+     * Convert r.
+     *
+     * @param prop the prop
+     * @param byteBuf the byte buf
+     * @return the r
+     */
     String convert(Prop prop, ByteBuf byteBuf);
+
+    default byte[] readBytes(Prop prop, ByteBuf byteBuf) {
+        // TODO 相对位置 和 绝对位置
+        byte[] bytes = new byte[prop.getLength()];
+        byteBuf.readBytes(bytes);
+        return bytes;
+    }
 
 }
