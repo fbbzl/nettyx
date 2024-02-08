@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.xml.converter;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.annotation.Type;
 import org.fz.nettyx.serializer.xml.element.Prop;
+import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 import org.fz.nettyx.util.BytesKit.Endian;
 
 /**
@@ -27,13 +28,17 @@ public class NumberConverter implements TypeConverter {
 
     //************************************            private start              *************************************//
 
-    private int getIntes() {
+    private int getIntDigests(Prop prop) {
+        PropType type = prop.getType();
+        String[] typeArgs = type.getTypeArgs();
+        typeArgs
 
     }
 
 
-    private int getIntes() {
-
+    private int getDecimalDigests(Prop prop) {
+        PropType type = prop.getType();
+        String[] typeArgs = type.getTypeArgs();
     }
 
 
