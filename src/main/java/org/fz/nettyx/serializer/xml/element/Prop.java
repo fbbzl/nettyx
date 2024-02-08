@@ -4,15 +4,18 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Data;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.fz.nettyx.serializer.xml.converter.NumberConverter;
 import org.fz.nettyx.util.BytesKit;
 import org.fz.nettyx.util.BytesKit.Endian;
 
 import java.util.regex.Pattern;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
+import static com.sun.org.apache.bcel.internal.Const.EMPTY_STRING_ARRAY;
 import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
 import static org.fz.nettyx.serializer.xml.XmlUtils.name;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
+import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
 
 
 /**
@@ -62,35 +65,35 @@ public class Prop {
         public static final Pattern TYPE_ARGS_PATTERN = Pattern.compile("^(.+)\\(.+\\)$");
 
         private final String[] typeArgs;
-        private final String type;
+        private final String value;
+        private boolean isArray;
+        private int arrayLength;
 
         public PropType(String typeText) {
             boolean hasTypeArgs = TYPE_ARGS_PATTERN.matcher(typeText).matches();
 
-            this.typeArgs = hasTypeArgs ? splitToArray(subBetween(typeText, "(", ")"), ",") : new String[0];
-
-            this.type = subBefore(typeText, "(", false);
+            this.typeArgs = hasTypeArgs ? splitToArray(subBetween(typeText, "(", ")"), ",") : EMPTY_STRING_ARRAY;
+            this.value = subBefore(typeText, "(", false);
+            this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
+            if (this.isArray) {
+                this.arrayLength = Integer.parseInt(subBetween(typeText, "[", "]"));
+            }
         }
 
         public boolean isNumber() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "number");
+            return NumberConverter.convertible(getValue()) && !isArray();
         }
 
         public boolean isString() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "string");
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
         }
 
         public boolean isEnum() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "enum");
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "enum") && !isArray();
         }
 
         public boolean isSwitch() {
-            return CharSequenceUtil.startWithIgnoreCase(getType(), "switch");
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "switch") && !isArray();
         }
-
-        public boolean isArray() {
-            return ARRAY_PATTERN.matcher(getType()).matches();
-        }
-
     }
 }

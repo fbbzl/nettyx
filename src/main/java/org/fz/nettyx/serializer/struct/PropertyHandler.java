@@ -1,17 +1,22 @@
 package org.fz.nettyx.serializer.struct;
 
-import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.StructSerializer.readBasic;
+import static org.fz.nettyx.serializer.struct.StructSerializer.readStruct;
+import static org.fz.nettyx.serializer.struct.StructSerializer.writeBasic;
+import static org.fz.nettyx.serializer.struct.StructSerializer.writeStruct;
 
+import cn.hutool.core.util.ClassUtil;
+import io.netty.buffer.ByteBuf;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructSerializer.*;
+import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The top-level parent class of all custom serialization processors
@@ -22,13 +27,8 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.*;
 @SuppressWarnings("all")
 public interface PropertyHandler<A extends Annotation> {
 
-    default <T extends Annotation> boolean isTargetAnnotation(Class<T> otherAnnotationType) {
-        Class<Annotation> targetAnnotationType = getTargetAnnotationType(this.getClass());
-        return targetAnnotationType == otherAnnotationType;
-    }
-
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
-        if (clazz.isEnum() || clazz.isInterface()) {
+        if (!ClassUtil.isNormalClass(clazz)) {
             return null;
         }
 

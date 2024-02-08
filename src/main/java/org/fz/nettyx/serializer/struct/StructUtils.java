@@ -1,5 +1,13 @@
 package org.fz.nettyx.serializer.struct;
 
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.ANNOTATION_HANDLER_MAPPING;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.BASIC_BYTES_SIZE_CACHE;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.FIELD_READER_CACHE;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.FIELD_WRITER_CACHE;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
@@ -8,21 +16,20 @@ import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.function.Predicate;
-
-import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
-import static org.fz.nettyx.serializer.struct.StructScanner.*;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 
 
 /**
@@ -66,7 +73,7 @@ public class StructUtils {
     public <A extends Annotation> A findHandlerAnnotation(AnnotatedElement element) {
         for (Annotation annotation : AnnotationUtil.getAnnotations(element, false)) {
             Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (ANNOTATION_HANDLER_MAPPING_CACHE.containsKey(annotationType)) {
+            if (ANNOTATION_HANDLER_MAPPING.containsKey(annotationType)) {
                 return (A) annotation;
             }
         }
@@ -83,7 +90,7 @@ public class StructUtils {
     public <H extends PropertyHandler<?>> H getHandler(AnnotatedElement element) {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
         if (handlerAnnotation != null) {
-            Class<? extends PropertyHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING_CACHE.get(
+            Class<? extends PropertyHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
                 handlerAnnotation.annotationType());
             return (H) newHandler(handlerClass);
         }
