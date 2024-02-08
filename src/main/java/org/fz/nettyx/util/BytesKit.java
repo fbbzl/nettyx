@@ -1,10 +1,10 @@
 package org.fz.nettyx.util;
 
-import static java.lang.Integer.min;
-import static org.apache.logging.log4j.util.Constants.EMPTY_BYTE_ARRAY;
-
 import cn.hutool.core.util.PrimitiveArrayUtil;
 import lombok.experimental.UtilityClass;
+
+import static java.lang.Integer.min;
+import static org.apache.logging.log4j.util.Constants.EMPTY_BYTE_ARRAY;
 
 /**
  * bytes util
@@ -19,9 +19,58 @@ public class BytesKit {
     public static final BigEndian be = new BigEndian();
     public static final LittleEndian le = new LittleEndian();
     public static final int KB = 1024;
-    public static class BigEndian {
 
-        private BigEndian() { }
+    public interface Endian {
+
+        byte[] fromByteValue(byte bite);
+
+        byte toByteValue(byte[] bytes);
+
+        byte[] fromShortValue(short s);
+
+        short toShortValue(byte[] bytes);
+
+        byte[] fromCharValue(char chr);
+
+        char toCharValue(byte[] bytes);
+
+        byte[] fromIntValue(int i);
+
+        int toIntValue(byte[] bytes);
+
+        byte[] fromLongValue(long l);
+
+        long toLongValue(byte[] bytes);
+
+        int toFloatValue(byte[] b);
+
+        byte[] fromByte(Byte bite);
+
+        byte[] fromShort(Short shot);
+
+        byte[] fromChar(Character character);
+
+        byte[] fromInteger(Integer integer);
+
+        byte[] fromLong(Long lon);
+
+        byte[] fromNumber(Number number);
+
+        short toUnsignedByte(byte[] bytes);
+
+        int toUnsignedShort(byte[] bytes);
+
+        long toUnsignedInt(byte[] bytes);
+
+        float toUnsignedFloat(byte[] bytes);
+
+        byte[] fromNumber(Number number, int assignBytesLength);
+    }
+
+    public static class BigEndian implements Endian {
+
+        private BigEndian() {
+        }
 
         public byte[] fromByteValue(byte bite) {
             byte[] bytes = new byte[1];
@@ -30,7 +79,9 @@ public class BytesKit {
             return bytes;
         }
 
-        public byte toByteValue(byte[] bytes) { return bytes[0]; }
+        public byte toByteValue(byte[] bytes) {
+            return bytes[0];
+        }
 
         public byte[] fromShortValue(short s) {
             byte[] b = new byte[2];
@@ -41,11 +92,17 @@ public class BytesKit {
             return b;
         }
 
-        public short toShortValue(byte[] bytes) { return (short) ((bytes[0] << 8) | bytes[1] & 0xff); }
+        public short toShortValue(byte[] bytes) {
+            return (short) ((bytes[0] << 8) | bytes[1] & 0xff);
+        }
 
-        public byte[] fromCharValue(char chr) { return fromShortValue((short) chr); }
+        public byte[] fromCharValue(char chr) {
+            return fromShortValue((short) chr);
+        }
 
-        public char toCharValue(byte[] bytes) { return (char) toShortValue(bytes); }
+        public char toCharValue(byte[] bytes) {
+            return (char) toShortValue(bytes);
+        }
 
         public byte[] fromIntValue(int i) {
             byte[] b = new byte[4];
@@ -84,40 +141,76 @@ public class BytesKit {
 
         public long toLongValue(byte[] bytes) {
             return (((long) bytes[0] & 0xff) << 56)
-                | (((long) bytes[1] & 0xff) << 48)
-                | (((long) bytes[2] & 0xff) << 40)
-                | (((long) bytes[3] & 0xff) << 32)
-                | (((long) bytes[4] & 0xff) << 24)
-                | (((long) bytes[5] & 0xff) << 16)
-                | (((long) bytes[6] & 0xff) << 8)
-                | ((long) bytes[7] & 0xff);
+                    | (((long) bytes[1] & 0xff) << 48)
+                    | (((long) bytes[2] & 0xff) << 40)
+                    | (((long) bytes[3] & 0xff) << 32)
+                    | (((long) bytes[4] & 0xff) << 24)
+                    | (((long) bytes[5] & 0xff) << 16)
+                    | (((long) bytes[6] & 0xff) << 8)
+                    | ((long) bytes[7] & 0xff);
         }
 
-        public static int  toFloatValue(byte[] b) {
-            return  (b[3] & 0xff) |(b[2] & 0xff) << 8|(b[1] & 0xff) << 16|(b[0] & 0xff) << 24;
+        public int toFloatValue(byte[] b) {
+            return (b[3] & 0xff) | (b[2] & 0xff) << 8 | (b[1] & 0xff) << 16 | (b[0] & 0xff) << 24;
         }
 
-        public byte[] fromByte(Byte bite)          { return be.fromByte(bite);        }
-        public byte[] fromShort(Short shot)        { return be.fromShort(shot);       }
-        public byte[] fromInteger(Integer integer) { return be.fromIntValue(integer); }
-        public byte[] fromLong(Long lon)           { return be.fromLong(lon);         }
+        public byte[] fromByte(Byte bite) {
+            return be.fromByte(bite);
+        }
 
-        public short toUnsignedByte(byte[] bytes)  { return (short) Byte.toUnsignedInt(toByteValue(bytes)); }
-        public int   toUnsignedShort(byte[] bytes) { return Short.toUnsignedInt(toShortValue(bytes));       }
-        public long  toUnsignedInt(byte[] bytes)   { return Integer.toUnsignedLong(toIntValue(bytes));      }
-        public float  toUnsignedFloat(byte[] bytes)   { return  Float.intBitsToFloat(toFloatValue(bytes));      }
+        public byte[] fromShort(Short shot) {
+            return be.fromShort(shot);
+        }
+
+        @Override
+        public byte[] fromChar(Character character) {
+            return be.fromCharValue(character);
+        }
+
+        public byte[] fromInteger(Integer integer) {
+            return be.fromIntValue(integer);
+        }
+
+        public byte[] fromLong(Long lon) {
+            return be.fromLong(lon);
+        }
+
+        public short toUnsignedByte(byte[] bytes) {
+            return (short) Byte.toUnsignedInt(toByteValue(bytes));
+        }
+
+        public int toUnsignedShort(byte[] bytes) {
+            return Short.toUnsignedInt(toShortValue(bytes));
+        }
+
+        public long toUnsignedInt(byte[] bytes) {
+            return Integer.toUnsignedLong(toIntValue(bytes));
+        }
+
+        public float toUnsignedFloat(byte[] bytes) {
+            return Float.intBitsToFloat(toFloatValue(bytes));
+        }
 
         public byte[] fromNumber(Number number) {
-            if (number instanceof Integer) { return be.fromIntValue(number.intValue());     }
-            if (number instanceof Short)   { return be.fromShortValue(number.shortValue()); }
-            if (number instanceof Long)    { return be.fromLongValue(number.longValue());   }
-            if (number instanceof Byte)    { return be.fromByteValue(number.byteValue());   }
+            if (number instanceof Integer) {
+                return be.fromIntValue(number.intValue());
+            }
+            if (number instanceof Short) {
+                return be.fromShortValue(number.shortValue());
+            }
+            if (number instanceof Long) {
+                return be.fromLongValue(number.longValue());
+            }
+            if (number instanceof Byte) {
+                return be.fromByteValue(number.byteValue());
+            }
 
-            throw new UnsupportedOperationException("can not create byte array by number [" + number +"]");
+            throw new UnsupportedOperationException("can not create byte array by number [" + number + "]");
         }
 
         /**
          * cut more and less make up
+         *
          * @return byte array of specified length
          */
         public byte[] fromNumber(Number number, int assignBytesLength) {
@@ -135,9 +228,11 @@ public class BytesKit {
         }
     }
 
-    public static class LittleEndian {
-        private LittleEndian() { }
+    public static class LittleEndian implements Endian {
+        private LittleEndian() {
+        }
 
+        @Override
         public byte[] fromByteValue(byte bite) {
             byte[] bytes = new byte[1];
             bytes[0] = bite;
@@ -145,8 +240,12 @@ public class BytesKit {
             return bytes;
         }
 
-        public byte toByteValue(byte[] bytes) { return bytes[0]; }
+        @Override
+        public byte toByteValue(byte[] bytes) {
+            return bytes[0];
+        }
 
+        @Override
         public byte[] fromShortValue(short s) {
             byte[] b = new byte[2];
 
@@ -156,12 +255,22 @@ public class BytesKit {
             return b;
         }
 
-        public short toShortValue(byte[] bytes) { return (short) ((bytes[1] << 8) | bytes[0] & 0xff); }
+        @Override
+        public short toShortValue(byte[] bytes) {
+            return (short) ((bytes[1] << 8) | bytes[0] & 0xff);
+        }
 
-        public byte[] fromCharValue(char chr) { return fromShortValue((short) chr); }
+        @Override
+        public byte[] fromCharValue(char chr) {
+            return fromShortValue((short) chr);
+        }
 
-        public char toCharValue(byte[] bytes) { return (char)toShortValue(bytes); }
+        @Override
+        public char toCharValue(byte[] bytes) {
+            return (char) toShortValue(bytes);
+        }
 
+        @Override
         public byte[] fromIntValue(int i) {
             byte[] b = new byte[4];
 
@@ -173,6 +282,7 @@ public class BytesKit {
             return b;
         }
 
+        @Override
         public int toIntValue(byte[] bytes) {
             int int1 = bytes[0] & 0xff;
             int int2 = (bytes[1] & 0xff) << 8;
@@ -182,6 +292,7 @@ public class BytesKit {
             return int1 | int2 | int3 | int4;
         }
 
+        @Override
         public byte[] fromLongValue(long l) {
             byte[] b = new byte[8];
 
@@ -197,45 +308,92 @@ public class BytesKit {
             return b;
         }
 
+        @Override
         public long toLongValue(byte[] bytes) {
             return ((long) bytes[0] & 0xff)
-                | (((long) bytes[1] & 0xff) << 8)
-                | (((long) bytes[2] & 0xff) << 16)
-                | (((long) bytes[3] & 0xff) << 24)
-                | (((long) bytes[4] & 0xff) << 32)
-                | (((long) bytes[5] & 0xff) << 40)
-                | (((long) bytes[6] & 0xff) << 48)
-                | (((long) bytes[7] & 0xff) << 56);
+                    | (((long) bytes[1] & 0xff) << 8)
+                    | (((long) bytes[2] & 0xff) << 16)
+                    | (((long) bytes[3] & 0xff) << 24)
+                    | (((long) bytes[4] & 0xff) << 32)
+                    | (((long) bytes[5] & 0xff) << 40)
+                    | (((long) bytes[6] & 0xff) << 48)
+                    | (((long) bytes[7] & 0xff) << 56);
         }
 
-        public static int  toFloatValue(byte[] b) {
-            return  (b[0] & 0xff) |(b[1] & 0xff) << 8|(b[2] & 0xff) << 16|(b[3] & 0xff) << 24;
+        @Override
+        public int toFloatValue(byte[] b) {
+            return (b[0] & 0xff) | (b[1] & 0xff) << 8 | (b[2] & 0xff) << 16 | (b[3] & 0xff) << 24;
         }
 
-        public byte[] fromByte(Byte bite)           { return le.fromByteValue(bite);      }
-        public byte[] fromShort(Short shot)         { return le.fromShortValue(shot);     }
-        public byte[] fromChar(Character character) { return le.fromCharValue(character); }
-        public byte[] fromInteger(Integer integer)  { return le.fromIntValue(integer);    }
-        public byte[] fromLong(Long lon)            { return le.fromLongValue(lon);       }
+        @Override
+        public byte[] fromByte(Byte bite) {
+            return le.fromByteValue(bite);
+        }
 
+        @Override
+        public byte[] fromShort(Short shot) {
+            return le.fromShortValue(shot);
+        }
+
+        @Override
+        public byte[] fromChar(Character character) {
+            return le.fromCharValue(character);
+        }
+
+        @Override
+        public byte[] fromInteger(Integer integer) {
+            return le.fromIntValue(integer);
+        }
+
+        @Override
+        public byte[] fromLong(Long lon) {
+            return le.fromLongValue(lon);
+        }
+
+        @Override
         public byte[] fromNumber(Number number) {
-            if (number instanceof Integer) { return le.fromIntValue(number.intValue());     }
-            if (number instanceof Long)    { return le.fromLongValue(number.longValue());   }
-            if (number instanceof Short)   { return le.fromShortValue(number.shortValue()); }
-            if (number instanceof Byte)    { return le.fromByteValue(number.byteValue());   }
+            if (number instanceof Integer) {
+                return le.fromIntValue(number.intValue());
+            }
+            if (number instanceof Long) {
+                return le.fromLongValue(number.longValue());
+            }
+            if (number instanceof Short) {
+                return le.fromShortValue(number.shortValue());
+            }
+            if (number instanceof Byte) {
+                return le.fromByteValue(number.byteValue());
+            }
 
             return EMPTY_BYTE_ARRAY;
         }
 
-        public short toUnsignedByte(byte[] bytes)  { return (short) Byte.toUnsignedInt(toByteValue(bytes)); }
-        public int   toUnsignedShort(byte[] bytes) { return Short.toUnsignedInt(toShortValue(bytes));       }
-        public long  toUnsignedInt(byte[] bytes)   { return Integer.toUnsignedLong(toIntValue(bytes));      }
-        public float toUnsignedFloat(byte[] bytes) { return  Float.intBitsToFloat(toFloatValue(bytes));     }
+        @Override
+        public short toUnsignedByte(byte[] bytes) {
+            return (short) Byte.toUnsignedInt(toByteValue(bytes));
+        }
+
+        @Override
+        public int toUnsignedShort(byte[] bytes) {
+            return Short.toUnsignedInt(toShortValue(bytes));
+        }
+
+        @Override
+        public long toUnsignedInt(byte[] bytes) {
+            return Integer.toUnsignedLong(toIntValue(bytes));
+        }
+
+        @Override
+        public float toUnsignedFloat(byte[] bytes) {
+            return Float.intBitsToFloat(toFloatValue(bytes));
+        }
 
         /**
          * cut more and less make up
+         *
          * @return byte array of specified length
          */
+        @Override
         public byte[] fromNumber(Number number, int assignBytesLength) {
             byte[] numberBytes = fromNumber(number);
             byte[] assignBytes = new byte[assignBytesLength];
@@ -244,7 +402,6 @@ public class BytesKit {
 
             return assignBytes;
         }
-
 
 
     }

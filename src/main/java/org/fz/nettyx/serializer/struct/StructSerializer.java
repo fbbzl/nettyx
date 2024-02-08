@@ -74,9 +74,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> T read(ByteBuf byteBuf, Type rootType) {
-        if (rootType instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).toObject();
+        if (rootType instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).parseStruct();
         else
-        if (rootType instanceof ParameterizedType) return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).toObject();
+        if (rootType instanceof ParameterizedType) return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).parseStruct();
         else
         if (rootType instanceof TypeRefer)         return read(byteBuf, ((TypeRefer<T>) rootType).getType());
         else
@@ -158,7 +158,7 @@ public final class StructSerializer implements Serializer {
      * @param <T> the type parameter
      * @return the t
      */
-    <T> T toObject() {
+    <T> T parseStruct() {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue;
