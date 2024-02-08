@@ -3,7 +3,8 @@ package org.fz.nettyx.serializer.xml.converter;
 /**
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/29 14:54
+ * @since 2024/2/6 22:20
  */
-public class CppConverter extends BytesConverter {
+public class StringConverter {
+
 }

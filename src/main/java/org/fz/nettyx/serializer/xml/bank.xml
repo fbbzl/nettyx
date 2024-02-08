@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<root namespace="bank">
+
+    <model-mapping>
+        <bankcard>0077AA</bankcard>
+    </model-mapping>
+
+    <enum>
+        <bank>
+            CCB,
+            ICBC,
+            PBC,
+            BOC
+        </bank>
+    </enum>
+
+    <switch>
+        <status>
+            TRUE,
+            FALSE
+        </status>
+    </switch>
+
+    <model>
+        <bankcard>
+            <bankname :offset="0" :length="2" :type="enum(bank)"/>
+            <cardnumber :offset="2" :length="10" :type="number(12,0)" :order="le"/>
+            <maincourse :offset="12" :length="1" :type="switch(status)"/>
+        </bankcard>
+    </model>
+</root>
+
+
+
+ 
+
+ 
