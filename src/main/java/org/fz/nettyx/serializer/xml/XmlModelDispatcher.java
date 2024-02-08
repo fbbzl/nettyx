@@ -3,10 +3,11 @@ package org.fz.nettyx.serializer.xml;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
 import org.fz.nettyx.serializer.xml.element.Model;
+
+import java.util.List;
 
 
 /**
@@ -25,7 +26,7 @@ public abstract class XmlModelDispatcher extends MessageToMessageCodec<ByteBuf, 
      * @param buf the buf
      * @return the dispatch key
      */
-    public abstract String getDispatchKey(ByteBuf buf);
+    public abstract String getDispatchHex(ByteBuf buf);
 
     /**
      * Gets message body.
@@ -40,17 +41,13 @@ public abstract class XmlModelDispatcher extends MessageToMessageCodec<ByteBuf, 
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-        String dispatchKey = this.getDispatchKey(msg);
+        String dispatchHex = this.getDispatchHex(msg);
 
-        Model model = XmlSerializerContext.findModel(dispatchKey);
-        if (model == null) {
-            return;
-        }
+        Model model = XmlSerializerContext.findModel(dispatchHex);
+        if (model == null) return;
 
-        Document read = XmlSerializer.read(getMessageBody(msg), model);
-
-        // TODO deal the document
-        System.err.println(read);
+        Document doc = XmlSerializer.read(getMessageBody(msg), model);
+        if (doc != null) out.add(doc);
     }
 
     @Override
