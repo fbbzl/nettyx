@@ -1,7 +1,7 @@
 # nettyx
 
 #### Introduce
-Based on [netty4.1.101. Final], ultra-lightweight packaging has been carried out, providing some tools and basic templates, as well as additional serial communication templates to help you quickly build netty-based server/client applications and serial port based applications
+Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, providing some tools and basic templates, as well as additional serial communication templates to help you quickly build netty-based server/client applications and serial port based applications
 
 #### Installation Tutorial
 1. Add Maven Dependency：
