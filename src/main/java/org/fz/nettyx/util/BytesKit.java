@@ -1,10 +1,10 @@
 package org.fz.nettyx.util;
 
-import cn.hutool.core.util.PrimitiveArrayUtil;
-import lombok.experimental.UtilityClass;
-
 import static java.lang.Integer.min;
 import static org.apache.logging.log4j.util.Constants.EMPTY_BYTE_ARRAY;
+
+import cn.hutool.core.util.PrimitiveArrayUtil;
+import lombok.experimental.UtilityClass;
 
 /**
  * bytes util
@@ -21,6 +21,8 @@ public class BytesKit {
     public static final int KB = 1024;
 
     public interface Endian {
+
+        String getOrder();
 
         byte[] fromByteValue(byte bite);
 
@@ -69,7 +71,11 @@ public class BytesKit {
 
     public static class BigEndian implements Endian {
 
-        private BigEndian() {
+        public static final String BE = "be";
+
+        @Override
+        public String getOrder() {
+            return BE;
         }
 
         public byte[] fromByteValue(byte bite) {
@@ -229,7 +235,12 @@ public class BytesKit {
     }
 
     public static class LittleEndian implements Endian {
-        private LittleEndian() {
+
+        public static final String LE = "le";
+
+        @Override
+        public String getOrder() {
+            return LE;
         }
 
         @Override

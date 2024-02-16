@@ -1,15 +1,14 @@
 package org.fz.nettyx.serializer.xml;
 
-import lombok.experimental.UtilityClass;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+import lombok.experimental.UtilityClass;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 
 
 /**
@@ -22,6 +21,9 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 public class XmlUtils {
 
 
+    /**
+     * You can use namespace to make calls across XML elements
+     */
     public static String namespace(Element root) {
         return XmlUtils.attrValue(root, NAMESPACE);
     }
@@ -31,6 +33,13 @@ public class XmlUtils {
             return EMPTY;
         }
         return element.getName();
+    }
+
+    public static String text(Element element) {
+        if (element == null) {
+            return EMPTY;
+        }
+        return element.getText();
     }
 
     public static String textTrim(Element element) {
