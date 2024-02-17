@@ -2,11 +2,11 @@ package org.fz.nettyx.serializer.struct;
 
 import static org.fz.nettyx.serializer.struct.PropertyHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.PropertyHandler.isWriteHandler;
-import static org.fz.nettyx.serializer.struct.StructContext.ANNOTATION_HANDLER_MAPPING;
-import static org.fz.nettyx.serializer.struct.StructContext.BASIC_BYTES_SIZE_CACHE;
-import static org.fz.nettyx.serializer.struct.StructContext.FIELD_READER_CACHE;
-import static org.fz.nettyx.serializer.struct.StructContext.FIELD_WRITER_CACHE;
 import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.ANNOTATION_HANDLER_MAPPING;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.BASIC_BYTES_SIZE_CACHE;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.FIELD_READER_CACHE;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.FIELD_WRITER_CACHE;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
