@@ -31,7 +31,7 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
  */
 @UtilityClass
 @SuppressWarnings("all")
-final class StructContext {
+final class StructSerializerContext {
 
     /**
      * reflection cache
