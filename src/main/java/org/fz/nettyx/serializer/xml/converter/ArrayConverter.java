@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.xml.converter;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.element.Prop;
+import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 
 /**
  * TODO
@@ -12,8 +13,17 @@ import org.fz.nettyx.serializer.xml.element.Prop;
  */
 public class ArrayConverter implements TypeConverter<String[]> {
 
+    private static final String[] EMPTY_STRING_ARRAY = {};
+
     @Override
     public String[] convert(Prop prop, ByteBuf byteBuf) {
+        PropType type = prop.getType();
+        if (!type.isArray()) {
+            return EMPTY_STRING_ARRAY;
+        }
+
+
+
         return null;
     }
 }
