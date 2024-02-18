@@ -82,6 +82,7 @@ public class Prop {
         }
 
         public boolean isString() {
+            // TODO 改成静态, 然后text和value用或来运算
             return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
         }
 
