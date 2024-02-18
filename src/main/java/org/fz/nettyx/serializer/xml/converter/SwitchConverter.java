@@ -2,14 +2,13 @@ package org.fz.nettyx.serializer.xml.converter;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 import org.fz.nettyx.util.Throws;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
 
 /**
  * @author fengbinbin
@@ -17,6 +16,11 @@ import java.util.List;
  * @since 2024/2/6 22:20
  */
 public class SwitchConverter implements TypeConverter {
+
+    @Override
+    public String forType() {
+        return "switch";
+    }
 
     @Override
     public String convert(Prop prop, ByteBuf byteBuf) {

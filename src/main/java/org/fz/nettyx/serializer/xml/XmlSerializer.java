@@ -1,8 +1,14 @@
 package org.fz.nettyx.serializer.xml;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+
 import cn.hutool.core.lang.Singleton;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.StringJoiner;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
@@ -10,15 +16,11 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.xml.converter.*;
+import org.fz.nettyx.serializer.xml.converter.TypeConverter;
 import org.fz.nettyx.serializer.xml.element.ElementHandler;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Prop.PropType;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 
 
 /**
@@ -65,19 +67,17 @@ public final class XmlSerializer implements Serializer {
                 if (prop.useHandler()) {
                     String handlerClassQName = prop.getHandler();
                     text = ((ElementHandler) (Singleton.get(handlerClassQName))).read(prop, getByteBuf());
-                } else if (NumberConverter.convertible(typeValue)) {
-                    text = NumberConverter.getConverter(prop).convert(prop, getByteBuf());
-                } else if (type.isString()) {
-                    text = Singleton.get(StringConverter.class).convert(prop, getByteBuf());
-                } else if (type.isEnum()) {
-                    text = Singleton.get(EnumConverter.class).convert(prop, getByteBuf());
-                } else if (type.isSwitch()) {
-                    text = Singleton.get(SwitchConverter.class).convert(prop, getByteBuf());
-                } else if (type.isArray()) {
-                    text = Singleton.get(ArrayConverter.class).convert(prop, getByteBuf());
-                } else {
-                    throw new IllegalArgumentException("this type is not recognized [" + type + "]");
                 }
+                else
+                if (type.isArray()) {
+                    text = parseArray(prop, getByteBuf());
+                }
+                else
+                if (XmlSerializerContext.containsType(typeValue)) {
+                    text = XmlSerializerContext.getConverter(typeValue).convert(prop, getByteBuf());
+                }
+                else throw new IllegalArgumentException("this type is not recognized [" + type + "]");
+
                 propEl.setText(text);
                 rootModel.add(propEl);
             } catch (Exception exception) {
@@ -100,6 +100,25 @@ public final class XmlSerializer implements Serializer {
 
     //*******************************           private start             ********************************************//
 
+    private String parseArray(Prop prop, ByteBuf byteBuf) {
+        PropType type = prop.getType();
+        if (!type.isArray()) {
+            return EMPTY;
+        }
+
+        int arrayLength = type.getArrayLength();
+        String typeValue = type.getValue();
+
+        TypeConverter converter = XmlSerializerContext.getConverter(typeValue);
+
+        StringJoiner values = new StringJoiner(",");
+        for (int i = 0; i < arrayLength; i++) {
+            values.add(converter.convert(prop, byteBuf));
+        }
+
+        return values.toString();
+    }
+
     //*******************************           private end             ********************************************//
 
     /**
@@ -109,8 +128,8 @@ public final class XmlSerializer implements Serializer {
      * @throws IOException the io exception
      */
     public static void main(String[] args) throws IOException {
-        File file = new File("C:\\Users\\fengbinbin\\Desktop\\school.xml");
-        File file2 = new File("C:\\Users\\fengbinbin\\Desktop\\bank.xml");
+        File file = new File("C:\\Users\\pc\\Desktop\\school.xml");
+        File file2 = new File("C:\\Users\\pc\\Desktop\\bank.xml");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
         byte[] bytes = new byte[100];

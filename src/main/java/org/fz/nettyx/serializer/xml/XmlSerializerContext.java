@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.xml;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -10,17 +11,22 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL_MAPPING;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
+import cn.hutool.core.lang.ClassScanner;
+import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ClassUtil;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.fz.nettyx.serializer.xml.converter.TypeConverter;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.util.Try;
 
@@ -51,6 +57,8 @@ public class XmlSerializerContext {
      */
     private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(64);
 
+    private static final Map<String, TypeConverter> TYPE_CONVERTERS = new SafeConcurrentHashMap<>(16);
+
     private final Path[] paths;
 
     public XmlSerializerContext(File... files) {
@@ -62,7 +70,7 @@ public class XmlSerializerContext {
         this.refresh();
     }
 
-    public void refresh() {
+    public synchronized void refresh() {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
         List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
@@ -79,6 +87,9 @@ public class XmlSerializerContext {
             scanModels(root);
             scanMappings(root);
         }
+
+        Set<Class<?>> classes = ClassScanner.scanPackageBySuper(EMPTY, TypeConverter.class);
+        scanConverters(classes);
     }
 
     //************************************          private start            *****************************************//
@@ -138,6 +149,16 @@ public class XmlSerializerContext {
         }
     }
 
+    private static void scanConverters(Set<Class<?>> converterClasses) {
+        for (Class<?> converterClass : converterClasses) {
+            if (!ClassUtil.isNormalClass(converterClass)) {
+                continue;
+            }
+            TypeConverter converter = (TypeConverter) Singleton.get(converterClass);
+            TYPE_CONVERTERS.putIfAbsent(converter.forType(), converter);
+        }
+    }
+
     //************************************           private end             *****************************************//
 
     //************************************          public start            *****************************************//
@@ -152,6 +173,14 @@ public class XmlSerializerContext {
 
     public static Model findModel(String mappingValue) {
         return MODEL_MAPPINGS.get(mappingValue);
+    }
+
+    public static boolean containsType(String typeValue) {
+        return TYPE_CONVERTERS.containsKey(typeValue);
+    }
+
+    public static TypeConverter getConverter(String typeValue) {
+        return TYPE_CONVERTERS.get(typeValue);
     }
 
     //************************************          public start            *****************************************//

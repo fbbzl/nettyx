@@ -33,7 +33,7 @@
         <student>
             <id :offset="0" :length="2" :type="string(utf-8)"/>
             <age :offset="2" :length="1" :type="byte"/>
-            <name :offset="3" :length="2" :type="string(utf-8)" :exp="$v/100"/>
+            <name :offset="3" :length="2" :type="string(utf-8)"/>
             <gender :offset="5" :length="1" :type="enum(gender)"/>
             <country :offset="6" :length="2" :type="enum(country)[2]"/>
             <maincourse :offset="8" :length="1" :type="switch(course)"/>
@@ -44,7 +44,7 @@
 
         <teacher>
             <id :offset="92" :length="2" :type="string(us-ascii)"/>
-            <name :offset="94" :length="2" :type="int" :exp="$v*100"/>
+            <name :offset="94" :length="2" :type="int"/>
         </teacher>
     </model>
 </root>

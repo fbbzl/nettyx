@@ -22,7 +22,6 @@ public class Dtd {
             ATTR_ORDER = ":order",
             ATTR_LENGTH = ":length",
             ATTR_TYPE = ":type",
-            ATTR_EXP = ":exp",
             ATTR_HANDLER = ":handler";
 
 }
