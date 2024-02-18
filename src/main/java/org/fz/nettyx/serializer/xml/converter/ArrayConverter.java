@@ -21,10 +21,11 @@ public class ArrayConverter implements TypeConverter {
         if (!type.isArray()) {
             return EMPTY;
         }
+        int arrayLength = type.getArrayLength();
 
         String value = type.getValue();
 
 
-        return String.join(",");
+        return String.join(",", arrayLength+"");
     }
 }
