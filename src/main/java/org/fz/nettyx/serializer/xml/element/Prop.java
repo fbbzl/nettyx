@@ -1,26 +1,20 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
-import static cn.hutool.core.text.CharSequenceUtil.subBefore;
-import static cn.hutool.core.text.CharSequenceUtil.subBetween;
-import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
-import static org.fz.nettyx.serializer.xml.XmlUtils.name;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
-import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
-
 import cn.hutool.core.text.CharSequenceUtil;
-import java.util.regex.Pattern;
 import lombok.Data;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.xml.converter.NumberConverter;
 import org.fz.nettyx.util.BytesKit;
 import org.fz.nettyx.util.BytesKit.Endian;
+
+import java.util.regex.Pattern;
+
+import static cn.hutool.core.text.CharSequenceUtil.*;
+import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
+import static org.fz.nettyx.serializer.xml.XmlUtils.name;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
+import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
 
 
 /**
@@ -72,13 +66,15 @@ public class Prop {
         private final String[] typeArgs;
         private final String value;
         private boolean isArray;
+        private int arrayLength;
 
         public PropType(String typeText) {
-            boolean hasTypeArgs = TYPE_ARGS_PATTERN.matcher(typeText).matches();
-
-            this.typeArgs = hasTypeArgs ? splitToArray(subBetween(typeText, "(", ")"), ",") : new String[0];
+            this.typeArgs = splitToArray(subBetween(typeText, "(", ")"), ",");
             this.value = subBefore(typeText, "(", false);
             this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
+            if (this.isArray) {
+                this.arrayLength = Integer.parseInt(subBetween(typeText, "[", "]"));
+            }
         }
 
         public boolean isNumber() {
@@ -86,6 +82,7 @@ public class Prop {
         }
 
         public boolean isString() {
+            // TODO 改成静态, 然后text和value用或来运算
             return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
         }
 

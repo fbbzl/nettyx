@@ -1,18 +1,19 @@
 package org.fz.nettyx.serializer.xml.converter;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.serializer.xml.element.Prop.PropType.TYPE_ARGS_PATTERN;
-import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
-
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
-import java.util.List;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 import org.fz.nettyx.util.BytesKit.Endian;
 import org.fz.nettyx.util.Throws;
+
+import java.util.List;
+
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.xml.element.Prop.PropType.TYPE_ARGS_PATTERN;
+import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
 
 /**
  * convert int to string value
@@ -22,7 +23,12 @@ import org.fz.nettyx.util.Throws;
  * @since 2024/2/6 22:20
  */
 
-public class EnumConverter implements TypeConverter<String> {
+public class EnumConverter implements TypeConverter {
+
+    @Override
+    public String forType() {
+        return "enum";
+    }
 
     public String convert(Prop prop, ByteBuf byteBuf, String defaultEnum) {
         return CharSequenceUtil.blankToDefault(this.convert(prop, byteBuf), defaultEnum);
