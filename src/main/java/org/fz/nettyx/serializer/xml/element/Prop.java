@@ -65,32 +65,39 @@ public class Prop {
 
         private final String[] typeArgs;
         private final String value;
-        private boolean isArray;
-        private int arrayLength;
+        /**
+         * if is not array, length will be null
+         */
+        private Integer arrayLength;
 
         public PropType(String typeText) {
             this.typeArgs = splitToArray(subBetween(typeText, "(", ")"), ",");
             this.value = subBefore(typeText, "(", false);
-            this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
-            if (this.isArray) {
+            if (ARRAY_PATTERN.matcher(typeText).matches()) {
                 this.arrayLength = Integer.parseInt(subBetween(typeText, "[", "]"));
             }
         }
 
-        public boolean isNumber() {
-            return NumberConverter.convertible(getValue()) && !isArray();
+        public static boolean isNumber(String value) {
+            return NumberConverter.convertible(value) && !isArray();
         }
 
-        public boolean isString() {
-            return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
+        public static boolean isString(String value) {
+            return CharSequenceUtil.startWithIgnoreCase(value, "string") && !isArray();
         }
 
-        public boolean isEnum() {
-            return CharSequenceUtil.startWithIgnoreCase(getValue(), "enum") && !isArray();
+        public static boolean isEnum(String value) {
+            return CharSequenceUtil.startWithIgnoreCase(value, "enum") && !isArray();
         }
 
-        public boolean isSwitch() {
-            return CharSequenceUtil.startWithIgnoreCase(getValue(), "switch") && !isArray();
+        public static boolean isSwitch(String value) {
+            return CharSequenceUtil.startWithIgnoreCase(value, "switch") && !isArray();
         }
+
+        public static boolean isArray(String value) {
+            return CharSequenceUtil.startWithIgnoreCase(value, "switch") && !isArray();
+        }
+
+
     }
 }
