@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.xml.converter;
+package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
@@ -16,10 +16,15 @@ import java.util.List;
  * @version 1.0
  * @since 2024/2/6 22:20
  */
-public class SwitchConverter implements TypeConverter {
+public class SwitchHandler implements XmlPropHandler {
 
     @Override
-    public String convert(Prop prop, ByteBuf byteBuf) {
+    public String forType() {
+        return "switch";
+    }
+
+    @Override
+    public String read(Prop prop, ByteBuf reading) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "enum [" + type.getValue() + "] do not support 2 type args");
@@ -27,13 +32,18 @@ public class SwitchConverter implements TypeConverter {
         String switchName = typeArgs[0];
         List<String> switches = XmlSerializerContext.findSwitch(switchName);
 
-        byte[] bytes = readBytes(prop, byteBuf);
+        byte[] bytes = readBytes(prop, reading);
         BitSet bitSet = BitSet.valueOf(bytes);
 
-        return getByBit(switches, bitSet);
+        return getByBitSet(switches, bitSet);
     }
 
-    private static String getByBit(List<String> switches, BitSet bitSet) {
+    @Override
+    public void write(Prop prop, ByteBuf writing) {
+        
+    }
+
+    private static String getByBitSet(List<String> switches, BitSet bitSet) {
         List<String> resultSwitches = new ArrayList<>(4);
         for (int i = 0; i < switches.size(); i++) {
             if (bitSet.get(i)) {

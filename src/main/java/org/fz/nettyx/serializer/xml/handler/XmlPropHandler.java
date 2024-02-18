@@ -1,28 +1,25 @@
-package org.fz.nettyx.serializer.xml.converter;
+package org.fz.nettyx.serializer.xml.handler;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.element.Prop;
 
 /**
- * The interface Type converter.
+ * The interface Type handler.
  *
  * @author fengbinbin
  * @version 1.0
  * @since 2024 /2/7 10:51
  */
-@SuppressWarnings("unchecked")
-public interface TypeConverter {
-
-    String forType();
+public interface XmlPropHandler {
 
     /**
-     * Convert r.
-     *
-     * @param prop the prop
-     * @param byteBuf the byte buf
-     * @return the r
+     * the type string value handled
      */
-    String convert(Prop prop, ByteBuf byteBuf);
+    String forType();
+
+    String read(Prop prop, ByteBuf reading);
+
+    void write(Prop prop, ByteBuf writing);
 
     default byte[] readBytes(Prop prop, ByteBuf byteBuf) {
         // TODO 相对位置 和 绝对位置

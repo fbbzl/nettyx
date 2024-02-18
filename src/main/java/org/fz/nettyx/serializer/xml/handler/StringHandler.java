@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.xml.converter;
+package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
@@ -14,12 +14,17 @@ import java.nio.charset.Charset;
  * @version 1.0
  * @since 2024/2/6 22:20
  */
-public class StringConverter implements TypeConverter {
+public class StringHandler implements XmlPropHandler {
+
+    @Override
+    public String forType() {
+        return "string";
+    }
 
     private static final String[] DEFAULT_CHARSET = {"UTF-8"};
 
     @Override
-    public String convert(Prop prop, ByteBuf byteBuf) {
+    public String read(Prop prop, ByteBuf reading) {
         PropType type = prop.getType();
         String[] typeArgs = ArrayUtil.defaultIfEmpty(type.getTypeArgs(), DEFAULT_CHARSET);
 
@@ -27,7 +32,12 @@ public class StringConverter implements TypeConverter {
 
         Charset charset = CharsetUtil.charset(typeArgs[0].toUpperCase());
 
-        return new String(readBytes(prop, byteBuf), charset);
+        return new String(readBytes(prop, reading), charset);
+    }
+
+    @Override
+    public void write(Prop prop, ByteBuf writing) {
+
     }
 
 }
