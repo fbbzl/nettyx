@@ -25,6 +25,6 @@ public class ArrayConverter implements TypeConverter {
         String value = type.getValue();
 
 
-        return null;
+        return String.join(",");
     }
 }

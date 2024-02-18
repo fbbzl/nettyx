@@ -74,7 +74,7 @@ public final class XmlSerializer implements Serializer {
                 } else if (type.isSwitch()) {
                     text = Singleton.get(SwitchConverter.class).convert(prop, getByteBuf());
                 } else if (type.isArray()) {
-                    text = String.join(",", Singleton.get(ArrayConverter.class).convert(prop, getByteBuf()));
+                    text = Singleton.get(ArrayConverter.class).convert(prop, getByteBuf());
                 } else {
                     throw new IllegalArgumentException("this type is not recognized [" + type + "]");
                 }
