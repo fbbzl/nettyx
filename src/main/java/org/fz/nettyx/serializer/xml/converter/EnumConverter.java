@@ -25,6 +25,11 @@ import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
 
 public class EnumConverter implements TypeConverter {
 
+    @Override
+    public String forType() {
+        return "enum";
+    }
+
     public String convert(Prop prop, ByteBuf byteBuf, String defaultEnum) {
         return CharSequenceUtil.blankToDefault(this.convert(prop, byteBuf), defaultEnum);
     }

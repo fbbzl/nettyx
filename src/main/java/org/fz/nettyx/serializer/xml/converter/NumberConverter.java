@@ -67,19 +67,6 @@ public abstract class NumberConverter implements TypeConverter {
         return toNumber(prop.getEndianKit()).apply(this.readBytes(prop, byteBuf)).toString();
     }
 
-    public static class ZeroedConverter extends NumberConverter {
-
-        @Override
-        protected String forNumberType() {
-            return "zero";
-        }
-
-        @Override
-        public Function<byte[], Number> toNumber(Endian endian) {
-            return bytes -> 0;
-        }
-    }
-
     protected abstract String forNumberType();
 
     protected abstract Function<byte[], Number> toNumber(Endian endian);
