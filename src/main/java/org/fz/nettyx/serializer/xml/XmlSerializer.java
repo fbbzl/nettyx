@@ -89,11 +89,11 @@ public final class XmlSerializer implements Serializer {
     }
 
     /**
-     * 将有值的xml转化成bytebuf
      *
      * @return byte buf
      */
     ByteBuf toByteBuf() {
+
 
         return null;
     }
