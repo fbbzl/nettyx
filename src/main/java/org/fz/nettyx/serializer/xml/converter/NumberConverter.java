@@ -1,17 +1,18 @@
 package org.fz.nettyx.serializer.xml.converter;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.buffer.ByteBuf;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 import org.fz.nettyx.util.BytesKit.Endian;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 
 /**
  * @author fengbinbin
@@ -19,7 +20,7 @@ import org.fz.nettyx.util.BytesKit.Endian;
  * @since 2024/2/6 22:20
  */
 
-public abstract class NumberConverter implements TypeConverter<Number> {
+public abstract class NumberConverter implements TypeConverter {
 
     /**
      * key is type value, value is converter
@@ -62,21 +63,8 @@ public abstract class NumberConverter implements TypeConverter<Number> {
     //************************************            private end                *************************************//
 
     @Override
-    public Number convert(Prop prop, ByteBuf byteBuf) {
-        return toNumber(prop.getEndianKit()).apply(this.readBytes(prop, byteBuf));
-    }
-
-    public static class ZeroedConverter extends NumberConverter {
-
-        @Override
-        protected String forNumberType() {
-            return "zero";
-        }
-
-        @Override
-        public Function<byte[], Number> toNumber(Endian endian) {
-            return bytes -> 0;
-        }
+    public String convert(Prop prop, ByteBuf byteBuf) {
+        return toNumber(prop.getEndianKit()).apply(this.readBytes(prop, byteBuf)).toString();
     }
 
     protected abstract String forNumberType();

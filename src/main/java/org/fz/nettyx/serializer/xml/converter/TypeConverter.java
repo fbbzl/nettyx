@@ -6,13 +6,14 @@ import org.fz.nettyx.serializer.xml.element.Prop;
 /**
  * The interface Type converter.
  *
- * @param <R> the type parameter
  * @author fengbinbin
  * @version 1.0
  * @since 2024 /2/7 10:51
  */
 @SuppressWarnings("unchecked")
-public interface TypeConverter<R> {
+public interface TypeConverter {
+
+    String forType();
 
     /**
      * Convert r.
@@ -21,7 +22,7 @@ public interface TypeConverter<R> {
      * @param byteBuf the byte buf
      * @return the r
      */
-    R convert(Prop prop, ByteBuf byteBuf);
+    String convert(Prop prop, ByteBuf byteBuf);
 
     default byte[] readBytes(Prop prop, ByteBuf byteBuf) {
         // TODO 相对位置 和 绝对位置

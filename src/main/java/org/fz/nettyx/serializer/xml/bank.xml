@@ -25,7 +25,7 @@
 
     <model>
         <bankcard>
-            <!--枚举只支持ordinary,如果使用name会涉及字符集的问题-->
+            <!--枚举只支持ordinary,如果使用name会涉及字符集的问题,为了简化程序, 所以不支持使用name索引-->
             <bankname :offset="0" :length="2" :type="enum(bank)"/>
             <cardnumber :offset="2" :length="10" :type="int" :order="le"/>
             <maincourse :offset="12" :length="1" :type="switch(status)"/>

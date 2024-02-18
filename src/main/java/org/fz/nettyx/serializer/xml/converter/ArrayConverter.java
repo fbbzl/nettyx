@@ -4,6 +4,10 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
+
 /**
  * TODO
  *
@@ -11,19 +15,27 @@ import org.fz.nettyx.serializer.xml.element.Prop.PropType;
  * @version 1.0
  * @since 2024/2/6 22:30
  */
-public class ArrayConverter implements TypeConverter<String[]> {
-
-    private static final String[] EMPTY_STRING_ARRAY = {};
+public class ArrayConverter implements TypeConverter {
 
     @Override
-    public String[] convert(Prop prop, ByteBuf byteBuf) {
+    public String convert(Prop prop, ByteBuf byteBuf) {
         PropType type = prop.getType();
         if (!type.isArray()) {
-            return EMPTY_STRING_ARRAY;
+            return EMPTY;
         }
 
+        int arrayLength = type.getArrayLength();
+        String typeValue = type.getValue();
+        String[] typeArgs = type.getTypeArgs();
 
+        if (EL_ENUM.equals(typeValue)) {
 
-        return null;
+        } else if (EL_SWITCH.equals(typeValue)) {
+
+        } else if("string".equals(typeValue)){
+
+        }
+
+        return String.join(",", arrayLength + "");
     }
 }
