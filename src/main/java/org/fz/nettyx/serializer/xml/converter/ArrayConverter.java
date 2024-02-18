@@ -21,8 +21,9 @@ public class ArrayConverter implements TypeConverter {
         if (!type.isArray()) {
             return EMPTY;
         }
-        int arrayLength = type.getArrayLength();
 
+        int arrayLength = type.getArrayLength();
+        String[] typeArgs = type.getTypeArgs();
         String value = type.getValue();
 
 
