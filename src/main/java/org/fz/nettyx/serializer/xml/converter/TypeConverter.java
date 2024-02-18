@@ -13,6 +13,8 @@ import org.fz.nettyx.serializer.xml.element.Prop;
 @SuppressWarnings("unchecked")
 public interface TypeConverter {
 
+    String forType();
+
     /**
      * Convert r.
      *
