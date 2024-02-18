@@ -32,6 +32,8 @@ public class ArrayConverter implements TypeConverter {
 
         } else if (EL_SWITCH.equals(typeValue)) {
 
+        } else if("string".equals(typeValue)){
+
         }
 
         return String.join(",", arrayLength + "");
