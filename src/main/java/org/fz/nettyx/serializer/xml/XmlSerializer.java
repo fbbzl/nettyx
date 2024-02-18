@@ -63,8 +63,8 @@ public final class XmlSerializer implements Serializer {
 
                 String text;
                 if (prop.useHandler()) {
-                    String handlerClassName = prop.getHandler();
-                    text = ((ElementHandler) (Singleton.get(handlerClassName))).read(prop, getByteBuf());
+                    String handlerClassQName = prop.getHandler();
+                    text = ((ElementHandler) (Singleton.get(handlerClassQName))).read(prop, getByteBuf());
                 } else if (NumberConverter.convertible(typeValue)) {
                     text = NumberConverter.getConverter(prop).convert(prop, getByteBuf());
                 } else if (type.isString()) {
