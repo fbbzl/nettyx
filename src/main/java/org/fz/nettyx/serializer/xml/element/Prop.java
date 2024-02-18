@@ -78,24 +78,24 @@ public class Prop {
             }
         }
 
-        public static boolean isNumber(String value) {
-            return NumberConverter.convertible(value) && !isArray();
+        public static boolean isNumber(String typeText) {
+            return NumberConverter.convertible(typeText) && !isArray(typeText);
         }
 
-        public static boolean isString(String value) {
-            return CharSequenceUtil.startWithIgnoreCase(value, "string") && !isArray();
+        public static boolean isString(String typeText) {
+            return CharSequenceUtil.startWithIgnoreCase(typeText, "string") && !isArray(typeText);
         }
 
-        public static boolean isEnum(String value) {
-            return CharSequenceUtil.startWithIgnoreCase(value, "enum") && !isArray();
+        public static boolean isEnum(String typeText) {
+            return CharSequenceUtil.startWithIgnoreCase(typeText, "enum") && !isArray(typeText);
         }
 
-        public static boolean isSwitch(String value) {
-            return CharSequenceUtil.startWithIgnoreCase(value, "switch") && !isArray();
+        public static boolean isSwitch(String typeText) {
+            return CharSequenceUtil.startWithIgnoreCase(typeText, "switch") && !isArray(typeText);
         }
 
-        public static boolean isArray(String value) {
-            return CharSequenceUtil.startWithIgnoreCase(value, "switch") && !isArray();
+        public static boolean isArray(String typeText) {
+            return ARRAY_PATTERN.matcher(typeText).matches();
         }
 
 
