@@ -11,7 +11,6 @@ import org.fz.nettyx.util.BytesKit.Endian;
 import java.util.regex.Pattern;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
-import static com.sun.org.apache.bcel.internal.Const.EMPTY_STRING_ARRAY;
 import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
 import static org.fz.nettyx.serializer.xml.XmlUtils.name;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
@@ -70,9 +69,7 @@ public class Prop {
         private int arrayLength;
 
         public PropType(String typeText) {
-            boolean hasTypeArgs = TYPE_ARGS_PATTERN.matcher(typeText).matches();
-
-            this.typeArgs = hasTypeArgs ? splitToArray(subBetween(typeText, "(", ")"), ",") : EMPTY_STRING_ARRAY;
+            this.typeArgs = splitToArray(subBetween(typeText, "(", ")"), ",");
             this.value = subBefore(typeText, "(", false);
             this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
             if (this.isArray) {
