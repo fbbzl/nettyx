@@ -65,39 +65,32 @@ public class Prop {
 
         private final String[] typeArgs;
         private final String value;
-        /**
-         * if is not array, length will be null
-         */
-        private Integer arrayLength;
+        private boolean isArray;
+        private int arrayLength;
 
         public PropType(String typeText) {
             this.typeArgs = splitToArray(subBetween(typeText, "(", ")"), ",");
             this.value = subBefore(typeText, "(", false);
-            if (ARRAY_PATTERN.matcher(typeText).matches()) {
+            this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
+            if (this.isArray) {
                 this.arrayLength = Integer.parseInt(subBetween(typeText, "[", "]"));
             }
         }
 
-        public static boolean isNumber(String typeText) {
-            return NumberConverter.convertible(typeText) && !isArray(typeText);
+        public boolean isNumber() {
+            return NumberConverter.convertible(getValue()) && !isArray();
         }
 
-        public static boolean isString(String typeText) {
-            return CharSequenceUtil.startWithIgnoreCase(typeText, "string") && !isArray(typeText);
+        public boolean isString() {
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
         }
 
-        public static boolean isEnum(String typeText) {
-            return CharSequenceUtil.startWithIgnoreCase(typeText, "enum") && !isArray(typeText);
+        public boolean isEnum() {
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "enum") && !isArray();
         }
 
-        public static boolean isSwitch(String typeText) {
-            return CharSequenceUtil.startWithIgnoreCase(typeText, "switch") && !isArray(typeText);
+        public boolean isSwitch() {
+            return CharSequenceUtil.startWithIgnoreCase(getValue(), "switch") && !isArray();
         }
-
-        public static boolean isArray(String typeText) {
-            return ARRAY_PATTERN.matcher(typeText).matches();
-        }
-
-
     }
 }
