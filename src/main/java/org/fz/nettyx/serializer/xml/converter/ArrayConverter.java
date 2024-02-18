@@ -23,10 +23,11 @@ public class ArrayConverter implements TypeConverter {
         }
 
         int arrayLength = type.getArrayLength();
+        String typeValue = type.getValue();
         String[] typeArgs = type.getTypeArgs();
-        String value = type.getValue();
 
+        
 
-        return String.join(",", arrayLength+"");
+        return String.join(",", arrayLength + "");
     }
 }
