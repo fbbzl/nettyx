@@ -5,6 +5,8 @@ import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.serializer.xml.element.Prop.PropType;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
 
 /**
  * TODO
@@ -26,7 +28,11 @@ public class ArrayConverter implements TypeConverter {
         String typeValue = type.getValue();
         String[] typeArgs = type.getTypeArgs();
 
-        
+        if (EL_ENUM.equals(typeValue)) {
+
+        } else if (EL_SWITCH.equals(typeValue)) {
+
+        }
 
         return String.join(",", arrayLength + "");
     }

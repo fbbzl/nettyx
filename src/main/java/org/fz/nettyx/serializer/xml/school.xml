@@ -37,9 +37,9 @@
             <gender :offset="5" :length="1" :type="enum(gender)"/>
             <country :offset="6" :length="2" :type="enum(country)"/>
             <maincourse :offset="8" :length="1" :type="switch(course)"/>
-            <phonenums :offset="9" :length="4" :type="string(utf-8)[2]"/>
+            <phonenums :offset="9" :length="4" :type="int[2]"/>
             <secondarycourses :offset="13" :length="8" :type="switch(course)[3]"/>
-            <address :offset="21" :length="2" :type="string(utf-8)"/>
+            <address :offset="21" :length="2" :type="string(utf-8)[2]"/>
         </student>
 
         <teacher>
