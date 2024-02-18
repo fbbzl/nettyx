@@ -10,7 +10,6 @@ import org.fz.nettyx.serializer.xml.element.Prop;
  * @version 1.0
  * @since 2024 /2/7 10:51
  */
-@SuppressWarnings("unchecked")
 public interface TypeConverter {
 
     String forType();

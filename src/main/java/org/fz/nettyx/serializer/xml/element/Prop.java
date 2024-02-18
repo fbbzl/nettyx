@@ -1,20 +1,24 @@
 package org.fz.nettyx.serializer.xml.element;
 
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
+import static cn.hutool.core.text.CharSequenceUtil.subBetween;
+import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
+import static org.fz.nettyx.serializer.xml.XmlUtils.name;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
+
 import cn.hutool.core.text.CharSequenceUtil;
+import java.util.regex.Pattern;
 import lombok.Data;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
-import org.fz.nettyx.serializer.xml.converter.NumberConverter;
 import org.fz.nettyx.util.BytesKit;
 import org.fz.nettyx.util.BytesKit.Endian;
-
-import java.util.regex.Pattern;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
-import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
-import static org.fz.nettyx.serializer.xml.XmlUtils.name;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
-import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
 
 
 /**
@@ -31,7 +35,6 @@ public class Prop {
     private final int length;
     private final Endian endianKit;
     private final PropType type;
-    private final String exp;
     private final String handler;
 
     public Prop(Element propEl) {
@@ -40,7 +43,6 @@ public class Prop {
         this.length = Integer.parseInt(attrValue(propEl, ATTR_LENGTH));
         this.endianKit = LE.equals(attrValue(propEl, ATTR_ORDER)) ? BytesKit.le : BytesKit.be;
         this.type = new PropType(attrValue(propEl, ATTR_TYPE));
-        this.exp = attrValue(propEl, ATTR_EXP);
         this.handler = attrValue(propEl, ATTR_HANDLER);
     }
 
@@ -70,28 +72,19 @@ public class Prop {
 
         public PropType(String typeText) {
             this.typeArgs = splitToArray(subBetween(typeText, "(", ")"), ",");
-            this.value = subBefore(typeText, "(", false);
             this.isArray = ARRAY_PATTERN.matcher(typeText).matches();
+
             if (this.isArray) {
                 this.arrayLength = Integer.parseInt(subBetween(typeText, "[", "]"));
+                if (CharSequenceUtil.contains(typeText, "(")) {
+                    this.value = subBefore(typeText, "(", false);
+                }
+                else {
+                    this.value = subBefore(typeText, "[", false);
+                }
+            } else {
+                this.value = subBefore(typeText, "(", false);
             }
-        }
-
-        public boolean isNumber() {
-            return NumberConverter.convertible(getValue()) && !isArray();
-        }
-
-        public boolean isString() {
-            // TODO 改成静态, 然后text和value用或来运算
-            return CharSequenceUtil.startWithIgnoreCase(getValue(), "string") && !isArray();
-        }
-
-        public boolean isEnum() {
-            return CharSequenceUtil.startWithIgnoreCase(getValue(), "enum") && !isArray();
-        }
-
-        public boolean isSwitch() {
-            return CharSequenceUtil.startWithIgnoreCase(getValue(), "switch") && !isArray();
         }
     }
 }
