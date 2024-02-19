@@ -1,15 +1,13 @@
 package org.fz.nettyx.serializer.xml.handler;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
+
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.util.BytesKit.Endian;
-
-import java.util.List;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.util.BytesKit.LittleEndian.LE;
 
 /**
  * read int to string value
@@ -28,13 +26,13 @@ public class EnumHandler implements XmlPropHandler {
 
     @Override
     public String read(Prop prop, ByteBuf reading) {
-        List<String> enums = XmlSerializerContext.findEnum(prop);
+        String[] enums = XmlSerializerContext.findEnum(prop);
 
-        if (enums.isEmpty()) {
+        if (ArrayUtil.isEmpty(enums)) {
             return EMPTY;
         }
 
-        return enums.get(this.findEnumOrdinary(prop, reading));
+        return enums[this.findEnumOrdinary(prop, reading)];
     }
 
     @Override
