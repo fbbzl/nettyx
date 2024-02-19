@@ -1,10 +1,9 @@
 package org.fz.nettyx.serializer.xml.handler;
 
 import io.netty.buffer.ByteBuf;
+import java.util.function.Function;
 import org.fz.nettyx.serializer.xml.element.Prop;
 import org.fz.nettyx.util.BytesKit.Endian;
-
-import java.util.function.Function;
 
 /**
  * @author fengbinbin
@@ -21,12 +20,12 @@ public abstract class NumberHandler implements XmlPropHandler {
 
     @Override
     public void write(Prop prop, ByteBuf writing) {
-        writing.writeBytes(fromNumber(prop.getEndianKit()).apply(prop.getText()));
+        prop.getEndianKit().fromNumber(toNumber(prop.getText()));
     }
 
     protected abstract Function<byte[], Number> toNumber(Endian endian);
 
-    protected abstract Function<String, byte[]> fromNumber(Endian endian);
+    protected abstract Number toNumber(String text);
 
     public static class ByteHandler extends NumberHandler {
 
@@ -41,8 +40,8 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromByteValue(Byte.parseByte(str));
+        protected Number toNumber(String text) {
+            return Byte.parseByte(text);
         }
     }
 
@@ -59,8 +58,8 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromShortValue(Short.parseShort(str));
+        protected Number toNumber(String text) {
+            return Short.parseShort(text);
         }
     }
 
@@ -77,8 +76,8 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromIntValue(Integer.parseInt(str));
+        protected Number toNumber(String text) {
+            return Integer.parseInt(text);
         }
     }
 
@@ -95,8 +94,8 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromLongValue(Long.parseLong(str));
+        protected Number toNumber(String text) {
+            return Long.parseLong(text);
         }
     }
 
