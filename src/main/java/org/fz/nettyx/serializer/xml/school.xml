@@ -35,11 +35,11 @@
             <age :offset="2" :length="1" :type="byte"/>
             <name :offset="3" :length="2" :type="string(utf-8)"/>
             <gender :offset="5" :length="1" :type="enum(gender)"/>
-            <country :offset="6" :length="2" :type="enum(country)[2]"/>
+            <country-array :offset="6" :length="2" :array-length="2" :type="enum(country)"/>
             <maincourse :offset="8" :length="1" :type="switch(course)"/>
-            <phonenums :offset="9" :length="4" :type="int[2]"/>
-            <secondarycourses :offset="13" :length="8" :type="switch(course)[3]"/>
-            <address :offset="21" :length="2" :type="string(utf-8)[2]"/>
+            <phonenum-array :offset="9" :length="4" :array-length="2" :type="int"/>
+            <secondarycours-array :offset="13" :length="8" :array-length="2" :type="switch(course)"/>
+            <address-array :offset="21" :length="2" :array-length="3" :type="string(utf-8)"/>
         </student>
 
         <teacher>
@@ -47,6 +47,7 @@
             <name :offset="94" :length="2" :type="int"/>
         </teacher>
     </model>
+
 </root>
 
 

@@ -1,8 +1,9 @@
 package org.fz.nettyx.serializer.xml.handler;
 
+import cn.hutool.core.util.NumberUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.element.Prop;
-import org.fz.nettyx.util.BytesKit.Endian;
+import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
+import org.fz.nettyx.util.EndianKit;
 
 import java.util.function.Function;
 
@@ -15,18 +16,18 @@ import java.util.function.Function;
 public abstract class NumberHandler implements XmlPropHandler {
 
     @Override
-    public String read(Prop prop, ByteBuf reading) {
+    public String read(XmlProp prop, ByteBuf reading) {
         return toNumber(prop.getEndianKit()).apply(this.readBytes(prop, reading)).toString();
     }
 
     @Override
-    public void write(Prop prop, ByteBuf writing) {
-        writing.writeBytes(fromNumber(prop.getEndianKit()).apply(prop.getText()));
+    public void write(XmlProp prop, ByteBuf writing) {
+        writing.writeBytes(fromNumber(prop.getEndianKit()).apply(NumberUtil.parseNumber(prop.getText())));
     }
 
-    protected abstract Function<byte[], Number> toNumber(Endian endian);
+    protected abstract Function<byte[], Number> toNumber(EndianKit endian);
 
-    protected abstract Function<String, byte[]> fromNumber(Endian endian);
+    protected abstract Function<Number, byte[]> fromNumber(EndianKit endian);
 
     public static class ByteHandler extends NumberHandler {
 
@@ -36,13 +37,13 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        public Function<byte[], Number> toNumber(Endian endian) {
+        public Function<byte[], Number> toNumber(EndianKit endian) {
             return endian::toByteValue;
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromByteValue(Byte.parseByte(str));
+        protected Function<Number, byte[]> fromNumber(EndianKit endian) {
+            return num -> endian.fromByteValue(num.byteValue());
         }
     }
 
@@ -54,13 +55,13 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        public Function<byte[], Number> toNumber(Endian endian) {
-            return endian::toShortValue;
+        public Function<byte[], Number> toNumber(EndianKit endian) {
+            return endian::toShort;
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromShortValue(Short.parseShort(str));
+        protected Function<Number, byte[]> fromNumber(EndianKit endian) {
+            return num -> endian.fromShort(num.shortValue());
         }
     }
 
@@ -72,13 +73,13 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        public Function<byte[], Number> toNumber(Endian endian) {
-            return endian::toIntValue;
+        public Function<byte[], Number> toNumber(EndianKit endian) {
+            return endian::toInt;
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromIntValue(Integer.parseInt(str));
+        protected Function<Number, byte[]> fromNumber(EndianKit endian) {
+            return num -> endian.fromInt(num.intValue());
         }
     }
 
@@ -90,14 +91,49 @@ public abstract class NumberHandler implements XmlPropHandler {
         }
 
         @Override
-        public Function<byte[], Number> toNumber(Endian endian) {
-            return endian::toLongValue;
+        public Function<byte[], Number> toNumber(EndianKit endian) {
+            return endian::toLong;
         }
 
         @Override
-        protected Function<String, byte[]> fromNumber(Endian endian) {
-            return str -> endian.fromLongValue(Long.parseLong(str));
+        protected Function<Number, byte[]> fromNumber(EndianKit endian) {
+            return num -> endian.fromLong(num.longValue());
         }
     }
 
+    public static class FloatHandler extends NumberHandler {
+
+        @Override
+        public String forType() {
+            return "float";
+        }
+
+        @Override
+        public Function<byte[], Number> toNumber(EndianKit endian) {
+            return endian::toFloat;
+        }
+
+        @Override
+        protected Function<Number, byte[]> fromNumber(EndianKit endian) {
+            return num -> endian.fromFloat(num.floatValue());
+        }
+    }
+
+    public static class DoubleHandler extends NumberHandler {
+
+        @Override
+        public String forType() {
+            return "double";
+        }
+
+        @Override
+        public Function<byte[], Number> toNumber(EndianKit endian) {
+            return endian::toDouble;
+        }
+
+        @Override
+        protected Function<Number, byte[]> fromNumber(EndianKit endian) {
+            return num -> endian.fromDouble(num.doubleValue());
+        }
+    }
 }
