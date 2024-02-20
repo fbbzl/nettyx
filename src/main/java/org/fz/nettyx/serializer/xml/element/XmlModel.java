@@ -1,21 +1,29 @@
 package org.fz.nettyx.serializer.xml.element;
 
-import cn.hutool.core.text.CharSequenceUtil;
-import lombok.Data;
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
-import org.fz.nettyx.serializer.xml.XmlUtils;
-import org.fz.nettyx.util.EndianKit;
-
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
+import static cn.hutool.core.text.CharSequenceUtil.subBetween;
 import static java.util.stream.Collectors.toList;
 import static org.fz.nettyx.serializer.xml.XmlUtils.attrValue;
 import static org.fz.nettyx.serializer.xml.XmlUtils.name;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ARRAY_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 import static org.fz.nettyx.util.EndianKit.LE;
+
+import cn.hutool.core.text.CharSequenceUtil;
+import java.util.List;
+import java.util.regex.Pattern;
+import lombok.Data;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.dom.DOMElement;
+import org.fz.nettyx.serializer.xml.XmlUtils;
+import org.fz.nettyx.util.EndianKit;
 
 /**
  * @author fengbinbin
@@ -41,8 +49,8 @@ public class XmlModel {
 
         private static final EndianKit DEFAULT_ENDIAN = EndianKit.BE;
 
+        private final Element propEl;
         private final String name;
-        private final String text;
         private final int offset;
         private final int length;
         private final PropType type;
@@ -50,8 +58,8 @@ public class XmlModel {
         private final String handlerQName;
 
         public XmlProp(Element propEl) {
+            this.propEl = propEl;
             this.name = name(propEl);
-            this.text = XmlUtils.textTrim(propEl);
             this.offset = Integer.parseInt(attrValue(propEl, ATTR_OFFSET));
             this.length = Integer.parseInt(attrValue(propEl, ATTR_LENGTH));
 
@@ -75,11 +83,16 @@ public class XmlModel {
             if (endianKit == LE) {
                 el.setAttribute(ATTR_ORDER, LE.name());
             }
-            if (CharSequenceUtil.isNotBlank(getText())) {
-                el.setText(getText());
-            }
 
             return el;
+        }
+
+        public String getText() {
+            return XmlUtils.textTrim(propEl);
+        }
+
+        public List<Node> getContent() {
+            return XmlUtils.content(propEl);
         }
 
         //**************************************           private start              ************************************//
