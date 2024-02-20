@@ -4,8 +4,8 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
-import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp.PropType;
+import org.fz.nettyx.serializer.xml.element.Model.PropElement;
+import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
 import org.fz.nettyx.util.Throws;
 
 import java.nio.charset.Charset;
@@ -25,7 +25,7 @@ public class StringHandler implements XmlPropHandler {
     private static final String DEFAULT_CHARSET = "UTF-8";
 
     @Override
-    public String read(XmlProp prop, ByteBuf reading) {
+    public String read(PropElement prop, ByteBuf reading) {
         PropType type = prop.getType();
         String[] typeArgs = ArrayUtil.defaultIfEmpty(type.getTypeArgs(), new String[]{DEFAULT_CHARSET});
 
@@ -37,9 +37,8 @@ public class StringHandler implements XmlPropHandler {
     }
 
     @Override
-    public void write(XmlProp prop, ByteBuf writing) {
-        String text = prop.getText();
-        byte[] bytes = CharSequenceUtil.bytes(text, DEFAULT_CHARSET);
+    public void write(PropElement prop, ByteBuf writing) {
+        byte[] bytes = CharSequenceUtil.bytes(prop.getText(), DEFAULT_CHARSET);
         writing.writeBytes(bytes);
     }
 
