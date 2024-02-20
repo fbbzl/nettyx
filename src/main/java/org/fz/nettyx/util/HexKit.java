@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
  * @since 2022 -01-29 21:07
  */
 @UtilityClass
-public class Hexs {
+public class HexKit {
 
     private static final int LOOKUP_LENGTH = 16;
     private static final char[] LOOK_UP_HEX_ALPHABET = new char[LOOKUP_LENGTH];

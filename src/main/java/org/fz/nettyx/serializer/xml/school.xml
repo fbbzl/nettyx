@@ -3,8 +3,8 @@
 <root namespace="school">
 
     <model-mapping>
-        <student>stu</student>
-        <teacher>teac</teacher>
+        <student>66AA</student>
+        <teacher>7A01</teacher>
     </model-mapping>
 
     <enum>
@@ -48,30 +48,29 @@
         </teacher>
     </model>
 
-    <student1>
+    <student>
         <id :offset="0" :length="2" :type="string(utf-8)">&#0;&#0;</id>
         <age :offset="2" :length="1" :type="byte">0</age>
         <name :offset="3" :length="2" :type="string(utf-8)">&#0;&#0;</name>
         <gender :offset="5" :length="1" :type="enum(gender)">FEMAIL</gender>
-        <country-array :offset="6" :length="2" :type="enum(country)">
-            <country>CHINA</country>
-            <country>CHINA</country>
+        <country-array :offset="6" :length="2" :array-length="2" :type="enum(country)">
+            <country :offset="6" :length="1" :type="enum(country)">CHINA</country>
+            <country :offset="7" :length="1" :type="enum(country)">CHINA</country>
         </country-array>
-        <maincourse :offset="8" :length="1" :type="switch(course)">1</maincourse>
-        <phonenum-array :offset="9" :length="4" :type="int">
-            <phonenum>0</phonenum>
-            <phonenum>0</phonenum>
+        1
+        <phonenum-array :offset="9" :length="4" :array-length="2" :type="int">
+            <phonenum :offset="9" :length="2" :type="int">0</phonenum>
+            <phonenum :offset="11" :length="2" :type="int">0</phonenum>
         </phonenum-array>
-        <secondarycours-array :offset="13" :length="8" :type="switch(course)">
-            <secondarycours>1</secondarycours>
-            <secondarycours>1</secondarycours>
+        <secondarycours-array :offset="13" :length="8" :array-length="2" :type="switch(course)">
+            <secondarycours :offset="13" :length="4" :type="switch(course)">1</secondarycours>
+            <secondarycours :offset="17" :length="4" :type="switch(course)">1</secondarycours>
         </secondarycours-array>
-        <address-array :offset="21" :length="2" :type="string(utf-8)">
-            <address>&#0;&#0;</address>
-            <address>&#0;&#0;</address>
-            <address>&#0;&#0;</address>
+        <address-array :offset="21" :length="2" :array-length="2" :type="string(utf-8)">
+            <address :offset="21" :length="1" :type="string(utf-8)">&#0;&#0;</address>
+            <address :offset="22" :length="1" :type="string(utf-8)">&#0;&#0;</address>
         </address-array>
-    </student1>
+    </student>
 </root>
 
 
