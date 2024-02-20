@@ -4,11 +4,10 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
+import java.nio.charset.Charset;
 import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
 import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp.PropType;
 import org.fz.nettyx.util.Throws;
-
-import java.nio.charset.Charset;
 
 /**
  * @author fengbinbin
@@ -38,8 +37,7 @@ public class StringHandler implements XmlPropHandler {
 
     @Override
     public void write(XmlProp prop, ByteBuf writing) {
-        String text = prop.getText();
-        byte[] bytes = CharSequenceUtil.bytes(text, DEFAULT_CHARSET);
+        byte[] bytes = CharSequenceUtil.bytes(prop.getText(), DEFAULT_CHARSET);
         writing.writeBytes(bytes);
     }
 

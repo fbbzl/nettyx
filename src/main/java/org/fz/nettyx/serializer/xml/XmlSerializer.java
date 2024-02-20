@@ -1,8 +1,15 @@
 package org.fz.nettyx.serializer.xml;
 
 import cn.hutool.core.lang.Singleton;
+import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
@@ -15,13 +22,6 @@ import org.fz.nettyx.serializer.xml.element.XmlModel;
 import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
 import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -144,8 +144,9 @@ public final class XmlSerializer implements Serializer {
 
         XmlPropHandler handler = XmlSerializerContext.getHandler(typeValue);
 
-        for (int i = 0; i < arrayLength; i++) {
-            // TODO write的时候要根据split出来的字符串进行转换的
+        List<Node> content = prop.getContent();
+        for (Node node : content) {
+            String text = CharSequenceUtil.trim(node.getText());
             handler.write(prop, writing);
         }
 
@@ -160,8 +161,8 @@ public final class XmlSerializer implements Serializer {
      * @throws IOException the io exception
      */
     public static void main(String[] args) throws IOException {
-        File file = new File("C:\\Users\\fengbinbin\\Desktop\\school.xml");
-        File file2 = new File("C:\\Users\\fengbinbin\\Desktop\\bank.xml");
+        File file = new File("C:\\Users\\pc\\Desktop\\school.xml");
+        File file2 = new File("C:\\Users\\pc\\Desktop\\bank.xml");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
         byte[] bytes = new byte[100];
