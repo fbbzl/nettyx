@@ -21,6 +21,7 @@ public class Dtd {
             ATTR_OFFSET = ":offset",
             ATTR_LENGTH = ":length",
             ATTR_TYPE = ":type",
+            ATTR_ARRAY_LENGTH = ":array-length",
             ATTR_ORDER = ":order",
             ATTR_HANDLER = ":handler";
 
