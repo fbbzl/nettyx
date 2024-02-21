@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
-import org.fz.nettyx.serializer.xml.element.XmlModel;
+import org.fz.nettyx.serializer.xml.element.Model;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public abstract class XmlModelDispatcher extends MessageToMessageCodec<ByteBuf, 
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
         String dispatchHex = this.getDispatchHex(msg);
 
-        XmlModel model = XmlSerializerContext.findModel(dispatchHex);
+        Model model = XmlSerializerContext.findModel(dispatchHex);
         if (model == null) return;
 
         Document doc = XmlSerializer.read(getMessageBody(msg), model);

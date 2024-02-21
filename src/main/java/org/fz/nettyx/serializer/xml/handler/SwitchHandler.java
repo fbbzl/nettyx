@@ -2,11 +2,12 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext;
+import org.fz.nettyx.serializer.xml.element.Model.PropElement;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
 
 /**
  * @author fengbinbin
@@ -21,7 +22,7 @@ public class SwitchHandler implements XmlPropHandler {
     }
 
     @Override
-    public String read(XmlProp prop, ByteBuf reading) {
+    public String read(PropElement prop, ByteBuf reading) {
         String[] switches = XmlSerializerContext.findSwitch(prop);
 
         byte[] bytes = readBytes(prop, reading);
@@ -31,7 +32,7 @@ public class SwitchHandler implements XmlPropHandler {
     }
 
     @Override
-    public void write(XmlProp prop, ByteBuf writing) {
+    public void write(PropElement prop, ByteBuf writing) {
         String[] switchValues = CharSequenceUtil.splitToArray(prop.getText(), ",");
         String[] switches = XmlSerializerContext.findSwitch(prop);
 
