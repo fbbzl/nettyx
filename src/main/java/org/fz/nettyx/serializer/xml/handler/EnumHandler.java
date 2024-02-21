@@ -6,7 +6,7 @@ import static org.fz.nettyx.util.EndianKit.LE;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
+import org.fz.nettyx.serializer.xml.element.Model.PropElement;
 import org.fz.nettyx.util.EndianKit;
 
 /**
@@ -25,7 +25,7 @@ public class EnumHandler implements XmlPropHandler {
     }
 
     @Override
-    public String read(XmlProp prop, ByteBuf reading) {
+    public String read(PropElement prop, ByteBuf reading) {
         String[] enums = XmlSerializerContext.findEnum(prop);
 
         if (ArrayUtil.isEmpty(enums)) {
@@ -36,15 +36,14 @@ public class EnumHandler implements XmlPropHandler {
     }
 
     @Override
-    public void write(XmlProp prop, ByteBuf writing) {
-        String text = prop.getText();
-        int ordinary = Integer.parseInt(text);
+    public void write(PropElement prop, ByteBuf writing) {
+        int ordinary = Integer.parseInt(prop.getText());
         EndianKit endianKit = prop.getEndianKit();
 
         endianKit.fromInt(ordinary);
     }
 
-    protected int findEnumOrdinary(XmlProp prop, ByteBuf buf) {
+    protected int findEnumOrdinary(PropElement prop, ByteBuf buf) {
         byte[] bytes = this.readBytes(prop, buf);
         EndianKit endianKit = prop.getEndianKit();
 

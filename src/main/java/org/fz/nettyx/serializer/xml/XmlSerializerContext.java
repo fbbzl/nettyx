@@ -8,9 +8,9 @@ import cn.hutool.core.util.ClassUtil;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.fz.nettyx.serializer.xml.element.XmlModel;
-import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp;
-import org.fz.nettyx.serializer.xml.element.XmlModel.XmlProp.PropType;
+import org.fz.nettyx.serializer.xml.element.Model;
+import org.fz.nettyx.serializer.xml.element.Model.PropElement;
+import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
@@ -37,7 +37,7 @@ public class XmlSerializerContext {
     /**
      * first key is target-value, second key is namespace, the value is model
      */
-    private static final Map<String, XmlModel> MODEL_MAPPINGS = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, Model> MODEL_MAPPINGS = new SafeConcurrentHashMap<>(64);
     private static final Map<String, Document> NAMESPACES_DOCS = new SafeConcurrentHashMap<>(64);
     /**
      * key is enum name, the value is the enum-string
@@ -50,7 +50,7 @@ public class XmlSerializerContext {
     /**
      * first key is namespace, second key is model name, the value is model
      */
-    private static final Map<String, Map<String, XmlModel>> MODELS = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(64);
 
     private static final Map<String, XmlPropHandler> TYPE_HANDLERS = new SafeConcurrentHashMap<>(16);
 
@@ -121,8 +121,8 @@ public class XmlSerializerContext {
     protected void scanModels(Element rootElement) {
         Element models = rootElement.element(EL_MODEL);
 
-        Map<String, XmlModel> modelMap = new LinkedHashMap<>(16);
-        XmlUtils.elements(models).stream().map(XmlModel::new).forEach(m -> modelMap.put(m.getName(), m));
+        Map<String, Model> modelMap = new LinkedHashMap<>(16);
+        XmlUtils.elements(models).stream().map(Model::new).forEach(m -> modelMap.put(m.getName(), m));
 
         MODELS.putIfAbsent(XmlUtils.attrValue(rootElement, NAMESPACE), modelMap);
     }
@@ -137,7 +137,7 @@ public class XmlSerializerContext {
 
         for (Element mapping : mappings.elements()) {
             String mappingValue = XmlUtils.textTrim(mapping);
-            XmlModel model = MODELS.getOrDefault(namespace, emptyMap()).get(XmlUtils.name(mapping));
+            Model model = MODELS.getOrDefault(namespace, emptyMap()).get(XmlUtils.name(mapping));
 
             MODEL_MAPPINGS.putIfAbsent(mappingValue, model);
         }
@@ -158,7 +158,7 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
-    public static String[] findEnum(XmlProp prop) {
+    public static String[] findEnum(PropElement prop) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "enum [" + type.getValue() + "] do not support 2 type args");
@@ -168,7 +168,7 @@ public class XmlSerializerContext {
         return findEnum(enumName);
     }
 
-    public static String[] findSwitch(XmlProp prop) {
+    public static String[] findSwitch(PropElement prop) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "switch [" + type.getValue() + "] do not support 2 type args");
@@ -186,7 +186,7 @@ public class XmlSerializerContext {
         return ENUMS.getOrDefault(enumName, new String[]{});
     }
 
-    public static XmlModel findModel(String mappingValue) {
+    public static Model findModel(String mappingValue) {
         return MODEL_MAPPINGS.get(mappingValue);
     }
 
