@@ -1,8 +1,18 @@
 package org.fz.nettyx.serializer.xml;
 
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
+
 import cn.hutool.core.lang.Singleton;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
@@ -16,15 +26,6 @@ import org.fz.nettyx.serializer.xml.element.Model.PropElement;
 import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
 import org.fz.nettyx.util.Throws;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
-import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
 
 
 /**
@@ -121,7 +122,9 @@ public final class XmlSerializer implements Serializer {
             elementByteLength = arrayBytesLength / arrayLength,
             offset = prop.getOffset();
 
-        Throws.ifTrue(prop.getLength() % arrayLength != 0, newIllegalArgException("illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is [" + arrayLength + "]"));
+        Throws.ifTrue(prop.getLength() % arrayLength != 0, newIllegalArgException(
+            "illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is ["
+                + arrayLength + "]"));
 
         String arrayElementName = XmlUtils.arrayElementName(prop);
         PropType type = prop.getType();
