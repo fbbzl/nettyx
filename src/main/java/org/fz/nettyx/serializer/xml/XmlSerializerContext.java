@@ -1,29 +1,35 @@
 package org.fz.nettyx.serializer.xml;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.fz.nettyx.serializer.xml.element.Model;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
-import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
+import org.fz.nettyx.serializer.xml.dtd.Model;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop.PropType;
+import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * application must config this
@@ -34,10 +40,6 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
  */
 public class XmlSerializerContext {
 
-    /**
-     * first key is target-value, second key is namespace, the value is model
-     */
-    private static final Map<String, Model> MODEL_MAPPINGS = new SafeConcurrentHashMap<>(64);
     private static final Map<String, Document> NAMESPACES_DOCS = new SafeConcurrentHashMap<>(64);
     /**
      * key is enum name, the value is the enum-string
@@ -52,7 +54,8 @@ public class XmlSerializerContext {
      */
     private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(64);
 
-    private static final Map<String, XmlPropHandler> TYPE_HANDLERS = new SafeConcurrentHashMap<>(16);
+    private static final Map<String, PropTypeHandler> TYPE_CONVERTERS = new SafeConcurrentHashMap<>(16);
+    private static final Map<String, PropTypeHandler> PROP_HANDLERS = new SafeConcurrentHashMap<>(16);
 
     private final Path[] paths;
 
@@ -80,7 +83,6 @@ public class XmlSerializerContext {
             scanEnums(root);
             scanSwitches(root);
             scanModels(root);
-            scanMappings(root);
         }
 
         scanHandlers();
@@ -127,30 +129,19 @@ public class XmlSerializerContext {
         MODELS.putIfAbsent(XmlUtils.attrValue(rootElement, NAMESPACE), modelMap);
     }
 
-    protected void scanMappings(Element rootElement) {
-        Element mappings = rootElement.element(EL_MODEL_MAPPING);
-        if (mappings == null) {
-            return;
-        }
-
-        String namespace = XmlUtils.attrValue(rootElement, NAMESPACE);
-
-        for (Element mapping : mappings.elements()) {
-            String mappingValue = XmlUtils.textTrim(mapping);
-            Model model = MODELS.getOrDefault(namespace, emptyMap()).get(XmlUtils.name(mapping));
-
-            MODEL_MAPPINGS.putIfAbsent(mappingValue, model);
-        }
-    }
-
     protected void scanHandlers() {
-        Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(EMPTY, XmlPropHandler.class);
+        Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(EMPTY, PropTypeHandler.class);
         for (Class<?> handlerClass : handlerClasses) {
             if (!ClassUtil.isNormalClass(handlerClass)) {
                 continue;
             }
-            XmlPropHandler handler = (XmlPropHandler) Singleton.get(handlerClass);
-            TYPE_HANDLERS.putIfAbsent(handler.forType(), handler);
+            PropTypeHandler handler = (PropTypeHandler) Singleton.get(handlerClass);
+            String forType = handler.forType();
+            if (CharSequenceUtil.isNotBlank(forType)) {
+                PROP_HANDLERS.putIfAbsent(forType, handler);
+            } else {
+
+            }
         }
     }
 
@@ -158,7 +149,7 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
-    public static String[] findEnum(PropElement prop) {
+    public static String[] findEnum(Prop prop) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "enum [" + type.getValue() + "] do not support 2 type args");
@@ -168,7 +159,7 @@ public class XmlSerializerContext {
         return findEnum(enumName);
     }
 
-    public static String[] findSwitch(PropElement prop) {
+    public static String[] findSwitch(Prop prop) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "switch [" + type.getValue() + "] do not support 2 type args");
@@ -186,16 +177,16 @@ public class XmlSerializerContext {
         return ENUMS.getOrDefault(enumName, new String[]{});
     }
 
-    public static Model findModel(String mappingValue) {
-        return MODEL_MAPPINGS.get(mappingValue);
+    public static Model findModel(String namespace, String modelName) {
+        return MODELS.getOrDefault(namespace, emptyMap()).get(modelName);
     }
 
     public static boolean containsType(String typeValue) {
-        return TYPE_HANDLERS.containsKey(typeValue);
+        return PROP_HANDLERS.containsKey(typeValue);
     }
 
-    public static XmlPropHandler getHandler(String typeValue) {
-        return TYPE_HANDLERS.get(typeValue);
+    public static PropTypeHandler getHandler(String typeValue) {
+        return PROP_HANDLERS.get(typeValue);
     }
 
     //************************************          public start            *****************************************//
