@@ -16,6 +16,7 @@ import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class ClientTest {
 
     @Test
     public void initClient( ) throws Exception {
-        S
+        StructSerializerContext.doScan();
 
         TestClient testClient = new TestClient();
 
