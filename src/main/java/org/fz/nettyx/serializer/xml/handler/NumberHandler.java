@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.util.NumberUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.Model.Prop;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
 
 import java.util.function.Function;
