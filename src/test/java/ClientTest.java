@@ -31,7 +31,7 @@ public class ClientTest {
 
     @Test
     public void initClient( ) throws Exception {
-        StructSerializerContext.doScan();
+        StructSerializerContext structSerializerContext = new StructSerializerContext("org.fz.nettyx");
 
         TestClient testClient = new TestClient();
 
