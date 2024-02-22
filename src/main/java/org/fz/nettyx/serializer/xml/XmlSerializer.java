@@ -37,6 +37,7 @@ public final class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
     private final Model model;
+
     public static Dict read(ByteBuf byteBuf, Model model) {
         return new XmlSerializer(byteBuf, model).parse();
     }
@@ -50,7 +51,7 @@ public final class XmlSerializer implements Serializer {
         for (Prop prop : currentModel.getProps()) {
             try {
                 String name = prop.getName();
-                Element propEl = prop.copy();
+
                 PropType type = prop.getType();
 
                 if (prop.useHandler()) {
@@ -58,7 +59,7 @@ public final class XmlSerializer implements Serializer {
                 } else if (prop.isArray()) {
                     propEl.setContent(readArray(prop, reading));
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
-                    propEl.setText(XmlSerializerContext.getHandler(type.getValue()).read(prop, reading));
+                    map.put(name, XmlSerializerContext.getHandler(type.getValue()).read(prop, reading));
                 } else throw new IllegalArgumentException("type not recognized [" + type + "]");
             } catch (Exception exception) {
                 throw new IllegalArgumentException("exception occur while analyzing prop [" + prop + "]", exception);
