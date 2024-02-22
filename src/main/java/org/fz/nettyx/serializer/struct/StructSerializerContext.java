@@ -23,7 +23,6 @@ import java.util.Set;
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
 
-
 /**
  * The type Struct cache.
  *
@@ -33,7 +32,6 @@ import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnota
  */
 @UtilityClass
 @SuppressWarnings("all")
-
 final class StructSerializerContext {
 
     /**

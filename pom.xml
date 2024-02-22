@@ -66,6 +66,8 @@
 
         <!--expression engine-->
         <mvel2.version>2.5.2.Final</mvel2.version>
+
+        <junit.version>4.13.2</junit.version>
     </properties>
 
     <dependencies>
@@ -142,6 +144,12 @@
             <version>${mvel2.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -16,6 +16,7 @@ import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.junit.Test;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -26,7 +27,7 @@ import java.net.SocketAddress;
  * @since 2023/5/23 21:35
  */
 @Slf4j
-public class Codec {
+public class ClientTest {
 
     @Slf4j
     public static class TestClient extends SingleTcpChannelClient {
@@ -60,7 +61,7 @@ public class Codec {
     }
 
     public static class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
-        TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend>>() {
+        TypeRefer<StructSerializerTest.User<StructSerializerTest.Son<Clong4, Clong4>, StructSerializerTest.Wife, StructSerializerTest.GirlFriend>> typeRefer = new TypeRefer<StructSerializerTest.User<StructSerializerTest.Son<Clong4, Clong4>, StructSerializerTest.Wife, StructSerializerTest.GirlFriend>>() {
         };
 
         @Override
@@ -75,7 +76,9 @@ public class Codec {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+
+    @Test
+    public void initClient( ) throws Exception {
         TestClient testClient = new TestClient();
 
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
