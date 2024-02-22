@@ -4,13 +4,11 @@ import lombok.experimental.UtilityClass;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.text.CharSequenceUtil.subBefore;
 import static java.util.Collections.emptyList;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
@@ -23,10 +21,6 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
 @UtilityClass
 public class XmlUtils {
-
-    public static String arrayElementName(PropElement prop) {
-        return subBefore(prop.getName(), "-array", true);
-    }
 
     /**
      * You can use namespace to make calls across XML elements
