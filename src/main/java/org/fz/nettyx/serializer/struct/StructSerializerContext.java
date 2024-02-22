@@ -1,5 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
@@ -7,10 +10,6 @@ import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import lombok.experimental.UtilityClass;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -19,9 +18,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The type Struct cache.
@@ -30,7 +28,6 @@ import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnota
  * @version 1.0
  * @since 2021 /10/22 13:18
  */
-@UtilityClass
 @SuppressWarnings("all")
 final class StructSerializerContext {
 
@@ -47,8 +44,7 @@ final class StructSerializerContext {
      */
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
 
-    static {
-        // TODO 在构造函数中进行扫描, 虽然会增加使用难度, 但是效率高了很多,且使用统一的使用方式
+    public StructSerializerContext(String... packageNames) {
         doScan(EMPTY);
     }
 
