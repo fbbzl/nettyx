@@ -11,8 +11,8 @@ import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
-import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -187,7 +187,7 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * convert Object to ByteBuf
+     * read Object to ByteBuf
      *
      * @return the byte buf
      */
