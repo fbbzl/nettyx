@@ -55,7 +55,7 @@ public final class StructSerializerContext {
      *
      * @param packageNames the packages with struct or basic
      */
-    public static synchronized void doScan(String... packageNames) {
+    public synchronized void doScan(String... packageNames) {
         log.info("will scan " + Arrays.toString(packageNames) + " packages");
         try {
             for (String packageName : packageNames) {
@@ -70,7 +70,7 @@ public final class StructSerializerContext {
         }
     }
 
-    private static synchronized void scanHandlers(Set<Class<?>> classes) {
+    private synchronized void scanHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
 
@@ -86,7 +86,7 @@ public final class StructSerializerContext {
         }
     }
 
-    private static synchronized void scanBasics(Set<Class<?>> classes)
+    private synchronized void scanBasics(Set<Class<?>> classes)
             throws InvocationTargetException, InstantiationException, IllegalAccessException {
         for (Class<?> clazz : classes) {
             boolean isBasic = Basic.class.isAssignableFrom(clazz);
@@ -98,7 +98,7 @@ public final class StructSerializerContext {
         }
     }
 
-    private static synchronized void scanStructs(Set<Class<?>> classes) throws IntrospectionException {
+    private synchronized void scanStructs(Set<Class<?>> classes) throws IntrospectionException {
         for (Class<?> clazz : classes) {
             if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                 ReflectUtil.getConstructor(clazz);
