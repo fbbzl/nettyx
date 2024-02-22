@@ -64,7 +64,7 @@ public class Model {
         }
 
         public boolean isArray() {
-            return endWithIgnoreCase(propEl.getName(), "-array");
+            return endWithIgnoreCase(propEl.getName(), "-array") && getArrayLength() != 0;
         }
 
         public boolean useHandler() {
