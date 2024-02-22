@@ -19,10 +19,10 @@ public class Dtd {
 
     public static final String
             ATTR_OFFSET = ":offset",
-            ATTR_ORDER = ":order",
             ATTR_LENGTH = ":length",
             ATTR_TYPE = ":type",
-            ATTR_EXP = ":exp",
+            ATTR_ARRAY_LENGTH = ":array-length",
+            ATTR_ORDER = ":order",
             ATTR_HANDLER = ":handler";
 
 }

@@ -1,14 +1,16 @@
 package org.fz.nettyx.serializer.xml;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static java.util.Collections.emptyList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 
 
 /**
@@ -20,12 +22,19 @@ import org.dom4j.Element;
 @UtilityClass
 public class XmlUtils {
 
-
     /**
      * You can use namespace to make calls across XML elements
      */
     public static String namespace(Element root) {
         return XmlUtils.attrValue(root, NAMESPACE);
+    }
+
+    public static List<Node> content(Element element) {
+        if (element == null) {
+            return emptyList();
+        }
+
+        return element.content();
     }
 
     public static String name(Element element) {
@@ -60,7 +69,7 @@ public class XmlUtils {
 
     public static List<Element> elements(Element element, String name, Predicate<Element> filter) {
         if (element == null) {
-            return Collections.emptyList();
+            return emptyList();
         }
         List<Element> elements = element.elements(name);
         elements.removeIf(filter.negate());
@@ -69,14 +78,14 @@ public class XmlUtils {
 
     public static List<Element> elements(Element element, String name) {
         if (element == null) {
-            return Collections.emptyList();
+            return emptyList();
         }
         return element.elements(name);
     }
 
     public static List<Element> elements(Element element) {
         if (element == null) {
-            return Collections.emptyList();
+            return emptyList();
         }
         return element.elements();
     }
