@@ -1,19 +1,27 @@
-package org.fz.nettyx.serializer.xml.element;
+package org.fz.nettyx.serializer.xml.dtd;
 
+import static cn.hutool.core.text.CharSequenceUtil.endWithIgnoreCase;
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
+import static cn.hutool.core.text.CharSequenceUtil.subBetween;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ARRAY_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+import static org.fz.nettyx.util.EndianKit.LE;
+
+import java.util.List;
+import java.util.regex.Pattern;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.xml.XmlUtils;
 import org.fz.nettyx.util.EndianKit;
-
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
-import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
  * @author fengbinbin
@@ -26,20 +34,20 @@ public class Model {
 
     private final String namespace;
     private final String name;
-    private final List<PropElement> props;
+    private final List<Prop> props;
 
     public Model(Element modelEl) {
         this.namespace = XmlUtils.attrValue(modelEl.getDocument().getRootElement(), NAMESPACE);
         this.name = XmlUtils.name(modelEl);
-        this.props = XmlUtils.elements(modelEl).stream().map(PropElement::new).collect(toList());
+        this.props = XmlUtils.elements(modelEl).stream().map(Prop::new).collect(toList());
     }
 
-    public static class PropElement {
+    public static class Prop {
 
         @Delegate
         private final Element propEl;
 
-        public PropElement(Element propEl) {
+        public Prop(Element propEl) {
             this.propEl = propEl;
         }
 
@@ -64,21 +72,19 @@ public class Model {
         }
 
         public boolean isArray() {
-            return endWithIgnoreCase(propEl.getName(), "-array");
+            return endWithIgnoreCase(propEl.getName(), "-array") && getArrayLength() != 0;
         }
 
         public boolean useHandler() {
-            // return CharSequenceUtil.isNotBlank(getHandlerQName());
-            return false;
+            return propEl.attribute(ATTR_HANDLER) != null;
         }
 
         public String getHandlerQName() {
-            // return CharSequenceUtil.isNotBlank(getHandlerQName());
-            return "xx.xx.yy.Hnadler";
+            return propEl.attribute(ATTR_HANDLER).getValue();
         }
 
-        public List<PropElement> propElements() {
-            return propEl.elements().stream().map(PropElement::new).collect(toList());
+        public List<Prop> propElements() {
+            return propEl.elements().stream().map(Prop::new).collect(toList());
         }
 
         public Element copy() {
