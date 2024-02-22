@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.xml.dtd;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import lombok.Data;
 import lombok.experimental.Delegate;
 import org.dom4j.Element;
@@ -68,13 +69,11 @@ public class Model {
         }
 
         public boolean useHandler() {
-            // return CharSequenceUtil.isNotBlank(getHandlerQName());
-            return false;
+            return CharSequenceUtil.isNotBlank(getHandlerQName());
         }
 
         public String getHandlerQName() {
-            // return CharSequenceUtil.isNotBlank(getHandlerQName());
-            return "xx.xx.yy.Hnadler";
+            return propEl.attribute(ATTR_HANDLER).getValue();
         }
 
         public List<Prop> propElements() {
