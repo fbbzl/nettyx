@@ -78,7 +78,6 @@ public class Model {
         }
 
         public List<PropElement> propElements() {
-            // TODO 计算偏移
             return propEl.elements().stream().map(PropElement::new).collect(toList());
         }
 
