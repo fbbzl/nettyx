@@ -1,18 +1,8 @@
 package org.fz.nettyx.serializer.xml;
 
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
-import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
-
 import cn.hutool.core.lang.Singleton;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
@@ -26,6 +16,15 @@ import org.fz.nettyx.serializer.xml.element.Model.PropElement;
 import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
 import org.fz.nettyx.util.Throws;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
+import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
 
 
 /**
@@ -51,10 +50,6 @@ public final class XmlSerializer implements Serializer {
      */
     public static Document read(ByteBuf byteBuf, Model model) {
         return new XmlSerializer(byteBuf, model).parseDoc();
-    }
-
-    public static ByteBuf write(ByteBuf byteBuf, Model model) {
-        return new XmlSerializer(byteBuf, model).toByteBuf();
     }
 
     /**
@@ -91,29 +86,6 @@ public final class XmlSerializer implements Serializer {
         return document;
     }
 
-    /**
-     * @return byte buf
-     */
-    ByteBuf toByteBuf() {
-        Model currentModel = getModel();
-        ByteBuf writing = getByteBuf();
-
-        for (PropElement prop : currentModel.getProps()) {
-            PropType type = prop.getType();
-            String typeValue = type.getValue();
-
-            if (prop.useHandler()) {
-                ((XmlPropHandler) (Singleton.get(prop.getHandlerQName()))).write(prop, writing);
-            } else if (prop.isArray()) {
-                writeArray(prop, writing);
-            } else if (XmlSerializerContext.containsType(typeValue)) {
-                XmlSerializerContext.getHandler(typeValue).write(prop, writing);
-            } else throw new IllegalArgumentException("type not recognized [" + type + "]");
-
-        }
-        return null;
-    }
-
     //*******************************           private start             ********************************************//
 
     private List<Node> readArray(PropElement prop, ByteBuf reading) {
@@ -147,21 +119,6 @@ public final class XmlSerializer implements Serializer {
         }
 
         return elements;
-    }
-
-    private void writeArray(PropElement prop, ByteBuf writing) {
-        PropType type = prop.getType();
-
-        int arrayLength = prop.getArrayLength();
-        String typeValue = type.getValue();
-
-        XmlPropHandler handler = XmlSerializerContext.getHandler(typeValue);
-
-        List<PropElement> elements = prop.propElements();
-        for (PropElement propEl : elements) {
-            handler.write(propEl, writing);
-        }
-
     }
 
     //*******************************           private end             ********************************************//
