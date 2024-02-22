@@ -1,12 +1,12 @@
 package org.fz.nettyx.serializer.xml;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Singleton;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.dom.DOMElement;
@@ -19,9 +19,7 @@ import org.fz.nettyx.util.Throws;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
@@ -48,8 +46,8 @@ public final class XmlSerializer implements Serializer {
      * @param model   the model
      * @return the document
      */
-    public static Document read(ByteBuf byteBuf, Model model) {
-        return new XmlSerializer(byteBuf, model).parseDoc();
+    public static Dict read(ByteBuf byteBuf, Model model) {
+        return new XmlSerializer(byteBuf, model).parse();
     }
 
     /**
@@ -57,46 +55,44 @@ public final class XmlSerializer implements Serializer {
      *
      * @return the document
      */
-    Document parseDoc() {
+    Dict parse() {
         Model currentModel = getModel();
         ByteBuf reading = getByteBuf();
 
-        Element rootModel = new DOMElement(currentModel.getName());
-        Document document = DocumentHelper.createDocument(rootModel);
+        Map<String, Object> map = new LinkedHashMap<>();
 
         for (PropElement prop : currentModel.getProps()) {
             try {
+                String name = prop.getName();
                 Element propEl = prop.copy();
                 PropType type = prop.getType();
 
                 if (prop.useHandler()) {
-                    propEl.setText(((XmlPropHandler) (Singleton.get(prop.getHandlerQName()))).read(prop, reading));
+                    map.put(name, ((XmlPropHandler) (Singleton.get(prop.getHandlerQName()))).read(prop, reading));
                 } else if (prop.isArray()) {
                     propEl.setContent(readArray(prop, reading));
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
                     propEl.setText(XmlSerializerContext.getHandler(type.getValue()).read(prop, reading));
                 } else throw new IllegalArgumentException("type not recognized [" + type + "]");
-
-                rootModel.add(propEl);
             } catch (Exception exception) {
                 throw new IllegalArgumentException("exception occur while analyzing prop [" + prop + "]", exception);
             }
         }
 
-        return document;
+        return new Dict(map);
     }
 
     //*******************************           private start             ********************************************//
 
     private List<Node> readArray(PropElement prop, ByteBuf reading) {
         int arrayBytesLength = prop.getLength(),
-            arrayLength = prop.getArrayLength(),
-            elementByteLength = arrayBytesLength / arrayLength,
-            offset = prop.getOffset();
+                arrayLength = prop.getArrayLength(),
+                elementByteLength = arrayBytesLength / arrayLength,
+                offset = prop.getOffset();
 
         Throws.ifTrue(prop.getLength() % arrayLength != 0, newIllegalArgException(
-            "illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is ["
-                + arrayLength + "]"));
+                "illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is ["
+                        + arrayLength + "]"));
 
         String arrayElementName = XmlUtils.arrayElementName(prop);
         PropType type = prop.getType();
