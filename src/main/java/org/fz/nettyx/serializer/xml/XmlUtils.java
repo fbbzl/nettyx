@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.fz.nettyx.serializer.xml.element.Model.Prop;
+import org.fz.nettyx.serializer.xml.Model.Prop;
 
 import java.util.List;
 import java.util.function.Predicate;

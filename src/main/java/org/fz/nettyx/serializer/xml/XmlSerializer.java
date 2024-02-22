@@ -7,9 +7,8 @@ import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.xml.element.Model;
-import org.fz.nettyx.serializer.xml.element.Model.Prop;
-import org.fz.nettyx.serializer.xml.element.Model.Prop.PropType;
+import org.fz.nettyx.serializer.xml.Model.Prop;
+import org.fz.nettyx.serializer.xml.Model.Prop.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
 import org.fz.nettyx.util.Throws;
 
