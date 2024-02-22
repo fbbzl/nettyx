@@ -9,9 +9,8 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.*;
 import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
 import org.fz.nettyx.serializer.struct.basic.cpp.signed.*;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.*;
+import org.junit.Test;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,24 +19,20 @@ import java.util.List;
  * @version 1.0
  * @since 2021/10/20 16:27
  */
-public class TypedSerializerTest {
+public class StructSerializerTest {
 
-    public static void main(String[] args) {
+    @Test
+    public void test() {
         byte[] bytes = new byte[1024 * 1024];
         Arrays.fill(bytes, (byte) 1);
-        // bytes = HexBins.decode("11");
-        long l = System.currentTimeMillis();
-        int times = 1;
-
         TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
         };
-        for (int i = 0; i < times; i++) {
 
-            // these bytes may from nio, netty, input-stream, output-stream.....
-            User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(
+        // these bytes may from nio, netty, input-stream, output-stream.....
+        User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(
                 Unpooled.wrappedBuffer(bytes), typeRefer);
 
-             System.err.println("read :" + user);
+        System.err.println("read :" + user);
 //            user.setAddress(null);
 //            user.setLoginNames(null);
 //            user.setQqNames(null);
@@ -46,23 +41,17 @@ public class TypedSerializerTest {
 //            user.setFirstWifes(null);
 //            user.setBigSons(null);
 
-            final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
+        final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
 
 //            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> turn = StructSerializer.read(userWriteBytes, typeRefer);
 //            turn = new User<>();
 
-            //byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
+        //byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
 
-            //System.err.println(Arrays.toString(bytes1));
-            //   System.err.println("turn :" + turn);
+        //System.err.println(Arrays.toString(bytes1));
+        //   System.err.println("turn :" + turn);
 
-            //  System.err.println(turn.equals(user));
-
-        }
-        BigDecimal l1 = new BigDecimal((System.currentTimeMillis() - l) / 1000 + "");
-        System.err.println(l1);
-
-        System.err.println(l1.divide(new BigDecimal(times + ""), 10, RoundingMode.HALF_UP));
+        //  System.err.println(turn.equals(user));
     }
 
     @Data
