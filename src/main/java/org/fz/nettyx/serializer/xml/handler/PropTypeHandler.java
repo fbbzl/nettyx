@@ -18,7 +18,7 @@ public interface PropTypeHandler extends PropHandler {
     String forType();
 
     default byte[] readBytes(Prop prop, ByteBuf byteBuf) {
-        // TODO 相对位置 和 绝对位置
+        // TODO  相对位置 和 绝对位置
         byte[] bytes = new byte[prop.getLength()];
         byteBuf.readBytes(bytes);
         return bytes;
