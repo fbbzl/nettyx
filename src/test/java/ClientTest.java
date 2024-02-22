@@ -41,16 +41,6 @@ public class ClientTest {
         System.err.println("ok");
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        StructSerializerContext structSerializerContext = new StructSerializerContext("org.fz.nettyx");
-
-        TestClient testClient = new TestClient();
-
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
-        testClient.connect(inetSocketAddress).sync();
-
-        System.err.println("ok");
-    }
     @Slf4j
     public static class TestClient extends SingleTcpChannelClient {
 
