@@ -30,6 +30,8 @@ public class ClientTest {
 
     @Test
     public void initClient( ) throws Exception {
+        S
+
         TestClient testClient = new TestClient();
 
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);

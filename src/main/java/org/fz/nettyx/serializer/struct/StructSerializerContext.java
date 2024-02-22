@@ -31,7 +31,7 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
  */
 @Slf4j
 @SuppressWarnings("all")
-final class StructSerializerContext {
+public final class StructSerializerContext {
 
     /**
      * reflection cache
