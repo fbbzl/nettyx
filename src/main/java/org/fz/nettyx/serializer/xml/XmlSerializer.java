@@ -50,17 +50,18 @@ public final class XmlSerializer implements Serializer {
 
         for (Prop prop : currentModel.getProps()) {
             try {
-                String name = prop.getName();
-
                 PropType type = prop.getType();
 
+                Object value;
                 if (prop.useHandler()) {
-                    map.put(name, ((XmlPropHandler) (Singleton.get(prop.getHandlerQName()))).read(prop, reading));
+                    value = ((XmlPropHandler) (Singleton.get(prop.getHandlerQName()))).read(prop, reading);
                 } else if (prop.isArray()) {
-                    propEl.setContent(readArray(prop, reading));
+                    value = readArray(prop, reading);
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
-                    map.put(name, XmlSerializerContext.getHandler(type.getValue()).read(prop, reading));
+                    value = XmlSerializerContext.getHandler(type.getValue()).read(prop, reading);
                 } else throw new IllegalArgumentException("type not recognized [" + type + "]");
+
+                map.put(prop.getName(), value);
             } catch (Exception exception) {
                 throw new IllegalArgumentException("exception occur while analyzing prop [" + prop + "]", exception);
             }
