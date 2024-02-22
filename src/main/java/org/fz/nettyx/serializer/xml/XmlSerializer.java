@@ -57,9 +57,8 @@ public final class XmlSerializer implements Serializer {
                     value = readArray(prop, reading);
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
                     value = XmlSerializerContext.getHandler(type.getValue()).read(prop, reading);
-                } else {
-                    throw new IllegalArgumentException("type not recognized [" + type + "]");
                 }
+                else throw new IllegalArgumentException("type not recognized [" + type + "]");
 
                 map.put(prop.getName(), value);
             } catch (UtilException hutoolException) {
