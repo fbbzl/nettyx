@@ -18,7 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
-import lombok.experimental.UtilityClass;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
@@ -29,7 +28,6 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
  * @version 1.0
  * @since 2021 /10/22 13:18
  */
-@UtilityClass
 @SuppressWarnings("all")
 final class StructSerializerContext {
 
