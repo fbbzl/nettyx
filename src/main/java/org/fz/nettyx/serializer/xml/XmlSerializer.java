@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.dom.DOMElement;
@@ -38,23 +37,10 @@ public final class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
     private final Model model;
-
-    /**
-     * Read document.
-     *
-     * @param byteBuf the byte buf
-     * @param model   the model
-     * @return the document
-     */
     public static Dict read(ByteBuf byteBuf, Model model) {
         return new XmlSerializer(byteBuf, model).parse();
     }
 
-    /**
-     * return a document with a model
-     *
-     * @return the document
-     */
     Dict parse() {
         Model currentModel = getModel();
         ByteBuf reading = getByteBuf();
@@ -133,9 +119,9 @@ public final class XmlSerializer implements Serializer {
         byte[] bytes = new byte[100];
         Arrays.fill(bytes, (byte) 0);
         Model model1 = XmlSerializerContext.findModel("stu");
-        Document doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
+        Dict doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
 
-        System.err.println(doc.asXML());
+        System.err.println(doc);
     }
 
 }
