@@ -4,8 +4,8 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.Model.Prop;
-import org.fz.nettyx.serializer.xml.Model.Prop.PropType;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop.PropType;
 import org.fz.nettyx.util.Throws;
 
 import java.nio.charset.Charset;

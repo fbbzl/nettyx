@@ -1,9 +1,10 @@
-package org.fz.nettyx.serializer.xml;
+package org.fz.nettyx.serializer.xml.dtd;
 
 import lombok.Data;
 import lombok.experimental.Delegate;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.fz.nettyx.serializer.xml.XmlUtils;
 import org.fz.nettyx.util.EndianKit;
 
 import java.util.List;
