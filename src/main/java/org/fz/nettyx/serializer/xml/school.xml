@@ -57,7 +57,6 @@
             <country :offset="6" :length="1" :type="enum(country)">CHINA</country>
             <country :offset="7" :length="1" :type="enum(country)">CHINA</country>
         </country-array>
-        1
         <phonenum-array :offset="9" :length="4" :array-length="2" :type="int">
             <phonenum :offset="9" :length="2" :type="int">0</phonenum>
             <phonenum :offset="11" :length="2" :type="int">0</phonenum>
