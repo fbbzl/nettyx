@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
 
 import cn.hutool.core.annotation.AnnotationUtil;
@@ -45,7 +44,7 @@ final class StructSerializerContext {
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
 
     public StructSerializerContext(String... packageNames) {
-        doScan(EMPTY);
+        doScan(packageNames);
     }
 
     /**
