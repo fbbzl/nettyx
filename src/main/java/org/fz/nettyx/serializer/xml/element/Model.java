@@ -26,20 +26,20 @@ public class Model {
 
     private final String namespace;
     private final String name;
-    private final List<PropElement> props;
+    private final List<Prop> props;
 
     public Model(Element modelEl) {
         this.namespace = XmlUtils.attrValue(modelEl.getDocument().getRootElement(), NAMESPACE);
         this.name = XmlUtils.name(modelEl);
-        this.props = XmlUtils.elements(modelEl).stream().map(PropElement::new).collect(toList());
+        this.props = XmlUtils.elements(modelEl).stream().map(Prop::new).collect(toList());
     }
 
-    public static class PropElement {
+    public static class Prop {
 
         @Delegate
         private final Element propEl;
 
-        public PropElement(Element propEl) {
+        public Prop(Element propEl) {
             this.propEl = propEl;
         }
 
@@ -77,8 +77,8 @@ public class Model {
             return "xx.xx.yy.Hnadler";
         }
 
-        public List<PropElement> propElements() {
-            return propEl.elements().stream().map(PropElement::new).collect(toList());
+        public List<Prop> propElements() {
+            return propEl.elements().stream().map(Prop::new).collect(toList());
         }
 
         public Element copy() {
