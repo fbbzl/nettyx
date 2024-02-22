@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.xml.handler;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement;
+import org.fz.nettyx.serializer.xml.element.Model.Prop;
 
 /**
  * The interface Type handler.
@@ -17,11 +17,11 @@ public interface XmlPropHandler {
      */
     String forType();
 
-    String read(PropElement prop, ByteBuf reading);
+    String read(Prop prop, ByteBuf reading);
 
-    void write(PropElement prop, ByteBuf writing);
+    void write(Prop prop, ByteBuf writing);
 
-    default byte[] readBytes(PropElement prop, ByteBuf byteBuf) {
+    default byte[] readBytes(Prop prop, ByteBuf byteBuf) {
         // TODO 相对位置 和 绝对位置
         byte[] bytes = new byte[prop.getLength()];
         byteBuf.readBytes(bytes);

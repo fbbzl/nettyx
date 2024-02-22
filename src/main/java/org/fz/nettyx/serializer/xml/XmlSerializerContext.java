@@ -9,8 +9,8 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.fz.nettyx.serializer.xml.element.Model;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
+import org.fz.nettyx.serializer.xml.element.Model.Prop;
+import org.fz.nettyx.serializer.xml.element.Model.Prop.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
@@ -158,7 +158,7 @@ public class XmlSerializerContext {
 
     //************************************          public start            *****************************************//
 
-    public static String[] findEnum(PropElement prop) {
+    public static String[] findEnum(Prop prop) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "enum [" + type.getValue() + "] do not support 2 type args");
@@ -168,7 +168,7 @@ public class XmlSerializerContext {
         return findEnum(enumName);
     }
 
-    public static String[] findSwitch(PropElement prop) {
+    public static String[] findSwitch(Prop prop) {
         PropType type = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "switch [" + type.getValue() + "] do not support 2 type args");

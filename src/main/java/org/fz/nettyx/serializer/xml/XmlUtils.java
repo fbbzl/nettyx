@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement;
+import org.fz.nettyx.serializer.xml.element.Model.Prop;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,7 +24,7 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
 @UtilityClass
 public class XmlUtils {
 
-    public static String arrayElementName(PropElement prop) {
+    public static String arrayElementName(Prop prop) {
         return subBefore(prop.getName(), "-array", true);
     }
 

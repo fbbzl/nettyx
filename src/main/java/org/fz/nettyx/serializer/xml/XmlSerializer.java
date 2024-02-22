@@ -11,8 +11,8 @@ import org.dom4j.Node;
 import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.Model;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement;
-import org.fz.nettyx.serializer.xml.element.Model.PropElement.PropType;
+import org.fz.nettyx.serializer.xml.element.Model.Prop;
+import org.fz.nettyx.serializer.xml.element.Model.Prop.PropType;
 import org.fz.nettyx.serializer.xml.handler.XmlPropHandler;
 import org.fz.nettyx.util.Throws;
 
@@ -47,7 +47,7 @@ public final class XmlSerializer implements Serializer {
 
         Map<String, Object> map = new LinkedHashMap<>();
 
-        for (PropElement prop : currentModel.getProps()) {
+        for (Prop prop : currentModel.getProps()) {
             try {
                 String name = prop.getName();
                 Element propEl = prop.copy();
@@ -70,7 +70,7 @@ public final class XmlSerializer implements Serializer {
 
     //*******************************           private start             ********************************************//
 
-    private List<Node> readArray(PropElement prop, ByteBuf reading) {
+    private List<Node> readArray(Prop prop, ByteBuf reading) {
         int arrayBytesLength = prop.getLength(),
                 arrayLength = prop.getArrayLength(),
                 elementByteLength = arrayBytesLength / arrayLength,
