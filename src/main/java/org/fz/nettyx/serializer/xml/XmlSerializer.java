@@ -6,9 +6,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.dom.DOMElement;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.xml.element.Model;
 import org.fz.nettyx.serializer.xml.element.Model.Prop;
@@ -20,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
 
 
@@ -72,34 +68,21 @@ public final class XmlSerializer implements Serializer {
 
     //*******************************           private start             ********************************************//
 
-    private List<Node> readArray(Prop prop, ByteBuf reading) {
+    private List<String> readArray(Prop prop, ByteBuf reading) {
         int arrayBytesLength = prop.getLength(),
-                arrayLength = prop.getArrayLength(),
-                elementByteLength = arrayBytesLength / arrayLength,
-                offset = prop.getOffset();
+                arrayLength = prop.getArrayLength();
 
         Throws.ifTrue(prop.getLength() % arrayLength != 0, newIllegalArgException(
                 "illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is ["
                         + arrayLength + "]"));
 
-        String arrayElementName = XmlUtils.arrayElementName(prop);
         PropType type = prop.getType();
 
         XmlPropHandler handler = XmlSerializerContext.getHandler(type.getValue());
 
-        List<Node> elements = new ArrayList<>(8);
+        List<String> elements = new ArrayList<>(8);
         for (int i = 0; i < arrayLength; i++) {
-            Element el = new DOMElement(arrayElementName);
-            try {
-                el.addAttribute(ATTR_OFFSET, String.valueOf(offset));
-                el.addAttribute(ATTR_LENGTH, String.valueOf(elementByteLength));
-                el.addAttribute(ATTR_TYPE, type.getTypeText());
-
-                el.setText(handler.read(prop, reading));
-                elements.add(el);
-            } finally {
-                offset += elementByteLength;
-            }
+            elements.add(handler.read(prop, reading));
         }
 
         return elements;
