@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.xml.handler;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.element.Model.Prop;
+import org.fz.nettyx.serializer.xml.Model.Prop;
 
 /**
  * The interface Type handler.
