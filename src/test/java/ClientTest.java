@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -16,9 +18,7 @@ import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+import org.junit.Test;
 
 /**
  * @author fengbinbin
@@ -26,7 +26,17 @@ import java.net.SocketAddress;
  * @since 2023/5/23 21:35
  */
 @Slf4j
-public class Codec {
+public class ClientTest {
+
+    @Test
+    public void initClient( ) throws Exception {
+        TestClient testClient = new TestClient();
+
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
+        testClient.connect(inetSocketAddress).sync();
+
+        System.err.println("ok");
+    }
 
     @Slf4j
     public static class TestClient extends SingleTcpChannelClient {
@@ -60,7 +70,7 @@ public class Codec {
     }
 
     public static class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
-        TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend>> typeRefer = new TypeRefer<TypedSerializerTest.User<TypedSerializerTest.Son<Clong4, Clong4>, TypedSerializerTest.Wife, TypedSerializerTest.GirlFriend>>() {
+        TypeRefer<StructSerializerTest.User<StructSerializerTest.Son<Clong4, Clong4>, StructSerializerTest.Wife, StructSerializerTest.GirlFriend>> typeRefer = new TypeRefer<StructSerializerTest.User<StructSerializerTest.Son<Clong4, Clong4>, StructSerializerTest.Wife, StructSerializerTest.GirlFriend>>() {
         };
 
         @Override
@@ -74,15 +84,5 @@ public class Codec {
             log.error("{}", read);
         }
     }
-
-    public static void main(String[] args) throws Exception {
-        TestClient testClient = new TestClient();
-
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
-        testClient.connect(inetSocketAddress).sync();
-
-        System.err.println("ok");
-    }
-
 
 }
