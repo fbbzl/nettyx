@@ -68,7 +68,7 @@ public final class XmlSerializer implements Serializer {
 
     //*******************************           private start             ********************************************//
 
-    private List<String> readArray(Prop prop, ByteBuf reading) {
+    private List<Object> readArray(Prop prop, ByteBuf reading) {
         int arrayBytesLength = prop.getLength(),
                 arrayLength = prop.getArrayLength();
 
@@ -80,7 +80,7 @@ public final class XmlSerializer implements Serializer {
 
         XmlPropHandler handler = XmlSerializerContext.getHandler(type.getValue());
 
-        List<String> elements = new ArrayList<>(8);
+        List<Object> elements = new ArrayList<>(8);
         for (int i = 0; i < arrayLength; i++) {
             elements.add(handler.read(prop, reading));
         }
