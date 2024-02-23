@@ -36,7 +36,5 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         s.stop();
 
         Console.print(s.prettyPrint(TimeUnit.MILLISECONDS));
-
-        log.error("{}", read);
     }
 }
