@@ -17,7 +17,7 @@ import static org.fz.nettyx.util.EndianKit.LE;
  * @since 2024/2/6 22:20
  */
 
-public class EnumHandler implements XmlPropHandler {
+public class EnumHandler implements PropTypeHandler {
 
     @Override
     public String forType() {

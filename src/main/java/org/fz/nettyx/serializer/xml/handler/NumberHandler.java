@@ -2,10 +2,9 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.util.NumberUtil;
 import io.netty.buffer.ByteBuf;
+import java.util.function.Function;
 import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
-
-import java.util.function.Function;
 
 /**
  * @author fengbinbin
@@ -13,7 +12,7 @@ import java.util.function.Function;
  * @since 2024/2/6 22:20
  */
 
-public abstract class NumberHandler implements XmlPropHandler {
+public abstract class NumberHandler implements PropTypeHandler {
 
     @Override
     public String read(Prop prop, ByteBuf reading) {
