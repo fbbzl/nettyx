@@ -39,7 +39,6 @@ public class TestClient extends SingleTcpChannelClient {
         return super.newBootstrap()
                 .handler(channelInitializer())
                 .connect(address);
-
     }
 
     private ChannelInitializer<NioSocketChannel> channelInitializer() {
