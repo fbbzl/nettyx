@@ -25,7 +25,7 @@
 
     <model>
         <student>
-            <id :offset="0" :length="2" :type="string(utf-8)" :handler="com.xx.aa.StatusHandler"/>
+            <id :offset="0" :length="2" :type="string(utf-8)"/>
             <age :offset="2" :length="1" :type="byte"/>
             <name :offset="3" :length="2" :type="string(utf-8)"/>
             <gender :offset="5" :length="1" :type="enum(gender)"/>
