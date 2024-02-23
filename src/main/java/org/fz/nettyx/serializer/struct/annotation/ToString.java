@@ -43,7 +43,7 @@ public @interface ToString {
      */
     int bufferLength();
 
-    class ToCharSequenceHandler implements StructFieldHandler.ReadWriteHandler<ToString> {
+    class ToStringHandler implements StructFieldHandler.ReadWriteHandler<ToString> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToString toString) {
