@@ -67,7 +67,7 @@ public final class StructSerializerContext {
             for (String packageName : packageNames) {
                 Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
-                scanHandlers(classes);
+                scanFieldHandlers(classes);
                 scanBasics(classes);
                 scanStructs(classes);
             }
@@ -76,7 +76,7 @@ public final class StructSerializerContext {
         }
     }
 
-    private synchronized void scanHandlers(Set<Class<?>> classes) {
+    private synchronized void scanFieldHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
 
