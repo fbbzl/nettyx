@@ -1,26 +1,11 @@
 package org.fz.nettyx.serializer.xml;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
-
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import lombok.Getter;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -30,6 +15,16 @@ import org.fz.nettyx.serializer.xml.dtd.Model.Prop.PropType;
 import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 
 /**
  * application must config this
@@ -54,9 +49,9 @@ public class XmlSerializerContext {
      */
     private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(64);
 
-    private static final Map<String, PropTypeHandler> TYPE_CONVERTERS = new SafeConcurrentHashMap<>(16);
-    private static final Map<String, PropTypeHandler> PROP_HANDLERS = new SafeConcurrentHashMap<>(16);
+    private static final Map<String, PropTypeHandler> PROP_TYPE_CONVERTERS = new SafeConcurrentHashMap<>(16);
 
+    @Getter
     private final Path[] paths;
 
     public XmlSerializerContext(File... files) {
@@ -65,10 +60,10 @@ public class XmlSerializerContext {
 
     public XmlSerializerContext(Path... paths) {
         this.paths = paths;
-        this.refresh();
+        this.doScan();
     }
 
-    public synchronized void refresh() {
+    public synchronized void doScan() {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
         List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
@@ -85,7 +80,7 @@ public class XmlSerializerContext {
             scanModels(root);
         }
 
-        scanHandlers();
+        scanTypeHandlers();
     }
 
     //************************************          private start            *****************************************//
@@ -129,7 +124,7 @@ public class XmlSerializerContext {
         MODELS.putIfAbsent(XmlUtils.attrValue(rootElement, NAMESPACE), modelMap);
     }
 
-    protected void scanHandlers() {
+    protected void scanTypeHandlers() {
         Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(EMPTY, PropTypeHandler.class);
         for (Class<?> handlerClass : handlerClasses) {
             if (!ClassUtil.isNormalClass(handlerClass)) {
@@ -138,9 +133,7 @@ public class XmlSerializerContext {
             PropTypeHandler handler = (PropTypeHandler) Singleton.get(handlerClass);
             String forType = handler.forType();
             if (CharSequenceUtil.isNotBlank(forType)) {
-                PROP_HANDLERS.putIfAbsent(forType, handler);
-            } else {
-
+                PROP_TYPE_CONVERTERS.putIfAbsent(forType, handler);
             }
         }
     }
@@ -182,11 +175,11 @@ public class XmlSerializerContext {
     }
 
     public static boolean containsType(String typeValue) {
-        return PROP_HANDLERS.containsKey(typeValue);
+        return PROP_TYPE_CONVERTERS.containsKey(typeValue);
     }
 
-    public static PropTypeHandler getHandler(String typeValue) {
-        return PROP_HANDLERS.get(typeValue);
+    public static PropTypeHandler getTypeHandler(String typeValue) {
+        return PROP_TYPE_CONVERTERS.get(typeValue);
     }
 
     //************************************          public start            *****************************************//

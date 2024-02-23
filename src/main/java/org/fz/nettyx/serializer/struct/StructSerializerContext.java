@@ -1,7 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
-
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
@@ -9,6 +7,11 @@ import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -18,9 +21,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
 
 /**
  * The type Struct cache.
@@ -46,7 +48,11 @@ public final class StructSerializerContext {
      */
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
 
+    @Getter
+    private final String[] packageNames;
+
     public StructSerializerContext(String... packageNames) {
+        this.packageNames = packageNames;
         doScan(packageNames);
     }
 
@@ -61,7 +67,7 @@ public final class StructSerializerContext {
             for (String packageName : packageNames) {
                 Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
-                scanHandlers(classes);
+                scanFieldHandlers(classes);
                 scanBasics(classes);
                 scanStructs(classes);
             }
@@ -70,7 +76,7 @@ public final class StructSerializerContext {
         }
     }
 
-    private synchronized void scanHandlers(Set<Class<?>> classes) {
+    private synchronized void scanFieldHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
 

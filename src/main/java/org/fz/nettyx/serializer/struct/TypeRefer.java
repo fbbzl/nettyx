@@ -9,6 +9,7 @@ import java.lang.reflect.*;
 
 /**
  * type parameter at the time of serialization
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/1/15 11:24
@@ -39,6 +40,10 @@ public abstract class TypeRefer<T> implements Type {
     }
 
     public static <T> Class<T> getActualType(Type root, Type type) {
+        return getActualType(root, type, 0);
+    }
+
+    public static <T> Class<T> getActualType(Type root, Type type, int index) {
         if (type instanceof Class) return (Class<T>) type;
         if (!(root instanceof ParameterizedType) || type instanceof WildcardType) return (Class<T>) Object.class;
 
@@ -49,7 +54,7 @@ public abstract class TypeRefer<T> implements Type {
             if (actualTypeArguments.length == 0) {
                 return (Class<T>) Object.class;
             }
-            return getActualType(root, actualTypeArguments[0]);
+            return getActualType(root, actualTypeArguments[index]);
         }
         if (type instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);
