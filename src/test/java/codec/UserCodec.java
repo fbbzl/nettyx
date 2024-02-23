@@ -22,8 +22,7 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
     };
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         StopWatch s = new StopWatch();
         s.start("read");
         User<Son<Clong4, Clong4>, Wife, GirlFriend> read = StructSerializer.read(msg, typeRefer);
