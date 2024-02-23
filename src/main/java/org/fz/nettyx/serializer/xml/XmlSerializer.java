@@ -65,7 +65,7 @@ public final class XmlSerializer implements Serializer {
             } catch (UtilException hutoolException) {
                 throw new IllegalArgumentException("can not find handler [" + prop.getHandlerQName() + "]");
             } catch (Exception exception) {
-                throw new IllegalArgumentException("exception occur while analyzing prop [" + prop + "]", exception);
+                throw new IllegalArgumentException("exception occur while analyzing prop [" + prop.getName() + "]", exception);
             }
         }
 
