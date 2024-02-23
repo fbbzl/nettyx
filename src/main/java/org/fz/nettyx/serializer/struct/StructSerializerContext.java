@@ -1,5 +1,7 @@
 package org.fz.nettyx.serializer.struct;
 
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
@@ -7,21 +9,18 @@ import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import lombok.experimental.UtilityClass;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The type Struct cache.
@@ -30,9 +29,9 @@ import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnota
  * @version 1.0
  * @since 2021 /10/22 13:18
  */
-@UtilityClass
+@Slf4j
 @SuppressWarnings("all")
-final class StructSerializerContext {
+public final class StructSerializerContext {
 
     /**
      * reflection cache
@@ -47,9 +46,8 @@ final class StructSerializerContext {
      */
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
 
-    static {
-        // TODO 在构造函数中进行扫描, 虽然会增加使用难度, 但是效率高了很多,且使用统一的使用方式
-        doScan(EMPTY);
+    public StructSerializerContext(String... packageNames) {
+        doScan(packageNames);
     }
 
     /**
@@ -57,21 +55,22 @@ final class StructSerializerContext {
      *
      * @param packageNames the packages with struct or basic
      */
-    public static synchronized void doScan(String... packageNames) {
+    public synchronized void doScan(String... packageNames) {
+        log.info("will scan " + Arrays.toString(packageNames) + " packages");
         try {
             for (String packageName : packageNames) {
                 Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
-                scanAllHandlers(classes);
-                scanAllBasics(classes);
-                scanAllStructs(classes);
+                scanHandlers(classes);
+                scanBasics(classes);
+                scanStructs(classes);
             }
         } catch (Exception e) {
             throw new NotInitedException("init serializer context failed please check", e);
         }
     }
 
-    private static synchronized void scanAllHandlers(Set<Class<?>> classes) {
+    private synchronized void scanHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
 
@@ -87,7 +86,7 @@ final class StructSerializerContext {
         }
     }
 
-    private static synchronized void scanAllBasics(Set<Class<?>> classes)
+    private synchronized void scanBasics(Set<Class<?>> classes)
             throws InvocationTargetException, InstantiationException, IllegalAccessException {
         for (Class<?> clazz : classes) {
             boolean isBasic = Basic.class.isAssignableFrom(clazz);
@@ -99,7 +98,7 @@ final class StructSerializerContext {
         }
     }
 
-    private static synchronized void scanAllStructs(Set<Class<?>> classes) throws IntrospectionException {
+    private synchronized void scanStructs(Set<Class<?>> classes) throws IntrospectionException {
         for (Class<?> clazz : classes) {
             if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                 ReflectUtil.getConstructor(clazz);

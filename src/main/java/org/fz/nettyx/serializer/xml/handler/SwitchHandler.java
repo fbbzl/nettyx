@@ -2,19 +2,18 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
 
 /**
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/6 22:20
  */
-public class SwitchHandler implements XmlPropHandler {
+public class SwitchHandler implements PropTypeHandler {
 
     @Override
     public String forType() {
