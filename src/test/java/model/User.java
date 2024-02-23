@@ -62,17 +62,17 @@ public class User<T, W, G> {
     private Cppushort[] qqNames;
 
     private T sonsbaba;
-    @ToLinkedList(size = 50)
+    @ToLinkedList(size = 5)
     private List<T> sons;
-    @ToArray(length = 50)
+    @ToArray(length = 5)
     private T[] sons11;
 
     private W wwife;
-    @ToArrayList(size = 50)
+    @ToArrayList(size = 5)
     private List<W> wives;
-    @ToArray(length = 50)
+    @ToArray(length = 5)
     private W[] wives121212;
 
-    @ToArray(length = 100)
+    @ToArray(length = 10)
     private G[] gfs;
 }

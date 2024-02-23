@@ -1,6 +1,5 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 import model.GirlFriend;
@@ -52,36 +51,31 @@ public class SerializerTester {
 
     @Test
     public void testStructSerializer() {
-
-        byte[] bytes = new byte[1024 * 1024];
+        byte[] bytes = new byte[268];
         Arrays.fill(bytes, (byte) 1);
         TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
         };
 
-        // these bytes may from nio, netty, input-stream, output-stream.....
-        User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(
-                Unpooled.wrappedBuffer(bytes), typeRefer);
+        User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
         System.err.println("read :" + user);
-//            user.setAddress(null);
-//            user.setLoginNames(null);
-//            user.setQqNames(null);
-//            user.setWives(null);
-//            user.setSons(null);
-//            user.setFirstWifes(null);
-//            user.setBigSons(null);
+//        user.setAddress(null);
+//        user.setQqNames(null);
+//        user.setQqNames(null);
+//        user.setWives(null);
+//        user.setSons(null);
+//        user.setWives121212(null);
+//        user.setWives(null);
+//        user.setWwife(null);
 
-        final ByteBuf userWriteBytes = StructSerializer.write(user, typeRefer);
+        final byte[] userWriteBytes = StructSerializer.writeBytes(user, typeRefer);
+        System.err.println("userWriteBytes: " + userWriteBytes.length);
+        User<Son<Clong4, Clong4>, Wife, GirlFriend> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
-//            User<Son<Clong4, Clong4>, Wife, Cchar, GirlFriend, Clong8> turn = StructSerializer.read(userWriteBytes, typeRefer);
-//            turn = new User<>();
-
-        //byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
-
-        //System.err.println(Arrays.toString(bytes1));
-        //   System.err.println("turn :" + turn);
-
-        //  System.err.println(turn.equals(user));
+        byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
+        System.err.println("bytes1: " + bytes1.length);
+        System.err.println(Arrays.toString(bytes1));
+        System.err.println("turn :" + turn);
     }
 
 }
