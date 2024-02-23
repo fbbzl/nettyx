@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -14,12 +16,10 @@ import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.junit.Test;
-
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 /**
  * @author fengbinbin
@@ -28,6 +28,18 @@ import java.net.SocketAddress;
  */
 @Slf4j
 public class ClientTest {
+
+    @Test
+    public void initClient( ) throws Exception {
+        StructSerializerContext structSerializerContext = new StructSerializerContext("org.fz.nettyx");
+
+        TestClient testClient = new TestClient();
+
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
+        testClient.connect(inetSocketAddress).sync();
+
+        System.err.println("ok");
+    }
 
     @Slf4j
     public static class TestClient extends SingleTcpChannelClient {
@@ -75,17 +87,5 @@ public class ClientTest {
             log.error("{}", read);
         }
     }
-
-
-    @Test
-    public void initClient( ) throws Exception {
-        TestClient testClient = new TestClient();
-
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
-        testClient.connect(inetSocketAddress).sync();
-
-        System.err.println("ok");
-    }
-
 
 }

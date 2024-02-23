@@ -1,13 +1,13 @@
 package org.fz.nettyx.serializer.xml.handler;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.util.EndianKit.LE;
+
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
  * read int to string value
@@ -17,7 +17,7 @@ import static org.fz.nettyx.util.EndianKit.LE;
  * @since 2024/2/6 22:20
  */
 
-public class EnumHandler implements XmlPropHandler {
+public class EnumHandler implements PropTypeHandler {
 
     @Override
     public String forType() {
