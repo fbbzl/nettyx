@@ -23,13 +23,6 @@ import java.util.Map;
 
 import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
-
 
 /**
  * a xml bytebuf serializer
@@ -71,7 +64,7 @@ public final class XmlSerializer implements Serializer {
                 }
                 else throw new IllegalArgumentException("type not recognized [" + type + "]");
 
-                if (prop.hasExpression()){
+                if (prop.hasExpression()) {
                     value = MVEL.eval(prop.getExpression(), MapUtil.of("$v", value));
                 }
 
