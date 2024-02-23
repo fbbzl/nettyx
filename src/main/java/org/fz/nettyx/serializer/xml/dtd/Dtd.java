@@ -22,6 +22,7 @@ public class Dtd {
             ATTR_LENGTH = ":length",
             ATTR_TYPE = ":type",
             ATTR_ARRAY_LENGTH = ":array-length",
+            ATTR_EXP = ":exp",
             ATTR_ORDER = ":order",
             ATTR_HANDLER = ":handler";
 
