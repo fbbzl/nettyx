@@ -56,7 +56,6 @@ public final class XmlSerializer implements Serializer {
                 Object value;
                 if (prop.hasHandler()) {
                     value = ((PropHandler) (Singleton.get(prop.getHandlerQName()))).read(prop, reading);
-
                 } else if (prop.isArray()) {
                     value = readArray(prop, reading);
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
