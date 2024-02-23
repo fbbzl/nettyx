@@ -2,11 +2,13 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext;
+import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
+import org.fz.nettyx.util.Throws;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
 
 /**
  * @author fengbinbin
@@ -26,6 +28,7 @@ public class SwitchHandler implements PropTypeHandler {
 
         byte[] bytes = readBytes(prop, reading);
         BitSet bitSet = BitSet.valueOf(bytes);
+        Throws.ifTrue(bitSet.length() > switches.length, "bits length [" + bitSet.length() + "] is more then switches length [" + switches.length + "]");
 
         return readSwitches(switches, bitSet);
     }
