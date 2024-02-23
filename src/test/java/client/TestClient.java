@@ -22,7 +22,7 @@ import java.net.SocketAddress;
 @Slf4j
 public class TestClient extends SingleTcpChannelClient {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         new StructSerializerContext("org.fz.nettyx");
 
         TestClient testClient = new TestClient();
