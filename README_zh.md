@@ -36,10 +36,6 @@ endpoint
   serial
      jsc                            基于JSC的Java串行通信的简单实现
          ---JSerialCommClient       简单的基于jsc的客户端 
-     rxtx                           串行 rxtx 封装
-         ---RxtxClient                     串行通信顶级父类
-         ---MultiRxtxChannelClient         多通道串口通讯，使用键检索对应通道
-         ---SingleRxtxChannelClient        单通道串行通信
   tcp                                    TCP 封装
      client                              提供客户端基本实现
        ---TcpClient                      TCP 封装

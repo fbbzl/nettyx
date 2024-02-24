@@ -56,6 +56,7 @@ public final class XmlSerializer implements Serializer {
                 Object value;
                 if (prop.hasHandler()) {
                     value = ((PropHandler) (Singleton.get(prop.getHandlerQName()))).read(prop, reading);
+
                 } else if (prop.isArray()) {
                     value = readArray(prop, reading);
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
@@ -63,9 +64,7 @@ public final class XmlSerializer implements Serializer {
                 }
                 else throw new IllegalArgumentException("type not recognized [" + type + "]");
 
-                if (prop.hasExpression()) {
-                    // TODO
-                    // $v依然是有类型的
+                if (prop.hasExpression()){
                     value = MVEL.eval(prop.getExpression(), MapUtil.of("$v", value));
                 }
 
