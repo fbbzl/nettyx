@@ -65,13 +65,11 @@ public class OpenSslContextFactory {
                                 .trustManager(rootPath.toFile()).build();
     }
 
-
     protected SslContext getClientSslContext(Path certChainPath, Path keyPath, String keypass, Path rootPath)
     throws SSLException {
         return SslContextBuilder.forClient().keyManager(certChainPath.toFile(), keyPath.toFile(), keypass)
                                 .trustManager(rootPath.toFile()).build();
     }
-
 
     @Data
     public static class OpenSslConfig {

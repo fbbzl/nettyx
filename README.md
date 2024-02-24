@@ -6,7 +6,6 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 #### Installation Tutorial
 1. Add Maven Dependency：
 ```xml
-
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
@@ -36,10 +35,6 @@ endpoint
   serial
       jsc                            A Simple Implementation of Java Serial Communication Based on JSC
          ---JSerialCommClient           simple jsc client    
-      rxtx                           Serial rxtx packaging
-         ---RxtxClient                     Serial communication top-level parent class
-         ---MultiRxtxChannelClient         Multi channel serial communication, using key to retrieve corresponding channels
-         ---SingleRxtxChannelClient        Single channel serial communication
   tcp                                    TCP encapsulation
      client                              Provide client side basic implementation
        ---TcpClient                      TCP encapsulation
