@@ -4,12 +4,14 @@ import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.CharsetUtil;
 import io.netty.buffer.ByteBuf;
-import java.nio.charset.Charset;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop.PropType;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.PropType;
 import org.fz.nettyx.util.Throws;
 
+import java.nio.charset.Charset;
+
 /**
+ * String prop handler
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/6 22:20

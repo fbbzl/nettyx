@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.xml.handler;
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 import org.fz.nettyx.util.Throws;
 
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.BitSet;
 import java.util.List;
 
 /**
+ * switch means the bit-switch
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/6 22:20
