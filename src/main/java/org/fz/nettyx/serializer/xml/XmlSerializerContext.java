@@ -114,11 +114,15 @@ public class XmlSerializerContext {
             return;
         }
 
+        Map<String, String[]> switches = new HashMap<>(64);
         for (Element el : switchEl.elements()) {
-            SWITCHES.put(XmlUtils.name(el),
-                    Arrays.stream(splitToArray(XmlUtils.textTrim(el), ",")).map(CharSequenceUtil::removeAllLineBreaks)
-                            .map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
+            switches.put(XmlUtils.name(el),
+                         Arrays.stream(splitToArray(XmlUtils.textTrim(el), ","))
+                               .map(CharSequenceUtil::removeAllLineBreaks)
+                               .map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
         }
+
+        SWITCHES.putAll(switches);
     }
 
     protected void scanModels(Element rootElement) {
