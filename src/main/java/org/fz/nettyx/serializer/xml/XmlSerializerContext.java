@@ -22,12 +22,12 @@ import org.fz.nettyx.util.Try;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
 import static java.util.Collections.emptyMap;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
 import static org.fz.nettyx.util.EndianKit.LE;
@@ -133,8 +133,10 @@ public class XmlSerializerContext {
     protected void scanModels(Element rootElement) {
         Element models = rootElement.element(EL_MODEL);
 
-        Map<String, Model> modelMap = new LinkedHashMap<>(16);
-        XmlUtils.elements(models).stream().map(Model::new).forEach(m -> modelMap.put(m.getName(), m));
+        Map<String, Model> modelMap =
+                XmlUtils.elements(models).stream()
+                        .map(Model::new)
+                        .collect(Collectors.toMap(Model::getName, identity()));
 
         MODELS.putIfAbsent(XmlUtils.attrValue(rootElement, NAMESPACE), modelMap);
     }
@@ -146,7 +148,7 @@ public class XmlSerializerContext {
                 handlerClasses.stream()
                               .filter(ClassUtil::isNormalClass)
                               .map(hc -> (PropTypeHandler) Singleton.get(hc))
-                              .collect(Collectors.toMap(PropTypeHandler::forType, Function.identity()));
+                              .collect(Collectors.toMap(PropTypeHandler::forType, identity()));
 
         PROP_TYPE_CONVERTERS.putAll(handlers);
     }
