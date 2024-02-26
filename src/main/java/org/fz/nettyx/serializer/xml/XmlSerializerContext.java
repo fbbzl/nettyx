@@ -22,7 +22,9 @@ import org.fz.nettyx.util.Try;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.text.CharSequenceUtil.*;
 import static java.util.Collections.emptyMap;
@@ -130,16 +132,14 @@ public class XmlSerializerContext {
 
     protected void scanTypeHandlers() {
         Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(EMPTY, PropTypeHandler.class);
-        for (Class<?> handlerClass : handlerClasses) {
-            if (!ClassUtil.isNormalClass(handlerClass)) {
-                continue;
-            }
-            PropTypeHandler handler = (PropTypeHandler) Singleton.get(handlerClass);
-            String forType = handler.forType();
-            if (CharSequenceUtil.isNotBlank(forType)) {
-                PROP_TYPE_CONVERTERS.putIfAbsent(forType, handler);
-            }
-        }
+
+        Map<String, PropTypeHandler> handlers =
+                handlerClasses.stream()
+                              .filter(ClassUtil::isNormalClass)
+                              .map(hc -> (PropTypeHandler) Singleton.get(hc))
+                              .collect(Collectors.toMap(PropTypeHandler::forType, Function.identity()));
+
+        PROP_TYPE_CONVERTERS.putAll(handlers);
     }
 
     //************************************           protected end             *****************************************//
