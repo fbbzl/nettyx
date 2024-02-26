@@ -5,9 +5,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import java.io.File;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -20,12 +17,16 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 
+import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+
 @Slf4j
 public class TestClient extends SingleTcpChannelClient {
 
     public static void main(String[] args) {
         new StructSerializerContext("org.fz.nettyx");
-        String u = "pc";
+        String u = "fengbinbin";
         File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
         new XmlSerializerContext(file);
 
