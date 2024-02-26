@@ -10,7 +10,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.1.2-RELEASE</version>
+    <version>2.2.0-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -92,21 +92,32 @@ serializer                             序列化工具
      ---StructUtils                    序列化工具
      ---TypeRefer                      结构泛型类型应用
   xml
-     ---XmlSerializer
-  yml
-     ---YmlSerializer
+     dtd
+        ---Dtd                         xml序列化器定义
+     handler
+        ---EnumHandler                 
+        ---NumberHandler             
+        ---PropHandler                 顶级的xml prop处理器
+        ---PropTypeHandler             处理prop-type的处理器
+        ---StringHandler             
+        ---SwitchHandler             
+     ---XmlSerializer                  从xml中读取配置, 然后序列化成LinkedMap
+     ---XmlSerializerContext           xml序列化器的上下文
+     ---XmlUtils        
   ---Serializer.java                    顶级序列化器接口
 ssl
   ---OpenSslContextFactory           OpenSSL 上下文工厂
   ---SslContextFactory               SSL 上下文工厂
 util                                 基础工具
-  ---ChannelStorage                  存储通道，内部使用 KV 对进行存储
-  ---HexBins                         16进制工具
   ---Bins                            二进制工具
-  ---BytesKit                        字节工具           
+  ---ChannelStorage                  存储通道，内部使用 KV 对进行存储
   ---CommPorts                       串口工具
+  ---EndianKit                       字节工具  
   ---Exceptions                      异常工具
+  ---HexKit                          16进制工具
   ---Throws                          建言工具
   ---Try                             lambda受检异常工具
   
 ```
+更多使用案例, 请参考: https://blog.csdn.net/fbbwht
+
