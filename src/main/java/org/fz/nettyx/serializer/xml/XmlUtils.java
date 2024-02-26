@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.xml;
 import lombok.experimental.UtilityClass;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
-import org.dom4j.Node;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -27,14 +26,6 @@ public class XmlUtils {
      */
     public static String namespace(Element root) {
         return XmlUtils.attrValue(root, NAMESPACE);
-    }
-
-    public static List<Node> content(Element element) {
-        if (element == null) {
-            return emptyList();
-        }
-
-        return element.content();
     }
 
     public static String name(Element element) {
