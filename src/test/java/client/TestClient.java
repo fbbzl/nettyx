@@ -14,6 +14,7 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.tcp.client.SingleTcpChannelClient;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
+import org.fz.nettyx.handler.advice.OutboundAdvice;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 
@@ -48,10 +49,15 @@ public class TestClient extends SingleTcpChannelClient {
     private ChannelInitializer<NioSocketChannel> channelInitializer() {
         InboundAdvice inboundAdvice = new InboundAdvice();
         inboundAdvice.whenChannelInactive(ctx -> Console.print("invoke your re-connect method here"));
+
+        OutboundAdvice outboundAdvice = new OutboundAdvice();
+        outboundAdvice.whenDisconnect((ctx, promise) -> Console.print("invoke your disconnect method"));
+
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
                 channel.pipeline()
+                        .addLast(outboundAdvice)
                         // in  out
                         // ▼   ▲  remove start and end flag
                         .addLast(new StartEndFlagFrameCodec(1024 * 1024, false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
