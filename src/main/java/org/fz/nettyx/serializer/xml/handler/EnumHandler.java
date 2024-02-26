@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.xml.handler;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
 import org.fz.nettyx.util.Throws;
 
@@ -11,7 +11,7 @@ import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
- * read int to string value
+ * read int value to the enum which defined in the XML, NOT java enum
  *
  * @author fengbinbin
  * @version 1.0
