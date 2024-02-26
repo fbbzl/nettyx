@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
-import org.fz.nettyx.util.HexBins;
+import org.fz.nettyx.util.HexKit;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -123,8 +123,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
          * @return Buffer after escaped
          */
         public static EscapeMap mapEachHex(String[] realHexes, String[] replacementHexes) {
-            ByteBuf[] realBuffers = Stream.of(realHexes).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacementHexes).map(HexBins::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
+            ByteBuf[] realBuffers = Stream.of(realHexes).map(HexKit::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
+                    replacementBuffers = Stream.of(replacementHexes).map(HexKit::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -192,7 +192,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
          * @return the escape map
          */
         public static EscapeMap mapHex(String realHex, String replacementHex) {
-            return map(HexBins.decode(realHex), HexBins.decode(replacementHex));
+            return map(HexKit.decode(realHex), HexKit.decode(replacementHex));
         }
 
         /**

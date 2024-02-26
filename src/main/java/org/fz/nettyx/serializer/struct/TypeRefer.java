@@ -9,11 +9,12 @@ import java.lang.reflect.*;
 
 /**
  * type parameter at the time of serialization
+ *
+ * @param <T> the type parameter
  * @author fengbinbin
  * @version 1.0
- * @since 2024/1/15 11:24
+ * @since 2024 /1/15 11:24
  */
-
 @Getter
 @SuppressWarnings("unchecked")
 @NoArgsConstructor
@@ -25,6 +26,13 @@ public abstract class TypeRefer<T> implements Type {
         return this.type.toString();
     }
 
+    /**
+     * Gets raw type.
+     *
+     * @param <T>  the type parameter
+     * @param type the type
+     * @return the raw type
+     */
     public static <T> Class<T> getRawType(Type type) {
         if (type instanceof Class<?>) {
             return (Class<T>) type;
@@ -34,11 +42,40 @@ public abstract class TypeRefer<T> implements Type {
         throw new TypeJudgmentException(type);
     }
 
+    /**
+     * Gets field actual type.
+     *
+     * @param <T>      the type parameter
+     * @param rootType the root type
+     * @param field    the field
+     * @return the field actual type
+     */
     public static <T> Class<T> getFieldActualType(Type rootType, Field field) {
         return getActualType(rootType, TypeUtil.getType(field));
     }
 
+    /**
+     * Gets actual type.
+     *
+     * @param <T>  the type parameter
+     * @param root the root
+     * @param type the type
+     * @return the actual type
+     */
     public static <T> Class<T> getActualType(Type root, Type type) {
+        return getActualType(root, type, 0);
+    }
+
+    /**
+     * Gets actual type.
+     *
+     * @param <T>   the type parameter
+     * @param root  the root
+     * @param type  the type
+     * @param index the index
+     * @return the actual type
+     */
+    public static <T> Class<T> getActualType(Type root, Type type, int index) {
         if (type instanceof Class) return (Class<T>) type;
         if (!(root instanceof ParameterizedType) || type instanceof WildcardType) return (Class<T>) Object.class;
 
@@ -49,7 +86,7 @@ public abstract class TypeRefer<T> implements Type {
             if (actualTypeArguments.length == 0) {
                 return (Class<T>) Object.class;
             }
-            return getActualType(root, actualTypeArguments[0]);
+            return getActualType(root, actualTypeArguments[index]);
         }
         if (type instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);

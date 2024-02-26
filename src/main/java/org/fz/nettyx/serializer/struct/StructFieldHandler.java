@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
+import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -20,15 +21,10 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.*;
  * @since 2022 -01-16 16:39
  */
 @SuppressWarnings("all")
-public interface PropertyHandler<A extends Annotation> {
-
-    default <T extends Annotation> boolean isTargetAnnotation(Class<T> otherAnnotationType) {
-        Class<Annotation> targetAnnotationType = getTargetAnnotationType(this.getClass());
-        return targetAnnotationType == otherAnnotationType;
-    }
+public interface StructFieldHandler<A extends Annotation> {
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
-        if (clazz.isEnum() || clazz.isInterface()) {
+        if (!ClassUtil.isNormalClass(clazz)) {
             return null;
         }
 
@@ -38,7 +34,7 @@ public interface PropertyHandler<A extends Annotation> {
             if (genericInterface instanceof ParameterizedType) {
                 ParameterizedType type = (ParameterizedType) genericInterface;
                 Type[] actualTypeArguments = type.getActualTypeArguments();
-                if (type.getOwnerType() == PropertyHandler.class && actualTypeArguments.length > 0) {
+                if (type.getOwnerType() == StructFieldHandler.class && actualTypeArguments.length > 0) {
                     return (Class<A>) actualTypeArguments[0];
                 }
             }
@@ -52,7 +48,7 @@ public interface PropertyHandler<A extends Annotation> {
      * @param clazz the clazz
      * @return the boolean
      */
-    static <S extends PropertyHandler<?>> boolean isReadHandler(Class<S> clazz) {
+    static <S extends StructFieldHandler<?>> boolean isReadHandler(Class<S> clazz) {
         return ReadHandler.class.isAssignableFrom(clazz);
     }
 
@@ -62,7 +58,7 @@ public interface PropertyHandler<A extends Annotation> {
      * @param clazz the clazz
      * @return the boolean
      */
-    static <S extends PropertyHandler<?>> boolean isWriteHandler(Class<S> clazz) {
+    static <S extends StructFieldHandler<?>> boolean isWriteHandler(Class<S> clazz) {
         return WriteHandler.class.isAssignableFrom(clazz);
     }
 
@@ -72,7 +68,7 @@ public interface PropertyHandler<A extends Annotation> {
      * @param handler the handler
      * @return the boolean
      */
-    static <S extends PropertyHandler<?>> boolean isReadHandler(S handler) {
+    static <S extends StructFieldHandler<?>> boolean isReadHandler(S handler) {
         return handler instanceof ReadHandler;
     }
 
@@ -82,7 +78,7 @@ public interface PropertyHandler<A extends Annotation> {
      * @param handler the handler
      * @return the boolean
      */
-    static <S extends PropertyHandler<?>> boolean isWriteHandler(S handler) {
+    static <S extends StructFieldHandler<?>> boolean isWriteHandler(S handler) {
         return handler instanceof ReadHandler.WriteHandler;
     }
 
@@ -92,7 +88,7 @@ public interface PropertyHandler<A extends Annotation> {
      * @author fengbinbin
      * @since 2022 -01-16 13:37
      */
-    interface ReadHandler<A extends Annotation> extends PropertyHandler<A> {
+    interface ReadHandler<A extends Annotation> extends StructFieldHandler<A> {
 
         /**
          * Do read object. if not override, this method will return null
@@ -127,7 +123,7 @@ public interface PropertyHandler<A extends Annotation> {
      * @author fengbinbin
      * @since 2022 -01-16 13:37
      */
-    interface WriteHandler<A extends Annotation> extends PropertyHandler<A> {
+    interface WriteHandler<A extends Annotation> extends StructFieldHandler<A> {
 
         /**
          * Do write.

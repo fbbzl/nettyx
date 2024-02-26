@@ -11,8 +11,8 @@ import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.PropertyHandler.ReadHandler;
-import org.fz.nettyx.serializer.struct.PropertyHandler.WriteHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -74,9 +74,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> T read(ByteBuf byteBuf, Type rootType) {
-        if (rootType instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).toObject();
+        if (rootType instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).parseStruct();
         else
-        if (rootType instanceof ParameterizedType) return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).toObject();
+        if (rootType instanceof ParameterizedType) return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).parseStruct();
         else
         if (rootType instanceof TypeRefer)         return read(byteBuf, ((TypeRefer<T>) rootType).getType());
         else
@@ -158,7 +158,7 @@ public final class StructSerializer implements Serializer {
      * @param <T> the type parameter
      * @return the t
      */
-    <T> T toObject() {
+    <T> T parseStruct() {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue;
@@ -187,7 +187,7 @@ public final class StructSerializer implements Serializer {
     }
 
     /**
-     * convert Object to ByteBuf
+     * read Object to ByteBuf
      *
      * @return the byte buf
      */
