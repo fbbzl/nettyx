@@ -73,7 +73,7 @@ public class XmlSerializerContext {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
         List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
-                .collect(toList());
+                                    .collect(toList());
 
         // scan namespaces
         docs.forEach(this::scanNamespaces);
@@ -89,7 +89,8 @@ public class XmlSerializerContext {
         scanTypeHandlers();
     }
 
-    //************************************          protected start            *****************************************//
+    //************************************          protected start
+    // *****************************************//
 
     protected void scanNamespaces(Document doc) {
         NAMESPACES_DOCS.put(XmlUtils.attrValue(doc.getRootElement(), NAMESPACE), doc);
@@ -101,11 +102,15 @@ public class XmlSerializerContext {
             return;
         }
 
+        Map<String, String[]> enums = new HashMap<>(64);
         for (Element el : enumEl.elements()) {
-            ENUMS.put(XmlUtils.name(el),
-                    Arrays.stream(splitToArray(XmlUtils.text(el), ",")).map(CharSequenceUtil::removeAllLineBreaks)
+            enums.put(XmlUtils.name(el),
+                      Arrays.stream(splitToArray(XmlUtils.text(el), ","))
+                            .map(CharSequenceUtil::removeAllLineBreaks)
                             .map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
         }
+
+        ENUMS.putAll(enums);
     }
 
     protected void scanSwitches(Element rootElement) {
@@ -146,7 +151,8 @@ public class XmlSerializerContext {
         PROP_TYPE_CONVERTERS.putAll(handlers);
     }
 
-    //************************************           protected end             *****************************************//
+    //************************************           protected end
+    // *****************************************//
 
     //************************************          public start            *****************************************//
 
@@ -293,6 +299,7 @@ public class XmlSerializerContext {
             }
         }
 
-        //**************************************           public end              ************************************//
+        //**************************************           public end
+        // ************************************//
     }
 }
