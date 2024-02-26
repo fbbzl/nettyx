@@ -16,7 +16,7 @@ import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.dtd.Model;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 
 import java.util.concurrent.TimeUnit;
 
