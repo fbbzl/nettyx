@@ -14,8 +14,7 @@ public class Dtd {
 
     public static final String EL_MODEL = "model",
             EL_ENUM = "enum",
-            EL_SWITCH = "switch",
-            EL_MODEL_MAPPING = "model-mapping";
+            EL_SWITCH = "switch";
 
     public static final String
             ATTR_OFFSET = ":offset",

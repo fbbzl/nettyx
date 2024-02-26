@@ -1,10 +1,11 @@
 package org.fz.nettyx.serializer.xml.handler;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.xml.dtd.Model.Prop;
+import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 
 /**
- * The interface Type handler.
+ * use to handle the prop with the assigned type.
+ * <id :offset="0" :length="2" :type="short"/>
  *
  * @author fengbinbin
  * @version 1.0
