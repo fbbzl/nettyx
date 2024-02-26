@@ -1,17 +1,14 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
-import java.net.SocketAddress;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.util.ChannelStorage;
+
+import java.net.SocketAddress;
 
 /**
  * The type Multi channel client. use channel key to retrieve and use channels
@@ -56,7 +53,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
     @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
         Channel oldChannel = channelStorage.get(key);
-        if (active(oldChannel)) {
+        if (isActive(oldChannel)) {
             oldChannel.close().sync();
             channelStorage.remove(key);
         }
@@ -98,14 +95,14 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
     public ChannelPromise send(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
-        if (inActive(channel)) {
+        if (notActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
             return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
         try {
-            if (unWritable(channel)) {
+            if (notWritable(channel)) {
                 log.debug("channel [{}] is not writable, channel key [{}]", channel, channelKey);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "channel: [" + channel + "] is not writable");

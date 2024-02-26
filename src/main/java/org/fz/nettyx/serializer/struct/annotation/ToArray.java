@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.PropertyHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -45,7 +45,7 @@ public @interface ToArray {
     int length();
 
     @SuppressWarnings("unchecked")
-    class ToArrayHandler implements PropertyHandler.ReadWriteHandler<ToArray> {
+    class ToArrayHandler implements StructFieldHandler.ReadWriteHandler<ToArray> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {

@@ -31,16 +31,16 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
     @Override
     public void operationComplete(ChannelFuture channelFuture) {
         // success
-        if (channelFuture.isSuccess()) invokeAction(whenSuccess, channelFuture);
+        if (channelFuture.isSuccess())   invokeAction(whenSuccess, channelFuture);
         else
         // failed
-        if (!channelFuture.isSuccess()) invokeAction(whenFailure, channelFuture);
+        if (!channelFuture.isSuccess())  invokeAction(whenFailure, channelFuture);
 
         // done
-        if (channelFuture.isDone()) invokeAction(whenDone, channelFuture);
+        if (channelFuture.isDone())      invokeAction(whenDone,    channelFuture);
         else
         // canceled
-        if (channelFuture.isCancelled()) invokeAction(whenCancel, channelFuture);
+        if (channelFuture.isCancelled()) invokeAction(whenCancel,  channelFuture);
     }
 
     //********************************************      private start      ***************************************************//
