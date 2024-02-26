@@ -7,7 +7,6 @@ import model.Son;
 import model.User;
 import model.Wife;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
@@ -34,8 +33,6 @@ public class SerializerTester {
         File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
         File file2 = new File("C:\\Users\\" + u + "\\Desktop\\bank.xml");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
-
-        new StructSerializerContext("org.fz.nettyx");
     }
 
     @Test
