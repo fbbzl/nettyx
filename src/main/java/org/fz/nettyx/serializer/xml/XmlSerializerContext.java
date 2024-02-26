@@ -1,10 +1,26 @@
 package org.fz.nettyx.serializer.xml;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import lombok.Getter;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -16,16 +32,6 @@ import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
-
 /**
  * application must config this
  *
@@ -33,6 +39,7 @@ import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
  * @version 1.0
  * @since 2024/1/29 11:16
  */
+@Getter
 public class XmlSerializerContext {
 
     private static final Map<String, Document> NAMESPACES_DOCS = new SafeConcurrentHashMap<>(64);
@@ -51,7 +58,6 @@ public class XmlSerializerContext {
 
     private static final Map<String, PropTypeHandler> PROP_TYPE_CONVERTERS = new SafeConcurrentHashMap<>(16);
 
-    @Getter
     private final Path[] paths;
 
     public XmlSerializerContext(File... files) {
