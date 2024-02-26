@@ -1,5 +1,6 @@
 package client;
 
+import cn.hutool.core.lang.Console;
 import codec.UserCodec;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -11,7 +12,6 @@ import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.tcp.client.SingleTcpChannelClient;
-import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
@@ -47,10 +47,10 @@ public class TestClient extends SingleTcpChannelClient {
 
     private ChannelInitializer<NioSocketChannel> channelInitializer() {
         InboundAdvice inboundAdvice = new InboundAdvice();
-
-        return new AdvisableChannelInitializer<NioSocketChannel>(inboundAdvice) {
+        inboundAdvice.whenChannelInactive(ctx -> Console.print("invoke your re-connect method here"));
+        return new ChannelInitializer<NioSocketChannel>() {
             @Override
-            protected void addHandlers(NioSocketChannel channel) {
+            protected void initChannel(NioSocketChannel channel) {
                 channel.pipeline()
                         // in  out
                         // ▼   ▲  remove start and end flag
@@ -58,7 +58,8 @@ public class TestClient extends SingleTcpChannelClient {
                         .addLast(new EscapeCodec(EscapeMap.mapHex("7e", "7d5e")))
                         .addLast(new UserCodec())
                         // ▼   ▲  deal control character and recover application data
-                        .addLast(new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR));
+                        .addLast(new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR))
+                        .addLast(inboundAdvice);
             }
         };
     }
