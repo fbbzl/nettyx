@@ -14,7 +14,6 @@ import org.fz.nettyx.handler.AdvisableChannelInitializer;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.advice.InboundAdvice;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 
 import java.io.File;
@@ -25,7 +24,6 @@ import java.net.SocketAddress;
 public class TestClient extends SingleTcpChannelClient {
 
     public static void main(String[] args) {
-        new StructSerializerContext("org.fz.nettyx");
         String u = "fengbinbin";
         File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
         new XmlSerializerContext(file);
