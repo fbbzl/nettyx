@@ -52,9 +52,9 @@ public class XmlSerializerContext {
     /**
      * first key is namespace, second key is model name, the value is model
      */
-    private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(256);
 
-    private static final Map<String, PropTypeHandler> PROP_TYPE_CONVERTERS = new SafeConcurrentHashMap<>(16);
+    private static final Map<String, PropTypeHandler> PROP_TYPE_CONVERTERS = new SafeConcurrentHashMap<>(64);
 
     private final Path[] paths;
 
