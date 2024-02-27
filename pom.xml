@@ -6,7 +6,7 @@
 
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.0-RELEASE</version>
+    <version>2.2.1-RELEASE</version>
 
     <name>nettyx</name>
     <description>a tool about netty</description>

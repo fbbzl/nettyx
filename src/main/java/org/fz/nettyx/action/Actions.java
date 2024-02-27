@@ -2,6 +2,7 @@ package org.fz.nettyx.action;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+
 import java.net.SocketAddress;
 
 /**
@@ -90,6 +91,17 @@ public interface Actions {
         if (channelReadAction != null) {
             channelReadAction.act(ctx, msg);
         }
+    }
+
+    static void invokeAction(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
+        if (exceptionAction != null) {
+            exceptionAction.act(ctx, throwable);
+        }
+    }
+
+    static void invokeActionAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
+        invokeAction(exceptionAction, ctx, cause);
+        ctx.channel().close();
     }
 
 }
