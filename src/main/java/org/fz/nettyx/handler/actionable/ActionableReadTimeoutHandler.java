@@ -3,11 +3,14 @@ package org.fz.nettyx.handler.actionable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ChannelExceptionAction;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Actionable read timeout handler.
@@ -72,8 +75,8 @@ public class ActionableReadTimeoutHandler extends ReadTimeoutHandler {
 
     @Override
     protected void readTimedOut(ChannelHandlerContext ctx) throws Exception {
-        this.timeoutAction.act(ctx, ReadTimeoutException.INSTANCE);
-
+        invokeAction(timeoutAction, ctx,
+                     new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.readTimedOut(ctx);
     }
 
