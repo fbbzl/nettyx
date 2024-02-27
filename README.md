@@ -3,6 +3,8 @@
 #### Introduce
 Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, providing some tools and basic templates, as well as additional serial communication templates to help you quickly build netty-based server/client applications and serial port based applications
 
+for more use cases please refer to: https://blog.csdn.net/fbbwht
+
 #### Installation Tutorial
 1. Add Maven Dependency：
 ```xml
@@ -119,4 +121,3 @@ util                              nettyx tool class
   ---Try                             lambda exception
   
 ```
-for more use cases please refer to: https://blog.csdn.net/fbbwht
