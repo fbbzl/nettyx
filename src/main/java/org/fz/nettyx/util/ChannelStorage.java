@@ -1,10 +1,11 @@
 package org.fz.nettyx.util;
 
+import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.channel.Channel;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -25,7 +26,7 @@ public class ChannelStorage<K> {
      * Instantiates a new Channel storage.
      */
     public ChannelStorage() {
-        this.channelMap = new ConcurrentHashMap<>();
+        this.channelMap = new SafeConcurrentHashMap<>();
     }
 
     /**
@@ -34,7 +35,7 @@ public class ChannelStorage<K> {
      * @param initialCapacity the initial capacity
      */
     public ChannelStorage(int initialCapacity) {
-        this.channelMap = new ConcurrentHashMap<>(initialCapacity);
+        this.channelMap = new SafeConcurrentHashMap<>(initialCapacity);
     }
 
     /**
@@ -43,7 +44,7 @@ public class ChannelStorage<K> {
      * @param channelMap the channel map
      */
     public ChannelStorage(Map<K, Channel> channelMap) {
-        this.channelMap = new ConcurrentHashMap<>(channelMap);
+        this.channelMap = new SafeConcurrentHashMap<>(channelMap);
     }
 
     /**
@@ -64,7 +65,7 @@ public class ChannelStorage<K> {
      * @param concurrencyLevel the concurrency level
      */
     public ChannelStorage(int initialCapacity, float loadFactor, int concurrencyLevel) {
-        this.channelMap = new ConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
+        this.channelMap = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
     }
 
     /**
