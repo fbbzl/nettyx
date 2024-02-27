@@ -64,7 +64,7 @@ public final class XmlSerializer implements Serializer {
                 }
                 else throw new IllegalArgumentException("type not recognized [" + type + "]");
 
-                if (prop.hasExpression()){
+                if (prop.hasExpression()) {
                     value = MVEL.eval(prop.getExpression(), MapUtil.of("$v", value));
                 }
 

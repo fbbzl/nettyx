@@ -3,6 +3,8 @@
 #### 介绍
 基于[netty4.1.X.Final]进行了超轻量级的封装, 提供了一些工具和基础模板, 并额外提供串口通信模板, 帮助你快速搭建基于netty的服务端/客户端应用 及 基于串口的应用
 
+更多使用案例, 请参考: https://blog.csdn.net/fbbwht
+
 #### 安装教程
 1. 在项目添加以下依赖包：
 ```xml
@@ -10,7 +12,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.0-RELEASE</version>
+    <version>2.2.1-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -35,7 +37,7 @@ codec                              提供了一些基本的编解码器
 endpoint
   serial
      jsc                            基于JSC的Java串行通信的简单实现
-         ---JSerialCommClient       简单的基于jsc的客户端 
+       ---JSerialCommClient       简单的基于jsc的客户端 
   tcp                                    TCP 封装
      client                              提供客户端基本实现
        ---TcpClient                      TCP 封装
@@ -48,7 +50,6 @@ envet                                为网络事件提供支持
   ---ChannelEvent                     Channel 事件对象，建议与 Spring 容器事件结合使用
   ---ChannelEvents                    通道事件对象工具
 exception                           异常扩展
-  ---ClosingChannelException           结合通道建议，可以通过抛出异常子类来关闭通道
   ---HandlerException
   ---NoSuchPortException
   ---ParameterizedTypeException
@@ -60,12 +61,10 @@ handler                             提供了一些基本的通道处理程序�
      ---ActionableIdleStateHandler     可操作的空闲状态处理程序
      ---ActionableReadTimeoutHandler   可操作的 读取超时 处理程序
      ---ActionableWriteTimeoutHandler  可操作的 写超时 处理程序
-  advice
-     ---InboundAdvice                  入站建言
-     ---OutboundAdvice                 出站建言
   interceptor
      ---ChannelInterceptor                信道拦截器，适用于通信前握手等预操作
      ---ChannelInterceptors               通道拦截器实用程序
+  ---ChannelAdvice                     包含入站建言和出站建言
   ---AdvisableChannelInitializer       通道建议初始值设定项
   ---ExceptionHandler                  异常处理程序
   ---HeartBeater                       TCP 心跳设备
@@ -119,5 +118,4 @@ util                                 基础工具
   ---Try                             lambda受检异常工具
   
 ```
-更多使用案例, 请参考: https://blog.csdn.net/fbbwht
 

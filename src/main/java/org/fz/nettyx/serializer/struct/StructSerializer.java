@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
-import org.fz.nettyx.exception.HandlerException;
+import org.fz.nettyx.exception.FieldHandlerException;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
@@ -245,7 +245,7 @@ public final class StructSerializer implements Serializer {
             return handledValue;
         } catch (Exception readHandlerException) {
             readHandler.afterReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
-            throw new HandlerException(handleField, readHandler.getClass(), readHandlerException);
+            throw new FieldHandlerException(handleField, readHandler.getClass(), readHandlerException);
         }
     }
 
@@ -285,7 +285,7 @@ public final class StructSerializer implements Serializer {
         } catch (Exception writeHandlerException) {
             writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing,
                 writeHandlerException);
-            throw new HandlerException(handleField, writeHandler.getClass(), writeHandlerException);
+            throw new FieldHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
     }
 

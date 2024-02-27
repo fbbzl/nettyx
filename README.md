@@ -3,13 +3,15 @@
 #### Introduce
 Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, providing some tools and basic templates, as well as additional serial communication templates to help you quickly build netty-based server/client applications and serial port based applications
 
+for more use cases please refer to: https://blog.csdn.net/fbbwht
+
 #### Installation Tutorial
 1. Add Maven Dependency：
 ```xml
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.0-RELEASE</version>
+    <version>2.2.1-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -34,7 +36,7 @@ codec                               Provided some basic codecs
 endpoint
   serial
       jsc                            A Simple Implementation of Java Serial Communication Based on JSC
-         ---JSerialCommClient           simple jsc client    
+        ---JSerialCommClient           simple jsc client    
   tcp                                    TCP encapsulation
      client                              Provide client side basic implementation
        ---TcpClient                      TCP encapsulation
@@ -47,7 +49,6 @@ envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
 exception                           Abnormal extension
-  ---ClosingChannelException           In conjunction with channel advice, the channel can be closed by throwing the abnormal subclass
   ---HandlerException
   ---NoSuchPortException
   ---ParameterizedTypeException
@@ -59,12 +60,10 @@ handler                             Provided some basic channel handler implemen
      ---ActionableIdleStateHandler     Actionable Idle State Handler
      ---ActionableReadTimeoutHandler   Actionable ReadTimeout Handler
      ---ActionableWriteTimeoutHandler  Actionable WriteTimeout Handler
-  advice
-     ---InboundAdvice                  Inbound Advice
-     ---OutboundAdvice                 Outbound Advice
   interceptor
      ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
      ---ChannelInterceptors               Channel interceptor utils
+  ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---AdvisableChannelInitializer       Channel advice initializer
   ---ExceptionHandler                  exception handler
   ---HeartBeater                       TCP heartbeat device
@@ -119,4 +118,3 @@ util                              nettyx tool class
   ---Try                             lambda exception
   
 ```
-for more use cases please refer to: https://blog.csdn.net/fbbwht
