@@ -1,7 +1,7 @@
 package org.fz.nettyx.handler.actionable;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.timeout.ReadTimeoutException;
+import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,7 +77,7 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
     @Override
     protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
         invokeAction(timeoutAction, ctx,
-                     new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
+                     new WriteTimeoutException("has got write-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.writeTimedOut(ctx);
     }
 
