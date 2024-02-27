@@ -1,19 +1,20 @@
 package org.fz.nettyx.serializer.struct.basic;
 
-import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
-
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
+import lombok.Getter;
+import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.util.Throws;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import lombok.Getter;
-import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.util.Throws;
+
+import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -47,7 +48,7 @@ public abstract class Basic<V> {
     public abstract ByteOrder order();
 
     /**
-     * To byte buf byte buf.
+     * To byte buf.
      *
      * @param value the value
      * @param size the size

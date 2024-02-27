@@ -159,6 +159,7 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             if (decodedByteBuf != null) {
                 if (decodedByteBuf.readableBytes() > 0) {
                     if (stripStartEndDelimiter) return decodedByteBuf;
+                    // must use ByteBuf.retainedDuplicate, if you use ByteBuf.duplicate(), it will also be release, and will never be usable
                     return Unpooled.wrappedBuffer(startFlag.retainedDuplicate(), decodedByteBuf, endFlag.retainedDuplicate());
                 } else {
                     ReferenceCountUtil.release(decodedByteBuf);
