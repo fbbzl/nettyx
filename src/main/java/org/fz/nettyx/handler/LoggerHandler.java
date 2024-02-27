@@ -1,28 +1,19 @@
 package org.fz.nettyx.handler;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.nio.charset.StandardCharsets.UTF_16;
-import static java.nio.charset.StandardCharsets.UTF_16BE;
-import static java.nio.charset.StandardCharsets.UTF_16LE;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.CombinedChannelDuplexHandler;
-import java.net.SocketAddress;
-import java.nio.charset.Charset;
-import java.util.Objects;
-import java.util.function.Function;
+import io.netty.channel.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.SocketAddress;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.function.Function;
+
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL
@@ -36,7 +27,7 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
     private static final Sl4jLevel DEFAULT_LEVEL = Sl4jLevel.INFO;
 
     /**
-     * The constant TO_HEX.
+     * The TO_HEX.
      */
     public static final Function<Object, String>
         TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
