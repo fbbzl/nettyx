@@ -4,6 +4,7 @@ import cn.hutool.core.lang.Console;
 import codec.UserCodec;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
@@ -12,15 +13,19 @@ import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.tcp.client.SingleTcpChannelClient;
+import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
+import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
+import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
-import org.fz.nettyx.handler.advice.InboundAdvice;
-import org.fz.nettyx.handler.advice.OutboundAdvice;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
+import org.fz.nettyx.util.HexKit;
 
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class TestClient extends SingleTcpChannelClient {
@@ -31,8 +36,8 @@ public class TestClient extends SingleTcpChannelClient {
         new XmlSerializerContext(file);
 
         TestClient testClient = new TestClient();
-        ActionableChannelFutureListener listener = new ActionableChannelFutureListener();
-        listener.whenSuccess(cf -> System.err.println("ok"));
+        ChannelFutureListener listener = new ActionableChannelFutureListener()
+                .whenSuccess(cf -> System.err.println("ok"));
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
         testClient.connect(inetSocketAddress).addListener(listener);
 
@@ -41,31 +46,49 @@ public class TestClient extends SingleTcpChannelClient {
     @SneakyThrows
     @Override
     public ChannelFuture connect(SocketAddress address) {
+        Console.log("connecting address [" + address.toString() + "]");
+        ChannelFutureListener listener = new ActionableChannelFutureListener()
+                .whenFailure(cf -> cf.channel().eventLoop().schedule(() -> connect(address), 2, SECONDS));
+
         return super.newBootstrap()
-                .handler(channelInitializer())
-                .connect(address);
+                    .handler(channelInitializer(address))
+                    .connect(address).addListener(listener);
     }
 
-    private ChannelInitializer<NioSocketChannel> channelInitializer() {
-        InboundAdvice inboundAdvice = new InboundAdvice();
-        inboundAdvice.whenChannelInactive(ctx -> Console.print("invoke your re-connect method here"));
-
-        OutboundAdvice outboundAdvice = new OutboundAdvice();
-        outboundAdvice.whenDisconnect((ctx, promise) -> Console.print("invoke your disconnect method"));
-
+    private ChannelInitializer<NioSocketChannel> channelInitializer(SocketAddress address) {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
+                InboundAdvice inAdvice = new InboundAdvice(channel)
+                        .whenReadIdle(2, ctx -> Console.log("读闲置啦"))
+                        .whenReadTimeout(5, false, (ctx, th) -> Console.log("读超时"))
+                        .whenChannelInactive(ctx -> {
+                            Console.log("invoke your re-connect method here");
+                            TestClient.this.connect(address);
+                        })
+                        .whenExceptionCaught((ctx, th) -> Console.log("入站异常, ", th));
+
+                OutboundAdvice outAdvice = new OutboundAdvice(channel)
+                        .whenDisconnect((ctx, promise) -> Console.log("invoke your disconnect method"))
+                        .whenWriteIdle(4, ctx -> Console.log("写闲置"))
+                        .whenWriteTimeout(2, false, (ctx, th) -> Console.log("写超时"))
+                        .whenClose((ctx, pro) -> Console.log("close"));
+
                 channel.pipeline()
-                        .addLast(outboundAdvice)
-                        // in  out
-                        // ▼   ▲  remove start and end flag
-                        .addLast(new StartEndFlagFrameCodec(1024 * 1024, false, Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
-                        .addLast(new EscapeCodec(EscapeMap.mapHex("7e", "7d5e")))
-                        .addLast(new UserCodec())
-                        // ▼   ▲  deal control character and recover application data
-                        .addLast(new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR))
-                        .addLast(inboundAdvice);
+                       .addLast(outAdvice)
+                       .addLast(new ReadIdleHeartBeater(2, ctx -> {
+                           Console.log("心跳啦");
+                           ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("7777")));
+                       }))
+                       // in  out
+                       // ▼   ▲  remove start and end flag
+                       .addLast(new StartEndFlagFrameCodec(1024 * 1024, false,
+                                                           Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
+                       .addLast(new EscapeCodec(EscapeMap.mapHex("7e", "7d5e")))
+                       .addLast(new UserCodec())
+                       // ▼   ▲  deal control character and recover application data
+                       .addLast(new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR))
+                       .addLast(inAdvice);
             }
         };
     }

@@ -1,5 +1,6 @@
 package org.fz.nettyx.action;
 
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 
@@ -78,6 +79,10 @@ public interface Actions {
         if (channelWriteAction != null) {
             channelWriteAction.act(ctx, msg, promise);
         }
+    }
+
+    static void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture channelFuture) {
+        if (channelFutureAction != null) channelFutureAction.act(channelFuture);
     }
 
     /**

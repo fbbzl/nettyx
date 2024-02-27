@@ -75,7 +75,8 @@ public class ActionableReadTimeoutHandler extends ReadTimeoutHandler {
 
     @Override
     protected void readTimedOut(ChannelHandlerContext ctx) throws Exception {
-        invokeAction(timeoutAction, ctx, ReadTimeoutException.INSTANCE);
+        invokeAction(timeoutAction, ctx,
+                     new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.readTimedOut(ctx);
     }
 

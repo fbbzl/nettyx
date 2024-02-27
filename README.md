@@ -66,7 +66,7 @@ handler                             Provided some basic channel handler implemen
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---AdvisableChannelInitializer       Channel advice initializer
   ---ExceptionHandler                  exception handler
-  ---HeartBeater                       TCP heartbeat device
+  ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log
   ---MessageStealer                    use to discard message
 listener

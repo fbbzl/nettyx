@@ -55,6 +55,10 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             return this;
         }
 
+        public final InboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
+            return whenReadTimeout(timeoutSeconds, true, timeoutAction);
+        }
+
         /**
          * When read timeout inbound advice.
          *
@@ -63,8 +67,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
          *
          * @return the inbound advice
          */
-        public final InboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.readTimeoutHandler = new ActionableReadTimeoutHandler(timeoutSeconds, timeoutAction);
+        public final InboundAdvice whenReadTimeout(int timeoutSeconds, boolean fireTimeout,
+                                                   ChannelExceptionAction timeoutAction) {
+            this.readTimeoutHandler = new ActionableReadTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
             this.channel.pipeline().addFirst(this.readTimeoutHandler);
             return this;
         }
@@ -76,7 +81,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public final void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-            log.debug("channel registered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
+            log.debug("channel registered, remote-address is [{}], local-address is [{}]",
+                      ctx.channel().remoteAddress(),
                       ctx.channel().localAddress());
             invokeAction(whenChannelRegister, ctx);
             super.channelRegistered(ctx);
@@ -84,7 +90,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public final void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-            log.debug("channel unregistered, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
+            log.debug("channel unregistered, remote-address is [{}], local-address is [{}]",
+                      ctx.channel().remoteAddress(),
                       ctx.channel().localAddress());
             invokeAction(whenChannelUnRegister, ctx);
             super.channelUnregistered(ctx);
@@ -114,7 +121,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public final void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-            log.debug("channel read complete, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
+            log.debug("channel read complete, remote-address is [{}], local-address is [{}]",
+                      ctx.channel().remoteAddress(),
                       ctx.channel().localAddress());
             invokeAction(whenChannelReadComplete, ctx);
             super.channelReadComplete(ctx);
@@ -160,8 +168,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         /**
          * When write idle outbound advice.
          *
-         * @param idleSeconds the idle seconds
+         * @param idleSeconds  the idle seconds
          * @param writeIdleAct the write idle action
+         *
          * @return the outbound advice
          */
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
@@ -170,15 +179,13 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             return this;
         }
 
-        /**
-         * When write timeout outbound advice.
-         *
-         * @param timeoutSeconds the timeout seconds
-         * @param timeoutAction the timeout action
-         * @return the outbound advice
-         */
-        public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
-            this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds, timeoutAction);
+        public final OutboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
+            return whenWriteTimeout(timeoutSeconds, true, timeoutAction);
+        }
+
+        public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, boolean fireTimeout,
+                                                     ChannelExceptionAction timeoutAction) {
+            this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
             this.channel.pipeline().addFirst(this.writeTimeoutHandler);
             return this;
         }
@@ -196,16 +203,16 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
-            throws Exception {
+                throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                localAddress);
+                      localAddress);
             invokeAction(whenBind, ctx, localAddress, promise);
             super.bind(ctx, localAddress, promise);
         }
 
         @Override
         public final void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
-            ChannelPromise promise) throws Exception {
+                                  ChannelPromise promise) throws Exception {
             log.debug("channel connecting, remote-address is [{}], local-address is [{}]", remoteAddress, localAddress);
             invokeAction(whenConnect, ctx, remoteAddress, localAddress, promise);
             super.connect(ctx, remoteAddress, localAddress, promise);
@@ -213,8 +220,9 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-            log.debug("channel disconnect, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress());
+            log.debug("channel disconnect, remote-address is [{}], local-address is [{}]",
+                      ctx.channel().remoteAddress(),
+                      ctx.channel().localAddress());
             invokeAction(whenDisconnect, ctx, promise);
             super.disconnect(ctx, promise);
         }
@@ -222,15 +230,16 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         @Override
         public final void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             log.debug("channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress());
+                      ctx.channel().localAddress());
             invokeAction(whenClose, ctx, promise);
             super.close(ctx, promise);
         }
 
         @Override
         public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-            log.debug("channel deregister, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress());
+            log.debug("channel deregister, remote-address is [{}], local-address is [{}]",
+                      ctx.channel().remoteAddress(),
+                      ctx.channel().localAddress());
             invokeAction(whenDeregister, ctx, promise);
             super.deregister(ctx, promise);
         }
@@ -238,7 +247,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         @Override
         public final void read(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel read during writing, remote-address is [{}], local-address is [{}]",
-                ctx.channel().remoteAddress(), ctx.channel().localAddress());
+                      ctx.channel().remoteAddress(), ctx.channel().localAddress());
             invokeAction(whenRead, ctx);
             super.read(ctx);
         }
@@ -246,7 +255,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         @Override
         public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress());
+                      ctx.channel().localAddress());
             invokeAction(whenWrite, ctx, msg, promise);
             super.write(ctx, msg, promise);
         }
@@ -254,7 +263,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         @Override
         public final void flush(ChannelHandlerContext ctx) throws Exception {
             log.debug("channel flush, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
-                ctx.channel().localAddress());
+                      ctx.channel().localAddress());
             invokeAction(whenFlush, ctx);
             super.flush(ctx);
         }
@@ -266,6 +275,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         private static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
 
             private ChannelExceptionAction whenExceptionCaught;
+
             @Override
             public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
                 promise.addListener(failureListener(ctx, this.whenExceptionCaught));
@@ -301,7 +311,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
                 super.write(ctx, msg, promise);
             }
 
-            static ChannelFutureListener failureListener(ChannelHandlerContext ctx, ChannelExceptionAction whenExceptionCaught) {
+            static ChannelFutureListener failureListener(ChannelHandlerContext ctx,
+                                                         ChannelExceptionAction whenExceptionCaught) {
                 return cf -> {
                     if (!cf.isSuccess()) {
                         log.error(cf.cause().getMessage());
