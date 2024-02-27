@@ -1,13 +1,16 @@
 package org.fz.nettyx.handler.actionable;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.timeout.WriteTimeoutException;
+import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ChannelExceptionAction;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Actionable write timeout handler.
@@ -72,8 +75,7 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
 
     @Override
     protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
-        timeoutAction.act(ctx, WriteTimeoutException.INSTANCE);
-
+        invokeAction(timeoutAction, ctx, ReadTimeoutException.INSTANCE);
         if (fireNext) super.writeTimedOut(ctx);
     }
 
