@@ -7,6 +7,8 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
 
+import static org.fz.nettyx.action.Actions.invokeAction;
+
 /**
  * The type Actionable channel future listener.
  *
@@ -43,11 +45,4 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
         if (channelFuture.isCancelled()) invokeAction(whenCancel,  channelFuture);
     }
 
-    //********************************************      private start      ***************************************************//
-
-    private void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture channelFuture) {
-        if (channelFutureAction != null) channelFutureAction.act(channelFuture);
-    }
-
-    //********************************************      private end      ***************************************************//
 }

@@ -67,7 +67,8 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param timeoutAction the timeout action
      * @param fireNext      the fire next
      */
-    public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction,
+                                         boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
         this.fireNext = fireNext;
@@ -75,7 +76,8 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
 
     @Override
     protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
-        invokeAction(timeoutAction, ctx, ReadTimeoutException.INSTANCE);
+        invokeAction(timeoutAction, ctx,
+                     new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.writeTimedOut(ctx);
     }
 
