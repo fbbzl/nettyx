@@ -2,7 +2,6 @@ package client;
 
 import cn.hutool.core.lang.Console;
 import codec.UserCodec;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -25,6 +24,7 @@ import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
@@ -74,21 +74,17 @@ public class TestClient extends SingleTcpChannelClient {
                         .whenWriteTimeout(2, false, (ctx, th) -> Console.log("写超时"))
                         .whenClose((ctx, pro) -> Console.log("close"));
 
-                channel.pipeline()
-                       .addLast(outAdvice)
-                       .addLast(new ReadIdleHeartBeater(2, ctx -> {
-                           Console.log("心跳啦");
-                           ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("7777")));
-                       }))
-                       // in  out
-                       // ▼   ▲  remove start and end flag
-                       .addLast(new StartEndFlagFrameCodec(1024 * 1024, false,
-                                                           Unpooled.wrappedBuffer(new byte[]{(byte) 0x7e})))
-                       .addLast(new EscapeCodec(EscapeMap.mapHex("7e", "7d5e")))
-                       .addLast(new UserCodec())
-                       // ▼   ▲  deal control character and recover application data
-                       .addLast(new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR))
-                       .addLast(inAdvice);
+                channel.pipeline().addLast(
+                        outAdvice
+                        , new ReadIdleHeartBeater(2, ctx -> {
+                            Console.log("心跳啦");
+                            ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
+                        })
+                        , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                        , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                        , new UserCodec()
+                        , new LoggerHandler.InboundLogger(log, LoggerHandler.Sl4jLevel.ERROR)
+                        , inAdvice);
             }
         };
     }
