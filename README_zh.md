@@ -67,7 +67,7 @@ handler                             提供了一些基本的通道处理程序�
   ---ChannelAdvice                     包含入站建言和出站建言
   ---AdvisableChannelInitializer       通道建议初始值设定项
   ---ExceptionHandler                  异常处理程序
-  ---HeartBeater                       TCP 心跳设备
+  ---IdledHeartBeater                  闲置后的心跳器
   ---LoggerHandler                     进入和退出消息日志
   ---MessageStealer                    用于丢弃消息
 listener
