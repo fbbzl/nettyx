@@ -30,7 +30,7 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
      * The TO_HEX.
      */
     public static final Function<Object, String>
-        TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
+            TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
     /**
      * The To ascii.
      */
