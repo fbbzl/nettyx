@@ -26,10 +26,8 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
                 .whenFailure(cf -> cf.channel().eventLoop().schedule(() -> connect(key, address), 2, SECONDS));
 
         new Bootstrap()
-                .attr(key)
                 .group(getEventLoopGroup())
                 .channel(NioSocketChannel.class)
-                .handler(channelInitializer(address))
                 .connect(address)
                 .addListener(listener);
     }
