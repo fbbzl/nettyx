@@ -84,7 +84,6 @@ public abstract class SingleTcpChannelClient extends NettyClient {
                 .handler(channelInitializer())
                 .connect(address)
                 .addListener(listener);
-
     }
 
     protected abstract <C extends Channel> ChannelInitializer<C> channelInitializer();
