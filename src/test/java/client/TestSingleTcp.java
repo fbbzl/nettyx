@@ -2,8 +2,6 @@ package client;
 
 import cn.hutool.core.lang.Console;
 import codec.UserCodec;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
@@ -15,42 +13,28 @@ import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.util.HexKit;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
-    public static final InetSocketAddress remoteAddress = new InetSocketAddress("127.0.0.1", 9081);
+
+    protected TestSingleTcp(SocketAddress remoteAddress) {
+        super(remoteAddress);
+    }
 
     public static void main(String[] args) {
-        TestSingleTcp testClient = new TestSingleTcp();
+        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9081));
 
-        testClient.connect(remoteAddress);
+        testClient.connect();
     }
 
     @Override
-    public void connect(SocketAddress address) {
-        Console.log("connecting address [" + address.toString() + "]");
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-                .whenSuccess(cf -> System.err.println("ok"))
-                .whenFailure(cf -> cf.channel().eventLoop().schedule(() -> connect(address), 2, SECONDS));
-
-        new Bootstrap()
-                .group(getEventLoopGroup())
-                .channel(NioSocketChannel.class)
-                .handler(channelInitializer(SocketAddress address))
-                .connect(address)
-                .addListener(listener);
-
-    }
-
-    private ChannelInitializer<NioSocketChannel> channelInitializer(SocketAddress address) {
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
@@ -59,7 +43,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                         .whenReadTimeout(5, false, (ctx, th) -> Console.log("读超时"))
                         .whenChannelInactive(ctx -> {
                             Console.log("invoke your re-connect method here");
-                            TestSingleTcp.this.connect(address);
+                            TestSingleTcp.this.connect();
                         })
                         .whenExceptionCaught((ctx, th) -> Console.log("入站异常, ", th));
 
