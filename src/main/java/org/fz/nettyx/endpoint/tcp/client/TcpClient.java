@@ -3,9 +3,10 @@ package org.fz.nettyx.endpoint.tcp.client;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
 import org.fz.nettyx.endpoint.NettyClient;
+
+import java.net.SocketAddress;
 
 /**
  * basic tcp client
@@ -22,7 +23,10 @@ public abstract class TcpClient extends NettyClient {
 
     protected TcpClient() {
         this.eventLoopGroup = new NioEventLoopGroup();
-        this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+        //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+        this.bootstrap = newBootstrap(getEventLoopGroup());
     }
+
+    protected abstract Bootstrap newBootstrap(EventLoopGroup eventLoopGroup, SocketAddress remoteAddress);
 
 }
