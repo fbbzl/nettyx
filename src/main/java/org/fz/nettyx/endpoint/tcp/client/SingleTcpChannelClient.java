@@ -28,12 +28,17 @@ import java.net.SocketAddress;
 public abstract class SingleTcpChannelClient extends NettyClient {
 
     private final SocketAddress remoteAddress;
+    private final Bootstrap bootstrap;
 
     private final EventLoopGroup eventLoopGroup;
 
     protected SingleTcpChannelClient(SocketAddress remoteAddress) {
         this.eventLoopGroup = new NioEventLoopGroup();
         this.remoteAddress = remoteAddress;
+        this.bootstrap = new Bootstrap()
+                .group(getEventLoopGroup())
+                .channel(NioSocketChannel.class)
+                .handler(channelInitializer());
     }
 
     protected Channel channel;
@@ -77,12 +82,9 @@ public abstract class SingleTcpChannelClient extends NettyClient {
                 .whenSuccess(whenConnectSuccess())
                 .whenFailure(whenConnectFailure());
 
-        new Bootstrap()
-                .group(getEventLoopGroup())
-                .channel(NioSocketChannel.class)
-                .handler(channelInitializer())
-                .connect(address)
-                .addListener(listener);
+        this.bootstrap.clone()
+                      .connect()
+                      .addListener(listener);
     }
 
     protected abstract <C extends Channel> ChannelInitializer<C> channelInitializer();
