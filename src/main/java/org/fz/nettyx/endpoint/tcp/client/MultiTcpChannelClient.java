@@ -1,5 +1,6 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
@@ -11,6 +12,7 @@ import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Try;
 
 import java.net.SocketAddress;
+import java.util.Map;
 
 /**
  * The type Multi channel client. use channel key to retrieve and use channels
@@ -26,19 +28,20 @@ import java.net.SocketAddress;
 public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     private final AttributeKey<K> channelKey = AttributeKey.valueOf("$multi_tcp_channel_key$");
-
+    protected final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
     protected final EventLoopGroup eventLoopGroup;
+    private final Bootstrap bootstrap;
 
-
-    protected MultiTcpChannelClient() {
+    protected MultiTcpChannelClient(Map<K, SocketAddress> addressMap) {
         this.eventLoopGroup = new NioEventLoopGroup();
         //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
-    }
 
-    /**
-     * Used to store different channels
-     */
-    protected final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
+    }
+    protected MultiTcpChannelClient(K key, SocketAddress address) {
+        this.eventLoopGroup = new NioEventLoopGroup();
+        //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+
+    }
 
     public Channel getChannel(K key) {
         return this.channelStorage.get(key);
@@ -92,7 +95,7 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
      * @param channelKey the channel channelKey
      * @param message    the message
      */
-    public ChannelPromise send(K channelKey, Object message) {
+    public ChannelPromise writeAndFlush(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
         if (notActive(channel)) {
