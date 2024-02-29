@@ -21,13 +21,13 @@ import java.util.function.Predicate;
 public class ChannelStorage<K> {
 
     @Delegate
-    private final Map<K, Channel> channelMap;
+    private final Map<K, Channel> storage;
 
     /**
      * Instantiates a new Channel storage.
      */
     public ChannelStorage() {
-        this.channelMap = new SafeConcurrentHashMap<>();
+        this.storage = new SafeConcurrentHashMap<>();
     }
 
     /**
@@ -36,7 +36,7 @@ public class ChannelStorage<K> {
      * @param initialCapacity the initial capacity
      */
     public ChannelStorage(int initialCapacity) {
-        this.channelMap = new SafeConcurrentHashMap<>(initialCapacity);
+        this.storage = new SafeConcurrentHashMap<>(initialCapacity);
     }
 
     /**
@@ -45,7 +45,7 @@ public class ChannelStorage<K> {
      * @param channelMap the channel map
      */
     public ChannelStorage(Map<K, Channel> channelMap) {
-        this.channelMap = new SafeConcurrentHashMap<>(channelMap);
+        this.storage = new SafeConcurrentHashMap<>(channelMap);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ChannelStorage<K> {
      * @param concurrencyLevel the concurrency level
      */
     public ChannelStorage(int initialCapacity, float loadFactor, int concurrencyLevel) {
-        this.channelMap = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
+        this.storage = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
     }
 
     /**
@@ -76,7 +76,7 @@ public class ChannelStorage<K> {
      * @param channel the channel
      */
     public void store(K key, Channel channel) {
-        channelMap.put(key, channel);
+        storage.put(key, channel);
     }
 
     /**
@@ -160,7 +160,7 @@ public class ChannelStorage<K> {
      */
     public List<Channel> findAll(Predicate<Channel> channelPredicate) {
         List<Channel> channels = new ArrayList<>(10);
-        for (Channel channel : channelMap.values()) {
+        for (Channel channel : storage.values()) {
             if (channelPredicate.test(channel)) channels.add(channel);
         }
         return channels;
@@ -174,7 +174,7 @@ public class ChannelStorage<K> {
      * @return the boolean
      */
     public boolean isAll(Predicate<Channel> channelPredicate) {
-        for (Channel channel : channelMap.values()) {
+        for (Channel channel : storage.values()) {
             if (channelPredicate.negate().test(channel)) {
                 return false;
             }
@@ -184,6 +184,6 @@ public class ChannelStorage<K> {
 
     @Override
     public String toString() {
-        return this.channelMap.toString();
+        return this.storage.toString();
     }
 }
