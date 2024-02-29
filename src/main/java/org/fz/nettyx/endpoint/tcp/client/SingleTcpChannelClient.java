@@ -82,7 +82,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
                 .whenSuccess(whenConnectSuccess())
                 .whenFailure(whenConnectFailure());
 
-        this.bootstrap.clone()
+        this.getBootstrap().clone()
                       .connect()
                       .addListener(listener);
     }
