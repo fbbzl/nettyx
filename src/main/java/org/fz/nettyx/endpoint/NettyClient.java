@@ -92,8 +92,6 @@ public abstract class NettyClient {
                 !channel.isWritable();
     }
 
-    protected abstract <C extends Channel> ChannelInitializer<C> getChannelInitializer();
-
     /**
      * Schedule scheduled future.
      *

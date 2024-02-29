@@ -83,7 +83,7 @@ public abstract class SingleTcpChannelClient extends TcpClient {
     }
 
     public ChannelFuture connect(SocketAddress address) {
-        return getBootstrap().clone().handler(getChannelInitializer()).connect(address);
+        return getBootstrap().connect(address);
     }
 
     /**
