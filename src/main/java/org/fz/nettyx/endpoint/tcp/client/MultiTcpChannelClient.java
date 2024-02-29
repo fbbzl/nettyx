@@ -9,12 +9,16 @@ import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.NettyClient;
+import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Try;
 
 import java.net.SocketAddress;
 import java.util.Map;
+
+import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 
 /**
  * The type Multi channel client. use channel key to retrieve and use channels
@@ -50,6 +54,11 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
     }
 
     protected void connect(K key) {
+        ChannelFutureListener listener = new ActionableChannelFutureListener()
+                .whenDone(whenConnectDone())
+                .whenCancel(whenConnectCancel())
+                .whenSuccess(whenConnectSuccess())
+                .whenFailure(whenConnectFailure());
 
     }
 
@@ -128,6 +137,22 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     //***********************************           override start           *****************************************//
 
+    protected ChannelFutureAction whenConnectDone() {
+        return NOTHING;
+    }
+
+    protected ChannelFutureAction whenConnectCancel() {
+        return NOTHING;
+    }
+
+    protected ChannelFutureAction whenConnectSuccess() {
+        return NOTHING;
+    }
+
+    protected ChannelFutureAction whenConnectFailure() {
+        return NOTHING;
+    }
+
     protected Bootstrap newBootstrap(K key) {
         return new Bootstrap()
                 .attr(channelKey, key)
@@ -138,6 +163,6 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     protected abstract ChannelInitializer<? extends Channel> channelInitializer();
 
-    //***********************************           override end           *****************************************//
+    //************************************           override end           ******************************************//
 
 }
