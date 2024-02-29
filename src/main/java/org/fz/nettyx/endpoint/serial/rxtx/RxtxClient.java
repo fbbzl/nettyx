@@ -6,9 +6,13 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxChannelConfig;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import lombok.Getter;
 import org.fz.nettyx.endpoint.NettyClient;
-
-import java.util.concurrent.*;
 
 /**
  * rxtx abstract client
@@ -16,6 +20,7 @@ import java.util.concurrent.*;
  * @author fengbinbin
  * @since 2022-01-26 19:58
  */
+@Getter
 @SuppressWarnings({"deprecation", "unchecked"})
 public abstract class RxtxClient extends NettyClient {
 
@@ -46,16 +51,6 @@ public abstract class RxtxClient extends NettyClient {
     }
 
     protected abstract void doRxtxConfig(RxtxChannelConfig rxtxChannel);
-
-    @Override
-    public EventLoopGroup getEventLoopGroup() {
-        return eventLoopGroup;
-    }
-
-    @Override
-    public Bootstrap getBootstrap() {
-        return bootstrap;
-    }
 
     protected int scheduledCorePoolSize() {
         return Runtime.getRuntime().availableProcessors();
