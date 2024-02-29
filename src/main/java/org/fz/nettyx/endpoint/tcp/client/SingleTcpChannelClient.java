@@ -64,7 +64,6 @@ public abstract class SingleTcpChannelClient extends NettyClient {
         if (gracefullyCloseable(channel)) this.closeChannel();
     }
 
-
     public void closeChannelGracefully(ChannelPromise promise) {
         if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
