@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public abstract class Client {
+public abstract class NettyClient {
 
     public abstract EventLoopGroup getEventLoopGroup();
 
@@ -98,6 +98,8 @@ public abstract class Client {
                 &&
                 !channel.isWritable();
     }
+
+    protected abstract <C extends Channel> ChannelInitializer<C> getChannelInitializer();
 
     /**
      * Schedule scheduled future.

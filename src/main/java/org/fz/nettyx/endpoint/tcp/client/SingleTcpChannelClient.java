@@ -87,9 +87,8 @@ public abstract class SingleTcpChannelClient extends TcpClient {
      *
      * @param address the address
      * @return the channel future
-     * @throws Exception the exception
      */
-    public abstract ChannelFuture connect(SocketAddress address) throws Exception;
+    public abstract ChannelFuture connect(SocketAddress address);
 
     /**
      * Send channel promise.
