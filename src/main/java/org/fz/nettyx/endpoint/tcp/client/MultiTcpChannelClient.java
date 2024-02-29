@@ -1,6 +1,5 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
@@ -30,12 +29,10 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     protected final EventLoopGroup eventLoopGroup;
 
-    private final Bootstrap bootstrap;
 
     protected MultiTcpChannelClient() {
         this.eventLoopGroup = new NioEventLoopGroup();
         //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
-        this.bootstrap = newBootstrap(getEventLoopGroup());
     }
 
     /**
@@ -47,9 +44,7 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         return this.channelStorage.get(key);
     }
 
-    protected ChannelFuture connect(K key, SocketAddress address) {
-        return getBootstrap().attr(channelKey, key).connect(address);
-    }
+    protected abstract void connect(K key, SocketAddress address);
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
