@@ -96,7 +96,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
      *
      * @return the channel promise
      */
-    public ChannelPromise send(Object message) {
+    public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);

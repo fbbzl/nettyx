@@ -32,8 +32,6 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         TestSingleTcp testClient = new TestSingleTcp();
 
         testClient.connect(remoteAddress);
-
-
     }
 
     @Override
@@ -46,9 +44,10 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         new Bootstrap()
                 .group(getEventLoopGroup())
                 .channel(NioSocketChannel.class)
-                .handler(channelInitializer(address))
+                .handler(channelInitializer(SocketAddress address))
                 .connect(address)
                 .addListener(listener);
+
     }
 
     private ChannelInitializer<NioSocketChannel> channelInitializer(SocketAddress address) {
