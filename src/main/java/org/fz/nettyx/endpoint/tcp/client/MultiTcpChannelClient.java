@@ -50,12 +50,6 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         storeChannel(channelKey, future.channel());
     }
 
-    /**
-     * must store channel after connect success!!
-     *
-     * @param key     the channelKey
-     * @param channel the channel
-     */
     @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
         Channel oldChannel = channelStorage.get(key);
