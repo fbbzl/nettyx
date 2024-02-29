@@ -5,10 +5,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.NettyClient;
 import org.fz.nettyx.util.ChannelStorage;
+import org.fz.nettyx.util.Try;
 
 import java.net.SocketAddress;
 
@@ -50,16 +50,16 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         storeChannel(channelKey, future.channel());
     }
 
-    @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
-        //TODO thread
-        Channel oldChannel = channelStorage.compute(key);
-        if (isActive(oldChannel)) {
-            oldChannel.close().sync();
-            channelStorage.remove(key);
-        }
-        channelStorage.store(key, channel);
-        log.info("has stored channel [{}]", channel);
+        channelStorage.compute(key, Try.apply((k, old) -> {
+            if (isActive(old)) {
+                old.close().sync();
+                channelStorage.remove(key);
+            }
+
+            log.info("has stored channel [{}]", channel);
+            return channel;
+        }));
     }
 
     /**
