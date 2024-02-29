@@ -41,7 +41,7 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     protected MultiTcpChannelClient(Map<K, SocketAddress> addressMap) {
         this.eventLoopGroup = new NioEventLoopGroup();
-        this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+        this.bootstrap = newBootstrap();
         this.addressMap = new SafeConcurrentHashMap<>(addressMap);
     }
 
@@ -55,11 +55,17 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     protected void connect(K key) {
         ChannelFutureListener listener = new ActionableChannelFutureListener()
-                .whenDone(whenConnectDone())
-                .whenCancel(whenConnectCancel())
-                .whenSuccess(whenConnectSuccess())
-                .whenFailure(whenConnectFailure());
+                .whenDone(whenConnectDone(key))
+                .whenCancel(whenConnectCancel(key))
+                .whenSuccess(whenConnectSuccess(key))
+                .whenFailure(whenConnectFailure(key));
 
+        getBootstrap()
+                .clone()
+                .attr(channelKey, key)
+                .handler(channelInitializer(key))
+                .connect()
+                .addListener(listener);
     }
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
@@ -137,31 +143,30 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     //***********************************           override start           *****************************************//
 
-    protected ChannelFutureAction whenConnectDone() {
+    protected ChannelFutureAction whenConnectDone(K key) {
         return NOTHING;
     }
 
-    protected ChannelFutureAction whenConnectCancel() {
+    protected ChannelFutureAction whenConnectCancel(K key) {
         return NOTHING;
     }
 
-    protected ChannelFutureAction whenConnectSuccess() {
+    protected ChannelFutureAction whenConnectSuccess(K key) {
         return NOTHING;
     }
 
-    protected ChannelFutureAction whenConnectFailure() {
+    protected ChannelFutureAction whenConnectFailure(K key) {
         return NOTHING;
     }
 
-    protected Bootstrap newBootstrap(K key) {
+
+    protected Bootstrap newBootstrap() {
         return new Bootstrap()
-                .attr(channelKey, key)
                 .group(getEventLoopGroup())
-                .channel(NioSocketChannel.class)
-                .handler(channelInitializer());
+                .channel(NioSocketChannel.class);
     }
 
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+    protected abstract ChannelInitializer<? extends Channel> channelInitializer(K key);
 
     //************************************           override end           ******************************************//
 
