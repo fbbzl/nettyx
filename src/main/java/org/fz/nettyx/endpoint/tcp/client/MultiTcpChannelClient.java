@@ -33,7 +33,9 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
     }
 
     protected ChannelFuture connect(K key, SocketAddress address) {
-        return getBootstrap().clone().attr(channelKey, key).connect(address);
+        ChannelFuture future = getBootstrap().clone().attr(channelKey, key).connect(address);
+
+        return future;
     }
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
