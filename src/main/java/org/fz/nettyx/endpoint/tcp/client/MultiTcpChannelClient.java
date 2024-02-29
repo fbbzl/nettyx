@@ -1,10 +1,14 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.endpoint.NettyClient;
 import org.fz.nettyx.util.ChannelStorage;
 
 import java.net.SocketAddress;
@@ -19,9 +23,20 @@ import java.net.SocketAddress;
  * @since 2021 /5/6 16:58
  */
 @Slf4j
-public abstract class MultiTcpChannelClient<K> extends TcpClient {
+@Getter
+public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
     private final AttributeKey<K> channelKey = AttributeKey.valueOf("$multi_tcp_channel_key$");
+
+    protected final EventLoopGroup eventLoopGroup;
+
+    private final Bootstrap bootstrap;
+
+    protected MultiTcpChannelClient() {
+        this.eventLoopGroup = new NioEventLoopGroup();
+        //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+        this.bootstrap = newBootstrap(getEventLoopGroup());
+    }
 
     /**
      * Used to store different channels
@@ -33,9 +48,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
     }
 
     protected ChannelFuture connect(K key, SocketAddress address) {
-        ChannelFuture future = getBootstrap().clone().attr(channelKey, key).connect(address);
-
-        return future;
+        return getBootstrap().attr(channelKey, key).connect(address);
     }
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
