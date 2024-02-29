@@ -1,6 +1,5 @@
 package org.fz.nettyx.endpoint;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,12 +59,6 @@ import java.util.concurrent.TimeUnit;
 public abstract class NettyClient {
 
     public abstract EventLoopGroup getEventLoopGroup();
-
-    public abstract Bootstrap getBootstrap();
-
-    protected Bootstrap cloneBootstrap() {
-        return getBootstrap().clone();
-    }
 
     protected boolean isRegistered(Channel channel) { return channel != null && channel.isRegistered(); }
     protected boolean isOpen(Channel channel)       { return channel != null && channel.isOpen();       }

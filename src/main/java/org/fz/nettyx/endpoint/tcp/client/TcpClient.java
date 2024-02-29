@@ -4,13 +4,16 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.Getter;
 import org.fz.nettyx.endpoint.NettyClient;
 
 /**
  * basic tcp client
+ *
  * @author fengbinbin
  * @since 2022-01-26 20:54
  **/
+@Getter
 public abstract class TcpClient extends NettyClient {
 
     protected final EventLoopGroup eventLoopGroup;
@@ -22,13 +25,4 @@ public abstract class TcpClient extends NettyClient {
         this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
     }
 
-    @Override
-    public EventLoopGroup getEventLoopGroup() {
-        return eventLoopGroup;
-    }
-
-    @Override
-    public Bootstrap getBootstrap() {
-        return bootstrap;
-    }
 }
