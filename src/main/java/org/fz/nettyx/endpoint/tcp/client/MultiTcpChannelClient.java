@@ -54,7 +54,6 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         channelStorage.compute(key, Try.apply((k, old) -> {
             if (isActive(old)) {
                 old.close().sync();
-                channelStorage.remove(key);
             }
 
             log.info("has stored channel [{}]", channel);
