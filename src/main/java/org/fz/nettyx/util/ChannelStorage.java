@@ -2,24 +2,25 @@ package org.fz.nettyx.util;
 
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.channel.Channel;
+import lombok.experimental.Delegate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
  * Used to store channels, using key-length pairs
  *
  * @param <K> the type parameter
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /4/29 10:19
  */
 public class ChannelStorage<K> {
 
+    @Delegate
     private final Map<K, Channel> channelMap;
 
     /**
@@ -76,16 +77,6 @@ public class ChannelStorage<K> {
      */
     public void store(K key, Channel channel) {
         channelMap.put(key, channel);
-    }
-
-    /**
-     * Get channel.
-     *
-     * @param key the key
-     * @return the channel
-     */
-    public Channel get(K key) {
-        return channelMap.get(key);
     }
 
     /**
@@ -164,6 +155,7 @@ public class ChannelStorage<K> {
      * Find all list.
      *
      * @param channelPredicate the channel predicate
+     *
      * @return the list
      */
     public List<Channel> findAll(Predicate<Channel> channelPredicate) {
@@ -178,6 +170,7 @@ public class ChannelStorage<K> {
      * Is all boolean.
      *
      * @param channelPredicate the channel predicate
+     *
      * @return the boolean
      */
     public boolean isAll(Predicate<Channel> channelPredicate) {
@@ -187,43 +180,6 @@ public class ChannelStorage<K> {
             }
         }
         return true;
-    }
-
-    /**
-     * For each.
-     *
-     * @param action the action
-     */
-    public void forEach(BiConsumer<K, Channel> action) {
-        channelMap.forEach(action);
-    }
-
-    /**
-     * Remove channel.
-     *
-     * @param key the key
-     * @return the channel
-     */
-    public Channel remove(K key) {
-        return channelMap.remove(key);
-    }
-
-    /**
-     * Clear.
-     */
-    public void clear() {
-        channelMap.clear();
-    }
-
-    /**
-     * Compute channel.
-     *
-     * @param key               the key
-     * @param remappingFunction the remapping function
-     * @return the channel
-     */
-    public Channel compute(K key, BiFunction<K, Channel, Channel> remappingFunction) {
-        return channelMap.compute(key, remappingFunction);
     }
 
     @Override

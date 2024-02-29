@@ -53,7 +53,7 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
     @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
         //TODO thread
-        Channel oldChannel = channelStorage.get(key);
+        Channel oldChannel = channelStorage.compute(key);
         if (isActive(oldChannel)) {
             oldChannel.close().sync();
             channelStorage.remove(key);
