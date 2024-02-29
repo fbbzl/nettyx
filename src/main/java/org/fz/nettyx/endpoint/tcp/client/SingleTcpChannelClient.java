@@ -1,13 +1,18 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
 
+import cn.hutool.core.lang.Console;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.NettyClient;
+import org.fz.nettyx.listener.ActionableChannelFutureListener;
 
 import java.net.SocketAddress;
 
@@ -22,31 +27,21 @@ import java.net.SocketAddress;
 @Getter
 public abstract class SingleTcpChannelClient extends NettyClient {
 
+    private final SocketAddress remoteAddress;
+
     private final EventLoopGroup eventLoopGroup;
 
-    protected SingleTcpChannelClient() {
+    protected SingleTcpChannelClient(SocketAddress remoteAddress) {
         this.eventLoopGroup = new NioEventLoopGroup();
+        this.remoteAddress = remoteAddress;
     }
 
-    /**
-     * The Channel.
-     */
     protected Channel channel;
 
-    /**
-     * Store channel.
-     *
-     * @param cf the cf
-     */
     protected void storeChannel(ChannelFuture cf) {
         storeChannel(cf.channel());
     }
 
-    /**
-     * Store channel.
-     *
-     * @param channel the channel
-     */
     @SneakyThrows
     protected void storeChannel(Channel channel) {
         if (isActive(this.channel)) {
@@ -55,47 +50,45 @@ public abstract class SingleTcpChannelClient extends NettyClient {
         this.channel = channel;
     }
 
-    /**
-     * Close channel.
-     */
     public void closeChannel() {
         this.channel.close();
     }
 
-    /**
-     * Close channel.
-     *
-     * @param promise the promise
-     */
+
     public void closeChannel(ChannelPromise promise) {
         this.channel.close(promise);
     }
 
-    /**
-     * Close channel gracefully.
-     */
+
     public void closeChannelGracefully() {
         if (gracefullyCloseable(channel)) this.closeChannel();
     }
 
-    /**
-     * Close channel gracefully.
-     *
-     * @param promise the promise
-     */
+
     public void closeChannelGracefully(ChannelPromise promise) {
         if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
 
-    public abstract void connect(SocketAddress remoteAddress);
+    public void connect() {
+        final SocketAddress address = getRemoteAddress();
+        Console.log("connecting address [" + address.toString() + "]");
+        ChannelFutureListener listener = new ActionableChannelFutureListener()
+                .whenDone(whenConnectDone())
+                .whenCancel(whenConnectCancel())
+                .whenSuccess(whenConnectSuccess())
+                .whenFailure(whenConnectFailure());
 
-    /**
-     * Send channel promise.
-     *
-     * @param message the message
-     *
-     * @return the channel promise
-     */
+        new Bootstrap()
+                .group(getEventLoopGroup())
+                .channel(NioSocketChannel.class)
+                .handler(channelInitializer())
+                .connect(address)
+                .addListener(listener);
+
+    }
+
+    protected abstract <C extends Channel> ChannelInitializer<C> channelInitializer();
+
     public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
@@ -115,4 +108,28 @@ public abstract class SingleTcpChannelClient extends NettyClient {
                                        "address is [" + channel.remoteAddress() + "]", exception);
         }
     }
+
+    //***************************************** event method start ***************************************************//
+
+    protected ChannelFutureAction whenConnectDone() {
+        return ctx -> {
+        };
+    }
+
+    protected ChannelFutureAction whenConnectCancel() {
+        return ctx -> {
+        };
+    }
+
+    protected ChannelFutureAction whenConnectSuccess() {
+        return ctx -> {
+        };
+    }
+
+    protected ChannelFutureAction whenConnectFailure() {
+        return ctx -> {
+        };
+    }
+
+
 }
