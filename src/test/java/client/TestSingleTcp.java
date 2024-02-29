@@ -23,7 +23,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
-public class TestSingleTcp extends SingleTcpChannelClient {
+public class TestSingleTcp extends SingleTcpChannelClient<NioSocketChannel> {
 
     protected TestSingleTcp(SocketAddress remoteAddress) {
         super(remoteAddress);

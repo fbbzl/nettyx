@@ -25,7 +25,7 @@ import java.net.SocketAddress;
  */
 @Slf4j
 @Getter
-public abstract class SingleTcpChannelClient extends NettyClient {
+public abstract class SingleTcpChannelClient<C extends Channel> extends NettyClient {
 
     private final SocketAddress remoteAddress;
     private final Bootstrap bootstrap;
@@ -88,7 +88,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
             .addListener(listener);
     }
 
-    protected abstract <C extends Channel> ChannelInitializer<C> channelInitializer();
+    protected abstract ChannelInitializer<C> channelInitializer();
 
     public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel)) {
