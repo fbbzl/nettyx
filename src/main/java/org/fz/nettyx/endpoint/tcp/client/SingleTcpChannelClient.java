@@ -28,7 +28,7 @@ import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 @Slf4j
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class SingleTcpChannelClient<C extends Channel> extends NettyClient {
+public abstract class SingleTcpChannelClient extends NettyClient {
 
     private final SocketAddress remoteAddress;
     private final Bootstrap bootstrap;
@@ -37,10 +37,7 @@ public abstract class SingleTcpChannelClient<C extends Channel> extends NettyCli
     protected SingleTcpChannelClient(SocketAddress remoteAddress) {
         this.eventLoopGroup = new NioEventLoopGroup();
         this.remoteAddress = remoteAddress;
-        this.bootstrap = new Bootstrap()
-                .group(getEventLoopGroup())
-                .channel((Class<? extends Channel>) TypeUtil.getTypeArgument(this.getClass(), 0))
-                .handler(channelInitializer());
+        this.bootstrap = newBootstrap();
     }
 
     protected Channel channel;
@@ -90,7 +87,14 @@ public abstract class SingleTcpChannelClient<C extends Channel> extends NettyCli
             .addListener(listener);
     }
 
-    protected abstract ChannelInitializer<C> channelInitializer();
+    protected Bootstrap newBootstrap() {
+        return new Bootstrap()
+                .group(getEventLoopGroup())
+                .channel((Class<? extends Channel>) TypeUtil.getTypeArgument(this.getClass(), 0))
+                .handler(channelInitializer());
+    }
+
+    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
 
     public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel)) {
