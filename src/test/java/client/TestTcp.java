@@ -2,9 +2,11 @@ package client;
 
 import cn.hutool.core.lang.Console;
 import codec.UserCodec;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class TestTcp extends SingleTcpChannelClient {
@@ -40,7 +41,11 @@ public class TestTcp extends SingleTcpChannelClient {
                 .whenSuccess(cf -> System.err.println("ok"));
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
         testClient.connect(inetSocketAddress).addListener(listener);
+    }
 
+    @Override
+    protected Bootstrap newBootstrap(EventLoopGroup eventLoopGroup, SocketAddress socketAddress) {
+        return null;
     }
 
     @SneakyThrows
