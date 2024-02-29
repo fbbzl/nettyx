@@ -30,7 +30,6 @@ public abstract class SingleTcpChannelClient<C extends Channel> extends NettyCli
 
     private final SocketAddress remoteAddress;
     private final Bootstrap bootstrap;
-
     private final EventLoopGroup eventLoopGroup;
 
     protected SingleTcpChannelClient(SocketAddress remoteAddress) {
