@@ -25,13 +25,15 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
-public class TestTcp extends SingleTcpChannelClient {
+public class TestSingleTcp extends SingleTcpChannelClient {
     public static final InetSocketAddress remoteAddress = new InetSocketAddress("127.0.0.1", 9081);
 
     public static void main(String[] args) {
-        TestTcp testClient = new TestTcp();
+        TestSingleTcp testClient = new TestSingleTcp();
 
         testClient.connect(remoteAddress);
+
+
     }
 
     @Override
@@ -43,7 +45,6 @@ public class TestTcp extends SingleTcpChannelClient {
 
         new Bootstrap()
                 .group(getEventLoopGroup())
-                .handler(channelInitializer(address))
                 .channel(NioSocketChannel.class)
                 .handler(channelInitializer(address))
                 .connect(address)
@@ -59,7 +60,7 @@ public class TestTcp extends SingleTcpChannelClient {
                         .whenReadTimeout(5, false, (ctx, th) -> Console.log("读超时"))
                         .whenChannelInactive(ctx -> {
                             Console.log("invoke your re-connect method here");
-                            TestTcp.this.connect(address);
+                            TestSingleTcp.this.connect(address);
                         })
                         .whenExceptionCaught((ctx, th) -> Console.log("入站异常, ", th));
 
