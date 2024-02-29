@@ -16,6 +16,8 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 
 import java.net.SocketAddress;
 
+import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
+
 /**
  * Single channel client
  *
@@ -111,23 +113,19 @@ public abstract class SingleTcpChannelClient<C extends Channel> extends NettyCli
     }
 
     protected ChannelFutureAction whenConnectDone() {
-        return ctx -> {
-        };
+        return NOTHING;
     }
 
     protected ChannelFutureAction whenConnectCancel() {
-        return ctx -> {
-        };
+        return NOTHING;
     }
 
     protected ChannelFutureAction whenConnectSuccess() {
-        return ctx -> {
-        };
+        return NOTHING;
     }
 
     protected ChannelFutureAction whenConnectFailure() {
-        return ctx -> {
-        };
+        return NOTHING;
     }
 
 
