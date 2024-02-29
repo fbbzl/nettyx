@@ -1,14 +1,15 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelPromise;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.endpoint.NettyClient;
 
 import java.net.SocketAddress;
 
@@ -21,7 +22,16 @@ import java.net.SocketAddress;
  */
 @Slf4j
 @Getter
-public abstract class SingleTcpChannelClient extends TcpClient {
+public abstract class SingleTcpChannelClient extends NettyClient {
+
+    protected final EventLoopGroup eventLoopGroup;
+
+    private final Bootstrap bootstrap;
+
+    protected SingleTcpChannelClient() {
+        this.eventLoopGroup = new NioEventLoopGroup();
+        this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+    }
 
     /**
      * The Channel.
