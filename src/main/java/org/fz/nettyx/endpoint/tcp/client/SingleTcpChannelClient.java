@@ -2,10 +2,10 @@ package org.fz.nettyx.endpoint.tcp.client;
 
 
 import cn.hutool.core.lang.Console;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -90,7 +90,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
     protected Bootstrap newBootstrap() {
         return new Bootstrap()
                 .group(getEventLoopGroup())
-                .channel((Class<? extends Channel>) TypeUtil.getTypeArgument(this.getClass(), 0))
+                .channel(NioSocketChannel.class)
                 .handler(channelInitializer());
     }
 
