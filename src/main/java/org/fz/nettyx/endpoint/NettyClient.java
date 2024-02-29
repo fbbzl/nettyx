@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  *             .whenSuccess(connectSuccessAction(address))
  *             .whenFailure(connectFailureAction(address));
  *
- *         super.newBootstrap()
+ *         super.cloneBootstrap()
  *             .handler(channelInitializer())
  *             .connect(address)
  *             .addListeners(connectListener);
@@ -63,7 +63,7 @@ public abstract class NettyClient {
 
     public abstract Bootstrap getBootstrap();
 
-    protected Bootstrap newBootstrap() {
+    protected Bootstrap cloneBootstrap() {
         return getBootstrap().clone();
     }
 
