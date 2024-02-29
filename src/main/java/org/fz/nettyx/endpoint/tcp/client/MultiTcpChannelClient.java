@@ -37,6 +37,7 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
 
     }
+
     protected MultiTcpChannelClient(K key, SocketAddress address) {
         this.eventLoopGroup = new NioEventLoopGroup();
         //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
@@ -47,7 +48,11 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         return this.channelStorage.get(key);
     }
 
-    protected abstract void connect(K key, SocketAddress address);
+    protected void connect(K key, SocketAddress address) {
+
+    }
+
+    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
@@ -64,11 +69,6 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         }));
     }
 
-    /**
-     * Store according channel future
-     *
-     * @param cf the cf
-     */
     protected void storeChannel(ChannelFuture cf) {
         this.storeChannel(channelKey(cf), cf.channel());
     }
@@ -89,12 +89,6 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         if (gracefullyCloseable(getChannel(key))) this.closeChannel(key, promise);
     }
 
-    /**
-     * Send.
-     *
-     * @param channelKey the channel channelKey
-     * @param message    the message
-     */
     public ChannelPromise writeAndFlush(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
@@ -117,42 +111,18 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
         }
     }
 
-    /**
-     * Clear channelStorage
-     */
     protected void clear() {
         channelStorage.clear();
     }
 
-    /**
-     * Channel key k.
-     *
-     * @param ctx the ctx
-     *
-     * @return the k
-     */
     protected K channelKey(ChannelHandlerContext ctx) {
         return ctx.channel().attr(channelKey).get();
     }
 
-    /**
-     * Channel key k.
-     *
-     * @param channelFuture the channel future
-     *
-     * @return the k
-     */
     protected K channelKey(ChannelFuture channelFuture) {
         return channelFuture.channel().attr(channelKey).get();
     }
 
-    /**
-     * Channel key k.
-     *
-     * @param channel the channel
-     *
-     * @return the k
-     */
     protected K channelKey(Channel channel) {
         return channel.attr(channelKey).get();
     }
