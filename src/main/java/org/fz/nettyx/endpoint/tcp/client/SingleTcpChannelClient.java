@@ -37,7 +37,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
     protected SingleTcpChannelClient(SocketAddress remoteAddress) {
         this.eventLoopGroup = new NioEventLoopGroup();
         this.remoteAddress = remoteAddress;
-        this.bootstrap = this.newBootstrap();
+        this.bootstrap = this.newBootstrap(remoteAddress);
     }
 
     protected Channel channel;
@@ -125,8 +125,9 @@ public abstract class SingleTcpChannelClient extends NettyClient {
         return NOTHING;
     }
 
-    protected Bootstrap newBootstrap() {
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
+                .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channel(NioSocketChannel.class)
                 .handler(channelInitializer());
