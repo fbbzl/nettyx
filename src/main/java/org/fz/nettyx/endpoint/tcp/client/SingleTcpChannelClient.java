@@ -87,15 +87,6 @@ public abstract class SingleTcpChannelClient extends NettyClient {
             .addListener(listener);
     }
 
-    protected Bootstrap newBootstrap() {
-        return new Bootstrap()
-                .group(getEventLoopGroup())
-                .channel(NioSocketChannel.class)
-                .handler(channelInitializer());
-    }
-
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
-
     public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel)) {
             log.debug("channel not in active status, message will be discard: {}", message);
@@ -116,6 +107,8 @@ public abstract class SingleTcpChannelClient extends NettyClient {
         }
     }
 
+    //***********************************           override start           *****************************************//
+
     protected ChannelFutureAction whenConnectDone() {
         return NOTHING;
     }
@@ -131,6 +124,17 @@ public abstract class SingleTcpChannelClient extends NettyClient {
     protected ChannelFutureAction whenConnectFailure() {
         return NOTHING;
     }
+
+    protected Bootstrap newBootstrap() {
+        return new Bootstrap()
+                .group(getEventLoopGroup())
+                .channel(NioSocketChannel.class)
+                .handler(channelInitializer());
+    }
+
+    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+
+    //************************************           override end           ******************************************//
 
 
 }
