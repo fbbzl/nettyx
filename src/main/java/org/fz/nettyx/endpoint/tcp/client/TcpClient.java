@@ -18,13 +18,9 @@ public abstract class TcpClient extends Client {
     private final Bootstrap bootstrap;
 
     protected TcpClient() {
-        this.eventLoopGroup = eventLoopGroup();
+        this.eventLoopGroup = new NioEventLoopGroup();
 
         this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
-    }
-
-    public EventLoopGroup eventLoopGroup() {
-        return new NioEventLoopGroup();
     }
 
     @Override
