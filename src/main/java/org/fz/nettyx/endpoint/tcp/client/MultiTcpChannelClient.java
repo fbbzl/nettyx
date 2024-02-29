@@ -1,6 +1,5 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
@@ -14,6 +13,7 @@ import java.net.SocketAddress;
  * The type Multi channel client. use channel key to retrieve and use channels
  *
  * @param <K> the channel channelKey type
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /5/6 16:58
@@ -21,7 +21,7 @@ import java.net.SocketAddress;
 @Slf4j
 public abstract class MultiTcpChannelClient<K> extends TcpClient {
 
-    private final AttributeKey<K> channelKey = AttributeKey.valueOf("$tcp_channel_key$");
+    private final AttributeKey<K> channelKey = AttributeKey.valueOf("$multi_tcp_channel_key$");
 
     /**
      * Used to store different channels
@@ -32,13 +32,11 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
         return this.channelStorage.get(key);
     }
 
-    /**
-     * Connect.
-     *
-     * @param channelKey the channel key
-     * @param address    the address
-     */
-    protected abstract ChannelFuture connect(K channelKey, SocketAddress address) throws Exception;
+    protected ChannelFuture connect(K key, SocketAddress address) {
+        ChannelFuture future = getBootstrap().clone().attr(channelKey, key).connect(address);
+
+        return future;
+    }
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
@@ -107,8 +105,10 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "channel: [" + channel + "] is not writable");
             } else return (ChannelPromise) channel.writeAndFlush(message);
-        } catch (Exception exception) {
-            throw new ChannelException("exception occurred while sending the message [" + message + "], remote address is [" + channel.remoteAddress() + "]", exception);
+        }
+        catch (Exception exception) {
+            throw new ChannelException("exception occurred while sending the message [" + message + "], remote " +
+                                       "address is [" + channel.remoteAddress() + "]", exception);
         }
     }
 
@@ -120,19 +120,10 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
     }
 
     /**
-     * Cloned bootstrap
-     *
-     * @param key the channelKey
-     * @return the bootstrap
-     */
-    protected Bootstrap newBootstrap(K key) {
-        return super.newBootstrap().attr(channelKey, key);
-    }
-
-    /**
      * Channel key k.
      *
      * @param ctx the ctx
+     *
      * @return the k
      */
     protected K channelKey(ChannelHandlerContext ctx) {
@@ -143,6 +134,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * Channel key k.
      *
      * @param channelFuture the channel future
+     *
      * @return the k
      */
     protected K channelKey(ChannelFuture channelFuture) {
@@ -153,6 +145,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * Channel key k.
      *
      * @param channel the channel
+     *
      * @return the k
      */
     protected K channelKey(Channel channel) {

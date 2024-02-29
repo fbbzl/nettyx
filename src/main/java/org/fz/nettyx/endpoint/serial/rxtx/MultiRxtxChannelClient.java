@@ -7,7 +7,7 @@ import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.Client;
+import org.fz.nettyx.endpoint.NettyClient;
 import org.fz.nettyx.util.ChannelStorage;
 
 
@@ -79,11 +79,11 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
     }
 
     public void closeChannelGracefully(K key) {
-        if (Client.gracefullyCloseable(getChannel(key))) this.closeChannel(key);
+        if (NettyClient.gracefullyCloseable(getChannel(key))) this.closeChannel(key);
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Client.gracefullyCloseable(getChannel(key))) this.closeChannel(key, promise);
+        if (NettyClient.gracefullyCloseable(getChannel(key))) this.closeChannel(key, promise);
     }
 
     /**
@@ -125,8 +125,8 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
      * @param key the channelKey
      * @return the bootstrap
      */
-    protected Bootstrap newBootstrap(K key) {
-        return super.newBootstrap().attr(channelKey, key);
+    protected Bootstrap cloneBootstrap(K key) {
+        return super.cloneBootstrap().attr(channelKey, key);
     }
 
     /**

@@ -1,6 +1,5 @@
 package org.fz.nettyx.endpoint;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *             .whenSuccess(connectSuccessAction(address))
  *             .whenFailure(connectFailureAction(address));
  *
- *         super.newBootstrap()
+ *         super.cloneBootstrap()
  *             .handler(channelInitializer())
  *             .connect(address)
  *             .addListeners(connectListener);
@@ -57,15 +56,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public abstract class Client {
+public abstract class NettyClient {
 
     public abstract EventLoopGroup getEventLoopGroup();
-
-    public abstract Bootstrap getBootstrap();
-
-    protected Bootstrap newBootstrap() {
-        return getBootstrap().clone();
-    }
 
     protected boolean isRegistered(Channel channel) { return channel != null && channel.isRegistered(); }
     protected boolean isOpen(Channel channel)       { return channel != null && channel.isOpen();       }
