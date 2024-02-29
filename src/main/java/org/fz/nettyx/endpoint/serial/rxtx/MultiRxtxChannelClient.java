@@ -1,7 +1,11 @@
 package org.fz.nettyx.endpoint.serial.rxtx;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
@@ -57,7 +61,7 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
             oldChannel.close().sync();
             channelStorage.remove(key);
         }
-        channelStorage.store(key, channel);
+        channelStorage.put(key, channel);
         log.info("has stored channel [{}]", channel);
     }
 
@@ -119,12 +123,6 @@ public abstract class MultiRxtxChannelClient<K> extends RxtxClient {
         channelStorage.clear();
     }
 
-    /**
-     * Cloned bootstrap
-     *
-     * @param key the channelKey
-     * @return the bootstrap
-     */
     protected Bootstrap cloneBootstrap(K key) {
         return super.cloneBootstrap().attr(channelKey, key);
     }
