@@ -3,12 +3,9 @@ package client;
 import cn.hutool.core.lang.Console;
 import codec.UserCodec;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
@@ -19,45 +16,37 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
-import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.util.HexKit;
 
-import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class TestTcp extends SingleTcpChannelClient {
+    public static final InetSocketAddress remoteAddress = new InetSocketAddress("127.0.0.1", 9081);
 
     public static void main(String[] args) {
-        String u = "fengbinbin";
-        File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
-        new XmlSerializerContext(file);
-
         TestTcp testClient = new TestTcp();
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-                .whenSuccess(cf -> System.err.println("ok"));
-        InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
-        testClient.connect(inetSocketAddress).addListener(listener);
+
+        testClient.connect(remoteAddress);
     }
 
     @Override
-    protected Bootstrap newBootstrap(EventLoopGroup eventLoopGroup, SocketAddress socketAddress) {
-        return null;
-    }
-
-    @SneakyThrows
-    @Override
-    public ChannelFuture connect(SocketAddress address) {
+    public void connect(SocketAddress address) {
         Console.log("connecting address [" + address.toString() + "]");
         ChannelFutureListener listener = new ActionableChannelFutureListener()
+                .whenSuccess(cf -> System.err.println("ok"))
                 .whenFailure(cf -> cf.channel().eventLoop().schedule(() -> connect(address), 2, SECONDS));
 
-        return super.newBootstrap()
-                    .handler(channelInitializer(address))
-                    .connect(address).addListener(listener);
+        new Bootstrap()
+                .group(getEventLoopGroup())
+                .handler(channelInitializer(address))
+                .channel(NioSocketChannel.class)
+                .handler(channelInitializer(address))
+                .connect(address).addListener(listener);
     }
 
     private ChannelInitializer<NioSocketChannel> channelInitializer(SocketAddress address) {

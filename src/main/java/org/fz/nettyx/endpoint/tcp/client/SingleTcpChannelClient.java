@@ -1,10 +1,8 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -24,13 +22,10 @@ import java.net.SocketAddress;
 @Getter
 public abstract class SingleTcpChannelClient extends NettyClient {
 
-    protected final EventLoopGroup eventLoopGroup;
-
-    private final Bootstrap bootstrap;
+    private final EventLoopGroup eventLoopGroup;
 
     protected SingleTcpChannelClient() {
         this.eventLoopGroup = new NioEventLoopGroup();
-        this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
     }
 
     /**
@@ -92,10 +87,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
         if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
 
-    public ChannelFuture connect(SocketAddress remoteAddress) {
-        log.info("connecting remote-address: [{}]", remoteAddress);
-        return getBootstrap().connect(remoteAddress);
-    }
+    public abstract void connect(SocketAddress remoteAddress);
 
     /**
      * Send channel promise.
