@@ -38,7 +38,7 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * @param channelKey the channel key
      * @param address    the address
      */
-    protected abstract ChannelFuture connect(K channelKey, SocketAddress address) throws Exception;
+    protected abstract ChannelFuture connect(K channelKey, SocketAddress address);
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
