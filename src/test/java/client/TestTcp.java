@@ -46,7 +46,8 @@ public class TestTcp extends SingleTcpChannelClient {
                 .handler(channelInitializer(address))
                 .channel(NioSocketChannel.class)
                 .handler(channelInitializer(address))
-                .connect(address).addListener(listener);
+                .connect(address)
+                .addListener(listener);
     }
 
     private ChannelInitializer<NioSocketChannel> channelInitializer(SocketAddress address) {
