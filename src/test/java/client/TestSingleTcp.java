@@ -32,7 +32,6 @@ public class TestSingleTcp extends SingleTcpChannelClient<NioSocketChannel> {
     public static void main(String[] args) {
         TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9081));
         testClient.connect();
-
     }
 
     @Override
