@@ -2,31 +2,32 @@ package org.fz.nettyx.util;
 
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.channel.Channel;
+import lombok.experimental.Delegate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
  * Used to store channels, using key-length pairs
  *
  * @param <K> the type parameter
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /4/29 10:19
  */
 public class ChannelStorage<K> {
 
-    private final Map<K, Channel> channelMap;
+    @Delegate
+    private final Map<K, Channel> storage;
 
     /**
      * Instantiates a new Channel storage.
      */
     public ChannelStorage() {
-        this.channelMap = new SafeConcurrentHashMap<>();
+        this.storage = new SafeConcurrentHashMap<>();
     }
 
     /**
@@ -35,7 +36,7 @@ public class ChannelStorage<K> {
      * @param initialCapacity the initial capacity
      */
     public ChannelStorage(int initialCapacity) {
-        this.channelMap = new SafeConcurrentHashMap<>(initialCapacity);
+        this.storage = new SafeConcurrentHashMap<>(initialCapacity);
     }
 
     /**
@@ -44,7 +45,7 @@ public class ChannelStorage<K> {
      * @param channelMap the channel map
      */
     public ChannelStorage(Map<K, Channel> channelMap) {
-        this.channelMap = new SafeConcurrentHashMap<>(channelMap);
+        this.storage = new SafeConcurrentHashMap<>(channelMap);
     }
 
     /**
@@ -65,27 +66,7 @@ public class ChannelStorage<K> {
      * @param concurrencyLevel the concurrency level
      */
     public ChannelStorage(int initialCapacity, float loadFactor, int concurrencyLevel) {
-        this.channelMap = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
-    }
-
-    /**
-     * Store.
-     *
-     * @param key     the key
-     * @param channel the channel
-     */
-    public void store(K key, Channel channel) {
-        channelMap.put(key, channel);
-    }
-
-    /**
-     * Get channel.
-     *
-     * @param key the key
-     * @return the channel
-     */
-    public Channel get(K key) {
-        return channelMap.get(key);
+        this.storage = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
     }
 
     /**
@@ -164,11 +145,12 @@ public class ChannelStorage<K> {
      * Find all list.
      *
      * @param channelPredicate the channel predicate
+     *
      * @return the list
      */
     public List<Channel> findAll(Predicate<Channel> channelPredicate) {
         List<Channel> channels = new ArrayList<>(10);
-        for (Channel channel : channelMap.values()) {
+        for (Channel channel : storage.values()) {
             if (channelPredicate.test(channel)) channels.add(channel);
         }
         return channels;
@@ -178,10 +160,11 @@ public class ChannelStorage<K> {
      * Is all boolean.
      *
      * @param channelPredicate the channel predicate
+     *
      * @return the boolean
      */
     public boolean isAll(Predicate<Channel> channelPredicate) {
-        for (Channel channel : channelMap.values()) {
+        for (Channel channel : storage.values()) {
             if (channelPredicate.negate().test(channel)) {
                 return false;
             }
@@ -189,45 +172,8 @@ public class ChannelStorage<K> {
         return true;
     }
 
-    /**
-     * For each.
-     *
-     * @param action the action
-     */
-    public void forEach(BiConsumer<K, Channel> action) {
-        channelMap.forEach(action);
-    }
-
-    /**
-     * Remove channel.
-     *
-     * @param key the key
-     * @return the channel
-     */
-    public Channel remove(K key) {
-        return channelMap.remove(key);
-    }
-
-    /**
-     * Clear.
-     */
-    public void clear() {
-        channelMap.clear();
-    }
-
-    /**
-     * Compute channel.
-     *
-     * @param key               the key
-     * @param remappingFunction the remapping function
-     * @return the channel
-     */
-    public Channel compute(K key, BiFunction<K, Channel, Channel> remappingFunction) {
-        return channelMap.compute(key, remappingFunction);
-    }
-
     @Override
     public String toString() {
-        return this.channelMap.toString();
+        return this.storage.toString();
     }
 }
