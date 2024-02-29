@@ -62,6 +62,7 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
 
         getBootstrap()
                 .clone()
+                .remoteAddress(addressMap.get(key))
                 .attr(channelKey, key)
                 .handler(channelInitializer(key))
                 .connect()
