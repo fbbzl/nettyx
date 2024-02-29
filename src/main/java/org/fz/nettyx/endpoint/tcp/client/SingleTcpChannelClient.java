@@ -2,10 +2,10 @@ package org.fz.nettyx.endpoint.tcp.client;
 
 
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -25,6 +25,7 @@ import java.net.SocketAddress;
  */
 @Slf4j
 @Getter
+@SuppressWarnings("unchecked")
 public abstract class SingleTcpChannelClient<C extends Channel> extends NettyClient {
 
     private final SocketAddress remoteAddress;
@@ -37,7 +38,7 @@ public abstract class SingleTcpChannelClient<C extends Channel> extends NettyCli
         this.remoteAddress = remoteAddress;
         this.bootstrap = new Bootstrap()
                 .group(getEventLoopGroup())
-                .channel(NioSocketChannel.class)
+                .channel((Class<? extends Channel>) TypeUtil.getTypeArgument(this.getClass(), 0))
                 .handler(channelInitializer());
     }
 
