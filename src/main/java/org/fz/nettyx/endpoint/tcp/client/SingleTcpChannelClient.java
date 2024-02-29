@@ -82,8 +82,9 @@ public abstract class SingleTcpChannelClient extends TcpClient {
         if (gracefullyCloseable(channel)) this.closeChannel(promise);
     }
 
-    public ChannelFuture connect(SocketAddress address) {
-        return getBootstrap().connect(address);
+    public ChannelFuture connect(SocketAddress remoteAddress) {
+        log.info("connecting remote-address: [{}]", remoteAddress);
+        return getBootstrap().connect(remoteAddress);
     }
 
     /**
