@@ -37,7 +37,7 @@ public abstract class SingleTcpChannelClient extends NettyClient {
     protected SingleTcpChannelClient(SocketAddress remoteAddress) {
         this.eventLoopGroup = new NioEventLoopGroup();
         this.remoteAddress = remoteAddress;
-        this.bootstrap = newBootstrap();
+        this.bootstrap = this.newBootstrap();
     }
 
     protected Channel channel;
