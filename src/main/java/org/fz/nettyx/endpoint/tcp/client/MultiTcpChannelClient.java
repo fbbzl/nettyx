@@ -1,8 +1,10 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
+import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
@@ -31,28 +33,25 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
     protected final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
     protected final EventLoopGroup eventLoopGroup;
     private final Bootstrap bootstrap;
+    private final Map<K, SocketAddress> addressMap;
 
     protected MultiTcpChannelClient(Map<K, SocketAddress> addressMap) {
         this.eventLoopGroup = new NioEventLoopGroup();
-        //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
-
-    }
-
-    protected MultiTcpChannelClient(K key, SocketAddress address) {
-        this.eventLoopGroup = new NioEventLoopGroup();
-        //this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
-
+        this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
+        this.addressMap = new SafeConcurrentHashMap<>(addressMap);
     }
 
     public Channel getChannel(K key) {
         return this.channelStorage.get(key);
     }
 
-    protected void connect(K key, SocketAddress address) {
+    protected void connectAll() {
 
     }
 
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+    protected void connect(K key) {
+
+    }
 
     protected void storeChannel(K channelKey, ChannelFuture future) {
         storeChannel(channelKey, future.channel());
@@ -126,5 +125,19 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
     protected K channelKey(Channel channel) {
         return channel.attr(channelKey).get();
     }
+
+    //***********************************           override start           *****************************************//
+
+    protected Bootstrap newBootstrap(K key) {
+        return new Bootstrap()
+                .attr(channelKey, key)
+                .group(getEventLoopGroup())
+                .channel(NioSocketChannel.class)
+                .handler(channelInitializer());
+    }
+
+    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+
+    //***********************************           override end           *****************************************//
 
 }
