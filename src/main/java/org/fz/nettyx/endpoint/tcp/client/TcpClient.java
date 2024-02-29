@@ -19,7 +19,6 @@ public abstract class TcpClient extends NettyClient {
 
     protected TcpClient() {
         this.eventLoopGroup = new NioEventLoopGroup();
-
         this.bootstrap = new Bootstrap().group(eventLoopGroup).channel(NioSocketChannel.class);
     }
 
