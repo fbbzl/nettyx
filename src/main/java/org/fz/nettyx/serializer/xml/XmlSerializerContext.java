@@ -72,7 +72,9 @@ public class XmlSerializerContext {
     public synchronized void doScan() {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
-        List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
+        List<Document> docs = Arrays.stream(this.paths)
+                                    .map(Path::toFile)
+                                    .map(Try.apply(f -> reader.read(f)))
                                     .collect(toList());
 
         // scan namespaces

@@ -1,16 +1,17 @@
-package org.fz.nettyx.endpoint.tcp.server;
+package org.fz.nettyx.endpoint.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.SocketAddress;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * basic server abstraction

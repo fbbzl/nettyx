@@ -105,13 +105,13 @@ public enum EndianKit {
 
         public long toLong(byte[] bytes) {
             return (((long) bytes[0] & 0xff) << 56)
-                    | (((long) bytes[1] & 0xff) << 48)
-                    | (((long) bytes[2] & 0xff) << 40)
-                    | (((long) bytes[3] & 0xff) << 32)
-                    | (((long) bytes[4] & 0xff) << 24)
-                    | (((long) bytes[5] & 0xff) << 16)
-                    | (((long) bytes[6] & 0xff) << 8)
-                    | ((long) bytes[7] & 0xff);
+                   | (((long) bytes[1] & 0xff) << 48)
+                   | (((long) bytes[2] & 0xff) << 40)
+                   | (((long) bytes[3] & 0xff) << 32)
+                   | (((long) bytes[4] & 0xff) << 24)
+                   | (((long) bytes[5] & 0xff) << 16)
+                   | (((long) bytes[6] & 0xff) << 8)
+                   | ((long) bytes[7] & 0xff);
         }
 
         @Override
@@ -204,11 +204,12 @@ public enum EndianKit {
          * @return byte array of specified length
          */
         public byte[] fromNumber(Number number, int assignBytesLength) {
-            byte[] numberBytes = fromNumber(number);
-            int numberBytesLength = numberBytes.length;
+            byte[] numberBytes       = fromNumber(number);
+            int    numberBytesLength = numberBytes.length;
 
             if (numberBytesLength > assignBytesLength) {
-                numberBytes = PrimitiveArrayUtil.sub(numberBytes, numberBytesLength - assignBytesLength, numberBytesLength);
+                numberBytes = PrimitiveArrayUtil.sub(numberBytes, numberBytesLength - assignBytesLength,
+                                                     numberBytesLength);
             }
             if (numberBytesLength < assignBytesLength) {
                 numberBytes = PrimitiveArrayUtil.addAll(new byte[assignBytesLength - numberBytesLength], numberBytes);
@@ -316,13 +317,13 @@ public enum EndianKit {
         @Override
         public long toLong(byte[] bytes) {
             return ((long) bytes[0] & 0xff)
-                    | (((long) bytes[1] & 0xff) << 8)
-                    | (((long) bytes[2] & 0xff) << 16)
-                    | (((long) bytes[3] & 0xff) << 24)
-                    | (((long) bytes[4] & 0xff) << 32)
-                    | (((long) bytes[5] & 0xff) << 40)
-                    | (((long) bytes[6] & 0xff) << 48)
-                    | (((long) bytes[7] & 0xff) << 56);
+                   | (((long) bytes[1] & 0xff) << 8)
+                   | (((long) bytes[2] & 0xff) << 16)
+                   | (((long) bytes[3] & 0xff) << 24)
+                   | (((long) bytes[4] & 0xff) << 32)
+                   | (((long) bytes[5] & 0xff) << 40)
+                   | (((long) bytes[6] & 0xff) << 48)
+                   | (((long) bytes[7] & 0xff) << 56);
         }
 
         @Override
@@ -445,47 +446,62 @@ public enum EndianKit {
 
     // short
     public abstract byte[] fromShort(short s);
+
     public abstract short toShort(byte[] bytes);
+
     public abstract byte[] fromUnsignedShort(int s);
+
     public abstract int toUnsignedShort(byte[] bytes);
 
     // char
     public abstract byte[] fromChar(char chr);
+
     public abstract char toChar(byte[] bytes);
 
     // int
     public abstract byte[] fromInt(int i);
+
     public abstract int toInt(byte[] bytes);
+
     public abstract byte[] fromUnsignedInt(long i);
+
     public abstract long toUnsignedInt(byte[] bytes);
 
     // long
     public abstract byte[] fromLong(long l);
+
     public abstract long toLong(byte[] bytes);
+
     public abstract byte[] fromUnsignedLong(BigInteger l);
+
     public abstract BigInteger toUnsignedLong(byte[] bytes);
 
     // float
     public byte[] fromFloat(float f) {
         return fromInt(Float.floatToRawIntBits(f));
     }
+
     public abstract float toFloat(byte[] bytes);
 
     // double
     public byte[] fromDouble(double d) {
         return fromLong(Double.doubleToRawLongBits(d));
     }
+
     public abstract double toDouble(byte[] bytes);
 
     public abstract short reverseUnsignedByte(short b);
 
     public abstract short reverseShort(short s);
+
     public abstract int reverseUnsignedShort(int s);
 
     public abstract int reverseInt(int i);
+
     public abstract long reverseUnsignedInt(long i);
 
     public abstract long reverseLong(long l);
+
     public abstract BigInteger reverseUnsignedLong(BigInteger l);
 
     public abstract float reverseFloat(float f);
@@ -515,6 +531,7 @@ public enum EndianKit {
 
         throw new UnsupportedOperationException("can not create byte array by number [" + num + "]");
     }
+
     public abstract byte[] fromNumber(Number number, int assignBytesLength);
 
 }
