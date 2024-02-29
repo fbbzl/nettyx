@@ -6,7 +6,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxChannelConfig;
-import org.fz.nettyx.endpoint.Client;
+import org.fz.nettyx.endpoint.NettyClient;
 
 import java.util.concurrent.*;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.*;
  * @since 2022-01-26 19:58
  */
 @SuppressWarnings({"deprecation", "unchecked"})
-public abstract class RxtxClient extends Client {
+public abstract class RxtxClient extends NettyClient {
 
     /**
      * The Oio Event loop group.
