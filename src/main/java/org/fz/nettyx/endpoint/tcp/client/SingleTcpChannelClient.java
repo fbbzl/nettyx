@@ -110,8 +110,6 @@ public abstract class SingleTcpChannelClient<C extends Channel> extends NettyCli
         }
     }
 
-    //***************************************** event method start ***************************************************//
-
     protected ChannelFutureAction whenConnectDone() {
         return ctx -> {
         };
