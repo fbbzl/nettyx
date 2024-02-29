@@ -125,8 +125,8 @@ public abstract class MultiTcpChannelClient<K> extends TcpClient {
      * @param key the channelKey
      * @return the bootstrap
      */
-    protected Bootstrap newBootstrap(K key) {
-        return super.newBootstrap().attr(channelKey, key);
+    protected Bootstrap cloneBootstrap(K key) {
+        return super.cloneBootstrap().attr(channelKey, key);
     }
 
     /**
