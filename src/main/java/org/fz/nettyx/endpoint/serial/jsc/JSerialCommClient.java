@@ -1,15 +1,16 @@
 package org.fz.nettyx.endpoint.serial.jsc;
 
-import static cn.hutool.core.util.PrimitiveArrayUtil.addAll;
-import static java.util.stream.Collectors.toList;
-
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.ReferenceCountUtil;
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.exception.NoSuchPortException;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import static cn.hutool.core.util.PrimitiveArrayUtil.addAll;
+import static java.util.stream.Collectors.toList;
 
 /**
  * comm util from the following url
