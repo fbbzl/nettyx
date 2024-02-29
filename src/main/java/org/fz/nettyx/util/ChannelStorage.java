@@ -70,16 +70,6 @@ public class ChannelStorage<K> {
     }
 
     /**
-     * Store.
-     *
-     * @param key     the key
-     * @param channel the channel
-     */
-    public void store(K key, Channel channel) {
-        storage.put(key, channel);
-    }
-
-    /**
      * Is all active boolean.
      *
      * @return the boolean
