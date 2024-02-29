@@ -28,14 +28,14 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
-public class TestClient extends SingleTcpChannelClient {
+public class TestTcp extends SingleTcpChannelClient {
 
     public static void main(String[] args) {
         String u = "fengbinbin";
         File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
         new XmlSerializerContext(file);
 
-        TestClient testClient = new TestClient();
+        TestTcp testClient = new TestTcp();
         ChannelFutureListener listener = new ActionableChannelFutureListener()
                 .whenSuccess(cf -> System.err.println("ok"));
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 9081);
@@ -64,7 +64,7 @@ public class TestClient extends SingleTcpChannelClient {
                         .whenReadTimeout(5, false, (ctx, th) -> Console.log("读超时"))
                         .whenChannelInactive(ctx -> {
                             Console.log("invoke your re-connect method here");
-                            TestClient.this.connect(address);
+                            TestTcp.this.connect(address);
                         })
                         .whenExceptionCaught((ctx, th) -> Console.log("入站异常, ", th));
 
