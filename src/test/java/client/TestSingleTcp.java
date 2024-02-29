@@ -5,6 +5,7 @@ import codec.UserCodec;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
@@ -19,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
@@ -29,8 +31,13 @@ public class TestSingleTcp extends SingleTcpChannelClient {
 
     public static void main(String[] args) {
         TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9081));
-
         testClient.connect();
+
+    }
+
+    @Override
+    protected ChannelFutureAction whenConnectFailure() {
+        return cf -> schedule(this::connect, 2, SECONDS);
     }
 
     @Override
