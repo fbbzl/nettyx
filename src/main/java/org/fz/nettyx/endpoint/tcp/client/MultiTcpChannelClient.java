@@ -50,10 +50,10 @@ public abstract class MultiTcpChannelClient<K> extends NettyClient {
     }
 
     protected void connectAll() {
-
+        addressMap.keySet().forEach(this::connect);
     }
 
-    protected void connect(K key) {
+    public void connect(K key) {
         ChannelFutureListener listener = new ActionableChannelFutureListener()
                 .whenDone(whenConnectDone(key))
                 .whenCancel(whenConnectCancel(key))
