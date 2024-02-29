@@ -1,22 +1,27 @@
 package org.fz.nettyx.endpoint.tcp.client;
 
 
+import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
+
 import cn.hutool.core.lang.Console;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.NettyClient;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
-
-import java.net.SocketAddress;
-
-import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 
 /**
  * Single channel client
@@ -42,16 +47,16 @@ public abstract class SingleTcpChannelClient extends NettyClient {
 
     protected Channel channel;
 
-    protected void storeChannel(ChannelFuture cf) {
-        storeChannel(cf.channel());
-    }
-
     @SneakyThrows
     protected void storeChannel(Channel channel) {
         if (isActive(this.channel)) {
             this.channel.close().sync();
         }
         this.channel = channel;
+    }
+
+    protected void storeChannel(ChannelFuture cf) {
+        storeChannel(cf.channel());
     }
 
     public void closeChannel() {
@@ -62,7 +67,6 @@ public abstract class SingleTcpChannelClient extends NettyClient {
     public void closeChannel(ChannelPromise promise) {
         this.channel.close(promise);
     }
-
 
     public void closeChannelGracefully() {
         if (gracefullyCloseable(channel)) this.closeChannel();
