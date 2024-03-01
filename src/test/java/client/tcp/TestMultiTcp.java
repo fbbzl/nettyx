@@ -39,7 +39,7 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
     protected ChannelFutureAction whenConnectFailure() {
         return cf -> {
             String key = channelKey(cf);
-            System.err.println(key +": fail");
+            System.err.println(key +": fail, " + cf.cause());
         };
     }
 
