@@ -86,7 +86,7 @@ public abstract class SingleChannelClient<C extends Channel, A extends SocketAdd
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
-                .channel(channelClass)
+                .channel(getChannelClass())
                 .handler(channelInitializer());
     }
 
