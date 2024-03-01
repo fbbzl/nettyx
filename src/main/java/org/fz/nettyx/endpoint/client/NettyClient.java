@@ -2,7 +2,6 @@ package org.fz.nettyx.endpoint.client;
 
 import io.netty.channel.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
 
@@ -15,12 +14,17 @@ import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
  */
 @Slf4j
 @Getter
-@RequiredArgsConstructor
-public abstract class NettyClient<C extends Channel> {
-    protected final Class<C>       channelClass;
-    protected final EventLoopGroup eventLoopGroup;
 
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+public abstract class NettyClient<C extends Channel> {
+    private final Class<C>       channelClass;
+    private final EventLoopGroup eventLoopGroup;
+
+    protected NettyClient(EventLoopGroup eventLoopGroup) {
+        this.eventLoopGroup = eventLoopGroup;
+        this.channelClass   = channelClass;
+    }
+
+    public abstract ChannelInitializer<? extends Channel> channelInitializer();
 
     protected boolean isRegistered(Channel channel)  { return channel != null && channel.isRegistered(); }
 

@@ -134,7 +134,7 @@ public abstract class MultiChannelClient<K, C extends Channel, A extends SocketA
                 .attr(getAttributeKey(), key)
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
-                .channel(channelClass)
+                .channel(getChannelClass())
                 .handler(channelInitializer());
     }
 
