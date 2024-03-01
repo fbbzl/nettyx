@@ -2,6 +2,7 @@ package client.tcp;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
 
 import java.net.InetSocketAddress;
@@ -24,6 +25,16 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
     @Override
     protected ChannelInitializer<NioSocketChannel> channelInitializer() {
         return CHANNEL_INITIALIZER;
+    }
+
+    @Override
+    protected ChannelFutureAction whenConnectSuccess() {
+        return cf -> { System.err.println("ok"); };
+    }
+
+    @Override
+    protected ChannelFutureAction whenConnectFailure() {
+        return cf -> { System.err.println("fail"); };
     }
 
     public static void main(String[] args) {
