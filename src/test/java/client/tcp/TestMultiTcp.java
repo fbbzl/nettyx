@@ -29,12 +29,18 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
 
     @Override
     protected ChannelFutureAction whenConnectSuccess() {
-        return cf -> { System.err.println("ok"); };
+        return cf -> {
+            String key = channelKey(cf);
+            System.err.println(key +": ok");
+        };
     }
 
     @Override
     protected ChannelFutureAction whenConnectFailure() {
-        return cf -> { System.err.println("fail"); };
+        return cf -> {
+            String key = channelKey(cf);
+            System.err.println(key +": fail");
+        };
     }
 
     public static void main(String[] args) {
