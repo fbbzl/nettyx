@@ -1,6 +1,5 @@
 package org.fz.nettyx.endpoint.client;
 
-import cn.hutool.core.util.TypeUtil;
 import io.netty.channel.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,9 @@ import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
  */
 @Slf4j
 @Getter
-@SuppressWarnings("unchecked")
 @RequiredArgsConstructor
 public abstract class NettyClient<C extends Channel> {
-    protected       Class<C>       channelClass = (Class<C>) TypeUtil.getTypeArgument(this.getClass(), 0);
+    protected final Class<C>       channelClass;
     protected final EventLoopGroup eventLoopGroup;
 
     protected abstract ChannelInitializer<? extends Channel> channelInitializer();
