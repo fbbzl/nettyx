@@ -20,13 +20,13 @@ import java.net.SocketAddress;
 @Getter
 public abstract class SingleChannelClient<C extends Channel, A extends SocketAddress> extends NettyClient<C> {
     private final A         remoteAddress;
-    protected     Channel   channel;
+    private       Channel   channel;
     private final Bootstrap bootstrap;
 
     protected SingleChannelClient(EventLoopGroup eventLoopGroup, A remoteAddress) {
         super(eventLoopGroup);
         this.remoteAddress = remoteAddress;
-        this.bootstrap = newBootstrap(remoteAddress);
+        this.bootstrap     = newBootstrap(remoteAddress);
     }
 
     public void connect() {
