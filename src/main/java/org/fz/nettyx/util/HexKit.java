@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HexKit {
 
-    private static final int LOOKUP_LENGTH = 16;
+    private static final int    LOOKUP_LENGTH        = 16;
     private static final char[] LOOK_UP_HEX_ALPHABET = new char[LOOKUP_LENGTH];
 
     static {
@@ -27,13 +27,14 @@ public class HexKit {
      * To binary string.
      *
      * @param hex the hex
+     *
      * @return the string
      */
     public String toBinary(String hex) {
         if (hex == null || hex.length() % 2 != 0) return null;
 
         StringBuilder bString = new StringBuilder();
-        String tmp;
+        String        tmp;
         for (int i = 0; i < hex.length(); i++) {
             tmp = "0000" + Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 1), 16));
             bString.append(tmp.substring(tmp.length() - 4));
@@ -46,6 +47,7 @@ public class HexKit {
      * From binary string.
      *
      * @param binaryString the binary string
+     *
      * @return the string
      */
     public String fromBinary(String binaryString) {
@@ -53,7 +55,7 @@ public class HexKit {
             return null;
         }
         StringBuilder tmp = new StringBuilder();
-        int iTmp;
+        int           iTmp;
         for (int i = 0; i < binaryString.length(); i += 4) {
             iTmp = 0;
             for (int j = 0; j < 4; j++) {
@@ -68,21 +70,22 @@ public class HexKit {
      * Encode a byte array to hex string
      *
      * @param bytes array of byte to encode
+     *
      * @return return encoded string
      */
     public static String encode(byte... bytes) {
         if (bytes == null) return null;
 
-        int lengthData = bytes.length;
-        int lengthEncode = lengthData * 2;
-        char[] encodedData = new char[lengthEncode];
-        int temp;
+        int    lengthData   = bytes.length;
+        int    lengthEncode = lengthData * 2;
+        char[] encodedData  = new char[lengthEncode];
+        int    temp;
         for (int i = 0; i < lengthData; i++) {
             temp = bytes[i];
             if (temp < 0) {
                 temp += 256;
             }
-            encodedData[i * 2] = LOOK_UP_HEX_ALPHABET[temp >> 4];
+            encodedData[i * 2]     = LOOK_UP_HEX_ALPHABET[temp >> 4];
             encodedData[i * 2 + 1] = LOOK_UP_HEX_ALPHABET[temp & 0xf];
         }
         return new String(encodedData);
@@ -92,6 +95,7 @@ public class HexKit {
      * To byte byte.
      *
      * @param hex the hex
+     *
      * @return the byte
      */
     public static byte toByte(String hex) {
@@ -102,16 +106,17 @@ public class HexKit {
      * Decode hex string to a byte array
      *
      * @param hex hex string
+     *
      * @return return array of byte to encode
      */
     public static byte[] decode(String hex) {
-        int hexLen = hex.length();
+        int    hexLen = hex.length();
         byte[] result;
         if (hexLen % 2 == 1) {
             //odd
             hexLen++;
             result = new byte[(hexLen / 2)];
-            hex = "0" + hex;
+            hex    = "0" + hex;
         } else {
             //even
             result = new byte[(hexLen / 2)];

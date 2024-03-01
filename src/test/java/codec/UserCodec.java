@@ -2,7 +2,6 @@ package codec;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
-import cn.hutool.core.lang.Dict;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -14,9 +13,6 @@ import model.Wife;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.serializer.xml.XmlSerializer;
-import org.fz.nettyx.serializer.xml.XmlSerializerContext;
-import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,10 +24,10 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         StopWatch s = new StopWatch();
-        s.start("xml");
-        Model model1 = XmlSerializerContext.findModel("school", "student");
-        Dict doc = XmlSerializer.read(msg.duplicate(), model1);
-        s.stop();
+//        s.start("xml");
+//        Model model1 = XmlSerializerContext.findModel("school", "student");
+//        Dict doc = XmlSerializer.read(msg.duplicate(), model1);
+//        s.stop();
 
         s.start("read");
         User<Son<Clong4, Clong4>, Wife, GirlFriend> read = StructSerializer.read(msg, typeRefer);
