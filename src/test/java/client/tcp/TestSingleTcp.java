@@ -23,6 +23,22 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
 
+    public static final ChannelInitializer<NioSocketChannel> CHANNEL_INITIALIZER =
+            new ChannelInitializer<NioSocketChannel>() {
+        @Override
+        protected void initChannel(NioSocketChannel channel) {
+            channel.pipeline().addLast(
+                    new ReadIdleHeartBeater(2, ctx -> {
+                        Console.log("心跳啦");
+                        ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
+                    })
+                    , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                    , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                    , new UserCodec()
+                    , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR));
+        }
+    };
+
     protected TestSingleTcp(InetSocketAddress remoteAddress) {
         super(remoteAddress);
     }
@@ -34,20 +50,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
 
     @Override
     protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new ChannelInitializer<NioSocketChannel>() {
-            @Override
-            protected void initChannel(NioSocketChannel channel) {
-                channel.pipeline().addLast(
-                        new ReadIdleHeartBeater(2, ctx -> {
-                            Console.log("心跳啦");
-                            ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
-                        })
-                        , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
-                        , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-                        , new UserCodec()
-                        , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR));
-            }
-        };
+        return CHANNEL_INITIALIZER;
     }
 
     public static void main(String[] args) {
