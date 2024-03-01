@@ -1,24 +1,21 @@
 package org.fz.nettyx.util;
 
-import static cn.hutool.core.collection.CollUtil.newArrayList;
-import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.system.OsInfo;
 import cn.hutool.system.SystemUtil;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
+
+import static cn.hutool.core.collection.CollUtil.newArrayList;
+import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
 
 
 /**
@@ -30,15 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 public class CommPorts {
 
-    static final OsInfo OS_INFO = SystemUtil.getOsInfo();
+    static final OsInfo                 OS_INFO = SystemUtil.getOsInfo();
     static final Supplier<List<String>> GET_COM_PORT;
 
     static {
-        if (OS_INFO.isLinux())  { GET_COM_PORT = CommPorts::getComPortsLinux;   }
-        else
-        if(OS_INFO.isWindows()) { GET_COM_PORT = CommPorts::getComPortsWindows; }
+        if (OS_INFO.isLinux()) { GET_COM_PORT = CommPorts::getComPortsLinux; } else if (OS_INFO.isWindows()) {
+            GET_COM_PORT = CommPorts::getComPortsWindows;
+        }
         // default is linux
-        else                    { GET_COM_PORT = CommPorts::getComPortsLinux;   }
+        else { GET_COM_PORT = CommPorts::getComPortsLinux; }
     }
 
     public static List<String> getLocalComPorts() {
@@ -58,26 +55,27 @@ public class CommPorts {
 
     @SneakyThrows(IOException.class)
     public static List<String> getComPortsWindows() {
-        List<String> ports = new ArrayList<>();
-        String command = "reg query HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM";
-        Process process = Runtime.getRuntime().exec(command);
-        InputStream in = process.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String line;
-        int index = 0;
+        List<String>   ports   = new ArrayList<>();
+        String         command = "reg query HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM";
+        Process        process = Runtime.getRuntime().exec(command);
+        InputStream    in      = process.getInputStream();
+        BufferedReader br      = new BufferedReader(new InputStreamReader(in));
+        String         line;
+        int            index   = 0;
         try {
             while ((line = br.readLine()) != null) {
                 if (line.isEmpty()) {
                     continue;
                 }
                 if (index != 0) {
-                    String[] strs = line.replaceAll(" +", ",").split(",");
-                    String comPort = strs[strs.length - 1];
+                    String[] strs    = line.replaceAll(" +", ",").split(",");
+                    String   comPort = strs[strs.length - 1];
                     ports.add(comPort);
                 }
                 index++;
             }
-        } catch (IOException ioException) {
+        }
+        catch (IOException ioException) {
             throw new UnsupportedOperationException("exception occur while reading windows regedit, command: " + command);
         }
 
@@ -86,7 +84,7 @@ public class CommPorts {
 
     public static List<String> getComPortsLinux() {
         try {
-            String cmd = "dmesg";
+            String cmd        = "dmesg";
             String execResult = executeLinuxCmd(cmd);
 
             String[] infos = execResult.split("\\s+");
@@ -94,7 +92,7 @@ public class CommPorts {
             Set<String> ttys = new HashSet<>();
             for (String info : infos) {
                 if (info.contains("ttyS") || info.contains("ttyU")) {
-                    String info2 = info.replace("[", "").replace(":", "").replace("]", "");
+                    String info2   = info.replace("[", "").replace(":", "").replace("]", "");
                     String ttyPath = "/dev/" + info2;
 
                     File file = new File(ttyPath);
@@ -104,7 +102,8 @@ public class CommPorts {
                 }
             }
             return newArrayList(ttys);
-        } catch (IOException exception) {
+        }
+        catch (IOException exception) {
             throw new UnsupportedOperationException("can not find comm-ports please check");
         }
     }
@@ -113,9 +112,9 @@ public class CommPorts {
         Runtime run = Runtime.getRuntime();
         Process process;
         process = run.exec(cmd);
-        InputStream in = process.getInputStream();
+        InputStream   in  = process.getInputStream();
         StringBuilder out = new StringBuilder();
-        byte[] b = new byte[8192];
+        byte[]        b   = new byte[8192];
         for (int n; (n = in.read(b)) != -1; ) {
             out.append(new String(b, 0, n));
         }

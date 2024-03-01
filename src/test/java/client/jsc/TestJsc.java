@@ -1,6 +1,4 @@
-package client;
-
-import org.fz.nettyx.endpoint.serial.jsc.JSerialCommClient;
+package client.jsc;
 
 /**
  * @author fengbinbin
@@ -10,7 +8,7 @@ import org.fz.nettyx.endpoint.serial.jsc.JSerialCommClient;
 public class TestJsc {
 
     public static void main(String[] args) {
-        JSerialCommClient jSerialCommClient = new JSerialCommClient();
+
 
     }
 }
