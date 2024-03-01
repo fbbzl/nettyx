@@ -24,7 +24,7 @@ public abstract class NettyClient<C extends Channel> {
         this.channelClass   = channelClass;
     }
 
-    public abstract ChannelInitializer<? extends Channel> channelInitializer();
+    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
 
     protected boolean isRegistered(Channel channel)  { return channel != null && channel.isRegistered(); }
 
