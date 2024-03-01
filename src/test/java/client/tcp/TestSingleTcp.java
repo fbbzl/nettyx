@@ -10,8 +10,6 @@ import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
-import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
-import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.LoggerHandler.Sl4jLevel;
@@ -39,32 +37,15 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
-                InboundAdvice inAdvice = new InboundAdvice(channel)
-                        .whenReadIdle(2, ctx -> Console.log("读闲置啦"))
-                        .whenReadTimeout(5, false, (ctx, th) -> Console.log("读超时"))
-                        .whenChannelInactive(ctx -> {
-                            Console.log("invoke your re-connect method here");
-                            TestSingleTcp.this.connect();
-                        })
-                        .whenExceptionCaught((ctx, th) -> Console.log("入站异常, ", th));
-
-                OutboundAdvice outAdvice = new OutboundAdvice(channel)
-                        .whenDisconnect((ctx, promise) -> Console.log("invoke your disconnect method"))
-                        .whenWriteIdle(4, ctx -> Console.log("写闲置"))
-                        .whenWriteTimeout(2, false, (ctx, th) -> Console.log("写超时"))
-                        .whenClose((ctx, pro) -> Console.log("close"));
-
                 channel.pipeline().addLast(
-                        outAdvice
-                        , new ReadIdleHeartBeater(2, ctx -> {
+                        new ReadIdleHeartBeater(2, ctx -> {
                             Console.log("心跳啦");
                             ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
                         })
                         , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
                         , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
                         , new UserCodec()
-                        , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR)
-                        , inAdvice);
+                        , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR));
             }
         };
     }
