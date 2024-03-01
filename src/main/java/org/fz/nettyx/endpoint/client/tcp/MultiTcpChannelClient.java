@@ -1,13 +1,14 @@
 package org.fz.nettyx.endpoint.client.tcp;
 
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.AttributeKey;
-import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.MultiChannelClient;
-
 import java.net.InetSocketAddress;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.endpoint.client.MultiChannelClient;
 
 /**
  * The type Multi channel client. use channel key to retrieve and use channels
@@ -19,10 +20,16 @@ import java.util.Map;
  * @since 2021 /5/6 16:58
  */
 @Slf4j
-public abstract class MultiTcpChannelClient<K> extends MultiChannelClient<K, NioSocketChannel, InetSocketAddress> {
+public abstract class MultiTcpChannelClient<K> extends
+                                               MultiChannelClient<K, NioSocketChannel, SocketChannelConfig> {
 
     protected MultiTcpChannelClient(Map<K, InetSocketAddress> addressMap) {
-        super(new NioEventLoopGroup(), addressMap);
+        super(addressMap);
+    }
+
+    @Override
+    protected EventLoopGroup newEventLoopGroup() {
+        return new NioEventLoopGroup();
     }
 
     @Override

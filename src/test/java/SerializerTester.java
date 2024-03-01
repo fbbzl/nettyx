@@ -1,6 +1,8 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
 import io.netty.buffer.Unpooled;
+import java.io.File;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import model.GirlFriend;
 import model.Son;
@@ -15,9 +17,6 @@ import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.Arrays;
 
 /**
  * @author fengbinbin

@@ -3,12 +3,12 @@ package org.fz.nettyx.endpoint.client.rxtx;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
+import io.netty.channel.rxtx.RxtxChannelConfig;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import io.netty.util.AttributeKey;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.MultiChannelClient;
-
-import java.util.Map;
 
 
 /**
@@ -20,10 +20,16 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiRxtxChannelClient<K> extends MultiChannelClient<K, RxtxChannel, RxtxDeviceAddress> {
+public abstract class MultiRxtxChannelClient<K> extends
+                                                MultiChannelClient<K, RxtxChannel, RxtxChannelConfig> {
 
-    protected MultiRxtxChannelClient(EventLoopGroup eventLoopGroup, Map<K, RxtxDeviceAddress> addressMap) {
-        super(new OioEventLoopGroup(), addressMap);
+    protected MultiRxtxChannelClient(Map<K, RxtxDeviceAddress> addressMap) {
+        super(addressMap);
+    }
+
+    @Override
+    protected EventLoopGroup newEventLoopGroup() {
+        return new OioEventLoopGroup();
     }
 
     @Override

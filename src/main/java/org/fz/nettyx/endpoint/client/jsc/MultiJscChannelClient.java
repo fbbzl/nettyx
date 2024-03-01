@@ -1,13 +1,15 @@
 package org.fz.nettyx.endpoint.client.jsc;
 
-import io.netty.channel.jsc.JSerialCommChannel;
-import io.netty.channel.jsc.JSerialCommDeviceAddress;
+
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.util.AttributeKey;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.MultiChannelClient;
-
-import java.util.Map;
+import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
+import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
+import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 
 /**
  * @author fengbinbin
@@ -17,11 +19,15 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiJscChannelClient<K> extends MultiChannelClient<K, JSerialCommChannel,
-        JSerialCommDeviceAddress> {
+public abstract class MultiJscChannelClient<K> extends MultiChannelClient<K, JscChannel, JscChannelConfig> {
 
-    protected MultiJscChannelClient(Map<K, JSerialCommDeviceAddress> addressMap) {
-        super(new OioEventLoopGroup(), addressMap);
+    protected MultiJscChannelClient(Map<K, JscDeviceAddress> addressMap) {
+        super(addressMap);
+    }
+
+    @Override
+    protected EventLoopGroup newEventLoopGroup() {
+        return new OioEventLoopGroup();
     }
 
     @Override

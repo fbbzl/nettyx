@@ -4,11 +4,10 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import lombok.experimental.UtilityClass;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 
 /**
  * tool class used with ChannelInterceptor
