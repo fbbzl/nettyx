@@ -1,21 +1,30 @@
 package org.fz.nettyx.endpoint.client;
 
+import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
+
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelConfig;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.ReflectiveChannelFactory;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
+import java.util.Map;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
-
-import java.net.SocketAddress;
-import java.util.Map;
 
 /**
  * @author fengbinbin
@@ -25,15 +34,16 @@ import java.util.Map;
 
 @Slf4j
 @Getter
-public abstract class MultiChannelClient<K, C extends Channel, A extends SocketAddress> extends NettyClient<C> {
+@SuppressWarnings({"unchecked", "unused"})
+public abstract class MultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
+                                                                                        NettyClient<C> {
 
-    private final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
-    private final Map<K, A>         addressMap;
-    private final Map<K, Bootstrap> bootstrapMap;
+    private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
+    private final Map<K, SocketAddress> addressMap;
+    private final Map<K, Bootstrap>     bootstrapMap;
 
-    protected MultiChannelClient(EventLoopGroup eventLoopGroup, Map<K, A> addressMap) {
-        super(eventLoopGroup);
-        this.addressMap   = addressMap;
+    protected <S extends SocketAddress> MultiChannelClient(Map<K, S> addressMap) {
+        this.addressMap   = (Map<K, SocketAddress>) addressMap;
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
 
@@ -43,10 +53,13 @@ public abstract class MultiChannelClient<K, C extends Channel, A extends SocketA
 
     public void connect(K key) {
         ChannelFutureListener listener = new ActionableChannelFutureListener()
-                .whenDone(whenConnectDone())
-                .whenCancel(whenConnectCancel())
-                .whenSuccess(whenConnectSuccess())
-                .whenFailure(whenConnectFailure());
+            .whenDone(whenConnectDone(key))
+            .whenCancel(whenConnectCancel(key))
+            .whenSuccess(cf -> {
+                storeChannel(cf);
+                whenConnectSuccess(key).act(cf);
+            })
+            .whenFailure(whenConnectFailure(key));
 
         Bootstrap bootstrap = getBootstrapMap().get(key);
         Throws.ifNull(bootstrap, "can not find config by key [" + key + "]");
@@ -80,11 +93,11 @@ public abstract class MultiChannelClient<K, C extends Channel, A extends SocketA
     }
 
     public void closeChannelGracefully(K key) {
-        if (NettyClient.gracefullyCloseable(getChannel(key))) this.getChannel(key).close();
+        if (NettyClient.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(); }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (NettyClient.gracefullyCloseable(getChannel(key))) this.getChannel(key).close(promise);
+        if (NettyClient.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(promise); }
     }
 
     public ChannelPromise writeAndFlush(K channelKey, Object message) {
@@ -101,7 +114,7 @@ public abstract class MultiChannelClient<K, C extends Channel, A extends SocketA
                 log.debug("comm channel [{}] is not writable, channel key [{}]", channel, channelKey);
                 ReferenceCountUtil.safeRelease(message);
                 return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
-            } else return (ChannelPromise) channel.writeAndFlush(message);
+            } else { return (ChannelPromise) channel.writeAndFlush(message); }
         }
         catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is " +
@@ -129,13 +142,37 @@ public abstract class MultiChannelClient<K, C extends Channel, A extends SocketA
         return AttributeKey.valueOf("$multi_channel_key$");
     }
 
+    protected void doChannelConfig(K targetChannelKey, F channelConfig) {
+        // default is nothing
+    }
+
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
-                .attr(getAttributeKey(), key)
-                .remoteAddress(remoteAddress)
-                .group(getEventLoopGroup())
-                .channel(getChannelClass())
-                .handler(channelInitializer());
+            .attr(getAttributeKey(), key)
+            .remoteAddress(remoteAddress)
+            .group(getEventLoopGroup())
+            .channelFactory(() -> {
+                C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
+                doChannelConfig(key, (F) chl.config());
+                return chl;
+            })
+            .handler(channelInitializer());
+    }
+
+    protected ChannelFutureAction whenConnectDone(K key) {
+        return NOTHING;
+    }
+
+    protected ChannelFutureAction whenConnectCancel(K key) {
+        return NOTHING;
+    }
+
+    protected ChannelFutureAction whenConnectSuccess(K key) {
+        return NOTHING;
+    }
+
+    protected ChannelFutureAction whenConnectFailure(K key) {
+        return NOTHING;
     }
 
 }

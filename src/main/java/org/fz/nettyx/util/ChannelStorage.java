@@ -2,12 +2,11 @@ package org.fz.nettyx.util;
 
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.channel.Channel;
-import lombok.experimental.Delegate;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import lombok.experimental.Delegate;
 
 /**
  * Used to store channels, using key-length pairs

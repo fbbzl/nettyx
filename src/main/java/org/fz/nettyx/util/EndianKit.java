@@ -1,10 +1,9 @@
 package org.fz.nettyx.util;
 
-import cn.hutool.core.util.PrimitiveArrayUtil;
-
-import java.math.BigInteger;
-
 import static java.lang.Integer.min;
+
+import cn.hutool.core.util.PrimitiveArrayUtil;
+import java.math.BigInteger;
 
 /**
  * endian util

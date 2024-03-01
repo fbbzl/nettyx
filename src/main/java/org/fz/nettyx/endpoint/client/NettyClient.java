@@ -1,14 +1,15 @@
 package org.fz.nettyx.endpoint.client;
 
 import cn.hutool.core.util.TypeUtil;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultChannelPromise;
+import io.netty.channel.EventLoopGroup;
+import java.lang.reflect.Type;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelFutureAction;
-
-import java.lang.reflect.Type;
-
-import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 
 /**
  * top level client based on netty
@@ -19,11 +20,12 @@ import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 @Getter
 @SuppressWarnings("unchecked")
 public abstract class NettyClient<C extends Channel> {
+
     private final Class<C>       channelClass;
     private final EventLoopGroup eventLoopGroup;
 
-    protected NettyClient(EventLoopGroup eventLoopGroup) {
-        this.eventLoopGroup = eventLoopGroup;
+    protected NettyClient() {
+        this.eventLoopGroup = newEventLoopGroup();
         this.channelClass   = this.findChannelClass();
     }
 
@@ -40,6 +42,8 @@ public abstract class NettyClient<C extends Channel> {
         Type[] actualTypes = TypeUtil.getActualTypes(this.getClass(), typeArgument);
         return (Class<C>) actualTypes[0];
     }
+
+    protected abstract EventLoopGroup newEventLoopGroup();
 
     protected abstract ChannelInitializer<? extends Channel> channelInitializer();
 
@@ -73,29 +77,13 @@ public abstract class NettyClient<C extends Channel> {
 
     public static boolean gracefullyCloseable(Channel channel) {
         return
-                channel != null
-                &&
-                !channel.isActive()
-                &&
-                !channel.isOpen()
-                &&
-                !channel.isWritable();
-    }
-
-    protected ChannelFutureAction whenConnectDone() {
-        return NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectCancel() {
-        return NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectSuccess() {
-        return NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectFailure() {
-        return NOTHING;
+            channel != null
+            &&
+            !channel.isActive()
+            &&
+            !channel.isOpen()
+            &&
+            !channel.isWritable();
     }
 
 }

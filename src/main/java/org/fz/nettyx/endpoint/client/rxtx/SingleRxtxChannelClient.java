@@ -1,5 +1,6 @@
 package org.fz.nettyx.endpoint.client.rxtx;
 
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
@@ -15,10 +16,16 @@ import org.fz.nettyx.endpoint.client.SingleChannelClient;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleRxtxChannelClient extends SingleChannelClient<RxtxChannel, RxtxDeviceAddress> {
+public abstract class SingleRxtxChannelClient extends
+                                              SingleChannelClient<RxtxChannel> {
 
     protected SingleRxtxChannelClient(RxtxDeviceAddress remoteAddress) {
-        super(new OioEventLoopGroup(), remoteAddress);
+        super(remoteAddress);
+    }
+
+    @Override
+    protected EventLoopGroup newEventLoopGroup() {
+        return new OioEventLoopGroup();
     }
 
 }

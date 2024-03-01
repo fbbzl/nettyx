@@ -1,15 +1,17 @@
 package client.tcp;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
 
+
+import client.TestChannelInitializer;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannelConfig;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-
-import static client.tcp.TestSingleTcp.CHANNEL_INITIALIZER;
+import java.util.concurrent.TimeUnit;
+import org.fz.nettyx.action.ChannelFutureAction;
+import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
 
 /**
  * @author fengbinbin
@@ -24,22 +26,26 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
 
     @Override
     protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return CHANNEL_INITIALIZER;
+        return new TestChannelInitializer<>();
     }
 
     @Override
-    protected ChannelFutureAction whenConnectSuccess() {
+    protected ChannelFutureAction whenConnectSuccess(String key) {
         return cf -> {
-            String key = channelKey(cf);
             System.err.println(key +": ok");
         };
     }
 
     @Override
-    protected ChannelFutureAction whenConnectFailure() {
+    protected void doChannelConfig(String key, SocketChannelConfig channelConfig) {
+        super.doChannelConfig(key, channelConfig);
+    }
+
+    @Override
+    protected ChannelFutureAction whenConnectFailure(String key) {
         return cf -> {
-            String key = channelKey(cf);
             System.err.println(key +": fail, " + cf.cause());
+            cf.channel().eventLoop().schedule(() -> connect(key), 2, TimeUnit.SECONDS);
         };
     }
 
