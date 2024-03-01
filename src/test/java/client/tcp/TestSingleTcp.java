@@ -10,6 +10,7 @@ import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
+import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.LoggerHandler.Sl4jLevel;
@@ -25,19 +26,22 @@ public class TestSingleTcp extends SingleTcpChannelClient {
 
     public static final ChannelInitializer<NioSocketChannel> CHANNEL_INITIALIZER =
             new ChannelInitializer<NioSocketChannel>() {
-        @Override
-        protected void initChannel(NioSocketChannel channel) {
-            channel.pipeline().addLast(
-                    new ReadIdleHeartBeater(2, ctx -> {
-                        Console.log("心跳啦");
-                        ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
-                    })
-                    , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
-                    , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-                    , new UserCodec()
-                    , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR));
-        }
-    };
+                @Override
+                protected void initChannel(NioSocketChannel channel) {
+                    InboundAdvice id = new InboundAdvice(channel);
+                    id.whenExceptionCaught((ctx, t) -> Console.log(t));
+
+                    channel.pipeline().addLast(
+                            new ReadIdleHeartBeater(2, ctx -> {
+                                Console.log("心跳啦");
+                                ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
+                            })
+                            , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                            , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                            , new UserCodec()
+                            , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR));
+                }
+            };
 
     protected TestSingleTcp(InetSocketAddress remoteAddress) {
         super(remoteAddress);
