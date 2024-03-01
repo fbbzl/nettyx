@@ -1,9 +1,12 @@
 package org.fz.nettyx.endpoint.client;
 
+import cn.hutool.core.util.TypeUtil;
 import io.netty.channel.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
+
+import java.lang.reflect.Type;
 
 import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 
@@ -14,14 +17,28 @@ import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
  */
 @Slf4j
 @Getter
-
+@SuppressWarnings("unchecked")
 public abstract class NettyClient<C extends Channel> {
     private final Class<C>       channelClass;
     private final EventLoopGroup eventLoopGroup;
 
     protected NettyClient(EventLoopGroup eventLoopGroup) {
         this.eventLoopGroup = eventLoopGroup;
-        this.channelClass   = channelClass;
+        this.channelClass   = this.findChannelClass();
+    }
+
+    protected Class<C> findChannelClass() {
+        Type     supperType;
+        Class<?> supperClass = this.getClass();
+        do {
+            supperType  = supperClass.getGenericSuperclass();
+            supperClass = supperClass.getSuperclass();
+        } while (supperClass != NettyClient.class);
+
+        Type typeArgument = TypeUtil.getTypeArgument(supperType);
+
+        Type[] actualTypes = TypeUtil.getActualTypes(this.getClass(), typeArgument);
+        return (Class<C>) actualTypes[0];
     }
 
     protected abstract ChannelInitializer<? extends Channel> channelInitializer();
