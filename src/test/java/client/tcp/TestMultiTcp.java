@@ -1,18 +1,11 @@
 package client.tcp;
 
-import cn.hutool.core.lang.Console;
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
 
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 import java.util.Map;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * @author fengbinbin
@@ -21,28 +14,16 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 public class TestMultiTcp extends MultiTcpChannelClient<String> {
 
-    protected TestMultiTcp(Map<String, SocketAddress> stringSocketAddressMap) {
-        super(stringSocketAddressMap);
+    protected TestMultiTcp(Map<String, InetSocketAddress> stringInetSocketAddressMap) {
+        super(stringInetSocketAddressMap);
     }
 
     @Override
-    protected ChannelInitializer<? extends Channel> channelInitializer(String key) {
+    protected ChannelInitializer<? extends Channel> channelInitializer() {
         return null;
     }
 
+    public static void main(String[] args) {
 
-    protected void connect(String key, SocketAddress address) {
-        Console.log("connecting address [" + address.toString() + "]");
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-                .whenSuccess(cf -> System.err.println("ok"))
-                .whenFailure(cf -> cf.channel().eventLoop().schedule(() -> connect(key, address), 2, SECONDS));
-
-        new Bootstrap()
-                .group(getEventLoopGroup())
-                .channel(NioSocketChannel.class)
-                .connect(address)
-                .addListener(listener);
     }
-
-
 }

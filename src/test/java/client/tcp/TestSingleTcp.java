@@ -17,7 +17,6 @@ import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.util.HexKit;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -25,18 +24,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
 
-    protected TestSingleTcp(SocketAddress remoteAddress) {
+    protected TestSingleTcp(InetSocketAddress remoteAddress) {
         super(remoteAddress);
-    }
-
-    public static void main(String[] args) {
-        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9081));
-        testClient.connect();
     }
 
     @Override
     protected ChannelFutureAction whenConnectFailure() {
-        return cf -> schedule(this::connect, 2, SECONDS);
+        return cf -> cf.channel().eventLoop().schedule(this::connect, 2, SECONDS);
     }
 
     @Override
@@ -72,5 +66,10 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                         , inAdvice);
             }
         };
+    }
+
+    public static void main(String[] args) {
+        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9081));
+        testClient.connect();
     }
 }
