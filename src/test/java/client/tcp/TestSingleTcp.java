@@ -28,8 +28,8 @@ public class TestSingleTcp extends SingleTcpChannelClient {
             new ChannelInitializer<NioSocketChannel>() {
                 @Override
                 protected void initChannel(NioSocketChannel channel) {
-                    InboundAdvice id = new InboundAdvice(channel);
-                    id.whenExceptionCaught((ctx, t) -> Console.log(t));
+                    InboundAdvice inboundAdvice = new InboundAdvice(channel);
+                    inboundAdvice.whenExceptionCaught((ctx, t) -> Console.log(t));
 
                     channel.pipeline().addLast(
                             new ReadIdleHeartBeater(2, ctx -> {
@@ -39,7 +39,8 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                             , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
                             , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
                             , new UserCodec()
-                            , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR));
+                            , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR)
+                            , inboundAdvice);
                 }
             };
 
