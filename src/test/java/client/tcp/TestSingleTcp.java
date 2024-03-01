@@ -1,6 +1,7 @@
 package client.tcp;
 
 import cn.hutool.core.lang.Console;
+import codec.UserCodec;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                         })
                         , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
                         , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-                       // , new UserCodec()
+                        , new UserCodec()
                         , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR)
                         , inAdvice);
             }
