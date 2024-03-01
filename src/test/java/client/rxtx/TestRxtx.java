@@ -2,10 +2,8 @@ package client.rxtx;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.rxtx.RxtxChannelConfig;
+import io.netty.channel.rxtx.RxtxDeviceAddress;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
-
-import java.net.SocketAddress;
 
 /**
  * @author fengbinbin
@@ -14,13 +12,8 @@ import java.net.SocketAddress;
  */
 public class TestRxtx extends SingleRxtxChannelClient {
 
-    protected TestRxtx(SocketAddress remoteAddress) {
+    protected TestRxtx(RxtxDeviceAddress remoteAddress) {
         super(remoteAddress);
-    }
-
-    @Override
-    protected void doRxtxConfig(RxtxChannelConfig rxtxChannel) {
-
     }
 
     @Override
