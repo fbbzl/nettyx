@@ -27,9 +27,9 @@ import java.util.Map;
 @Getter
 public abstract class MultiChannelClient<K, C extends Channel, A extends SocketAddress> extends NettyClient<C> {
 
-    protected final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
-    private final   Map<K, A>         addressMap;
-    private final   Map<K, Bootstrap> bootstrapMap;
+    private final ChannelStorage<K> channelStorage = new ChannelStorage<>(16);
+    private final Map<K, A>         addressMap;
+    private final Map<K, Bootstrap> bootstrapMap;
 
     protected MultiChannelClient(EventLoopGroup eventLoopGroup, Map<K, A> addressMap) {
         super(eventLoopGroup);
