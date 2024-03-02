@@ -35,14 +35,14 @@ import org.fz.nettyx.util.Try;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class MultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                        NettyClient<C> {
+public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
+                                                                                        Client<C> {
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
     private final Map<K, Bootstrap>     bootstrapMap;
 
-    protected <S extends SocketAddress> MultiChannelClient(Map<K, S> addressMap) {
+    protected <S extends SocketAddress> AbstractMultiChannelClient(Map<K, S> addressMap) {
         this.addressMap   = (Map<K, SocketAddress>) addressMap;
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
@@ -93,11 +93,11 @@ public abstract class MultiChannelClient<K, C extends Channel, F extends Channel
     }
 
     public void closeChannelGracefully(K key) {
-        if (NettyClient.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(); }
+        if (Client.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(); }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (NettyClient.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(promise); }
+        if (Client.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(promise); }
     }
 
     public ChannelPromise writeAndFlush(K channelKey, Object message) {
