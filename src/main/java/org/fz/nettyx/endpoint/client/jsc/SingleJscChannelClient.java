@@ -4,7 +4,7 @@ package org.fz.nettyx.endpoint.client.jsc;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.SingleChannelClient;
+import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 
@@ -17,7 +17,7 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 @Slf4j
 @SuppressWarnings("deprecation")
 public abstract class SingleJscChannelClient extends
-                                             SingleChannelClient<JscChannel> {
+                                             AbstractSingleChannelClient<JscChannel> {
 
     protected SingleJscChannelClient(JscDeviceAddress remoteAddress) {
         super(remoteAddress);
