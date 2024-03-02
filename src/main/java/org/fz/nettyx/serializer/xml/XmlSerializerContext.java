@@ -1,10 +1,40 @@
 package org.fz.nettyx.serializer.xml;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static cn.hutool.core.text.CharSequenceUtil.endWithIgnoreCase;
+import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
+import static cn.hutool.core.text.CharSequenceUtil.subBefore;
+import static cn.hutool.core.text.CharSequenceUtil.subBetween;
+import static java.util.Collections.emptyMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ARRAY_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+import static org.fz.nettyx.util.EndianKit.LE;
+
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -18,19 +48,6 @@ import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.EndianKit;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static cn.hutool.core.text.CharSequenceUtil.*;
-import static java.util.Collections.emptyMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
-import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
  * application must config this
@@ -72,7 +89,9 @@ public class XmlSerializerContext {
     public synchronized void doScan() {
         SAXReader reader = SAXReader.createDefault();
         // first add the doc mapping
-        List<Document> docs = Arrays.stream(this.paths).map(Path::toFile).map(Try.apply(reader::read))
+        List<Document> docs = Arrays.stream(this.paths)
+                                    .map(Path::toFile)
+                                    .map(Try.apply(f -> reader.read(f)))
                                     .collect(toList());
 
         // scan namespaces

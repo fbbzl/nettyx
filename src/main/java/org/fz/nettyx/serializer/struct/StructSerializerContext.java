@@ -1,5 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
+import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
@@ -7,10 +10,6 @@ import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -20,9 +19,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
-import static org.apache.logging.log4j.util.Strings.EMPTY;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 /**
  * The type Struct cache.

@@ -11,7 +11,7 @@ for more use cases please refer to: https://blog.csdn.net/fbbwht
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.1-RELEASE</version>
+    <version>2.2.2-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -66,7 +66,7 @@ handler                             Provided some basic channel handler implemen
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---AdvisableChannelInitializer       Channel advice initializer
   ---ExceptionHandler                  exception handler
-  ---HeartBeater                       TCP heartbeat device
+  ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log
   ---MessageStealer                    use to discard message
 listener
