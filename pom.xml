@@ -107,18 +107,6 @@
         </dependency>
 
         <dependency>
-            <groupId>se.koc</groupId>
-            <artifactId>netty-transport-jserialcomm</artifactId>
-            <version>${netty-transport-jserialcomm.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fazecast</groupId>
-                    <artifactId>jSerialComm</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>
             <version>${jSerialComm.version}</version>

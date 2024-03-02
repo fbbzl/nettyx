@@ -2,10 +2,9 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.util.NumberUtil;
 import io.netty.buffer.ByteBuf;
+import java.util.function.Function;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
-
-import java.util.function.Function;
 
 /**
  * the number type handler

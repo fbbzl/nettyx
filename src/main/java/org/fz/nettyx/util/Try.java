@@ -3,6 +3,7 @@ package org.fz.nettyx.util;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -26,7 +27,8 @@ public class Try {
         return () -> {
             try {
                 runnable.run();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -38,7 +40,21 @@ public class Try {
         return t -> {
             try {
                 return function.apply(t);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
+                log.debug(e.getMessage());
+                throw new LambdasException(e);
+            }
+        };
+    }
+
+    public <T, U, R> BiFunction<T, U, R> apply(UncheckedBiFunction<T, U, R> function) {
+        Objects.requireNonNull(function);
+        return (t, u) -> {
+            try {
+                return function.apply(t, u);
+            }
+            catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -50,7 +66,8 @@ public class Try {
         return t -> {
             try {
                 consumer.accept(t);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -62,7 +79,8 @@ public class Try {
         return (k, v) -> {
             try {
                 consumer.accept(k, v);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -74,7 +92,8 @@ public class Try {
         return () -> {
             try {
                 return supplier.get();
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -86,7 +105,8 @@ public class Try {
         return t -> {
             try {
                 return predicate.test(t);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -101,7 +121,8 @@ public class Try {
         return () -> {
             try {
                 run.run();
-            } catch (Exception exception) {
+            }
+            catch (Exception exception) {
                 log.error(exception.getMessage());
             }
         };
@@ -111,7 +132,8 @@ public class Try {
         return t -> {
             try {
                 consumer.accept(t);
-            } catch (Exception exception) {
+            }
+            catch (Exception exception) {
                 log.error(exception.getMessage());
             }
         };
@@ -154,6 +176,12 @@ public class Try {
         boolean test(T t) throws Exception;
     }
 
+    @FunctionalInterface
+    public interface UncheckedBiFunction<T, U, R> {
+
+        R apply(T t, U u) throws Exception;
+    }
+
     public static class LambdasException extends RuntimeException {
 
         public LambdasException(String message) {
@@ -169,7 +197,7 @@ public class Try {
         }
 
         public LambdasException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace) {
+                                boolean writableStackTrace) {
             super(message, cause, enableSuppression, writableStackTrace);
         }
     }

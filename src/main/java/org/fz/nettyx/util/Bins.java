@@ -41,16 +41,11 @@ public class Bins {
         return new Bins(toBins(value));
     }
 
-    @Override
-    public String toString() {
-        return toString(this.getBinaries());
-    }
-
     private static byte[] toBins(int value, int digest) {
-        byte[] buf = new byte[digest];
-        int charPos = digest;
-        int radix = 2;
-        int mask = radix - 1;
+        byte[] buf     = new byte[digest];
+        int    charPos = digest;
+        int    radix   = 2;
+        int    mask    = radix - 1;
         do {
             buf[--charPos] = digits[value & mask];
             value >>>= 1;
@@ -60,16 +55,49 @@ public class Bins {
     }
 
     private static byte[] toBins(long value) {
-        byte[] buf = new byte[64];
-        int charPos = 64;
-        int radix = 2;
-        int mask = radix - 1;
+        byte[] buf     = new byte[64];
+        int    charPos = 64;
+        int    radix   = 2;
+        int    mask    = radix - 1;
         do {
             buf[--charPos] = digits[(int) (value & mask)];
             value >>>= 1;
         } while (value != 0);
 
         return buf;
+    }
+
+    private static String toString(byte[] bins) {
+        StringBuilder bitsStr = new StringBuilder();
+        for (byte bin : bins) {
+            bitsStr.append(bin);
+        }
+        return bitsStr.toString();
+    }
+
+    private static int toInt(byte[] bins) {
+        int result = 0;
+        int radix  = 2;
+        for (int i = bins.length - 1, digit = 1; i >= 0; i--, digit *= radix) {
+            result += (bins[i] * digit);
+        }
+
+        return result;
+    }
+
+    private static long toLong(byte[] bins) {
+        long result = 0;
+        int  radix  = 2;
+        for (int i = bins.length - 1, digit = 1; i >= 0; i--, digit *= radix) {
+            result += ((long) bins[i] * digit);
+        }
+
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return toString(this.getBinaries());
     }
 
     public int length() {
@@ -154,34 +182,6 @@ public class Bins {
         for (int i = startIndex, j = startIndex + bins.length(), k = 0; i < j; i++, j--, k++) {
             this.set(i, bins.get(k));
         }
-    }
-
-    private static String toString(byte[] bins) {
-        StringBuilder bitsStr = new StringBuilder();
-        for (byte bin : bins) {
-            bitsStr.append(bin);
-        }
-        return bitsStr.toString();
-    }
-
-    private static int toInt(byte[] bins) {
-        int result = 0;
-        int radix = 2;
-        for (int i = bins.length - 1, digit = 1; i >= 0; i--, digit *= radix) {
-            result += (bins[i] * digit);
-        }
-
-        return result;
-    }
-
-    private static long toLong(byte[] bins) {
-        long result = 0;
-        int radix = 2;
-        for (int i = bins.length - 1, digit = 1; i >= 0; i--, digit *= radix) {
-            result += ((long) bins[i] * digit);
-        }
-
-        return result;
     }
 
 }

@@ -1,20 +1,19 @@
 package org.fz.nettyx.serializer.struct.basic;
 
+import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
+
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
-import lombok.Getter;
-import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.util.Throws;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
+import lombok.Getter;
+import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.util.Throws;
 
 /**
  * The type Basic. The specific implementation can be enhanced

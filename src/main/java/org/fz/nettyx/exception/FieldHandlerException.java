@@ -1,8 +1,7 @@
 package org.fz.nettyx.exception;
 
-import lombok.Getter;
-
 import java.lang.reflect.Field;
+import lombok.Getter;
 
 /**
  * @author fengbinbin
