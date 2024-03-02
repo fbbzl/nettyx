@@ -19,12 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class NettyClient<C extends Channel> {
+public abstract class Client<C extends Channel> {
 
     private final Class<C>       channelClass;
     private final EventLoopGroup eventLoopGroup;
 
-    protected NettyClient() {
+    protected Client() {
         this.eventLoopGroup = newEventLoopGroup();
         this.channelClass   = this.findChannelClass();
     }
@@ -35,7 +35,7 @@ public abstract class NettyClient<C extends Channel> {
         do {
             supperType  = supperClass.getGenericSuperclass();
             supperClass = supperClass.getSuperclass();
-        } while (supperClass != NettyClient.class);
+        } while (supperClass != Client.class);
 
         Type typeArgument = TypeUtil.getTypeArgument(supperType);
 
