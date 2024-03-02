@@ -27,14 +27,14 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 @Slf4j
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class SingleChannelClient<C extends Channel> extends
-                                                             NettyClient<C> {
+public abstract class AbstractSingleChannelClient<C extends Channel> extends
+                                                             Client<C> {
 
     private final SocketAddress remoteAddress;
     private       Channel       channel;
     private final Bootstrap     bootstrap;
 
-    protected SingleChannelClient(SocketAddress remoteAddress) {
+    protected AbstractSingleChannelClient(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
         this.bootstrap     = newBootstrap(remoteAddress);
     }
