@@ -34,17 +34,21 @@ codec                               Provided some basic codecs
   ---StartEndFlagFrameCodec            Start End Flag Codec, use to decoe message based on start and end flag
   ---StringMessageCodec                String Codec
 endpoint
-  serial
-      jsc                            A Simple Implementation of Java Serial Communication Based on JSC
-        ---JSerialCommClient           simple jsc client    
-  tcp                                    TCP encapsulation
-     client                              Provide client side basic implementation
-       ---TcpClient                      TCP encapsulation
-       ---MultiTcpChannelClient          Client with multiple channels, using key to retrieve corresponding channels
-       ---SingleTcpChannelClient         Single Channel Client
-     server
-       ---Server                          Provide server-side basic implementation
-  ---Client                            Top-level client abstraction  
+  client
+     jsc
+       ---MultiJscChannelClient        Client with multiple channels, using key to retrieve corresponding channels    
+       ---SingleJscChannelClient       Single Channel Client
+     rxtx
+       ---MultiRxtxChannelClient        Client with multiple channels, using key to retrieve corresponding channels
+       ---SingleRxtxChannelClient       Single Channel Client
+     tcp
+       ---MultiTcpChannelClient         Client with multiple channels, using key to retrieve corresponding channels
+       ---SingleTcpChannelClient        Single Channel Client
+     ---AbstractMultiChannelClient      Abstract parent class for multi-channel clients       
+     ---AbstractSingleChannelClient     Abstract parent class for single channel clients
+     ---Client                          Client top-level abstract parent class
+  server
+     ---TcpServer
 envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
@@ -64,8 +68,6 @@ handler                             Provided some basic channel handler implemen
      ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
      ---ChannelInterceptors               Channel interceptor utils
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
-  ---AdvisableChannelInitializer       Channel advice initializer
-  ---ExceptionHandler                  exception handler
   ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log
   ---MessageStealer                    use to discard message

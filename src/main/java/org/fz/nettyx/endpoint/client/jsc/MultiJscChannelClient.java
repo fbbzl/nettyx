@@ -6,7 +6,7 @@ import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.util.AttributeKey;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.MultiChannelClient;
+import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
@@ -19,7 +19,7 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiJscChannelClient<K> extends MultiChannelClient<K, JscChannel, JscChannelConfig> {
+public abstract class MultiJscChannelClient<K> extends AbstractMultiChannelClient<K, JscChannel, JscChannelConfig> {
 
     protected MultiJscChannelClient(Map<K, JscDeviceAddress> addressMap) {
         super(addressMap);
