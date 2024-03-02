@@ -1,5 +1,7 @@
 package org.fz.nettyx.handler.actionable;
 
+import static org.fz.nettyx.action.Actions.invokeAction;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
@@ -72,8 +74,8 @@ public class ActionableReadTimeoutHandler extends ReadTimeoutHandler {
 
     @Override
     protected void readTimedOut(ChannelHandlerContext ctx) throws Exception {
-        this.timeoutAction.act(ctx, ReadTimeoutException.INSTANCE);
-
+        invokeAction(timeoutAction, ctx,
+                     new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.readTimedOut(ctx);
     }
 

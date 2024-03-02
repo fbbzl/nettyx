@@ -1,14 +1,14 @@
 package org.fz.nettyx.serializer.xml.handler;
 
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.util.EndianKit.LE;
+
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
 import org.fz.nettyx.util.Throws;
-
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
  * read int value to the enum which defined in the XML, NOT java enum

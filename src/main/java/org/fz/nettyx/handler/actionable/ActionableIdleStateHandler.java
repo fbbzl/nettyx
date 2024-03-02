@@ -1,5 +1,7 @@
 package org.fz.nettyx.handler.actionable;
 
+import static org.fz.nettyx.action.Actions.invokeAction;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -94,25 +96,15 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
         else
         if (ChannelEvents.isWriteIdle(evt)) {
             log.warn("have been in write-idle state for [{}] seconds on [{}]", getWriterIdleSeconds(), ctx.channel().remoteAddress());
-            invokeAction(this.writeIdleAction(), ctx);
+            invokeAction(writeIdleAction, ctx);
         }
         else
         if (ChannelEvents.isAllIdle(evt)) {
             log.warn("have been in all-idle state for [{}] seconds on [{}]", getAllIdleSeconds(), ctx.channel().remoteAddress());
-            invokeAction(this.writeIdleAction(), ctx);
+            invokeAction(allIdleAction, ctx);
         }
 
         if (fireNext) super.channelIdle(ctx, evt);
-    }
-
-
-    /**
-     * will invoke the channel action
-     * @param channelAction the channel action
-     * @param ctx           the ctx
-     */
-    static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
-        if (channelAction != null) channelAction.act(ctx);
     }
 
     //********************************************        constructor start          **********************************************//

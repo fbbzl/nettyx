@@ -1,5 +1,7 @@
 package org.fz.nettyx.listener;
 
+import static org.fz.nettyx.action.Actions.invokeAction;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Setter;
@@ -43,11 +45,4 @@ public class ActionableChannelFutureListener implements ChannelFutureListener {
         if (channelFuture.isCancelled()) invokeAction(whenCancel,  channelFuture);
     }
 
-    //********************************************      private start      ***************************************************//
-
-    private void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture channelFuture) {
-        if (channelFutureAction != null) channelFutureAction.act(channelFuture);
-    }
-
-    //********************************************      private end      ***************************************************//
 }

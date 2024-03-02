@@ -63,9 +63,11 @@ public final class Exceptions {
     }
 
     /**
-     * coordinate Optional.orElseThrow {@link Optional#orElseThrow(Supplier)}  } In order to support the Optional API, this method is provided
+     * coordinate Optional.orElseThrow {@link Optional#orElseThrow(Supplier)}  } In order to support the Optional
+     * API, this method is provided
      *
      * @param exceptionMessage exception message
+     *
      * @return exception supplier
      */
     public static Supplier<RuntimeException> exception(String exceptionMessage) {

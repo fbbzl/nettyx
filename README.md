@@ -11,7 +11,7 @@ for more use cases please refer to: https://blog.csdn.net/fbbwht
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.0-RELEASE</version>
+    <version>2.2.2-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -36,7 +36,7 @@ codec                               Provided some basic codecs
 endpoint
   serial
       jsc                            A Simple Implementation of Java Serial Communication Based on JSC
-         ---JSerialCommClient           simple jsc client    
+        ---JSerialCommClient           simple jsc client    
   tcp                                    TCP encapsulation
      client                              Provide client side basic implementation
        ---TcpClient                      TCP encapsulation
@@ -49,7 +49,6 @@ envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
 exception                           Abnormal extension
-  ---ClosingChannelException           In conjunction with channel advice, the channel can be closed by throwing the abnormal subclass
   ---HandlerException
   ---NoSuchPortException
   ---ParameterizedTypeException
@@ -61,15 +60,13 @@ handler                             Provided some basic channel handler implemen
      ---ActionableIdleStateHandler     Actionable Idle State Handler
      ---ActionableReadTimeoutHandler   Actionable ReadTimeout Handler
      ---ActionableWriteTimeoutHandler  Actionable WriteTimeout Handler
-  advice
-     ---InboundAdvice                  Inbound Advice
-     ---OutboundAdvice                 Outbound Advice
   interceptor
      ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
      ---ChannelInterceptors               Channel interceptor utils
+  ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---AdvisableChannelInitializer       Channel advice initializer
   ---ExceptionHandler                  exception handler
-  ---HeartBeater                       TCP heartbeat device
+  ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log
   ---MessageStealer                    use to discard message
 listener
