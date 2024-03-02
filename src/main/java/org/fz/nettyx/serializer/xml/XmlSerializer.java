@@ -1,10 +1,16 @@
 package org.fz.nettyx.serializer.xml;
 
+import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
+
 import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.MapUtil;
 import io.netty.buffer.ByteBuf;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.Serializer;
@@ -15,13 +21,6 @@ import org.fz.nettyx.serializer.xml.handler.PropHandler;
 import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.Throws;
 import org.mvel2.MVEL;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
 
 
 /**

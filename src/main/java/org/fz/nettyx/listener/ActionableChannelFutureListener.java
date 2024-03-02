@@ -1,13 +1,13 @@
 package org.fz.nettyx.listener;
 
+import static org.fz.nettyx.action.Actions.invokeAction;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
-
-import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Actionable channel future listener.
