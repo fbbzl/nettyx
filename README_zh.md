@@ -12,7 +12,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.0-RELEASE</version>
+    <version>2.2.2-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -37,7 +37,7 @@ codec                              提供了一些基本的编解码器
 endpoint
   serial
      jsc                            基于JSC的Java串行通信的简单实现
-         ---JSerialCommClient       简单的基于jsc的客户端 
+       ---JSerialCommClient       简单的基于jsc的客户端 
   tcp                                    TCP 封装
      client                              提供客户端基本实现
        ---TcpClient                      TCP 封装
@@ -50,7 +50,6 @@ envet                                为网络事件提供支持
   ---ChannelEvent                     Channel 事件对象，建议与 Spring 容器事件结合使用
   ---ChannelEvents                    通道事件对象工具
 exception                           异常扩展
-  ---ClosingChannelException           结合通道建议，可以通过抛出异常子类来关闭通道
   ---HandlerException
   ---NoSuchPortException
   ---ParameterizedTypeException
@@ -62,15 +61,13 @@ handler                             提供了一些基本的通道处理程序�
      ---ActionableIdleStateHandler     可操作的空闲状态处理程序
      ---ActionableReadTimeoutHandler   可操作的 读取超时 处理程序
      ---ActionableWriteTimeoutHandler  可操作的 写超时 处理程序
-  advice
-     ---InboundAdvice                  入站建言
-     ---OutboundAdvice                 出站建言
   interceptor
      ---ChannelInterceptor                信道拦截器，适用于通信前握手等预操作
      ---ChannelInterceptors               通道拦截器实用程序
+  ---ChannelAdvice                     包含入站建言和出站建言
   ---AdvisableChannelInitializer       通道建议初始值设定项
   ---ExceptionHandler                  异常处理程序
-  ---HeartBeater                       TCP 心跳设备
+  ---IdledHeartBeater                  闲置后的心跳器
   ---LoggerHandler                     进入和退出消息日志
   ---MessageStealer                    用于丢弃消息
 listener

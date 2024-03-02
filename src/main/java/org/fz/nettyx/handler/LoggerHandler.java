@@ -36,10 +36,10 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
     private static final Sl4jLevel DEFAULT_LEVEL = Sl4jLevel.INFO;
 
     /**
-     * The constant TO_HEX.
+     * The TO_HEX.
      */
     public static final Function<Object, String>
-        TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
+            TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
     /**
      * The To ascii.
      */

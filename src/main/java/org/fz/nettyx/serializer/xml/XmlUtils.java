@@ -1,15 +1,14 @@
 package org.fz.nettyx.serializer.xml;
 
-import lombok.experimental.UtilityClass;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-
-import java.util.List;
-import java.util.function.Predicate;
-
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static java.util.Collections.emptyList;
 import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
+
+import java.util.List;
+import java.util.function.Predicate;
+import lombok.experimental.UtilityClass;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 
 
 /**

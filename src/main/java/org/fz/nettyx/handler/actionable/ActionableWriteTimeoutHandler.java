@@ -1,5 +1,7 @@
 package org.fz.nettyx.handler.actionable;
 
+import static org.fz.nettyx.action.Actions.invokeAction;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -64,7 +66,8 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param timeoutAction the timeout action
      * @param fireNext      the fire next
      */
-    public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionableWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction,
+                                         boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
         this.fireNext = fireNext;
@@ -72,8 +75,8 @@ public class ActionableWriteTimeoutHandler extends WriteTimeoutHandler {
 
     @Override
     protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
-        timeoutAction.act(ctx, WriteTimeoutException.INSTANCE);
-
+        invokeAction(timeoutAction, ctx,
+                     new WriteTimeoutException("has got write-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.writeTimedOut(ctx);
     }
 
