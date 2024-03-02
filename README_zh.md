@@ -35,17 +35,21 @@ codec                              提供了一些基本的编解码器
   ---StartEndFlagFrameCodec            Start End Flag 编解码器，用于根据开始和结束标志对消息进行解码
   ---StringMessageCodec                字符串编解码器
 endpoint
-  serial
-     jsc                            基于JSC的Java串行通信的简单实现
-       ---JSerialCommClient       简单的基于jsc的客户端 
-  tcp                                    TCP 封装
-     client                              提供客户端基本实现
-       ---TcpClient                      TCP 封装
-       ---MultiTcpChannelClient          具有多个通道的客户端，使用 key 检索相应的通道
-       ---SingleTcpChannelClient         单通道客户端
-     server
-       ---Server                       提供服务器端基本实现
-  ---Client                            顶级客户端抽象
+  client
+     jsc
+       ---MultiJscChannelClient        多jsc通道客户端 
+       ---SingleJscChannelClient       单jsc通道客户端
+     rxtx
+       ---MultiRxtxChannelClient        多rxtx通道客户端 
+       ---SingleRxtxChannelClient       单rxtx通道客户端
+     tcp
+       ---MultiTcpChannelClient         多tcp通道客户端 
+       ---SingleTcpChannelClient        单tcp通道客户端
+     ---AbstractMultiChannelClient      多通道客户端的抽象父类    
+     ---AbstractSingleChannelClient     单通道客户端的抽象父类
+     ---Client                          客户端顶级抽象父类
+  server
+     ---TcpServer
 envet                                为网络事件提供支持
   ---ChannelEvent                     Channel 事件对象，建议与 Spring 容器事件结合使用
   ---ChannelEvents                    通道事件对象工具
@@ -65,8 +69,6 @@ handler                             提供了一些基本的通道处理程序�
      ---ChannelInterceptor                信道拦截器，适用于通信前握手等预操作
      ---ChannelInterceptors               通道拦截器实用程序
   ---ChannelAdvice                     包含入站建言和出站建言
-  ---AdvisableChannelInitializer       通道建议初始值设定项
-  ---ExceptionHandler                  异常处理程序
   ---IdledHeartBeater                  闲置后的心跳器
   ---LoggerHandler                     进入和退出消息日志
   ---MessageStealer                    用于丢弃消息

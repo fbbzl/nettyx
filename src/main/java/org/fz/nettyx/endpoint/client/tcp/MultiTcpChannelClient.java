@@ -8,7 +8,7 @@ import io.netty.util.AttributeKey;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.MultiChannelClient;
+import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
 
 /**
  * The type Multi channel client. use channel key to retrieve and use channels
@@ -21,7 +21,7 @@ import org.fz.nettyx.endpoint.client.MultiChannelClient;
  */
 @Slf4j
 public abstract class MultiTcpChannelClient<K> extends
-                                               MultiChannelClient<K, NioSocketChannel, SocketChannelConfig> {
+                                               AbstractMultiChannelClient<K, NioSocketChannel, SocketChannelConfig> {
 
     protected MultiTcpChannelClient(Map<K, InetSocketAddress> addressMap) {
         super(addressMap);

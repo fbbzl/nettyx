@@ -5,7 +5,7 @@ import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannel;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.SingleChannelClient;
+import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
 
 /**
  * single channel rxtx client
@@ -17,7 +17,7 @@ import org.fz.nettyx.endpoint.client.SingleChannelClient;
 @Slf4j
 @SuppressWarnings("deprecation")
 public abstract class SingleRxtxChannelClient extends
-                                              SingleChannelClient<RxtxChannel> {
+                                              AbstractSingleChannelClient<RxtxChannel> {
 
     protected SingleRxtxChannelClient(RxtxDeviceAddress remoteAddress) {
         super(remoteAddress);
