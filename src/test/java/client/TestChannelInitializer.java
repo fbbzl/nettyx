@@ -10,9 +10,7 @@ import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
-import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
-import org.fz.nettyx.util.HexKit;
 
 /**
  * @author fengbinbin
@@ -29,13 +27,14 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
         inboundAdvice.whenExceptionCaught((ctx, t) -> Console.log(t));
 
         channel.pipeline().addLast(
-            new ReadIdleHeartBeater(2, ctx -> {
-                Console.log("心跳啦");
-                ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
-            })
-            , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
+//            new ReadIdleHeartBeater(2, ctx -> {
+//                Console.log("心跳啦");
+//                ctx.channel().writeAndFlush(wrappedBuffer(HexKit.decode("7777")));
+//            })
+//            ,
+            new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
             , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-           // , new UserCodec()
+            // , new UserCodec()
             , new LoggerHandler(log)
             , inboundAdvice);
     }
