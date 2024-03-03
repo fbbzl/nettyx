@@ -3,7 +3,6 @@ package client;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 import cn.hutool.core.lang.Console;
-import codec.UserCodec;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
             })
             , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
             , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-            , new UserCodec()
+           // , new UserCodec()
             , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR)
             , inboundAdvice);
     }
