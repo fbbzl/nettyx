@@ -12,7 +12,6 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.IdledHeartBeater.ReadIdleHeartBeater;
 import org.fz.nettyx.handler.LoggerHandler;
-import org.fz.nettyx.handler.LoggerHandler.Sl4jLevel;
 import org.fz.nettyx.util.HexKit;
 
 /**
@@ -37,7 +36,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
             , new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
             , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
            // , new UserCodec()
-            , new LoggerHandler.InboundLogger(log, Sl4jLevel.ERROR)
+            , new LoggerHandler(log)
             , inboundAdvice);
     }
 }
