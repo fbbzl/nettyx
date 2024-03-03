@@ -44,7 +44,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
         return cf -> {
             executorService.scheduleAtFixedRate(() -> {
                 this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
-            } , 2000,100,TimeUnit.MILLISECONDS);
+            } , 2000,500,TimeUnit.MILLISECONDS);
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }

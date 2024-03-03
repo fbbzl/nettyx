@@ -43,7 +43,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
         return cf -> {
             executorService.scheduleAtFixedRate(() -> {
                 this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
-            } , 2000,100,TimeUnit.MILLISECONDS);
+            } , 2000,500,TimeUnit.MILLISECONDS);
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }
@@ -88,6 +88,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
     public static void main(String[] args) {
         TestSingleJsc testSingleRxtx = new TestSingleJsc(new JscDeviceAddress("COM3"));
         testSingleRxtx.connect();
+
+
     }
 
 }
