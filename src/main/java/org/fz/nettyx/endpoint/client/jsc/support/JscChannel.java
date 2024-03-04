@@ -34,7 +34,6 @@ public class JscChannel extends OioByteStreamChannel {
 //
 //        stopWatch.stop();
 //
-//       // Console.log(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
 //    }
 
     private boolean          open = true;
