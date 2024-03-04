@@ -28,11 +28,11 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 @Getter
 @SuppressWarnings("unchecked")
 public abstract class AbstractSingleChannelClient<C extends Channel> extends
-                                                             Client<C> {
+                                                                     Client<C> {
 
     private final SocketAddress remoteAddress;
-    private       Channel       channel;
     private final Bootstrap     bootstrap;
+    private       Channel       channel;
 
     protected AbstractSingleChannelClient(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
