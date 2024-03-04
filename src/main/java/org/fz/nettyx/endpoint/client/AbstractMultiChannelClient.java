@@ -36,7 +36,7 @@ import org.fz.nettyx.util.Try;
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
 public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                        Client<C> {
+                                                                                                Client<C> {
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;

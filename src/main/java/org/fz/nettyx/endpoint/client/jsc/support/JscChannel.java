@@ -34,18 +34,9 @@ public class JscChannel extends OioByteStreamChannel {
     private final JscChannelConfig config;
 
     private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
-
-    @Override
-    public void doRead() {
-        // do not use method reference!!!
-        Runnable runnable = () -> JscChannel.super.doRead();
-        jscEventExecutors.execute(runnable);
-    }
-
     private boolean          open = true;
     private JscDeviceAddress deviceAddress;
     private SerialPort       serialPort;
-
     public JscChannel() {
         super(null);
 
@@ -161,6 +152,13 @@ public class JscChannel extends OioByteStreamChannel {
     @Override
     protected ChannelFuture shutdownInput() {
         return newFailedFuture(new UnsupportedOperationException("shutdownInput"));
+    }
+
+    @Override
+    public void doRead() {
+        // do not use method reference!!!
+        Runnable runnable = () -> JscChannel.super.doRead();
+        jscEventExecutors.execute(runnable);
     }
 
     private final class JSerialCommUnsafe extends AbstractUnsafe {
