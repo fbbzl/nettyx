@@ -29,6 +29,17 @@ public abstract class Client<C extends Channel> {
         this.channelClass   = this.findChannelClass();
     }
 
+    public static boolean gracefullyCloseable(Channel channel) {
+        return
+            channel != null
+            &&
+            !channel.isActive()
+            &&
+            !channel.isOpen()
+            &&
+            !channel.isWritable();
+    }
+
     protected Class<C> findChannelClass() {
         Type     supperType;
         Class<?> supperClass = this.getClass();
@@ -73,17 +84,6 @@ public abstract class Client<C extends Channel> {
 
     protected void shutdownGracefully() {
         getEventLoopGroup().shutdownGracefully();
-    }
-
-    public static boolean gracefullyCloseable(Channel channel) {
-        return
-            channel != null
-            &&
-            !channel.isActive()
-            &&
-            !channel.isOpen()
-            &&
-            !channel.isWritable();
     }
 
 }
