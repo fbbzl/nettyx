@@ -11,7 +11,7 @@ for more use cases please refer to: https://blog.csdn.net/fbbwht
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.2-RELEASE</version>
+    <version>2.2.3-RELEASE</version>
 </dependency>
 ```
 ## api
