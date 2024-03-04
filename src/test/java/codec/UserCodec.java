@@ -1,6 +1,7 @@
 package codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,10 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         System.err.println(msg.readableBytes());
 
         if (msg.readableBytes() == 8) {
-            ctx.channel().writeAndFlush(HexKit.decode("ffffffff"));
+            ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffff")));
         }
         if (msg.readableBytes() == 4) {
-            ctx.channel().writeAndFlush(HexKit.decode("ffffffffffffffff"));
+            ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
         }
         msg.release();
     }
