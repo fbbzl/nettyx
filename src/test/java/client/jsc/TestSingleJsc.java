@@ -3,7 +3,6 @@ package client.jsc;
 
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
@@ -12,7 +11,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
-import org.fz.nettyx.util.HexKit;
 
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
@@ -40,8 +38,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
     protected ChannelFutureAction whenConnectSuccess() {
         return cf -> {
             executorService.scheduleAtFixedRate(() -> {
-                this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
-            } , 2000,500,TimeUnit.MILLISECONDS);
+             //   this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
+            } , 2000,100,TimeUnit.MILLISECONDS);
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }
