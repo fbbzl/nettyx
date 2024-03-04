@@ -6,10 +6,9 @@ import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
+import io.netty.util.concurrent.DefaultEventExecutor;
 
 import java.net.SocketAddress;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
@@ -27,11 +26,11 @@ public class JscChannel extends PublicDoReadChannel {
 
     private final JscChannelConfig config;
 
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
+    DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
 
     @Override
     public void doRead() {
-        executorService.execute(super::doRead);
+        eventExecutors.execute(super::doRead);
     }
 
     private boolean          open = true;
