@@ -125,6 +125,7 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
     public static class InboundLogger extends ChannelInboundHandlerAdapter {
         private final Logger logger;
         private final Function<Object, String> messageFormatter;
+        // output the matching level log
         private final Sl4jLevel level;
 
         /**
