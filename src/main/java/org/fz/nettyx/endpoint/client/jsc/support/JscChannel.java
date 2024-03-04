@@ -6,6 +6,7 @@ import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
+import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
 
 import java.net.SocketAddress;
@@ -20,17 +21,19 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
  * @since 2024/3/2 13:29
  */
 
-public class JscChannel extends PublicDoReadChannel {
+public class JscChannel extends OioByteStreamChannel {
 
     private static final JscDeviceAddress LOCAL_ADDRESS = new JscDeviceAddress("localhost");
 
     private final JscChannelConfig config;
 
-    DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
+    private DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
 
     @Override
     public void doRead() {
-        eventExecutors.execute(super::doRead);
+        // do not use method reference!!!
+        Runnable runnable = () -> JscChannel.super.doRead();
+        jscEventExecutors.execute(runnable);
     }
 
     private boolean          open = true;
