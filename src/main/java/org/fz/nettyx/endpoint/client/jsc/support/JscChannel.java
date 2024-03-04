@@ -16,6 +16,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.OioByteStreamChannel;
+import io.netty.util.concurrent.DefaultEventExecutor;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
@@ -26,12 +27,20 @@ import java.util.concurrent.TimeUnit;
  * @since 2024/3/2 13:29
  */
 
-@SuppressWarnings("deprecation")
 public class JscChannel extends OioByteStreamChannel {
 
     private static final JscDeviceAddress LOCAL_ADDRESS = new JscDeviceAddress("localhost");
 
     private final JscChannelConfig config;
+
+    private DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
+
+    @Override
+    public void doRead() {
+        // do not use method reference!!!
+        Runnable runnable = () -> JscChannel.super.doRead();
+        jscEventExecutors.execute(runnable);
+    }
 
     private boolean          open = true;
     private JscDeviceAddress deviceAddress;
