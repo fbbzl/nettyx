@@ -21,7 +21,6 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
  * @since 2024/3/2 13:29
  */
 
-@SuppressWarnings("deprecation")
 public class JscChannel extends PublicDoReadChannel {
 
     private static final JscDeviceAddress LOCAL_ADDRESS = new JscDeviceAddress("localhost");
