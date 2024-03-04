@@ -16,7 +16,6 @@ import io.netty.channel.rxtx.RxtxChannelConfig;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
-import io.netty.channel.rxtx.RxtxDeviceAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.NettyxRxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.NettyxRxtxDeviceAddress;
 import org.fz.nettyx.util.HexKit;
 
 /**
@@ -35,7 +35,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
 
     private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    protected TestSingleRxtx(RxtxDeviceAddress remoteAddress) {
+    protected TestSingleRxtx(NettyxRxtxDeviceAddress remoteAddress) {
         super(remoteAddress);
     }
 
@@ -79,7 +79,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new RxtxDeviceAddress("COM3"));
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new NettyxRxtxDeviceAddress("COM3"));
         testSingleRxtx.connect();
     }
 }
