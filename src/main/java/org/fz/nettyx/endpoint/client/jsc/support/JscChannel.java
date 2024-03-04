@@ -1,6 +1,7 @@
 package org.fz.nettyx.endpoint.client.jsc.support;
 
 
+import cn.hutool.core.date.StopWatch;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
@@ -27,14 +28,14 @@ public class JscChannel extends OioByteStreamChannel {
 
     private final JscChannelConfig config;
 
-//    @Override
-//    protected void doRead() {
-//        StopWatch stopWatch = new StopWatch();
-//        stopWatch.start("do read");
-//
-//        stopWatch.stop();
-//
-//    }
+    @Override
+    protected void doRead() {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("do read");
+        super.doRead();
+        stopWatch.stop();
+
+    }
 
     private boolean          open = true;
     private JscDeviceAddress deviceAddress;
