@@ -15,7 +15,7 @@ public class NettyxRxtxChannel extends RxtxChannel {
     private final DefaultEventExecutor rxtxEventExecutors = new DefaultEventExecutor();
 
     @Override
-    protected void doRead() {
+    public void doRead() {
         // do not use method reference!!!
         Runnable runnable = () -> NettyxRxtxChannel.super.doRead();
         rxtxEventExecutors.execute(runnable);
