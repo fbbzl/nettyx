@@ -67,7 +67,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new RxtxDeviceAddress("COM3"));
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new RxtxDeviceAddress("COM2"));
         testSingleRxtx.connect();
     }
 }
