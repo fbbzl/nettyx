@@ -1,6 +1,15 @@
 package org.fz.nettyx.endpoint.client.jsc.support;
 
 
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.BAUD_RATE;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DATA_BITS;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DTR;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.PARITY_BIT;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.READ_TIMEOUT;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.RTS;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BITS;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.WAIT_TIME;
+
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
@@ -8,11 +17,8 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
-
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
-
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 
 /**
@@ -27,7 +33,7 @@ public class JscChannel extends OioByteStreamChannel {
 
     private final JscChannelConfig config;
 
-    private DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
+    private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
 
     @Override
     public void doRead() {
@@ -77,10 +83,10 @@ public class JscChannel extends OioByteStreamChannel {
 
     protected void doInit() {
         serialPort.setComPortParameters(
-                config().getOption(BAUD_RATE),
-                config().getOption(DATA_BITS),
-                config().getOption(STOP_BITS).value(),
-                config().getOption(PARITY_BIT).value());
+            config().getOption(BAUD_RATE),
+            config().getOption(DATA_BITS),
+            config().getOption(STOP_BITS).value(),
+            config().getOption(PARITY_BIT).value());
 
         if (Boolean.TRUE.equals(config().getOption(DTR))) {
             serialPort.setDTR();
@@ -161,8 +167,8 @@ public class JscChannel extends OioByteStreamChannel {
 
         @Override
         public void connect(
-                final SocketAddress remoteAddress,
-                final SocketAddress localAddress, final ChannelPromise promise) {
+            final SocketAddress remoteAddress,
+            final SocketAddress localAddress, final ChannelPromise promise) {
             if (!promise.setUncancellable() || !ensureOpen(promise)) {
                 return;
             }
