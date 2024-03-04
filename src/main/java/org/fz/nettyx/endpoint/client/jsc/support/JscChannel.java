@@ -33,7 +33,7 @@ public class JscChannel extends OioByteStreamChannel {
 
     private final JscChannelConfig config;
 
-    private DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
+    private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
 
     @Override
     public void doRead() {
