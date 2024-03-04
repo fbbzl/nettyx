@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * basic server abstraction
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021/5/13 9:10
@@ -31,7 +32,7 @@ public abstract class TcpServer {
     private final ServerBootstrap serverBootstrap;
 
     protected TcpServer() {
-        this.childEventLoopGroup = childEventLoopGroup();
+        this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
 
         this.serverBootstrap =
@@ -76,8 +77,10 @@ public abstract class TcpServer {
         return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
-    public <T> ScheduledFuture<T> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
-        return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay, unit);
+    public <T> ScheduledFuture<T> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,
+                                                         TimeUnit unit) {
+        return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay,
+                                                                                     unit);
     }
 
 }
