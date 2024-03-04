@@ -3,12 +3,12 @@ package client.rxtx;
 import client.TestChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.rxtx.RxtxDeviceAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
+import org.fz.nettyx.endpoint.client.rxtx.support.NettyxRxtxDeviceAddress;
 
 /**
  * @author fengbinbin
@@ -17,7 +17,7 @@ import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
  */
 public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
 
-    protected TestMultiRxtx(Map<String, RxtxDeviceAddress> stringRxtxDeviceAddressMap) {
+    protected TestMultiRxtx(Map<String, NettyxRxtxDeviceAddress> stringRxtxDeviceAddressMap) {
         super(stringRxtxDeviceAddressMap);
     }
 
@@ -39,10 +39,10 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
     }
 
     public static void main(String[] args) {
-        Map<String, RxtxDeviceAddress> map = new HashMap<>();
+        Map<String, NettyxRxtxDeviceAddress> map = new HashMap<>();
 
-        map.put("5", new RxtxDeviceAddress("COM5"));
-        map.put("6", new RxtxDeviceAddress("COM6"));
+        map.put("5", new NettyxRxtxDeviceAddress("COM5"));
+        map.put("6", new NettyxRxtxDeviceAddress("COM6"));
 
         TestMultiRxtx testMultiTcp = new TestMultiRxtx(map);
         testMultiTcp.connectAll();
