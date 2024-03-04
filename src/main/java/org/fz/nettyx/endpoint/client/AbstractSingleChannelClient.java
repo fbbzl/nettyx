@@ -40,16 +40,11 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
     }
 
     public void connect() {
-        connect(true);
-    }
-
-    public void connect(boolean autoStoreChannel) {
         ChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenDone(whenConnectDone())
             .whenCancel(whenConnectCancel())
             .whenSuccess(cf -> {
-                if (autoStoreChannel) { storeChannel(cf); }
-
+                storeChannel(cf);
                 whenConnectSuccess().act(cf);
             })
             .whenFailure(whenConnectFailure());
