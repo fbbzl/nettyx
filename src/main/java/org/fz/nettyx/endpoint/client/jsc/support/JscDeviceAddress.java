@@ -4,7 +4,7 @@ package org.fz.nettyx.endpoint.client.jsc.support;
 import java.net.SocketAddress;
 
 /**
- * A {@link SocketAddress} subclass to wrap the serial port address of a jSerialComm device (e.g. COM1, /dev/ttyUSB0).
+ * A {@link SocketAddress} subclass to wrap the serial port address of a jSerialComm device like COM1, /dev/ttyUSB0
  *
  * @author fengbinbin
  * @version 1.0
@@ -24,10 +24,10 @@ public class JscDeviceAddress extends SocketAddress {
         this.value = value;
     }
 
-    /**
-     * @return The serial port address of the device (e.g. COM1, /dev/ttyUSB0, ...)
-     */
-    public String value() {
-        return value;
+    @Override
+    public String toString() {
+        return "JscDeviceAddress{" +
+               "value='" + value + '\'' +
+               '}';
     }
 }
