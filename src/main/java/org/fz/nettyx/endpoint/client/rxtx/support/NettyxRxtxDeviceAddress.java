@@ -7,6 +7,8 @@ import io.netty.channel.rxtx.RxtxDeviceAddress;
  * @version 1.0
  * @since 2024/3/4 20:47
  */
+
+@SuppressWarnings("deprecation")
 public class NettyxRxtxDeviceAddress extends RxtxDeviceAddress {
 
     /**
