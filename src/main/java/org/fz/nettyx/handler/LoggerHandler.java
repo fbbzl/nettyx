@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.InboundLogger, LoggerHandler.OutboundLogger> {
 
-    private static final Sl4jLevel DEFAULT_LEVEL = Sl4jLevel.INFO;
+    private static final Sl4jLevel DEFAULT_LEVEL = Sl4jLevel.ERROR;
 
     /**
      * The TO_HEX.
