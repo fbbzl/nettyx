@@ -1,13 +1,6 @@
 package client.rxtx;
 
 
-import static io.netty.channel.rxtx.RxtxChannelOption.BAUD_RATE;
-import static io.netty.channel.rxtx.RxtxChannelOption.DATA_BITS;
-import static io.netty.channel.rxtx.RxtxChannelOption.DTR;
-import static io.netty.channel.rxtx.RxtxChannelOption.PARITY_BIT;
-import static io.netty.channel.rxtx.RxtxChannelOption.RTS;
-import static io.netty.channel.rxtx.RxtxChannelOption.STOP_BITS;
-
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -17,10 +10,13 @@ import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
 import io.netty.channel.rxtx.RxtxDeviceAddress;
-import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
+
+import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
+
+import static io.netty.channel.rxtx.RxtxChannelOption.*;
 
 /**
  * @author fengbinbin
@@ -28,8 +24,6 @@ import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
  * @since 2024/2/29 10:31
  */
 public class TestSingleRxtx extends SingleRxtxChannelClient {
-
-
 
     protected TestSingleRxtx(RxtxDeviceAddress remoteAddress) {
         super(remoteAddress);
