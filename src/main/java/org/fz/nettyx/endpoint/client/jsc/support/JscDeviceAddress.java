@@ -24,10 +24,10 @@ public class JscDeviceAddress extends SocketAddress {
         this.value = value;
     }
 
-    /**
-     * @return The serial port address of the device (e.g. COM1, /dev/ttyUSB0, ...)
-     */
-    public String value() {
-        return value;
+    @Override
+    public String toString() {
+        return "JscDeviceAddress{" +
+               "value='" + value + '\'' +
+               '}';
     }
 }
