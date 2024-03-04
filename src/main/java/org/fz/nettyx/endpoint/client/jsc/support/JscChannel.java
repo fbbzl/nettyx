@@ -1,23 +1,17 @@
 package org.fz.nettyx.endpoint.client.jsc.support;
 
 
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.BAUD_RATE;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DATA_BITS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DTR;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.PARITY_BIT;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.READ_TIMEOUT;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.RTS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BITS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.WAIT_TIME;
-
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.OioByteStreamChannel;
+
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 
 /**
@@ -32,6 +26,16 @@ public class JscChannel extends OioByteStreamChannel {
     private static final JscDeviceAddress LOCAL_ADDRESS = new JscDeviceAddress("localhost");
 
     private final JscChannelConfig config;
+
+//    @Override
+//    protected void doRead() {
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("do read");
+//
+//        stopWatch.stop();
+//
+//       // Console.log(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+//    }
 
     private boolean          open = true;
     private JscDeviceAddress deviceAddress;

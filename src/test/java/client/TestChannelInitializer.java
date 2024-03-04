@@ -1,7 +1,6 @@
 package client;
 
-import static io.netty.buffer.Unpooled.wrappedBuffer;
-
+import codec.UserCodec;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +8,8 @@ import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.LoggerHandler;
+
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 /**
  * @author fengbinbin
@@ -27,7 +28,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
 
             new StartEndFlagFrameCodec(false, wrappedBuffer(new byte[]{(byte) 0x7e}))
             , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-            // , new UserCodec()
+             , new UserCodec()
             , new LoggerHandler(log)
             );
     }
