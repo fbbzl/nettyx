@@ -8,6 +8,8 @@ import io.netty.util.concurrent.DefaultEventExecutor;
  * @version 1.0
  * @since 2024/3/4 19:29
  */
+
+@SuppressWarnings("deprecation")
 public class NettyxRxtxChannel extends RxtxChannel {
 
     private final DefaultEventExecutor rxtxEventExecutors = new DefaultEventExecutor();
