@@ -41,7 +41,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
         return cf -> {
             executorService.scheduleAtFixedRate(() -> {
                  this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
-            } , 2000,500,TimeUnit.MILLISECONDS);
+            } , 2000,200,TimeUnit.MILLISECONDS);
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }
