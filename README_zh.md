@@ -37,9 +37,11 @@ codec                              提供了一些基本的编解码器
 endpoint
   client
      jsc
+       support                         jsc对netty的支持实现
        ---MultiJscChannelClient        多jsc通道客户端 
        ---SingleJscChannelClient       单jsc通道客户端
      rxtx
+       support                        重写了RxtxChannel, 提供了异步读取的方法, 读取将不会在阻塞发送
        ---MultiRxtxChannelClient        多rxtx通道客户端 
        ---SingleRxtxChannelClient       单rxtx通道客户端
      tcp
