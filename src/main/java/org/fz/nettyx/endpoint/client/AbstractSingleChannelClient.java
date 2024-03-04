@@ -77,7 +77,7 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
 
     public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel) || notWritable(channel)) {
-            log.debug("comm channel not in usable status, message will be discard: {}", message);
+            log.debug("channel not in usable status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
             return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
         }

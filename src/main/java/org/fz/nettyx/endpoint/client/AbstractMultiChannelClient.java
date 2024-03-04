@@ -104,16 +104,17 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         Channel channel = channelStorage.get(channelKey);
 
         if (notActive(channel) || notWritable(channel)) {
-            log.debug("comm channel not in usable status, message will be discard: {}", message);
+            log.debug("channel not in usable status, channel key is [{}], message will be discard: {}", channelKey,
+                      message);
             ReferenceCountUtil.safeRelease(message);
-            return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
+            return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
         try {
             return (ChannelPromise) channel.writeAndFlush(message);
         }
         catch (Exception exception) {
-            throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is " +
+            throw new ChannelException("exception occurred while sending the message [" + message + "], address is " +
                                        "[" + channel.remoteAddress() + "]", exception);
         }
     }
