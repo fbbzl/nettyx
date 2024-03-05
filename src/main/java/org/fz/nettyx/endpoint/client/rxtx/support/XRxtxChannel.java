@@ -10,14 +10,14 @@ import io.netty.util.concurrent.DefaultEventExecutor;
  */
 
 @SuppressWarnings("deprecation")
-public class NettyxRxtxChannel extends RxtxChannel {
+public class XRxtxChannel extends RxtxChannel {
 
     private final DefaultEventExecutor rxtxEventExecutors = new DefaultEventExecutor();
 
     @Override
     public void doRead() {
         // do not use method reference!!!
-        Runnable runnable = () -> NettyxRxtxChannel.super.doRead();
+        Runnable runnable = () -> XRxtxChannel.super.doRead();
         rxtxEventExecutors.execute(runnable);
     }
 }
