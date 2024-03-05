@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2024/3/2 13:29
  */
 
+@SuppressWarnings("deprecation")
 public class JscChannel extends OioByteStreamChannel {
 
     private static final JscDeviceAddress LOCAL_ADDRESS = new JscDeviceAddress("localhost");
@@ -34,9 +35,10 @@ public class JscChannel extends OioByteStreamChannel {
     private final JscChannelConfig config;
 
     private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
-    private boolean          open = true;
-    private JscDeviceAddress deviceAddress;
-    private SerialPort       serialPort;
+    private       boolean              open              = true;
+    private       JscDeviceAddress     deviceAddress;
+    private       SerialPort           serialPort;
+
     public JscChannel() {
         super(null);
 
@@ -141,6 +143,7 @@ public class JscChannel extends OioByteStreamChannel {
                 serialPort.closePort();
                 serialPort = null;
             }
+            this.jscEventExecutors.shutdownGracefully();
         }
     }
 

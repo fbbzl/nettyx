@@ -20,4 +20,10 @@ public class XRxtxChannel extends RxtxChannel {
         Runnable runnable = () -> XRxtxChannel.super.doRead();
         rxtxEventExecutors.execute(runnable);
     }
+
+    @Override
+    protected void doClose() throws Exception {
+        super.doClose();
+        this.rxtxEventExecutors.shutdownGracefully();
+    }
 }
