@@ -9,14 +9,14 @@ import io.netty.channel.rxtx.RxtxDeviceAddress;
  */
 
 @SuppressWarnings("deprecation")
-public class NettyxRxtxDeviceAddress extends RxtxDeviceAddress {
+public class XRxtxDeviceAddress extends RxtxDeviceAddress {
 
     /**
      * Creates a RxtxDeviceAddress representing the address of the serial port.
      *
      * @param value the address of the device (e.g. COM1, /dev/ttyUSB0, ...)
      */
-    public NettyxRxtxDeviceAddress(String value) {
+    public XRxtxDeviceAddress(String value) {
         super(value);
     }
 
