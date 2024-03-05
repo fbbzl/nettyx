@@ -36,7 +36,7 @@ import org.fz.nettyx.util.Try;
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
 public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                        Client<C> {
+                                                                                                Client<C> {
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
@@ -103,21 +103,18 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
     public ChannelPromise writeAndFlush(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
-        if (notActive(channel)) {
-            log.debug("comm channel not in active status, message will be discard: {}", message);
+        if (notActive(channel) || notWritable(channel)) {
+            log.debug("channel not in usable status, channel key is [{}], message will be discard: {}", channelKey,
+                      message);
             ReferenceCountUtil.safeRelease(message);
-            return failurePromise(channel, "comm channel: [" + channel + "] is not usable");
+            return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
         try {
-            if (notWritable(channel)) {
-                log.debug("comm channel [{}] is not writable, channel key [{}]", channel, channelKey);
-                ReferenceCountUtil.safeRelease(message);
-                return failurePromise(channel, "comm channel: [" + channel + "] is not writable");
-            } else { return (ChannelPromise) channel.writeAndFlush(message); }
+            return (ChannelPromise) channel.writeAndFlush(message);
         }
         catch (Exception exception) {
-            throw new ChannelException("exception occurred while sending the message [" + message + "], comm-port is " +
+            throw new ChannelException("exception occurred while sending the message [" + message + "], address is " +
                                        "[" + channel.remoteAddress() + "]", exception);
         }
     }

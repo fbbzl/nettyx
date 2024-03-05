@@ -11,7 +11,7 @@ for more use cases please refer to: https://blog.csdn.net/fbbwht
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.2-RELEASE</version>
+    <version>2.2.3-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -36,9 +36,11 @@ codec                               Provided some basic codecs
 endpoint
   client
      jsc
+       support                         rewrite jsc-netty support
        ---MultiJscChannelClient        Client with multiple channels, using key to retrieve corresponding channels    
        ---SingleJscChannelClient       Single Channel Client
      rxtx
+       support                          rewrite rxtx-netty support, using async comm-read
        ---MultiRxtxChannelClient        Client with multiple channels, using key to retrieve corresponding channels
        ---SingleRxtxChannelClient       Single Channel Client
      tcp
