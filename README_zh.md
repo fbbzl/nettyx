@@ -12,7 +12,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.3-RELEASE</version>
+    <version>2.2.4-RELEASE</version>
 </dependency>
 ```
 ## api
