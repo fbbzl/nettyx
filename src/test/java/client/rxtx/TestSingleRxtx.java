@@ -16,8 +16,6 @@ import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 import org.fz.nettyx.util.HexKit;
 
 import java.net.SocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static io.netty.channel.rxtx.RxtxChannelOption.*;
@@ -28,8 +26,6 @@ import static io.netty.channel.rxtx.RxtxChannelOption.*;
  * @since 2024/2/29 10:31
  */
 public class TestSingleRxtx extends SingleRxtxChannelClient {
-
-    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     protected TestSingleRxtx(XRxtxDeviceAddress remoteAddress) {
         super(remoteAddress);
