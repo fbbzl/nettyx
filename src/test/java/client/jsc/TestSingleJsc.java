@@ -1,18 +1,9 @@
 package client.jsc;
 
 
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.BAUD_RATE;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DATA_BITS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.PARITY_BIT;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BITS;
-
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
-import java.net.SocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelClient;
@@ -20,6 +11,11 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
+
+import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 /**
  * @author fengbinbin
@@ -29,8 +25,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 
 @Slf4j
 public class TestSingleJsc extends SingleJscChannelClient {
-
-    private static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     protected TestSingleJsc(JscDeviceAddress remoteAddress) {
         super(remoteAddress);
@@ -82,8 +76,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleJsc testSingleRxtx = new TestSingleJsc(new JscDeviceAddress("COM2"));
-        testSingleRxtx.connect();
+        TestSingleJsc testSingleJsc = new TestSingleJsc(new JscDeviceAddress("COM2"));
+        testSingleJsc.connect();
     }
 
 }
