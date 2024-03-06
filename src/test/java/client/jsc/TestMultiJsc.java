@@ -3,12 +3,13 @@ package client.jsc;
 import client.TestChannelInitializer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author fengbinbin
@@ -44,8 +45,8 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         map.put("5", new JscDeviceAddress("COM5"));
         map.put("6", new JscDeviceAddress("COM6"));
 
-        TestMultiJsc testMultiTcp = new TestMultiJsc(map);
-        testMultiTcp.connectAll();
+        TestMultiJsc testMultiJsc = new TestMultiJsc(map);
+        testMultiJsc.connectAll();
     }
 
 
