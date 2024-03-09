@@ -1,14 +1,14 @@
 package codec;
 
+import codec.model.GirlFriend;
+import codec.model.Son;
+import codec.model.User;
+import codec.model.Wife;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import model.GirlFriend;
-import model.Son;
-import model.User;
-import model.Wife;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.util.HexKit;

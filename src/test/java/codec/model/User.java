@@ -1,4 +1,4 @@
-package model;
+package codec.model;
 
 import java.util.List;
 import lombok.Data;

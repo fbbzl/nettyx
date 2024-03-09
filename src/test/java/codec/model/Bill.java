@@ -1,4 +1,4 @@
-package model;
+package codec.model;
 
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
