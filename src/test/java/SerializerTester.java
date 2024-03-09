@@ -1,13 +1,13 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
+import codec.model.GirlFriend;
+import codec.model.Son;
+import codec.model.User;
+import codec.model.Wife;
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
-import model.GirlFriend;
-import model.Son;
-import model.User;
-import model.Wife;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
