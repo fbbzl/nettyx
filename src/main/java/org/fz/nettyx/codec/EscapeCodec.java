@@ -6,7 +6,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.ReferenceCountUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -303,7 +302,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int     readIndex = 0;
-        ByteBuf budget    = msgBuf.alloc().buffer(target.readableBytes());
+        byte[] budget = new byte[target.readableBytes()];
         while (msgBuf.readableBytes() >= target.readableBytes()) {
             if (hasSimilarBytes(readIndex, msgBuf, target)) {
                 // prepare for reset
@@ -311,7 +310,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
                 msgBuf.readBytes(budget);
 
-                if (budget.equals(target) && !equalsAny(readIndex, msgBuf, excludes)) {
+                if (equalsContent(budget, target) && !equalsAny(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
                     readIndex += target.readableBytes();
@@ -323,14 +322,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     readIndex++;
                 }
 
-                budget.clear();
             } else {
                 result.writeByte(msgBuf.readByte());
                 readIndex++;
             }
         }
-
-        ReferenceCountUtil.release(budget);
 
         // write the left buffer
         if (msgBuf.readableBytes() > 0) {
