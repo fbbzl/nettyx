@@ -3,6 +3,7 @@ package client.rxtx;
 
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.rxtx.RxtxChannelConfig;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
@@ -12,6 +13,7 @@ import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
+import org.fz.nettyx.util.HexKit;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +34,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     @Override
     protected ChannelFutureAction whenConnectSuccess() {
         return cf -> {
-          //  this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
+            this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }
