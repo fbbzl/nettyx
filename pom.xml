@@ -36,10 +36,12 @@
     </licenses>
 
     <properties>
+        <!--base-->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.30</lombok.version>
 
+        <!--build-->
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <maven-compiler-plugin-version>3.8.1</maven-compiler-plugin-version>
@@ -53,19 +55,15 @@
         <log4j-slf4j-series.version>2.23.0</log4j-slf4j-series.version>
         <jul-to-slf4j.version>2.0.12</jul-to-slf4j.version>
 
+        <!--util-->
         <netty-all.version>4.1.107.Final</netty-all.version>
-
-        <jSerialComm.version>2.10.4</jSerialComm.version>
-
-        <!--common util-->
         <hutool-core.version>5.8.26</hutool-core.version>
-
-        <!-- file frames -->
+        <jSerialComm.version>2.10.4</jSerialComm.version>
+        <rxtx.version>2.1.7</rxtx.version>
         <dom4j.version>2.1.4</dom4j.version>
-
-        <!--expression engine-->
         <mvel2.version>2.5.2.Final</mvel2.version>
 
+        <!--test-->
         <junit.version>4.13.2</junit.version>
     </properties>
 
@@ -111,6 +109,12 @@
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>
             <version>${jSerialComm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.rxtx</groupId>
+            <artifactId>rxtx</artifactId>
+            <version>${rxtx.version}</version>
         </dependency>
 
         <dependency>
