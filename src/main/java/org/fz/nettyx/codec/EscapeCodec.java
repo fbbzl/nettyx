@@ -1,5 +1,8 @@
 package org.fz.nettyx.codec;
 
+import static cn.hutool.core.text.CharSequenceUtil.format;
+
+import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,7 +10,6 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
+import org.fz.nettyx.util.Throws;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -271,10 +274,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         private boolean contains(ByteBuf real, ByteBuf part) {
-            byte[] budget = new byte[part.readableBytes()];
+            byte[] sample = new byte[part.readableBytes()];
             for (int i = 0; i < real.readableBytes(); i++) {
-                real.getBytes(i, budget);
-                if (equalsContent(budget, part)) {
+                real.getBytes(i, sample);
+                if (equalsContent(sample, part)) {
                     return true;
                 }
             }
@@ -292,22 +295,21 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      *
      * @return the byte buf
      */
-    static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
+    protected static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
         if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
-        if (excludes.length != 0 && Arrays.binarySearch(excludes, target) != -1) {
-            log.warn("It is not recommended to exclude real [{}], This will cause the escape to fail", target);
-        }
+        Throws.ifTrue(excludes.length != 0 && ArrayUtil.contains(excludes, target),
+                      format("It is not recommended to exclude real [{}], This will cause the escape to fail", target));
 
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int    readIndex = 0;
-        byte[] budget    = new byte[target.readableBytes()];
+        byte[] sample    = new byte[target.readableBytes()];
         while (msgBuf.readableBytes() >= target.readableBytes()) {
             if (sameHeadAndTail(readIndex, msgBuf, target)) {
                 // prepare for reset
-                msgBuf.markReaderIndex().readBytes(budget);
+                msgBuf.markReaderIndex().readBytes(sample);
 
-                if (equalsContent(budget, target) && !equalsAny(readIndex, msgBuf, excludes)) {
+                if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
                     readIndex += target.readableBytes();
