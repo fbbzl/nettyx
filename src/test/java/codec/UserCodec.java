@@ -29,6 +29,6 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         if (msg.readableBytes() == 4) {
             ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
         }
-        msg.release();
+
     }
 }
