@@ -8,11 +8,13 @@ import io.netty.channel.rxtx.RxtxChannelConfig;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
+import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 
 import static io.netty.channel.rxtx.RxtxChannelOption.*;
 
@@ -27,21 +29,21 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
         super(remoteAddress);
     }
 
-//    @Override
-//    protected ChannelFutureAction whenConnectSuccess() {
-//        return cf -> {
-//          //  this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
-//            System.err.println(cf.channel().localAddress() + ": ok");
-//        };
-//    }
+    @Override
+    protected ChannelFutureAction whenConnectSuccess() {
+        return cf -> {
+          //  this.writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
+            System.err.println(cf.channel().localAddress() + ": ok");
+        };
+    }
 
-//    @Override
-//    protected ChannelFutureAction whenConnectFailure() {
-//        return cf -> {
-//            System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-//            cf.channel().eventLoop().schedule(this::connect, 2, TimeUnit.SECONDS);
-//        };
-//    }
+    @Override
+    protected ChannelFutureAction whenConnectFailure() {
+        return cf -> {
+            System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
+            cf.channel().eventLoop().schedule(this::connect, 2, TimeUnit.SECONDS);
+        };
+    }
 
     @Override
     protected void doChannelConfig(XRxtxChannel channel) {
