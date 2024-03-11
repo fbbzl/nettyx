@@ -286,7 +286,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      * Do escape byte buf.
      *
      * @param msgBuf      the msg buf
-     * @param target        the real buf
+     * @param target      the real buf
      * @param replacement the replacement
      * @param excludes    the excludes
      *
@@ -300,8 +300,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         final ByteBuf result = msgBuf.alloc().buffer();
 
-        int     readIndex = 0;
-        byte[] budget = new byte[target.readableBytes()];
+        int    readIndex = 0;
+        byte[] budget    = new byte[target.readableBytes()];
         while (msgBuf.readableBytes() >= target.readableBytes()) {
             if (hasSimilarBytes(readIndex, msgBuf, target)) {
                 // prepare for reset
@@ -345,7 +345,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         // compare header byte and tail byte
-        if (bytes[0] != buf.getByte(0) || bytes[bytes.length -1] != buf.getByte(readableBytes - 1)) {
+        if (bytes[0] != buf.getByte(0) || bytes[bytes.length - 1] != buf.getByte(readableBytes - 1)) {
             return false;
         }
 
