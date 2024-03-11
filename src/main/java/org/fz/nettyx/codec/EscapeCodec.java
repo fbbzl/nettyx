@@ -288,33 +288,33 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      * Do escape byte buf.
      *
      * @param msgBuf      the msg buf
-     * @param real        the real buf
+     * @param target        the real buf
      * @param replacement the replacement
      * @param excludes    the excludes
      *
      * @return the byte buf
      */
-    static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement, ByteBuf... excludes) {
-        if (containsInvalidByteBuf(msgBuf, real, replacement)) { return msgBuf; }
-        if (excludes.length != 0 && Arrays.binarySearch(excludes, real) != -1) {
-            log.warn("It is not recommended to exclude real [{}], This will cause the escape to fail", real);
+    static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
+        if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
+        if (excludes.length != 0 && Arrays.binarySearch(excludes, target) != -1) {
+            log.warn("It is not recommended to exclude real [{}], This will cause the escape to fail", target);
         }
 
         final ByteBuf result = msgBuf.alloc().buffer();
 
         int     readIndex = 0;
-        ByteBuf budget    = msgBuf.alloc().buffer(real.readableBytes());
-        while (msgBuf.readableBytes() >= real.readableBytes()) {
-            if (hasSimilarBytes(readIndex, msgBuf, real)) {
+        ByteBuf budget    = msgBuf.alloc().buffer(target.readableBytes());
+        while (msgBuf.readableBytes() >= target.readableBytes()) {
+            if (hasSimilarBytes(readIndex, msgBuf, target)) {
                 // prepare for reset
                 msgBuf.markReaderIndex();
 
                 msgBuf.readBytes(budget);
 
-                if (budget.equals(real) && !equalsAny(readIndex, msgBuf, excludes)) {
+                if (budget.equals(target) && !equalsAny(readIndex, msgBuf, excludes)) {
                     result.writeBytes(replacement.duplicate());
 
-                    readIndex += real.readableBytes();
+                    readIndex += target.readableBytes();
                 } else {
                     // if not equals, will reset the read index
                     msgBuf.resetReaderIndex();
@@ -340,6 +340,28 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         return result;
+    }
+
+    private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
+        int readableBytes = buf.readableBytes();
+
+        if (bytes.length != readableBytes) {
+            return false;
+        }
+
+        // compare header byte and tail byte
+        if (bytes[0] != buf.getByte(0) || bytes[bytes.length -1] != buf.getByte(readableBytes - 1)) {
+            return false;
+        }
+
+        // compare content
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] != buf.getByte(i)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static boolean equalsAny(int index, ByteBuf msgBuf, ByteBuf... excludes) {
