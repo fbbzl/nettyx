@@ -308,7 +308,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             int    readIndex = 0;
             byte[] sample    = new byte[target.readableBytes()];
             while (msgBuf.readableBytes() >= target.readableBytes()) {
-                if (sameHeadAndTail(readIndex, msgBuf, target)) {
+                if (similar(readIndex, msgBuf, target)) {
                     // prepare for reset
                     msgBuf.markReaderIndex().readBytes(sample);
 
@@ -348,11 +348,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         int readableBytes = buf.readableBytes();
 
         if (bytes.length != readableBytes) {
-            return false;
-        }
-
-        // compare header byte and tail byte
-        if (bytes[0] != buf.getByte(0) || bytes[bytes.length - 1] != buf.getByte(readableBytes - 1)) {
             return false;
         }
 
@@ -405,7 +400,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      * @param msgBuf reading message buffer
      * @param target the target buffer
      */
-    private static boolean sameHeadAndTail(int index, ByteBuf msgBuf, ByteBuf target) {
+    private static boolean similar(int index, ByteBuf msgBuf, ByteBuf target) {
+
         return msgBuf.getByte(index) == target.getByte(0)
                &&
                msgBuf.getByte(index + target.readableBytes() - 1) == target.getByte(target.readableBytes() - 1);
