@@ -9,7 +9,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.ReferenceCountUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,11 +81,12 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
+            ByteBuf a=null;
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue(), escapeMap.getExcludes(bufEntry.getKey()));
+                a = doEscape(msg, bufEntry.getKey(), bufEntry.getValue(), escapeMap.getExcludes(bufEntry.getKey()));
             }
 
-            out.writeBytes(msg);
+            out.writeBytes(a);
         }
     }
 
@@ -304,49 +304,44 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      * @return the byte buf
      */
     protected static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
-        try {
-            if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
-            Throws.ifTrue(excludes.length != 0 && ArrayUtil.contains(excludes, target),
-                          format("It is not recommended to exclude real [{}], This will cause the escape to fail",
-                                 target));
+        if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
+        Throws.ifTrue(excludes.length != 0 && ArrayUtil.contains(excludes, target),
+                      format("It is not recommended to exclude real [{}], This will cause the escape to fail",
+                             target));
 
-            final ByteBuf result = msgBuf.alloc().buffer();
+        final ByteBuf result = msgBuf.alloc().buffer();
 
-            int readIndex = 0;
-            byte[] sample = new byte[target.readableBytes()];
-            while (msgBuf.readableBytes() >= target.readableBytes()) {
-                if (isSimilar(readIndex, msgBuf, target)) {
-                    // prepare for reset
-                    msgBuf.markReaderIndex().readBytes(sample);
+        int    readIndex = 0;
+        byte[] sample    = new byte[target.readableBytes()];
+        while (msgBuf.readableBytes() >= target.readableBytes()) {
+            if (isSimilar(readIndex, msgBuf, target)) {
+                // prepare for reset
+                msgBuf.markReaderIndex().readBytes(sample);
 
-                    if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
-                        result.writeBytes(replacement.duplicate());
+                if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
+                    result.writeBytes(replacement.duplicate());
 
-                        readIndex += target.readableBytes();
-                    }
-                    else {
-                        // if not equals, will reset the read index
-                        msgBuf.resetReaderIndex();
-
-                        result.writeByte(msgBuf.readByte()); readIndex++;
-                    }
-
+                    readIndex += target.readableBytes();
                 }
                 else {
+                    // if not equals, will reset the read index
+                    msgBuf.resetReaderIndex();
+
                     result.writeByte(msgBuf.readByte()); readIndex++;
                 }
-            }
 
-            // write the left buffer
-            if (msgBuf.readableBytes() > 0) {
-                byte[] bytes = new byte[msgBuf.readableBytes()]; msgBuf.readBytes(bytes); result.writeBytes(bytes);
             }
+            else {
+                result.writeByte(msgBuf.readByte()); readIndex++;
+            }
+        }
 
-            return result;
+        // write the left buffer
+        if (msgBuf.readableBytes() > 0) {
+            byte[] bytes = new byte[msgBuf.readableBytes()]; msgBuf.readBytes(bytes); result.writeBytes(bytes);
         }
-        finally {
-            ReferenceCountUtil.release(msgBuf);
-        }
+
+        return result;
     }
 
     private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
