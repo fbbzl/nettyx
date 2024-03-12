@@ -312,7 +312,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
             final ByteBuf result = msgBuf.alloc().buffer();
 
-            int readIndex = 0; byte[] sample = new byte[target.readableBytes()];
+            int readIndex = 0;
+            byte[] sample = new byte[target.readableBytes()];
             while (msgBuf.readableBytes() >= target.readableBytes()) {
                 if (isSimilar(readIndex, msgBuf, target)) {
                     // prepare for reset
