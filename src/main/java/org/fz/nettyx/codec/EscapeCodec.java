@@ -394,12 +394,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return false;
     }
 
-    /**
-     * check if it has the same header-byte and tail-byte
-     *
-     * @param msgBuf reading message buffer
-     * @param target the target buffer
-     */
     private static boolean isSimilar(int index, ByteBuf msgBuf, ByteBuf target) {
         int tarLength = target.readableBytes();
 
