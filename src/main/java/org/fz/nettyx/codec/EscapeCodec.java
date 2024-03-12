@@ -81,12 +81,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-            ByteBuf a=null;
             for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                a = doEscape(msg, bufEntry.getKey(), bufEntry.getValue(), escapeMap.getExcludes(bufEntry.getKey()));
+                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue(), escapeMap.getExcludes(bufEntry.getKey()));
             }
 
-            out.writeBytes(a);
+            out.writeBytes(msg);
         }
     }
 
