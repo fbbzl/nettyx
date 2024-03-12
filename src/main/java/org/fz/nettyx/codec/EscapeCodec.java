@@ -284,7 +284,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         private boolean contains(ByteBuf real, ByteBuf part) {
             byte[] sample = new byte[part.readableBytes()];
             for (int i = 0; i < real.readableBytes(); i++) {
-                real.getBytes(i, sample); if (equalsContent(sample, part)) {
+                real.getBytes(i, sample);
+                if (equalsContent(sample, part)) {
                     return true;
                 }
             }
