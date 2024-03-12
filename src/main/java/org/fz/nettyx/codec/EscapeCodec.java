@@ -326,7 +326,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     // if not equals, will reset the read index
                     msgBuf.resetReaderIndex();
 
-                    result.writeByte(msgBuf.readByte()); readIndex++;
+                    result.writeByte(msgBuf.readByte());
+                    readIndex++;
                 }
 
             }
