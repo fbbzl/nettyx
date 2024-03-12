@@ -128,289 +128,128 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             } else this.preExceptionCaught(ctx, cause);
         }
 
-        /**
-         * Pre channel registered.
-         *
-         * @param ctx the ctx
-         */
         protected void preChannelRegistered(ChannelHandlerContext ctx) {
             ctx.fireChannelRegistered();
         }
 
-        /**
-         * Pre channel unregistered.
-         *
-         * @param ctx the ctx
-         */
         protected void preChannelUnregistered(ChannelHandlerContext ctx) {
             ctx.fireChannelUnregistered();
         }
 
-        /**
-         * Pre channel active.
-         *
-         * @param ctx the ctx
-         */
         protected void preChannelActive(ChannelHandlerContext ctx) {
             ctx.fireChannelActive();
         }
 
-        /**
-         * Pre channel inactive.
-         *
-         * @param ctx the ctx
-         */
         protected void preChannelInactive(ChannelHandlerContext ctx) {
             ctx.fireChannelInactive();
         }
 
-        /**
-         * Pre channel read.
-         *
-         * @param ctx the ctx
-         * @param msg the msg
-         */
         protected void preChannelRead(ChannelHandlerContext ctx, M msg) {
             ctx.fireChannelRead(msg);
         }
 
-        /**
-         * Pre channel read complete.
-         *
-         * @param ctx the ctx
-         */
         protected void preChannelReadComplete(ChannelHandlerContext ctx) {
             ctx.fireChannelReadComplete();
         }
 
-        /**
-         * Pre user event triggered.
-         *
-         * @param ctx the ctx
-         * @param evt the evt
-         */
         protected void preUserEventTriggered(ChannelHandlerContext ctx, Object evt) {
             ctx.fireUserEventTriggered(evt);
         }
 
-        /**
-         * Pre channel writability changed.
-         *
-         * @param ctx the ctx
-         */
         protected void preChannelWritabilityChanged(ChannelHandlerContext ctx) {
             ctx.fireChannelWritabilityChanged();
         }
 
-        /**
-         * Pre exception caught.
-         *
-         * @param ctx   the ctx
-         * @param cause the cause
-         */
         protected void preExceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             ctx.fireExceptionCaught(cause);
         }
 
-        /**
-         * Free and registered.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndRegistered(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFireRegistered(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.channelRegistered(ctx);
         }
 
-        /**
-         * Free and unregistered.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndUnregistered(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFireUnregistered(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.channelUnregistered(ctx);
         }
 
-        /**
-         * Free and active.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndActive(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFireActive(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.channelActive(ctx);
         }
 
-        /**
-         * Free and inactive.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndInactive(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFireInactive(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.channelInactive(ctx);
         }
 
-        /**
-         * Free and read.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndRead(ChannelHandlerContext ctx, M msg) throws Exception {
+        protected void freeAndFireRead(ChannelHandlerContext ctx, M msg) throws Exception {
             this.free();
             this.channelRead(ctx, msg);
         }
 
-        /**
-         * Free and read complete.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndReadComplete(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFireReadComplete(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.channelReadComplete(ctx);
         }
 
-        /**
-         * Free and user event triggered.
-         *
-         * @param ctx the ctx
-         * @param evt the evt
-         * @throws Exception the exception
-         */
-        protected void freeAndUserEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        protected void freeAndFireUserEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             this.free();
             this.userEventTriggered(ctx, evt);
         }
 
-        /**
-         * Free and writability changed.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void freeAndWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        protected void freeAndFireWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.channelWritabilityChanged(ctx);
         }
 
-        /**
-         * Free and exception caught.
-         *
-         * @param ctx   the ctx
-         * @param cause the cause
-         * @throws Exception the exception
-         */
-        protected void freeAndExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        protected void freeAndFireExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             this.free();
             this.exceptionCaught(ctx, cause);
         }
 
-        /**
-         * Reset and registered.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void resetAndRegistered(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFireRegistered(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.channelRegistered(ctx);
         }
 
-        /**
-         * Reset and unregistered.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void resetAndUnregistered(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFireUnregistered(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.channelUnregistered(ctx);
         }
 
-        /**
-         * Reset and active.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void resetAndActive(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFireActive(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.channelActive(ctx);
         }
 
-        /**
-         * Reset and inactive.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void resetAndInactive(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFireInactive(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.channelInactive(ctx);
         }
 
-        /**
-         * Reset and read.
-         *
-         * @param ctx the ctx
-         * @param msg the msg
-         * @throws Exception the exception
-         */
-        protected void resetAndRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        protected void resetAndFireRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             this.reset();
             this.channelRead(ctx, msg);
         }
 
-        /**
-         * Reset and read complete.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void resetAndReadComplete(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFireReadComplete(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.channelReadComplete(ctx);
         }
 
-        /**
-         * Reset and user event triggered.
-         *
-         * @param ctx the ctx
-         * @param evt the evt
-         * @throws Exception the exception
-         */
-        protected void resetAndUserEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        protected void resetAndFireUserEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             this.reset();
             this.userEventTriggered(ctx, evt);
         }
 
-        /**
-         * Reset and writability changed.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
-        protected void resetAndWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        protected void resetAndFireWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.channelWritabilityChanged(ctx);
         }
 
-        /**
-         * Reset and exception caught.
-         *
-         * @param ctx   the ctx
-         * @param cause the cause
-         * @throws Exception the exception
-         */
-        protected void resetAndExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        protected void resetAndFireExceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             this.reset();
             this.exceptionCaught(ctx, cause);
         }
@@ -474,273 +313,113 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             } else this.preFlush(ctx);
         }
 
-        /**
-         * Pre bind.
-         *
-         * @param ctx          the ctx
-         * @param localAddress the local address
-         * @param promise      the promise
-         */
         public final void preBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
             ctx.bind(localAddress, promise);
         }
 
-        /**
-         * Pre connect.
-         *
-         * @param ctx           the ctx
-         * @param remoteAddress the remote address
-         * @param localAddress  the local address
-         * @param promise       the promise
-         */
         public final void preConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
             ctx.connect(remoteAddress, localAddress, promise);
         }
 
-        /**
-         * Pre disconnect.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         */
         public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
             ctx.disconnect(promise);
         }
 
-        /**
-         * Pre close.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         */
         public final void preClose(ChannelHandlerContext ctx, ChannelPromise promise) {
             ctx.close(promise);
         }
 
-        /**
-         * Pre deregister.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         */
         public final void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             ctx.deregister(promise);
         }
 
-        /**
-         * Pre read.
-         *
-         * @param ctx the ctx
-         */
         public final void preRead(ChannelHandlerContext ctx) {
             ctx.read();
         }
 
-        /**
-         * Pre write.
-         *
-         * @param ctx     the ctx
-         * @param msg     the msg
-         * @param promise the promise
-         */
         public final void preWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
             ctx.write(msg, promise);
         }
 
-        /**
-         * Pre flush.
-         *
-         * @param ctx the ctx
-         */
         public final void preFlush(ChannelHandlerContext ctx) {
             ctx.flush();
         }
 
-        /**
-         * Free and bind.
-         *
-         * @param ctx          the ctx
-         * @param localAddress the local address
-         * @param promise      the promise
-         * @throws Exception the exception
-         */
         protected void freeAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             this.free();
             this.bind(ctx, localAddress, promise);
         }
 
-        /**
-         * Free and connect.
-         *
-         * @param ctx           the ctx
-         * @param remoteAddress the remote address
-         * @param localAddress  the local address
-         * @param promise       the promise
-         * @throws Exception the exception
-         */
         protected void freeAndConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             this.free();
             this.connect(ctx, remoteAddress, localAddress, promise);
         }
 
-        /**
-         * Free and disconnect.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         */
         protected void freeAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.free();
             this.disconnect(ctx, promise);
         }
 
-        /**
-         * Free and close.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         * @throws Exception the exception
-         */
         protected void freeAndClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             this.free();
             this.close(ctx, promise);
         }
 
-        /**
-         * Free and deregister.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         */
         protected void freeAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.free();
             this.deregister(ctx, promise);
         }
 
-        /**
-         * Free and read.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
         protected void freeAndRead(ChannelHandlerContext ctx) throws Exception {
             this.free();
             this.read(ctx);
         }
 
-        /**
-         * Free and write.
-         *
-         * @param ctx     the ctx
-         * @param msg     the msg
-         * @param promise the promise
-         * @throws Exception the exception
-         */
         protected void freeAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             this.free();
             this.write(ctx, msg, promise);
         }
 
-        /**
-         * Free and flush.
-         *
-         * @param ctx the ctx
-         */
         protected void freeAndFlush(ChannelHandlerContext ctx) {
             this.free();
             this.flush(ctx);
         }
 
-        /**
-         * Reset and bind.
-         *
-         * @param ctx          the ctx
-         * @param localAddress the local address
-         * @param promise      the promise
-         */
         protected void resetAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
             this.reset();
             this.bind(ctx, localAddress, promise);
         }
 
-        /**
-         * Reset and connect.
-         *
-         * @param ctx           the ctx
-         * @param remoteAddress the remote address
-         * @param localAddress  the local address
-         * @param promise       the promise
-         * @throws Exception the exception
-         */
         protected void resetAndConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) throws Exception {
             this.reset();
             this.connect(ctx, remoteAddress, localAddress, promise);
         }
 
-        /**
-         * Reset and disconnect.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         * @throws Exception the exception
-         */
         protected void resetAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             this.reset();
             this.disconnect(ctx, promise);
         }
 
-        /**
-         * Reset and close.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         * @throws Exception the exception
-         */
         protected void resetAndClose(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
             this.reset();
             this.close(ctx, promise);
         }
 
-        /**
-         * Reset and deregister.
-         *
-         * @param ctx     the ctx
-         * @param promise the promise
-         */
         protected void resetAndDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.reset();
             this.deregister(ctx, promise);
         }
 
-        /**
-         * Reset and read.
-         *
-         * @param ctx the ctx
-         * @throws Exception the exception
-         */
         protected void resetAndRead(ChannelHandlerContext ctx) throws Exception {
             this.reset();
             this.read(ctx);
         }
 
-        /**
-         * Reset and write.
-         *
-         * @param ctx     the ctx
-         * @param msg     the msg
-         * @param promise the promise
-         * @throws Exception the exception
-         */
         protected void resetAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             this.reset();
             this.write(ctx, msg, promise);
         }
 
-        /**
-         * Reset and flush.
-         *
-         * @param ctx the ctx
-         */
         protected void resetAndFlush(ChannelHandlerContext ctx) {
             this.reset();
             this.flush(ctx);
