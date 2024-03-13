@@ -1,13 +1,6 @@
 package client.rxtx;
 
 
-import static io.netty.channel.rxtx.RxtxChannelOption.BAUD_RATE;
-import static io.netty.channel.rxtx.RxtxChannelOption.DATA_BITS;
-import static io.netty.channel.rxtx.RxtxChannelOption.DTR;
-import static io.netty.channel.rxtx.RxtxChannelOption.PARITY_BIT;
-import static io.netty.channel.rxtx.RxtxChannelOption.RTS;
-import static io.netty.channel.rxtx.RxtxChannelOption.STOP_BITS;
-
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -16,13 +9,16 @@ import io.netty.channel.rxtx.RxtxChannelConfig;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
-import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 import org.fz.nettyx.util.HexKit;
+
+import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
+
+import static io.netty.channel.rxtx.RxtxChannelOption.*;
 
 /**
  * @author fengbinbin
@@ -73,7 +69,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new XRxtxDeviceAddress("COM2"));
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new XRxtxDeviceAddress("COM1"));
         testSingleRxtx.connect();
     }
 }
