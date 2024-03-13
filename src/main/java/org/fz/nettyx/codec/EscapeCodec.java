@@ -136,10 +136,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                                           .map(HexKit::decode)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                replacementBuffers = Stream.of(replacementHexes)
-                                           .map(HexKit::decode)
-                                           .map(Unpooled::wrappedBuffer)
-                                           .toArray(ByteBuf[]::new);
+                    replacementBuffers = Stream.of(replacementHexes)
+                                               .map(HexKit::decode)
+                                               .map(Unpooled::wrappedBuffer)
+                                               .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -250,7 +250,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         private static void checkMapping(Object[] reals, Object[] replacements) {
             if (reals.length != replacements.length) {
                 throw new IllegalArgumentException(
-                    "The reals data must be the same as the number of replacements data");
+                        "The reals data must be the same as the number of replacements data");
             }
         }
 
@@ -273,7 +273,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
          */
         public void setExcludeMap(ByteBuf[] reals, ByteBuf[] replacements) {
             for (int i = 0; i < reals.length; i++) {
-                List<ByteBuf> excludes = new ArrayList<>(4); for (int j = 0; j < replacements.length; j++) {
+                List<ByteBuf> excludes = new ArrayList<>(4);
+                for (int j = 0; j < replacements.length; j++) {
                     if (i > j && contains(replacements[j], reals[i])) {
                         excludes.add(replacements[j]);
                     }
@@ -323,8 +324,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     result.writeBytes(replacement.duplicate());
 
                     readIndex += target.readableBytes();
-                }
-                else {
+                } else {
                     // if not equals, will reset the read index
                     msgBuf.resetReaderIndex();
 
@@ -332,9 +332,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     readIndex++;
                 }
 
-            }
-            else {
-                result.writeByte(msgBuf.readByte()); readIndex++;
+            } else {
+                result.writeByte(msgBuf.readByte());
+                readIndex++;
             }
         }
 
@@ -379,7 +379,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     return false;
                 }
             }
-        } return true;
+        }
+        return true;
     }
 
     private static boolean invalidByteBuf(ByteBuf buffer) {
@@ -391,7 +392,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             if (invalidByteBuf(byteBuf)) {
                 return true;
             }
-        } return false;
+        }
+        return false;
     }
 
     private static boolean isSimilar(int index, ByteBuf msgBuf, ByteBuf target) {
