@@ -86,8 +86,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             }
 
             out.writeBytes(msg);
-            // TODO
-           // msg.release();
+            msg.release();
         }
     }
 
