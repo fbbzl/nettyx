@@ -26,7 +26,6 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         System.err.println(msg.readableBytes());
         byte[] xx = new byte[1024];
         Arrays.fill(xx, (byte) 1);
-
         ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(xx));
     }
 }
