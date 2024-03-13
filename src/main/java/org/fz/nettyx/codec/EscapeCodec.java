@@ -1,7 +1,5 @@
 package org.fz.nettyx.codec;
 
-import static cn.hutool.core.text.CharSequenceUtil.format;
-
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -9,12 +7,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +16,15 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
+
+import static cn.hutool.core.text.CharSequenceUtil.format;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -166,9 +167,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             ByteBuf[] realBuffers = Stream.of(reals)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                replacementBuffers = Stream.of(replacements)
-                                           .map(Unpooled::wrappedBuffer)
-                                           .toArray(ByteBuf[]::new);
+                    replacementBuffers = Stream.of(replacements)
+                                               .map(Unpooled::wrappedBuffer)
+                                               .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
