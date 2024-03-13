@@ -78,7 +78,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleJsc testSingleJsc = new TestSingleJsc(new JscDeviceAddress("COM2"));
+        TestSingleJsc testSingleJsc = new TestSingleJsc(new JscDeviceAddress("COM1"));
         testSingleJsc.connect();
     }
 
