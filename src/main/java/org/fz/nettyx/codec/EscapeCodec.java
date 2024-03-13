@@ -340,9 +340,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         // write the left buffer
         if (msgBuf.readableBytes() > 0) {
-            byte[] bytes = new byte[msgBuf.readableBytes()];
-            msgBuf.readBytes(bytes);
-            result.writeBytes(bytes);
+            result.writeBytes(msgBuf);
         }
 
         return result;
