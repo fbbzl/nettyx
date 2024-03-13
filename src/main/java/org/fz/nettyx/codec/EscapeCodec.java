@@ -308,8 +308,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     protected static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement, ByteBuf... excludes) {
         if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
         Throws.ifTrue(excludes.length != 0 && ArrayUtil.contains(excludes, target),
-                      format("do not exclude real [{}], this will cause the escape to fail",
-                             target));
+                      format("do not exclude real [{}], this will cause the escape to fail", target));
 
         final ByteBuf result = msgBuf.alloc().buffer();
 
