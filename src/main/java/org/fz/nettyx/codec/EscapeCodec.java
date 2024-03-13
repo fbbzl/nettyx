@@ -308,44 +308,39 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
         Throws.ifTrue(excludes.length != 0 && ArrayUtil.contains(excludes, target),
                       format("do not exclude real [{}], this will cause the escape to fail", target));
-        try {
-            final ByteBuf result = msgBuf.alloc().buffer();
+        final ByteBuf result = msgBuf.alloc().buffer();
 
-            int    readIndex = 0;
-            byte[] sample    = new byte[target.readableBytes()];
-            while (msgBuf.readableBytes() >= target.readableBytes()) {
-                if (isSimilar(readIndex, msgBuf, target)) {
-                    // prepare for reset
-                    msgBuf.markReaderIndex().readBytes(sample);
+        int    readIndex = 0;
+        byte[] sample    = new byte[target.readableBytes()];
+        while (msgBuf.readableBytes() >= target.readableBytes()) {
+            if (isSimilar(readIndex, msgBuf, target)) {
+                // prepare for reset
+                msgBuf.markReaderIndex().readBytes(sample);
 
-                    if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
-                        result.writeBytes(replacement.duplicate());
+                if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
+                    result.writeBytes(replacement.duplicate());
 
-                        readIndex += target.readableBytes();
-                    }
-                    else {
-                        // if not equals, will reset the read index
-                        msgBuf.resetReaderIndex();
-
-                        result.writeByte(msgBuf.readByte());
-                        readIndex++;
-                    }
-
+                    readIndex += target.readableBytes();
                 }
                 else {
+                    // if not equals, will reset the read index
+                    msgBuf.resetReaderIndex();
+
                     result.writeByte(msgBuf.readByte());
                     readIndex++;
                 }
+
             }
-
-            // write the left buffer
-            result.writeBytes(msgBuf);
-
-            return result;
+            else {
+                result.writeByte(msgBuf.readByte());
+                readIndex++;
+            }
         }
-        finally {
-            msgBuf.release();
-        }
+
+        // write the left buffer
+        result.writeBytes(msgBuf);
+
+        return result;
     }
 
     private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
