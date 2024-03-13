@@ -1,5 +1,7 @@
 package org.fz.nettyx.codec;
 
+import static cn.hutool.core.text.CharSequenceUtil.format;
+
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -7,6 +9,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,15 +24,6 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
-
-import static cn.hutool.core.text.CharSequenceUtil.format;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -87,7 +86,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             }
 
             out.writeBytes(msg);
-            msg.release();
+            // TODO
+           // msg.release();
         }
     }
 
@@ -310,39 +310,44 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         Throws.ifTrue(excludes.length != 0 && ArrayUtil.contains(excludes, target),
                       format("do not exclude real [{}], this will cause the escape to fail", target));
 
-        final ByteBuf result = msgBuf.alloc().buffer();
+        try {
+            final ByteBuf result = msgBuf.alloc().buffer();
 
-        int    readIndex = 0;
-        byte[] sample    = new byte[target.readableBytes()];
-        while (msgBuf.readableBytes() >= target.readableBytes()) {
-            if (isSimilar(readIndex, msgBuf, target)) {
-                // prepare for reset
-                msgBuf.markReaderIndex().readBytes(sample);
+            int    readIndex = 0;
+            byte[] sample    = new byte[target.readableBytes()];
+            while (msgBuf.readableBytes() >= target.readableBytes()) {
+                if (isSimilar(readIndex, msgBuf, target)) {
+                    // prepare for reset
+                    msgBuf.markReaderIndex().readBytes(sample);
 
-                if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
-                    result.writeBytes(replacement.duplicate());
+                    if (equalsContent(sample, target) && !equalsAny(readIndex, msgBuf, excludes)) {
+                        result.writeBytes(replacement.duplicate());
 
-                    readIndex += target.readableBytes();
-                } else {
-                    // if not equals, will reset the read index
-                    msgBuf.resetReaderIndex();
+                        readIndex += target.readableBytes();
+                    }
+                    else {
+                        // if not equals, will reset the read index
+                        msgBuf.resetReaderIndex();
 
+                        result.writeByte(msgBuf.readByte());
+                        readIndex++;
+                    }
+
+                }
+                else {
                     result.writeByte(msgBuf.readByte());
                     readIndex++;
                 }
-
-            } else {
-                result.writeByte(msgBuf.readByte());
-                readIndex++;
             }
-        }
 
-        // write the left buffer
-        if (msgBuf.readableBytes() > 0) {
+            // write the left buffer
             result.writeBytes(msgBuf);
-        }
 
-        return result;
+            return result;
+        }
+        finally {
+            msgBuf.release();
+        }
     }
 
     private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
