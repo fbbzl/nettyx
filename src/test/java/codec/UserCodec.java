@@ -11,24 +11,22 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.util.HexKit;
+
+import java.util.Arrays;
 
 @Slf4j
 public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
 
-    TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
+    TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife,
+            GirlFriend>>() {
     };
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         System.err.println(msg.readableBytes());
+        byte[] xx = new byte[1024];
+        Arrays.fill(xx, (byte) 1);
 
-        if (msg.readableBytes() == 8) {
-            ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffff")));
-        }
-        if (msg.readableBytes() == 4) {
-            ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(HexKit.decode("ffffffffffffffff")));
-        }
-
+        ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(xx));
     }
 }
