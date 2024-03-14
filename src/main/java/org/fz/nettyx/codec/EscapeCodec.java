@@ -202,6 +202,24 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 }
             }
         }
+
+        private static boolean containsContent(ByteBuf buf, ByteBuf part) {
+            if (buf.readableBytes() < part.readableBytes()) return false;
+
+            byte[] sample = new byte[part.readableBytes()];
+            for (int i = 0; i < buf.readableBytes(); i++) {
+                try {
+                    buf.getBytes(i, sample);
+                }
+                catch (IndexOutOfBoundsException indexOutOfBounds) {
+                    return false;
+                }
+
+                if (equalsContent(sample, part)) return true;
+            }
+
+            return false;
+        }
     }
 
     protected static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement) {
@@ -237,14 +255,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         result.writeBytes(msgBuf);
 
         return result;
-    }
-
-    public static void main(String[] args) {
-        EscapeMap escapeMap = EscapeMap.mapHex("7901", "ffffff");
-        ByteBuf   byteBuf   = HexKit.decodeBuf("aaaa7901aa");
-
-        ByteBuf encode = encode(byteBuf, escapeMap);
-        System.err.println(hexDump(encode));
     }
 
     protected static ByteBuf encode(ByteBuf msgBuf, EscapeMap escapeMap) {
@@ -304,21 +314,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         return true;
-    }
-
-    private static boolean containsContent(ByteBuf buf, ByteBuf part) {
-        if (buf.readableBytes() < part.readableBytes()) {
-            return false;
-        }
-
-        byte[] sample = new byte[part.readableBytes()];
-        for (int i = 0; i < buf.readableBytes(); i++) {
-            buf.getBytes(i, sample);
-            if (equalsContent(sample, part)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static boolean invalidByteBuf(ByteBuf buffer) {
