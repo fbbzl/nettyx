@@ -18,13 +18,15 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
+import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.hexDump;
+import static java.util.Arrays.asList;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -241,45 +243,30 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             if (target == null || replacement == null)
                 throw new IllegalArgumentException("neither the target nor the replacement can be null, please check");
 
-            Throws.ifTrue(ByteBufUtil.equals(target, replacement), "target [" + hexDump(target) + "] can not be the " +
+            Throws.ifTrue(ByteBufUtil.equals(target, replacement), "target ["
+                                                                   + hexDump(target) + "] can not be the " +
                                                                    "same as the replacement [" + hexDump(replacement) + "]");
 
-            Throws.ifTrue(containsContent(replacement, target), "do not let replacement [" + hexDump(replacement) +
+            Throws.ifTrue(containsContent(replacement, target), "do not let replacement ["
+                                                                + hexDump(replacement) +
                                                                 "] contain target [" + hexDump(target) + "]");
         }
 
         private static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
             if (reals.length != replacements.length) {
                 throw new IllegalArgumentException(
-                        "the count of the targets must be the same as the count of replacements");
+                        "the count of the targets must be the same as the count of replacements, reals count is ["
+                        + reals.length + "], the replacements length is [" + replacements.length + "]");
             }
 
-            for (int i = 0; i < reals.length; i++) {
-                List<ByteBuf> excludes = new ArrayList<>(4);
-                for (int j = 0; j < replacements.length; j++) {
-                    if (i > j && containsContent(replacements[j], reals[i])) {
-                        excludes.add(replacements[j]);
-                    }
+            Collection<ByteBuf> intersection = intersection(asList(reals), asList(replacements));
+            Throws.ifNotEmpty(intersection, "do not let the real data intersect with the replacement data");
+
+            for (ByteBuf real : reals) {
+                for (ByteBuf replacement : replacements) {
+                    Throws.ifTrue(containsContent(replacement, real), "do not let the replacement data contain the real data");
                 }
             }
-
-
-
-        }
-
-        static boolean containsContent(ByteBuf buf, ByteBuf part) {
-            if (buf.readableBytes() < part.readableBytes()) {
-                return false;
-            }
-
-            byte[] sample = new byte[part.readableBytes()];
-            for (int i = 0; i < buf.readableBytes(); i++) {
-                buf.getBytes(i, sample);
-                if (equalsContent(sample, part)) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
@@ -376,6 +363,21 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         return true;
+    }
+
+    private static boolean containsContent(ByteBuf buf, ByteBuf part) {
+        if (buf.readableBytes() < part.readableBytes()) {
+            return false;
+        }
+
+        byte[] sample = new byte[part.readableBytes()];
+        for (int i = 0; i < buf.readableBytes(); i++) {
+            buf.getBytes(i, sample);
+            if (equalsContent(sample, part)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean invalidByteBuf(ByteBuf buffer) {
