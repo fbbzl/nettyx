@@ -1,5 +1,6 @@
 package org.fz.nettyx.codec;
 
+import cn.hutool.core.lang.Pair;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -17,10 +18,9 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.collection.CollUtil.intersection;
@@ -65,9 +65,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = doEscape(in, bufEntry.getValue(), bufEntry.getKey());
-            }
+//            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
+//                in = doEscape(in, bufEntry.getValue(), bufEntry.getKey());
+//            }
 
             out.add(in);
         }
@@ -83,9 +83,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue());
-            }
+//            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
+//                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue());
+//            }
 
             out.writeBytes(msg);
             msg.release();
@@ -102,12 +102,17 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         private static final ByteBuf[] EMPTY_BUFFER_ARRAY = new ByteBuf[0];
 
-        private final ByteBuf[] reals;
-        private final ByteBuf[] replacements;
+        private final Pair<ByteBuf, ByteBuf>[] mappings;
 
         public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
             checkMappings(reals, replacements);
-            return new EscapeMap(reals, replacements);
+
+            List<Pair<ByteBuf, ByteBuf>> mappings = new ArrayList<>(reals.length);
+            for (int i = 0; i < reals.length; i++) {
+                mappings.add(Pair.of(reals[i], replacements[i]));
+            }
+
+            return new EscapeMap(mappings.toArray(new Pair[0]));
         }
 
         public static EscapeMap mapEachHex(List<String> reals, List<String> replacements) {
@@ -199,9 +204,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    /**
-     * Do escape byte buf.
-     */
     protected static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement) {
         if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
         final ByteBuf result = msgBuf.alloc().buffer();
@@ -209,7 +211,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         int    readIndex = 0;
         byte[] sample    = new byte[target.readableBytes()];
         while (msgBuf.readableBytes() >= target.readableBytes()) {
-            if (isSimilar(readIndex, msgBuf, target)) {
+            if (hasSimilar(readIndex, msgBuf, target)) {
                 // prepare for reset
                 msgBuf.markReaderIndex().readBytes(sample);
 
@@ -237,47 +239,56 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return result;
     }
 
-    //
-    protected static ByteBuf doEscape(ByteBuf msgBuf, EscapeMap escapeMap) {
-        Iterator<ByteBuf> realsIt = escapeMap.keySet().iterator();
+    public static void main(String[] args) {
+        EscapeMap escapeMap = EscapeMap.mapHex("7901", "ffffff");
+        ByteBuf   byteBuf   = HexKit.decodeBuf("aaaa7901aa");
 
-        final ByteBuf result = msgBuf.alloc().buffer();
+        ByteBuf encode = encode(byteBuf, escapeMap);
+        System.err.println(hexDump(encode));
+    }
 
-        while (msgBuf.readableBytes() > 0) {
-            int readIndex = msgBuf.readerIndex();
-            while (realsIt.hasNext()) {
-                ByteBuf real = realsIt.next();
+    protected static ByteBuf encode(ByteBuf msgBuf, EscapeMap escapeMap) {
+        try {
+            Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
+            // new buf
+            final ByteBuf result = msgBuf.alloc().buffer();
 
-                isSimilar(readIndex, msgBuf, target);
+            while (msgBuf.readableBytes() > 0) {
+                int readIndex = msgBuf.readerIndex();
+                for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
+                    ByteBuf real        = mapping.getKey();
+                    ByteBuf replacement = mapping.getValue();
 
-            }
+                    int     realLength = real.readableBytes();
+                    boolean match;
+                    try {
+                        switch (realLength) {
+                            case 1:
+                            case 2:
+                                match = hasSimilar(readIndex, msgBuf, real);
+                                break;
+                            default:
+                                match = hasSimilar(readIndex, msgBuf, real) && equalsContent(ByteBufUtil.getBytes(msgBuf,
+                                                                                                                  readIndex, realLength), real);
+                        }
+                    }
+                    catch (IndexOutOfBoundsException toTail) {
+                        match = false;
+                    }
 
-            if (isSimilar(readIndex, msgBuf, target)) {
-                // prepare for reset
-                msgBuf.markReaderIndex().readBytes(sample);
-
-                if (equalsContent(sample, target)) {
-                    result.writeBytes(replacement.duplicate());
-
-                    readIndex += target.readableBytes();
-                } else {
-                    // if not equals, will reset the read index
-                    msgBuf.resetReaderIndex();
-
-                    result.writeByte(msgBuf.readByte());
-                    readIndex++;
+                    if (match) {
+                        result.writeBytes(replacement.duplicate());
+                        msgBuf.skipBytes(realLength);
+                    } else {
+                        result.writeByte(msgBuf.readByte());
+                    }
                 }
-
-            } else {
-                result.writeByte(msgBuf.readByte());
-                readIndex++;
             }
+            return result;
         }
-
-        // write the left buffer
-        result.writeBytes(msgBuf);
-
-        return result;
+        finally {
+            msgBuf.release();
+        }
     }
 
     private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
@@ -323,7 +334,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return false;
     }
 
-    private static boolean isSimilar(int index, ByteBuf msgBuf, ByteBuf target) {
+    private static boolean hasSimilar(int index, ByteBuf msgBuf, ByteBuf target) {
         int tarLength = target.readableBytes();
 
         boolean sameHead = msgBuf.getByte(index) == target.getByte(0);
