@@ -250,7 +250,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     public static void main(String[] args) {
-        EscapeMap escapeMap = EscapeMap.mapHex("7901", "ffffffff");
+        EscapeMap escapeMap = EscapeMap.mapEachHex(asList("7901", "aa"), asList("ffffffff", "11"));
         ByteBuf   msg       = HexKit.decodeBuf("aa7901aa");
         ByteBuf   encode    = encode(msg, escapeMap);
         System.err.println(hexDump(encode));
