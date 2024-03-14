@@ -200,13 +200,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
             byte[] sample = new byte[part.readableBytes()];
             for (int i = 0; i < buf.readableBytes(); i++) {
-                try {
-                    buf.getBytes(i, sample);
-                }
-                catch (IndexOutOfBoundsException indexOutOfBounds) {
+                if (buf.readableBytes() - i < sample.length) {
                     return false;
                 }
-
+                buf.getBytes(i, sample);
                 if (equalsContent(sample, part)) return true;
             }
 
