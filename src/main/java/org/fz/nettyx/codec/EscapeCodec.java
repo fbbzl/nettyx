@@ -246,6 +246,13 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return result;
     }
 
+    public static void main(String[] args) {
+        EscapeMap escapeMap = EscapeMap.mapHex("7901", "ffffffff");
+        ByteBuf   msg   = HexKit.decodeBuf("aa7901aa");
+        ByteBuf   encode    = encode(msg, escapeMap);
+        System.err.println(hexDump(encode));
+    }
+
     protected static ByteBuf encode(ByteBuf msgBuf, EscapeMap escapeMap) {
         try {
             Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
