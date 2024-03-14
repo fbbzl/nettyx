@@ -21,7 +21,6 @@ import org.fz.nettyx.util.Throws;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
@@ -244,6 +243,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
             Throws.ifTrue(ByteBufUtil.equals(target, replacement), "target [" + hexDump(target) + "] can not be the " +
                                                                    "same as the replacement [" + hexDump(replacement) + "]");
+
+            Throws.ifTrue(containsContent(replacement, target), "do not let replacement [" + hexDump(replacement) +
+                                                                "] contain target [" + hexDump(target) + "]");
         }
 
         private static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
@@ -252,28 +254,27 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                         "the count of the targets must be the same as the count of replacements");
             }
 
-            final Map<ByteBuf, ByteBuf[]> excludeMap = new HashMap<>(4);
-
             for (int i = 0; i < reals.length; i++) {
                 List<ByteBuf> excludes = new ArrayList<>(4);
                 for (int j = 0; j < replacements.length; j++) {
-                    if (i > j && contains(replacements[j], reals[i])) {
+                    if (i > j && containsContent(replacements[j], reals[i])) {
                         excludes.add(replacements[j]);
                     }
                 }
-                excludeMap.put(reals[i], excludes.toArray(new ByteBuf[]{}));
             }
+
+
 
         }
 
-        static boolean contains(ByteBuf real, ByteBuf part) {
-            if (real.readableBytes() < part.readableBytes()) {
+        static boolean containsContent(ByteBuf buf, ByteBuf part) {
+            if (buf.readableBytes() < part.readableBytes()) {
                 return false;
             }
 
             byte[] sample = new byte[part.readableBytes()];
-            for (int i = 0; i < real.readableBytes(); i++) {
-                real.getBytes(i, sample);
+            for (int i = 0; i < buf.readableBytes(); i++) {
+                buf.getBytes(i, sample);
                 if (equalsContent(sample, part)) {
                     return true;
                 }
