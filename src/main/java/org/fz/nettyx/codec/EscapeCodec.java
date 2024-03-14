@@ -1,5 +1,9 @@
 package org.fz.nettyx.codec;
 
+import static cn.hutool.core.collection.CollUtil.intersection;
+import static io.netty.buffer.ByteBufUtil.hexDump;
+import static java.util.Arrays.asList;
+
 import cn.hutool.core.lang.Pair;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -8,6 +12,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,15 +25,6 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static cn.hutool.core.collection.CollUtil.intersection;
-import static io.netty.buffer.ByteBufUtil.hexDump;
-import static java.util.Arrays.asList;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -125,10 +124,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                                           .map(HexKit::decode)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacementHexes)
-                                               .map(HexKit::decode)
-                                               .map(Unpooled::wrappedBuffer)
-                                               .toArray(ByteBuf[]::new);
+                replacementBuffers = Stream.of(replacementHexes)
+                                           .map(HexKit::decode)
+                                           .map(Unpooled::wrappedBuffer)
+                                           .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -141,9 +140,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             ByteBuf[] realBuffers = Stream.of(reals)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacements)
-                                               .map(Unpooled::wrappedBuffer)
-                                               .toArray(ByteBuf[]::new);
+                replacementBuffers = Stream.of(replacements)
+                                           .map(Unpooled::wrappedBuffer)
+                                           .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -165,12 +164,14 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         static void checkMapping(ByteBuf target, ByteBuf replacement) {
-            if (target == null || replacement == null)
+            if (target == null || replacement == null) {
                 throw new IllegalArgumentException("neither the target nor the replacement can be null, please check");
+            }
 
             Throws.ifTrue(ByteBufUtil.equals(target, replacement), "target ["
                                                                    + hexDump(target) + "] can not be the " +
-                                                                   "same as the replacement [" + hexDump(replacement) + "]");
+                                                                   "same as the replacement [" + hexDump(replacement)
+                                                                   + "]");
 
             Throws.ifTrue(containsContent(replacement, target), "do not let replacement ["
                                                                 + hexDump(replacement) +
@@ -180,8 +181,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
             if (reals.length != replacements.length) {
                 throw new IllegalArgumentException(
-                        "the count of the targets must be the same as the count of replacements, reals count is ["
-                        + reals.length + "], the replacements length is [" + replacements.length + "]");
+                    "the count of the targets must be the same as the count of replacements, reals count is ["
+                    + reals.length + "], the replacements length is [" + replacements.length + "]");
             }
 
             Collection<ByteBuf> intersection = intersection(asList(reals), asList(replacements));
@@ -196,7 +197,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         private static boolean containsContent(ByteBuf buf, ByteBuf part) {
-            if (buf.readableBytes() < part.readableBytes()) return false;
+            if (buf.readableBytes() < part.readableBytes()) { return false; }
 
             byte[] sample = new byte[part.readableBytes()];
             for (int i = 0; i < buf.readableBytes(); i++) {
@@ -204,7 +205,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     return false;
                 }
                 buf.getBytes(i, sample);
-                if (equalsContent(sample, part)) return true;
+                if (equalsContent(sample, part)) { return true; }
             }
 
             return false;
@@ -226,7 +227,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     result.writeBytes(replacement.duplicate());
 
                     readIndex += target.readableBytes();
-                } else {
+                }
+                else {
                     // if not equals, will reset the read index
                     msgBuf.resetReaderIndex();
 
@@ -234,7 +236,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     readIndex++;
                 }
 
-            } else {
+            }
+            else {
                 result.writeByte(msgBuf.readByte());
                 readIndex++;
             }
@@ -248,7 +251,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     public static void main(String[] args) {
         EscapeMap escapeMap = EscapeMap.mapHex("7901", "ffffffff");
-        ByteBuf   msg   = HexKit.decodeBuf("aa7901aa");
+        ByteBuf   msg       = HexKit.decodeBuf("aa7901aa");
         ByteBuf   encode    = encode(msg, escapeMap);
         System.err.println(hexDump(encode));
     }
@@ -274,8 +277,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                                 match = hasSimilar(readIndex, msgBuf, real);
                                 break;
                             default:
-                                match = hasSimilar(readIndex, msgBuf, real) && equalsContent(ByteBufUtil.getBytes(msgBuf,
-                                                                                                                  readIndex, realLength), real);
+                                match = hasSimilar(readIndex, msgBuf, real) && equalsContent(
+                                    ByteBufUtil.getBytes(msgBuf,
+                                                         readIndex, realLength), real);
                         }
                     }
                     catch (IndexOutOfBoundsException toTail) {
@@ -285,7 +289,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     if (match) {
                         result.writeBytes(replacement.duplicate());
                         msgBuf.skipBytes(realLength);
-                    } else {
+                    }
+                    else {
                         result.writeByte(msgBuf.readByte());
                     }
                 }
