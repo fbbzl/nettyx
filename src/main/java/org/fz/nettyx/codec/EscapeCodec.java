@@ -96,6 +96,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      * The type Escape map.
      */
     @Getter
+    @SuppressWarnings("all")
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @EqualsAndHashCode(callSuper = false)
     public static class EscapeMap {
@@ -119,15 +120,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return mapEachHex(reals.toArray(new String[]{}), replacements.toArray(new String[]{}));
         }
 
-        /**
-         * Escape bytebuffer as needed, and specify real data and replacement in order
-         *
-         * @param realHexes        The number and order of real buffers that need to be escaped should be the same as
-         *                         that of replacementHexes
-         * @param replacementHexes The number and order of replacement buffers should be the same as those of reals
-         *
-         * @return Buffer after escaped
-         */
         public static EscapeMap mapEachHex(String[] realHexes, String[] replacementHexes) {
             ByteBuf[] realBuffers = Stream.of(realHexes)
                                           .map(HexKit::decode)
