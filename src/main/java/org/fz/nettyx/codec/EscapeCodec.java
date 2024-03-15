@@ -215,44 +215,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    protected static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf target, ByteBuf replacement) {
-        if (containsInvalidByteBuf(msgBuf, target, replacement)) { return msgBuf; }
-        final ByteBuf result = msgBuf.alloc().buffer();
-
-//        int    readIndex = 0;
-//        byte[] sample    = new byte[target.readableBytes()];
-//        while (msgBuf.readableBytes() >= target.readableBytes()) {
-//            if (hasSimilar(readIndex, msgBuf, target)) {
-//                // prepare for reset
-//                msgBuf.markReaderIndex().readBytes(sample);
-//
-//                if (equalsContent(sample, target)) {
-//                    result.writeBytes(replacement.duplicate());
-//
-//                    readIndex += target.readableBytes();
-//                }
-//                else {
-//                    // if not equals, will reset the read index
-//                    msgBuf.resetReaderIndex();
-//
-//                    result.writeByte(msgBuf.readByte());
-//                    readIndex++;
-//                }
-//
-//            }
-//            else {
-//                result.writeByte(msgBuf.readByte());
-//                readIndex++;
-//            }
-//        }
-//
-//        // write the left buffer
-//        result.writeBytes(msgBuf);
-
-        return result;
-    }
-
-    protected static ByteBuf doEscape1(ByteBuf msgBuf, EscapeMap escapeMap) {
+    protected static ByteBuf doEscape(ByteBuf msgBuf, EscapeMap escapeMap) {
         Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
         if (ArrayUtil.isEmpty(mappings)) return msgBuf;
 
