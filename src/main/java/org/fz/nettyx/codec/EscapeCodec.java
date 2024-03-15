@@ -199,7 +199,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             }
         }
 
-        private static boolean containsContent(ByteBuf buf, ByteBuf part) {
+        static boolean containsContent(ByteBuf buf, ByteBuf part) {
             if (buf.readableBytes() < part.readableBytes()) { return false; }
 
             byte[] sample = new byte[part.readableBytes()];
@@ -213,6 +213,19 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
             return false;
         }
+
+        static boolean invalidByteBuf(ByteBuf buffer) {
+            return buffer == null || buffer.readableBytes() == 0;
+        }
+
+        static boolean containsInvalidByteBuf(ByteBuf... buffers) {
+            for (ByteBuf byteBuf : buffers) {
+                if (invalidByteBuf(byteBuf)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     protected static ByteBuf doEscape(ByteBuf msgBuf, EscapeMap escapeMap) {
@@ -224,8 +237,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             while (msgBuf.readableBytes() > 0) {
                 boolean match = false;
                 for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
-                    ByteBuf real        = mapping.getKey();
-                    int     realLength  = real.readableBytes();
+                    ByteBuf real       = mapping.getKey();
+                    int     realLength = real.readableBytes();
 
                     if (msgBuf.readableBytes() >= realLength) {
                         switch (realLength) {
@@ -270,19 +283,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         return true;
-    }
-
-    private static boolean invalidByteBuf(ByteBuf buffer) {
-        return buffer == null || buffer.readableBytes() == 0;
-    }
-
-    private static boolean containsInvalidByteBuf(ByteBuf... buffers) {
-        for (ByteBuf byteBuf : buffers) {
-            if (invalidByteBuf(byteBuf)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
