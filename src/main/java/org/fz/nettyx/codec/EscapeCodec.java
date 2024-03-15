@@ -3,7 +3,6 @@ package org.fz.nettyx.codec;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
@@ -26,7 +25,6 @@ import java.util.stream.Stream;
 
 import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.getBytes;
-import static io.netty.buffer.ByteBufUtil.hexDump;
 import static java.util.Arrays.asList;
 
 /**
@@ -164,22 +162,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         public static EscapeMap map(ByteBuf real, ByteBuf replacement) {
             return mapEach(new ByteBuf[]{real}, new ByteBuf[]{replacement});
-        }
-
-        static void checkMapping(ByteBuf real, ByteBuf replacement) {
-            if (containsInvalidByteBuf(real, replacement)) {
-                throw new IllegalArgumentException("neither the real nor the replacement can be null or un-readable, " +
-                                                   "please check");
-            }
-
-            Throws.ifTrue(ByteBufUtil.equals(real, replacement), "real data ["
-                                                                 + hexDump(real) + "] can not be the " +
-                                                                 "same as the replacement data [" + hexDump(replacement)
-                                                                 + "]");
-
-            Throws.ifTrue(containsContent(replacement, real), "do not let replacement data ["
-                                                              + hexDump(replacement) +
-                                                              "] contain real data [" + hexDump(real) + "]");
         }
 
         static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
