@@ -3,7 +3,6 @@ package org.fz.nettyx.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import io.netty.util.ReferenceCountUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,10 +24,7 @@ public class StringMessageCodec extends ByteToMessageCodec<String> {
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-        list.add(byteBuf.toString(charset));
-
-        // release after to string
-        ReferenceCountUtil.release(byteBuf);
+        list.add(byteBuf.readCharSequence(byteBuf.readableBytes(), charset));
     }
 
     @Override
