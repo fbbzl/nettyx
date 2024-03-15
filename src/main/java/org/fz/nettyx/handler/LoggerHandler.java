@@ -31,15 +31,15 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  * @since 2023 /4/28 22:02
  */
-public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.InboundLogger, LoggerHandler.OutboundLogger> {
+public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.InboundLogger,
+        LoggerHandler.OutboundLogger> {
 
     private static final Sl4jLevel DEFAULT_LEVEL = Sl4jLevel.ERROR;
 
     /**
      * The TO_HEX.
      */
-    public static final Function<Object, String>
-            TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
+    public static final Function<Object, String> TO_HEX = msg -> ByteBufUtil.hexDump((ByteBuf) msg),
     /**
      * The To ascii.
      */
@@ -77,7 +77,7 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
      */
     TO_STRING = Objects::toString;
 
-    private static final Function<Object, String> DEFAULT_FORMATTER = TO_HEX;
+    private static final Function<Object, String> DEFAULT_FORMATTER = TO_STRING;
 
     /**
      * Instantiates a new Logger handler.
@@ -123,10 +123,10 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
     @EqualsAndHashCode(callSuper = false)
     @Data
     public static class InboundLogger extends ChannelInboundHandlerAdapter {
-        private final Logger logger;
+        private final Logger                   logger;
         private final Function<Object, String> messageFormatter;
         // output the matching level log
-        private final Sl4jLevel level;
+        private final Sl4jLevel                level;
 
         /**
          * Instantiates a new Inbound logger.
@@ -205,23 +205,34 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
          * @param level            the level
          */
         public InboundLogger(Logger logger, Function<Object, String> messageFormatter, Sl4jLevel level) {
-            this.logger = logger;
+            this.logger           = logger;
             this.messageFormatter = messageFormatter;
-            this.level = level;
+            this.level            = level;
         }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            final String format = "received from [{}], message: [{}]";
+            final String  format        = "received from [{}], message: [{}]";
             SocketAddress socketAddress = ctx.channel().remoteAddress();
 
             switch (level) {
-                case ERROR: if (logger.isErrorEnabled()) logger.error(format, socketAddress, messageFormatter.apply(msg)); break;
-                case WARN:  if (logger.isWarnEnabled())  logger.warn(format,  socketAddress, messageFormatter.apply(msg)); break;
-                case INFO:  if (logger.isInfoEnabled())  logger.info(format,  socketAddress, messageFormatter.apply(msg)); break;
-                case DEBUG: if (logger.isDebugEnabled()) logger.debug(format, socketAddress, messageFormatter.apply(msg)); break;
-                case TRACE: if (logger.isTraceEnabled()) logger.trace(format, socketAddress, messageFormatter.apply(msg)); break;
-                default: /* default is do nothing */ break;
+                case ERROR:
+                    if (logger.isErrorEnabled()) logger.error(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case WARN:
+                    if (logger.isWarnEnabled()) logger.warn(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case INFO:
+                    if (logger.isInfoEnabled()) logger.info(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case DEBUG:
+                    if (logger.isDebugEnabled()) logger.debug(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case TRACE:
+                    if (logger.isTraceEnabled()) logger.trace(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                default: /* default is do nothing */
+                    break;
             }
 
             super.channelRead(ctx, msg);
@@ -235,9 +246,9 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
     @Data
     public static class OutboundLogger extends ChannelOutboundHandlerAdapter {
 
-        private final Logger logger;
+        private final Logger                   logger;
         private final Function<Object, String> messageFormatter;
-        private final Sl4jLevel level;
+        private final Sl4jLevel                level;
 
         /**
          * Instantiates a new Outbound logger.
@@ -316,24 +327,35 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
          * @param level            the level
          */
         public OutboundLogger(Logger logger, Function<Object, String> messageFormatter, Sl4jLevel level) {
-            this.logger = logger;
+            this.logger           = logger;
             this.messageFormatter = messageFormatter;
-            this.level = level;
+            this.level            = level;
         }
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            Channel channel = ctx.channel();
-            final String format = "channel [{}] write to [{}], message is: [{}]";
+            Channel       channel       = ctx.channel();
+            final String  format        = "write to [{}], message is: [{}]";
             SocketAddress socketAddress = channel.remoteAddress();
 
             switch (level) {
-                case ERROR: if (logger.isErrorEnabled()) logger.error(format, channel, socketAddress, messageFormatter.apply(msg)); break;
-                case WARN:  if (logger.isWarnEnabled())  logger.warn(format,  channel, socketAddress, messageFormatter.apply(msg)); break;
-                case INFO:  if (logger.isInfoEnabled())  logger.info(format,  channel, socketAddress, messageFormatter.apply(msg)); break;
-                case DEBUG: if (logger.isDebugEnabled()) logger.debug(format, channel, socketAddress, messageFormatter.apply(msg)); break;
-                case TRACE: if (logger.isTraceEnabled()) logger.trace(format, channel, socketAddress, messageFormatter.apply(msg)); break;
-                default: /* default is do nothing */ break;
+                case ERROR:
+                    if (logger.isErrorEnabled()) logger.error(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case WARN:
+                    if (logger.isWarnEnabled()) logger.warn(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case INFO:
+                    if (logger.isInfoEnabled()) logger.info(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case DEBUG:
+                    if (logger.isDebugEnabled()) logger.debug(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                case TRACE:
+                    if (logger.isTraceEnabled()) logger.trace(format, socketAddress, messageFormatter.apply(msg));
+                    break;
+                default: /* default is do nothing */
+                    break;
             }
 
             super.write(ctx, msg, promise);
