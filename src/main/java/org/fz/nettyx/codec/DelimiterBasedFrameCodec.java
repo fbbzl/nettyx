@@ -16,7 +16,8 @@ import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
  * @version 1.0
  * @since 2021 /9/2 9:17
  */
-public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<DelimiterBasedFrameDecoder, DelimiterBasedFrameEncoder> {
+public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<DelimiterBasedFrameDecoder,
+        DelimiterBasedFrameEncoder> {
 
     /**
      * Instantiates a new Delimiter based frame codec.
@@ -46,11 +47,8 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
 
         @Override
         public void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-            out.writeBytes(appendDelimiter(msg));
+            out.writeBytes(Unpooled.wrappedBuffer(msg, delimiter.duplicate()));
         }
 
-        private ByteBuf appendDelimiter(ByteBuf byteBuf) {
-            return Unpooled.wrappedBuffer(byteBuf, delimiter.duplicate());
-        }
     }
 }
