@@ -127,10 +127,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                                           .map(HexKit::decode)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                replacementBuffers = Stream.of(replacementHexes)
-                                           .map(HexKit::decode)
-                                           .map(Unpooled::wrappedBuffer)
-                                           .toArray(ByteBuf[]::new);
+                    replacementBuffers = Stream.of(replacementHexes)
+                                               .map(HexKit::decode)
+                                               .map(Unpooled::wrappedBuffer)
+                                               .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -143,9 +143,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             ByteBuf[] realBuffers = Stream.of(reals)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                replacementBuffers = Stream.of(replacements)
-                                           .map(Unpooled::wrappedBuffer)
-                                           .toArray(ByteBuf[]::new);
+                    replacementBuffers = Stream.of(replacements)
+                                               .map(Unpooled::wrappedBuffer)
+                                               .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -184,8 +184,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
             if (reals.length != replacements.length) {
                 throw new IllegalArgumentException(
-                    "the count of the targets must be the same as the count of replacements, reals count is ["
-                    + reals.length + "], the replacements length is [" + replacements.length + "]");
+                        "the count of the targets must be the same as the count of replacements, reals count is ["
+                        + reals.length + "], the replacements length is [" + replacements.length + "]");
             }
 
             Collection<ByteBuf> intersection = intersection(asList(reals), asList(replacements));
@@ -261,10 +261,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     protected static ByteBuf doEscape1(ByteBuf msgBuf, EscapeMap escapeMap) {
         Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
-        if (ArrayUtil.isEmpty(mappings)) { return msgBuf; }
+        if (ArrayUtil.isEmpty(mappings)) return msgBuf;
 
         try {
-            final ByteBuf result = msgBuf.alloc().buffer();
+            final ByteBuf escaped = msgBuf.alloc().buffer();
             while (msgBuf.readableBytes() > 0) {
                 boolean match = false;
                 for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
@@ -272,29 +272,29 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     ByteBuf replacement = mapping.getValue();
                     int     realLength  = real.readableBytes();
 
+                    if (msgBuf.readableBytes() >= realLength) {
+                        switch (realLength) {
+                            case 1:
+                            case 2:
+                                match = hasSimilar(msgBuf, real);
+                                break;
+                            default:
+                                match = hasSimilar(msgBuf, real) && equalsContent(
+                                        getBytes(msgBuf, msgBuf.readerIndex(), realLength), real);
+                                break;
+                        }
 
-                    switch (realLength) {
-                        case 1:
-                        case 2:
-                            match = hasSimilar(msgBuf, real);
+                        if (match) {
+                            msgBuf.skipBytes(realLength);
+                            escaped.writeBytes(replacement.duplicate());
+                            // only support single same, so if match we break
                             break;
-                        default:
-                            match = hasSimilar(msgBuf, real) && equalsContent(
-                                    getBytes(msgBuf, msgBuf.readerIndex(), realLength), real);
-                            break;
-                    }
-
-                    if (match) {
-                        msgBuf.skipBytes(realLength);
-                        result.writeBytes(replacement.duplicate());
-                        break;
+                        }
                     }
                 }
-                if (!match) {
-                    result.writeByte(msgBuf.readByte());
-                }
+                if (!match) escaped.writeByte(msgBuf.readByte());
             }
-            return result;
+            return escaped;
         }
         finally {
             msgBuf.release();
