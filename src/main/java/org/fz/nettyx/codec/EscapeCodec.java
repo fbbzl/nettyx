@@ -225,7 +225,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 boolean match = false;
                 for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
                     ByteBuf real        = mapping.getKey();
-                    ByteBuf replacement = mapping.getValue();
                     int     realLength  = real.readableBytes();
 
                     if (msgBuf.readableBytes() >= realLength) {
@@ -242,6 +241,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
                         if (match) {
                             msgBuf.skipBytes(realLength);
+                            ByteBuf replacement = mapping.getValue();
                             escaped.writeBytes(replacement.duplicate());
                             // only support single same, so if match we break
                             break;
