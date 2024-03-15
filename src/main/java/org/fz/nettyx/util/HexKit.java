@@ -1,5 +1,7 @@
 package org.fz.nettyx.util;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -100,6 +102,10 @@ public class HexKit {
      */
     public static byte toByte(String hex) {
         return (byte) Integer.parseInt(hex, 16);
+    }
+
+    public static ByteBuf decodeBuf(String hex) {
+        return Unpooled.wrappedBuffer(decode(hex));
     }
 
     /**
