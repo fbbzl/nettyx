@@ -167,8 +167,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         static void checkMapping(ByteBuf target, ByteBuf replacement) {
-            if (target == null || replacement == null) {
-                throw new IllegalArgumentException("neither the target nor the replacement can be null, please check");
+            if (containsInvalidByteBuf(target, replacement)) {
+                throw new IllegalArgumentException("neither the target nor the replacement can be null or empty, please check");
             }
 
             Throws.ifTrue(ByteBufUtil.equals(target, replacement), "target ["
@@ -215,7 +215,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         static boolean invalidByteBuf(ByteBuf buffer) {
-            return buffer == null || buffer.readableBytes() == 0;
+            return buffer == null || !buffer.isReadable();
         }
 
         static boolean containsInvalidByteBuf(ByteBuf... buffers) {
