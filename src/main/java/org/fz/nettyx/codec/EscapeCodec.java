@@ -70,7 +70,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
             ByteBuf decode = doEscape(msg, escapeMap, REPLACEMENT, REALS);
             out.add(decode);
-            decode.release();
         }
     }
 
