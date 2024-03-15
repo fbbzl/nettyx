@@ -1,10 +1,5 @@
 package org.fz.nettyx.codec;
 
-import static cn.hutool.core.collection.CollUtil.intersection;
-import static io.netty.buffer.ByteBufUtil.getBytes;
-import static io.netty.buffer.ByteBufUtil.hexDump;
-import static java.util.Arrays.asList;
-
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
@@ -14,10 +9,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,6 +18,16 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static cn.hutool.core.collection.CollUtil.intersection;
+import static io.netty.buffer.ByteBufUtil.getBytes;
+import static io.netty.buffer.ByteBufUtil.hexDump;
+import static java.util.Arrays.asList;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -271,21 +272,18 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     ByteBuf replacement = mapping.getValue();
                     int     realLength  = real.readableBytes();
 
-                    try {
-                        switch (realLength) {
-                            case 1:
-                            case 2:
-                                match = hasSimilar(msgBuf, real);
-                                break;
-                            default:
-                                match = hasSimilar(msgBuf, real) && equalsContent(
-                                    getBytes(msgBuf, msgBuf.readerIndex(), realLength), real);
-                                break;
-                        }
-                    }
-                    catch (IndexOutOfBoundsException toTail) {
 
+                    switch (realLength) {
+                        case 1:
+                        case 2:
+                            match = hasSimilar(msgBuf, real);
+                            break;
+                        default:
+                            match = hasSimilar(msgBuf, real) && equalsContent(
+                                    getBytes(msgBuf, msgBuf.readerIndex(), realLength), real);
+                            break;
                     }
+
                     if (match) {
                         msgBuf.skipBytes(realLength);
                         result.writeBytes(replacement.duplicate());
