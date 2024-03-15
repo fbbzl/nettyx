@@ -17,7 +17,6 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
  *
  * @author fengbinbin
  * @version 1.0
- * @apiNote The [strip] option is not provided and always strip the head and tail flag
  * @since 2021 /1/20 15:13
  */
 @Slf4j

@@ -7,14 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * struct object target annotation,
- * An error will be reported when the domain class corresponding to the struct does not have this annotation
- *
- * @Struct
- * public class User {
- *     private Clong id;
- *     private Cint age;
- * }
+ * struct annotation
  *
  * @author fengbinbin
  * @version 1.0
