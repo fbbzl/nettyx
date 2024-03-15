@@ -84,8 +84,12 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
             ByteBuf encoded = doEscape(msg, escapeMap, REALS, REPLACEMENT);
-            out.writeBytes(encoded);
-            encoded.release();
+            try {
+                out.writeBytes(encoded);
+            }
+            finally {
+                encoded.release();
+            }
         }
     }
 
