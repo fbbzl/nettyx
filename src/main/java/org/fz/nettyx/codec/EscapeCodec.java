@@ -280,7 +280,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return false;
         }
 
-        // compare content
         for (int i = 0; i < bytes.length; i++) {
             if (bytes[i] != buf.getByte(i)) {
                 return false;
