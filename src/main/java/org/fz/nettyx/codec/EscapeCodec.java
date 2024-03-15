@@ -279,8 +279,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
-        int tarLength = target.readableBytes(),
-                readerIndex = msgBuf.readerIndex();
+        int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
+
         boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
         if (tarLength == 1) { return sameHead; }
 
