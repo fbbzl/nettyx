@@ -331,24 +331,19 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
 
             switch (level) {
                 case ERROR:
-                    if (logger.isErrorEnabled()) logger.error(format, channel, socketAddress,
-                                                              messageFormatter.apply(msg));
+                    if (logger.isErrorEnabled()) logger.error(format, socketAddress, messageFormatter.apply(msg));
                     break;
                 case WARN:
-                    if (logger.isWarnEnabled()) logger.warn(format, channel, socketAddress,
-                                                            messageFormatter.apply(msg));
+                    if (logger.isWarnEnabled()) logger.warn(format, socketAddress, messageFormatter.apply(msg));
                     break;
                 case INFO:
-                    if (logger.isInfoEnabled()) logger.info(format, channel, socketAddress,
-                                                            messageFormatter.apply(msg));
+                    if (logger.isInfoEnabled()) logger.info(format, socketAddress, messageFormatter.apply(msg));
                     break;
                 case DEBUG:
-                    if (logger.isDebugEnabled()) logger.debug(format, channel, socketAddress,
-                                                              messageFormatter.apply(msg));
+                    if (logger.isDebugEnabled()) logger.debug(format, socketAddress, messageFormatter.apply(msg));
                     break;
                 case TRACE:
-                    if (logger.isTraceEnabled()) logger.trace(format, channel, socketAddress,
-                                                              messageFormatter.apply(msg));
+                    if (logger.isTraceEnabled()) logger.trace(format, socketAddress, messageFormatter.apply(msg));
                     break;
                 default: /* default is do nothing */
                     break;
