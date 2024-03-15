@@ -23,13 +23,13 @@ public class StringMessageCodec extends ByteToMessageCodec<String> {
     private final Charset charset;
 
     @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
-        list.add(byteBuf.readCharSequence(byteBuf.readableBytes(), charset));
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> list) {
+        list.add(in.readCharSequence(in.readableBytes(), charset).toString());
     }
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, String msg, ByteBuf byteBuf) {
-        byteBuf.writeBytes(msg.getBytes(charset));
+    protected void encode(ChannelHandlerContext channelHandlerContext, String msg, ByteBuf out) {
+        out.writeBytes(msg.getBytes(charset));
     }
 
 }
