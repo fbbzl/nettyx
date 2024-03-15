@@ -21,11 +21,14 @@ import org.fz.nettyx.util.Throws;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.getBytes;
 import static java.util.Arrays.asList;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REALS;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REPLACEMENT;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -64,12 +67,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         private final EscapeMap escapeMap;
 
         @Override
-        protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-//            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-//                in = doEscape(in, bufEntry.getValue(), bufEntry.getKey());
-//            }
-
-            out.add(in);
+        protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
+            ByteBuf decoded = doEscape(msg, escapeMap, REPLACEMENT, REALS);
+            out.add(decoded);
         }
     }
 
@@ -83,12 +83,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-//            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-//                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue());
-//            }
-
-            out.writeBytes(msg);
-            msg.release();
+            ByteBuf encoded = doEscape(msg, escapeMap, REALS, REPLACEMENT);
+            out.writeBytes(encoded);
         }
     }
 
@@ -101,7 +97,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     @EqualsAndHashCode(callSuper = false)
     public static class EscapeMap {
 
-        private static final ByteBuf[] EMPTY_BUFFER_ARRAY = new ByteBuf[0];
+        public static final Function<Pair<ByteBuf, ByteBuf>, ByteBuf>
+                REALS       = Pair::getKey,
+                REPLACEMENT = Pair::getValue;
+
+        static final ByteBuf[] EMPTY_BUFFER_ARRAY = new ByteBuf[0];
 
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
@@ -215,7 +215,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    protected static ByteBuf doEscape(ByteBuf msgBuf, EscapeMap escapeMap) {
+    protected static ByteBuf doEscape(ByteBuf msgBuf,
+                                      EscapeMap escapeMap,
+                                      Function<Pair<ByteBuf, ByteBuf>, ByteBuf> targetFn,
+                                      Function<Pair<ByteBuf, ByteBuf>, ByteBuf> replacementFn) {
         Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
         if (ArrayUtil.isEmpty(mappings)) return msgBuf;
 
@@ -224,25 +227,24 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             while (msgBuf.readableBytes() > 0) {
                 boolean match = false;
                 for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
-                    ByteBuf real       = mapping.getKey();
-                    int     realLength = real.readableBytes();
+                    ByteBuf target     = targetFn.apply(mapping);
+                    int     tarLength = target.readableBytes();
 
-                    if (msgBuf.readableBytes() >= realLength) {
-                        switch (realLength) {
+                    if (msgBuf.readableBytes() >= tarLength) {
+                        switch (tarLength) {
                             case 1:
                             case 2:
-                                match = hasSimilar(msgBuf, real);
+                                match = hasSimilar(msgBuf, target);
                                 break;
                             default:
-                                match = hasSimilar(msgBuf, real) && equalsContent(
-                                        getBytes(msgBuf, msgBuf.readerIndex(), realLength), real);
+                                match = hasSimilar(msgBuf, target) && equalsContent(
+                                        getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
                                 break;
                         }
 
                         if (match) {
-                            msgBuf.skipBytes(realLength);
-                            ByteBuf replacement = mapping.getValue();
-                            escaped.writeBytes(replacement.duplicate());
+                            msgBuf.skipBytes(tarLength);
+                            escaped.writeBytes(replacementFn.apply(mapping).duplicate());
                             // only support single same, so if match we break
                             break;
                         }
