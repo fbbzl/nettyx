@@ -38,7 +38,6 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
     @Override
     protected ChannelFutureAction whenConnectSuccess() {
-
         return cf -> {
             executor.scheduleAtFixedRate(() -> {
                 byte[] aa = new byte[1024 * 10];
