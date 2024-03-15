@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,22 +90,19 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    /**
-     * The type Escape map.
-     */
-    @Getter
     @SuppressWarnings("all")
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    @EqualsAndHashCode(callSuper = false)
     public static class EscapeMap {
 
         public static final Function<Pair<ByteBuf, ByteBuf>, ByteBuf>
-                REALS       = Pair::getKey,
-                REPLACEMENT = Pair::getValue;
+            REALS       = Pair::getKey,
+            REPLACEMENT = Pair::getValue;
 
-        static final ByteBuf[] EMPTY_BUFFER_ARRAY = new ByteBuf[0];
-
+        @Getter
         private final Pair<ByteBuf, ByteBuf>[] mappings;
+
+        private EscapeMap(Pair<ByteBuf, ByteBuf>[] mappings) {
+            this.mappings = mappings;
+        }
 
         public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
             // distinct each
@@ -133,10 +128,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                                           .map(HexKit::decode)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacementHexes)
-                                               .map(HexKit::decode)
-                                               .map(Unpooled::wrappedBuffer)
-                                               .toArray(ByteBuf[]::new);
+                replacementBuffers = Stream.of(replacementHexes)
+                                           .map(HexKit::decode)
+                                           .map(Unpooled::wrappedBuffer)
+                                           .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -149,9 +144,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             ByteBuf[] realBuffers = Stream.of(reals)
                                           .map(Unpooled::wrappedBuffer)
                                           .toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacements)
-                                               .map(Unpooled::wrappedBuffer)
-                                               .toArray(ByteBuf[]::new);
+                replacementBuffers = Stream.of(replacements)
+                                           .map(Unpooled::wrappedBuffer)
+                                           .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
@@ -175,8 +170,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
             if (reals.length != replacements.length) {
                 throw new IllegalArgumentException(
-                        "the count of the reals must be the same as the count of replacements, reals count is ["
-                        + reals.length + "], the replacements count is [" + replacements.length + "]");
+                    "the count of the reals must be the same as the count of replacements, reals count is ["
+                    + reals.length + "], the replacements count is [" + replacements.length + "]");
             }
 
             Throws.ifTrue(containsInvalidByteBuf(reals) || containsInvalidByteBuf(replacements), "reals or " +
@@ -220,6 +215,24 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 }
             }
             return false;
+        }
+
+        public boolean equals(final Object o) {
+            if (o == this) { return true; }
+            if (!(o instanceof EscapeMap)) { return false; }
+            final EscapeMap other = (EscapeMap) o;
+            if (!other.canEqual((Object) this)) { return false; }
+            if (!java.util.Arrays.deepEquals(this.mappings, other.mappings)) { return false; }
+            return true;
+        }
+
+        protected boolean canEqual(final Object other) { return other instanceof EscapeMap; }
+
+        public int hashCode() {
+            final int PRIME  = 59;
+            int       result = 1;
+            result = result * PRIME + java.util.Arrays.deepHashCode(this.mappings);
+            return result;
         }
     }
 
