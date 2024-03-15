@@ -9,12 +9,11 @@ import codec.model.Wife;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
@@ -32,8 +31,5 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
 
         Console.print(s.prettyPrint(TimeUnit.MILLISECONDS));
 
-//        byte[] xx = new byte[1024];
-//        Arrays.fill(xx, (byte)1);
-//        ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(xx));
     }
 }
