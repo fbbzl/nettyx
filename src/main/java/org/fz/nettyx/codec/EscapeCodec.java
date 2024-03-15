@@ -68,7 +68,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
-            doEscape(msg, escapeMap, REPLACEMENT, REALS);
+            msg = doEscape(msg.duplicate(), escapeMap, REPLACEMENT, REALS);
             out.add(msg);
         }
     }
@@ -83,7 +83,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-            doEscape(msg, escapeMap, REALS, REPLACEMENT);
+            msg = doEscape(msg, escapeMap, REALS, REPLACEMENT);
             out.writeBytes(msg);
         }
     }
@@ -215,49 +215,43 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    protected static void doEscape(ByteBuf msgBuf,
-                                   EscapeMap escapeMap,
-                                   Function<Pair<ByteBuf, ByteBuf>, ByteBuf> targetFn,
-                                   Function<Pair<ByteBuf, ByteBuf>, ByteBuf> replacementFn) {
+    protected static ByteBuf doEscape(ByteBuf msgBuf,
+                                      EscapeMap escapeMap,
+                                      Function<Pair<ByteBuf, ByteBuf>, ByteBuf> targetFn,
+                                      Function<Pair<ByteBuf, ByteBuf>, ByteBuf> replacementFn) {
         Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
-        if (ArrayUtil.isEmpty(mappings)) return;
+        if (ArrayUtil.isEmpty(mappings)) return msgBuf;
 
-        final ByteBuf copied = msgBuf.copy();
-        msgBuf.clear();
-        try {
-            while (copied.readableBytes() > 0) {
-                boolean match = false;
-                for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
-                    ByteBuf target    = targetFn.apply(mapping);
-                    int     tarLength = target.readableBytes();
+        final ByteBuf escaped = msgBuf.alloc().buffer();
+        while (msgBuf.readableBytes() > 0) {
+            boolean match = false;
+            for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
+                ByteBuf target    = targetFn.apply(mapping);
+                int     tarLength = target.readableBytes();
 
-                    if (copied.readableBytes() >= tarLength) {
-                        switch (tarLength) {
-                            case 1:
-                            case 2:
-                                match = hasSimilar(copied, target);
-                                break;
-                            default:
-                                match = hasSimilar(copied, target) && equalsContent(
-                                        getBytes(copied, copied.readerIndex(), tarLength), target);
-                                break;
-                        }
-
-                        if (match) {
-                            copied.skipBytes(tarLength);
-                            msgBuf.writeBytes(replacementFn.apply(mapping).duplicate());
-                            // only support single same, so if match we break
+                if (msgBuf.readableBytes() >= tarLength) {
+                    switch (tarLength) {
+                        case 1:
+                        case 2:
+                            match = hasSimilar(msgBuf, target);
                             break;
-                        }
+                        default:
+                            match = hasSimilar(msgBuf, target) && equalsContent(
+                                    getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
+                            break;
+                    }
+
+                    if (match) {
+                        msgBuf.skipBytes(tarLength);
+                        escaped.writeBytes(replacementFn.apply(mapping).duplicate());
+                        // only support single same, so if match we break
+                        break;
                     }
                 }
-                if (!match) msgBuf.writeByte(copied.readByte());
             }
-
+            if (!match) escaped.writeByte(msgBuf.readByte());
         }
-        finally {
-            copied.release();
-        }
+        return escaped;
     }
 
     private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
