@@ -253,7 +253,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                     if (match) {
                         msgBuf.skipBytes(tarLength);
                         escaped.writeBytes(replacementFn.apply(mapping).duplicate());
-                        // only support single same, so if match we break
+                        // only support one to one mapping
                         break;
                     }
                 }
