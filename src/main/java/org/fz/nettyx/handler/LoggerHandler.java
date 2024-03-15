@@ -315,7 +315,7 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             Channel channel = ctx.channel();
-            final String format = "channel [{}] write to [{}], message is: [{}]";
+            final String format = "write to [{}], message is: [{}]";
             SocketAddress socketAddress = channel.remoteAddress();
 
             switch (level) {
