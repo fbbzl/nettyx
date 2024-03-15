@@ -107,6 +107,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
         public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
+            // distinct each
+            reals        = ArrayUtil.distinct(reals);
+            replacements = ArrayUtil.distinct(replacements);
+
             checkMappings(reals, replacements);
 
             List<Pair<ByteBuf, ByteBuf>> mappings = new ArrayList<>(reals.length);
