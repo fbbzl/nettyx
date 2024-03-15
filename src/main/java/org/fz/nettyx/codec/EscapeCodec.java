@@ -67,8 +67,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         private final EscapeMap escapeMap;
 
         @Override
-        protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
-            ByteBuf decode = doEscape(msg, escapeMap, REPLACEMENT, REALS);
+        protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+            ByteBuf decode = doEscape(in, escapeMap, REPLACEMENT, REALS);
             out.add(decode);
         }
     }
