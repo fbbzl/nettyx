@@ -1,10 +1,20 @@
 package client.jsc;
 
 
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.BAUD_RATE;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DATA_BITS;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.PARITY_BIT;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BITS;
+
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFutureListener;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
+import java.net.SocketAddress;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelClient;
@@ -12,14 +22,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
-
-import java.net.SocketAddress;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 /**
  * @author fengbinbin
@@ -33,6 +35,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
     protected TestSingleJsc(JscDeviceAddress remoteAddress) {
         super(remoteAddress);
     }
+
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
 
@@ -40,12 +43,10 @@ public class TestSingleJsc extends SingleJscChannelClient {
     protected ChannelFutureAction whenConnectSuccess() {
         return cf -> {
             executor.scheduleAtFixedRate(() -> {
-                ChannelFutureListener listener = new ActionableChannelFutureListener()
-                        .whenSuccess(cf2-> System.err.println(cf2))
-                        .whenFailure(cf1 -> System.err.println(cf1.cause()));
-                this.writeAndFlush("ffff").addListener(listener);
-
-            } , 2,20,TimeUnit.MILLISECONDS);
+                byte[] msg = new byte[1024 * 4];
+                Arrays.fill(msg, (byte) 1);
+                this.writeAndFlush(Unpooled.wrappedBuffer(msg));
+            }, 2, 20, TimeUnit.MILLISECONDS);
 
             System.err.println(cf.channel().localAddress() + ": ok");
         };
