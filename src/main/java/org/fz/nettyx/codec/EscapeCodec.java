@@ -166,35 +166,40 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return mapEach(new ByteBuf[]{real}, new ByteBuf[]{replacement});
         }
 
-        static void checkMapping(ByteBuf target, ByteBuf replacement) {
-            if (containsInvalidByteBuf(target, replacement)) {
-                throw new IllegalArgumentException("neither the target nor the replacement can be null or empty, please check");
+        static void checkMapping(ByteBuf real, ByteBuf replacement) {
+            if (containsInvalidByteBuf(real, replacement)) {
+                throw new IllegalArgumentException("neither the real nor the replacement can be null or un-readable, " +
+                                                   "please check");
             }
 
-            Throws.ifTrue(ByteBufUtil.equals(target, replacement), "target ["
-                                                                   + hexDump(target) + "] can not be the " +
-                                                                   "same as the replacement [" + hexDump(replacement)
-                                                                   + "]");
+            Throws.ifTrue(ByteBufUtil.equals(real, replacement), "real data ["
+                                                                 + hexDump(real) + "] can not be the " +
+                                                                 "same as the replacement data [" + hexDump(replacement)
+                                                                 + "]");
 
-            Throws.ifTrue(containsContent(replacement, target), "do not let replacement ["
-                                                                + hexDump(replacement) +
-                                                                "] contain target [" + hexDump(target) + "]");
+            Throws.ifTrue(containsContent(replacement, real), "do not let replacement data ["
+                                                              + hexDump(replacement) +
+                                                              "] contain real data [" + hexDump(real) + "]");
         }
 
         static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
             if (reals.length != replacements.length) {
                 throw new IllegalArgumentException(
-                        "the count of the targets must be the same as the count of replacements, reals count is ["
-                        + reals.length + "], the replacements length is [" + replacements.length + "]");
+                        "the count of the reals must be the same as the count of replacements, reals count is ["
+                        + reals.length + "], the replacements count is [" + replacements.length + "]");
             }
 
+            Throws.ifTrue(containsInvalidByteBuf(reals) || containsInvalidByteBuf(replacements), "reals or " +
+                                                                                                 "replacements " +
+                                                                                                 "contains invalid " +
+                                                                                                 "buf, please check");
+
             Collection<ByteBuf> intersection = intersection(asList(reals), asList(replacements));
-            Throws.ifNotEmpty(intersection, "do not let the real data intersect with the replacement data");
+            Throws.ifNotEmpty(intersection, "do not let the reals intersect with the replacements, please check");
 
             for (ByteBuf real : reals) {
                 for (ByteBuf replacement : replacements) {
-                    Throws.ifTrue(containsContent(replacement, real), "do not let the replacement data contain the " +
-                                                                      "real data");
+                    Throws.ifTrue(containsContent(replacement, real), "do not let the replacements contain the reals");
                 }
             }
         }
