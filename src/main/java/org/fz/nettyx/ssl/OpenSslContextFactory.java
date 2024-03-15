@@ -11,17 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * For details about how to generate openssl files, see {@link ./support/openssl}. you may use like the following code:
- *
- * this.sslContext = OpenSslContextFactory.getClientSslContext(openSsl); SslHandler sslHandler =
- * sslContext.newHandler(channel.alloc()); sslHandler.setHandshakeTimeout(openSsl.handshakeTimeoutSeconds(),
- * TimeUnit.SECONDS);
- *
- * GenericFutureListener<Promise<Channel>> handshakeListener = future -> { if (future.isSuccess())  log.info("ssl
- * handshake success, remote address is [{}]", remoteAddress); if (!future.isSuccess()) log.error("ssl handshake
- * failure, remote address is [{}], exception is: [{}]", remoteAddress, future.cause().getMessage()); };
- *
- * sslHandler.handshakeFuture().addListener(handshakeListener); return sslHandler;
+ * use to get OpenSslContext
  *
  * @author fengbinbin
  * @version 1.0
