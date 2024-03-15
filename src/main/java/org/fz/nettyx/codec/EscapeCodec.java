@@ -275,12 +275,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return escaped;
     }
 
-    private static boolean equalsContent(byte[] bytes, ByteBuf buf) {
+    static boolean equalsContent(byte[] bytes, ByteBuf buf) {
         if (bytes.length != buf.readableBytes()) {
             return false;
         }
 
-        // compare content
         for (int i = 0; i < bytes.length; i++) {
             if (bytes[i] != buf.getByte(i)) {
                 return false;
@@ -290,7 +289,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return true;
     }
 
-    private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
+    static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
         int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
 
         boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
