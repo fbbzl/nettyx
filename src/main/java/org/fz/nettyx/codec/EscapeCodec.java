@@ -1,31 +1,34 @@
 package org.fz.nettyx.codec;
 
+import static cn.hutool.core.collection.CollUtil.intersection;
+import static io.netty.buffer.ByteBufUtil.getBytes;
+import static java.util.Arrays.asList;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REALS;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REPLACEMENT;
+
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.ReferenceCountUtil;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Stream;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
+import org.fz.nettyx.util.Throws;
 
 /**
- * used to escape messages
- * some sensitive characters can be replaced
+ * used to escape messages some sensitive characters can be replaced
  *
  * @author fengbinbin
  * @since 2022 -01-27 18:07
@@ -62,11 +65,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                in = doEscape(in, bufEntry.getValue(), bufEntry.getKey(), escapeMap.getExcludes(bufEntry.getValue()));
-            }
-
-            out.add(in);
+            ByteBuf decode = doEscape(in, escapeMap, REPLACEMENT, REALS);
+            out.add(decode);
         }
     }
 
@@ -80,294 +80,223 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-            for (Entry<ByteBuf, ByteBuf> bufEntry : escapeMap.entrySet()) {
-                msg = doEscape(msg, bufEntry.getKey(), bufEntry.getValue(), escapeMap.getExcludes(bufEntry.getKey()));
+            ByteBuf encoded = doEscape(msg, escapeMap, REALS, REPLACEMENT);
+            try {
+                out.writeBytes(encoded);
             }
-
-            out.writeBytes(msg);
+            finally {
+                encoded.release();
+            }
         }
     }
 
-    /**
-     * The type Escape map.
-     */
-    @Getter
-    @NoArgsConstructor
-    @EqualsAndHashCode(callSuper = false)
-    public static class EscapeMap extends HashMap<ByteBuf, ByteBuf> {
+    @SuppressWarnings("all")
+    public static class EscapeMap {
 
-        private static final ByteBuf[] EMPTY_BUFFER_ARRAY = new ByteBuf[0];
+        public static final Function<Pair<ByteBuf, ByteBuf>, ByteBuf>
+            REALS       = Pair::getKey,
+            REPLACEMENT = Pair::getValue;
 
-        private final Map<ByteBuf, ByteBuf[]> excludeMap = new HashMap<>(4);
+        @Getter
+        private final Pair<ByteBuf, ByteBuf>[] mappings;
 
-        /**
-         * init with assigned capacity
-         */
-        private EscapeMap(int initialCapacity) {
-            super(initialCapacity);
+        private EscapeMap(Pair<ByteBuf, ByteBuf>[] mappings) {
+            this.mappings = mappings;
         }
 
-        /**
-         * Map each hex escape map.
-         *
-         * @param reals        the reals
-         * @param replacements the replacements
-         * @return the escape map
-         */
+        public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
+            // distinct each
+            reals        = ArrayUtil.distinct(reals);
+            replacements = ArrayUtil.distinct(replacements);
+
+            checkMappings(reals, replacements);
+
+            List<Pair<ByteBuf, ByteBuf>> mappings = new ArrayList<>(reals.length);
+            for (int i = 0; i < reals.length; i++) {
+                mappings.add(Pair.of(reals[i], replacements[i]));
+            }
+
+            return new EscapeMap(mappings.toArray(new Pair[0]));
+        }
+
         public static EscapeMap mapEachHex(List<String> reals, List<String> replacements) {
             return mapEachHex(reals.toArray(new String[]{}), replacements.toArray(new String[]{}));
         }
 
-        /**
-         * Escape bytebuffer as needed, and specify real data and replacement in order
-         *
-         * @param realHexes        The number and order of real buffers that need to be escaped should be the same as that of replacementHexes
-         * @param replacementHexes The number and order of replacement buffers should be the same as those of reals
-         * @return Buffer after escaped
-         */
         public static EscapeMap mapEachHex(String[] realHexes, String[] replacementHexes) {
-            ByteBuf[] realBuffers = Stream.of(realHexes).map(HexKit::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
-                    replacementBuffers = Stream.of(replacementHexes).map(HexKit::decode).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
+            ByteBuf[] realBuffers = Stream.of(realHexes)
+                                          .map(HexKit::decode)
+                                          .map(Unpooled::wrappedBuffer)
+                                          .toArray(ByteBuf[]::new),
+                replacementBuffers = Stream.of(replacementHexes)
+                                           .map(HexKit::decode)
+                                           .map(Unpooled::wrappedBuffer)
+                                           .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
 
-        /**
-         * Map each bytes escape map.
-         *
-         * @param reals        the reals
-         * @param replacements the replacements
-         * @return the escape map
-         */
         public static EscapeMap mapEachBytes(List<byte[]> reals, List<byte[]> replacements) {
             return mapEachBytes(reals.toArray(new byte[][]{}), replacements.toArray(new byte[][]{}));
         }
 
-        /**
-         * Map each bytes escape map.
-         *
-         * @param reals        the reals
-         * @param replacements the replacements
-         * @return the escape map
-         */
         public static EscapeMap mapEachBytes(byte[][] reals, byte[][] replacements) {
-            ByteBuf[] realBuffers = Stream.of(reals).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new),
-                      replacementBuffers = Stream.of(replacements).map(Unpooled::wrappedBuffer).toArray(ByteBuf[]::new);
+            ByteBuf[] realBuffers = Stream.of(reals)
+                                          .map(Unpooled::wrappedBuffer)
+                                          .toArray(ByteBuf[]::new),
+                replacementBuffers = Stream.of(replacements)
+                                           .map(Unpooled::wrappedBuffer)
+                                           .toArray(ByteBuf[]::new);
 
             return mapEach(realBuffers, replacementBuffers);
         }
 
-        /**
-         * Map each escape map.
-         *
-         * @param reals        the reals
-         * @param replacements the replacements
-         * @return the escape map
-         */
         public static EscapeMap mapEach(List<ByteBuf> reals, List<ByteBuf> replacements) {
             return mapEach(reals.toArray(new ByteBuf[]{}), replacements.toArray(new ByteBuf[]{}));
         }
 
-        /**
-         * Map each escape map.
-         *
-         * @param reals        the reals
-         * @param replacements the replacements
-         * @return the escape map
-         */
-        public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
-            checkMapping(reals, replacements);
-
-            EscapeMap escapeMap = new EscapeMap(reals.length);
-            for (int i = 0; i < reals.length; i++) {
-                escapeMap.put(reals[i], replacements[i]);
-            }
-            escapeMap.setExcludeMap(reals, replacements);
-
-            return escapeMap;
-        }
-
-        /**
-         * Map hex escape map.
-         *
-         * @param realHex        the real hex
-         * @param replacementHex the replacement hex
-         * @return the escape map
-         */
         public static EscapeMap mapHex(String realHex, String replacementHex) {
             return map(HexKit.decode(realHex), HexKit.decode(replacementHex));
         }
 
-        /**
-         * Map escape map.
-         *
-         * @param realBytes        the real bytes
-         * @param replacementBytes the replacement bytes
-         * @return the escape map
-         */
         public static EscapeMap map(byte[] realBytes, byte[] replacementBytes) {
             return map(Unpooled.wrappedBuffer(realBytes), Unpooled.wrappedBuffer(replacementBytes));
         }
 
-        /**
-         * Map escape map.
-         *
-         * @param real        the real
-         * @param replacement the replacement
-         * @return the escape map
-         */
         public static EscapeMap map(ByteBuf real, ByteBuf replacement) {
-            EscapeMap escapeMap = new EscapeMap(1);
-            escapeMap.put(real, replacement);
-
-            escapeMap.setExcludeMap(new ByteBuf[]{real}, new ByteBuf[]{replacement});
-            return escapeMap;
+            return mapEach(new ByteBuf[]{real}, new ByteBuf[]{replacement});
         }
 
-        private static void checkMapping(Object[] reals, Object[] replacements) {
-            if (reals.length != replacements.length)
-                throw new IllegalArgumentException("The reals data must be the same as the number of replacements data");
-        }
+        static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
+            if (reals.length != replacements.length) {
+                throw new IllegalArgumentException(
+                    "the count of the reals must be the same as the count of replacements, reals count is ["
+                    + reals.length + "], the replacements count is [" + replacements.length + "]");
+            }
 
-        /**
-         * Get excludes byte buf [ ].
-         *
-         * @param real the real
-         * @return the byte buf [ ]
-         */
-        public ByteBuf[] getExcludes(ByteBuf real) {
-            return getExcludeMap().getOrDefault(real, EMPTY_BUFFER_ARRAY);
-        }
+            Throws.ifTrue(containsInvalidByteBuf(reals) || containsInvalidByteBuf(replacements), "reals or " +
+                                                                                                 "replacements " +
+                                                                                                 "contains invalid " +
+                                                                                                 "buf, please check");
 
-        /**
-         * Sets exclude map.
-         *
-         * @param reals        the reals
-         * @param replacements the replacements
-         */
-        public void setExcludeMap(ByteBuf[] reals, ByteBuf[] replacements) {
-            for (int i = 0; i < reals.length; i++) {
-                List<ByteBuf> excludes = new ArrayList<>(4);
-                for (int j = 0; j < replacements.length; j++) {
-                    if (i > j && contains(replacements[j], reals[i])) {
-                        excludes.add(replacements[j]);
-                    }
+            Collection<ByteBuf> intersection = intersection(asList(reals), asList(replacements));
+            Throws.ifNotEmpty(intersection, "do not let the reals intersect with the replacements, please check");
+
+            for (ByteBuf real : reals) {
+                for (ByteBuf replacement : replacements) {
+                    Throws.ifTrue(containsContent(replacement, real), "do not let the replacements contain the reals");
                 }
-                this.excludeMap.put(reals[i], excludes.toArray(new ByteBuf[]{}));
             }
         }
 
-        private boolean contains(ByteBuf real, ByteBuf part) {
-            ByteBuf buf = real.alloc().buffer(part.readableBytes());
-            for (int i = 0; i < real.readableBytes(); i++) {
-                real.getBytes(i, buf);
-                if (buf.equals(part)) {
-                    return true;
-                }
-                buf.clear();
-            }
-            return false;
-        }
-    }
+        static boolean containsContent(ByteBuf buf, ByteBuf part) {
+            if (buf.readableBytes() < part.readableBytes()) { return false; }
 
-    /**
-     * Do escape byte buf.
-     *
-     * @param msgBuf      the msg buf
-     * @param real        the real buf
-     * @param replacement the replacement
-     * @param excludes    the excludes
-     * @return the byte buf
-     */
-    static ByteBuf doEscape(ByteBuf msgBuf, ByteBuf real, ByteBuf replacement, ByteBuf... excludes) {
-        if (containsInvalidByteBuf(msgBuf, real, replacement)) return msgBuf;
-        if (excludes.length != 0 && Arrays.binarySearch(excludes, real) != -1) {
-            log.warn("It is not recommended to exclude real [{}], This will cause the escape to fail", real);
-        }
-
-        final ByteBuf result = msgBuf.alloc().buffer();
-
-        int readIndex = 0;
-        ByteBuf budget = msgBuf.alloc().buffer(real.readableBytes());
-        while (msgBuf.readableBytes() >= real.readableBytes()) {
-            if (hasSimilarBytes(readIndex, msgBuf, real)) {
-                // prepare for reset
-                msgBuf.markReaderIndex();
-
-                msgBuf.readBytes(budget);
-
-                if (budget.equals(real) && !equalsAny(readIndex, msgBuf, excludes)) {
-                    result.writeBytes(replacement.duplicate());
-
-                    readIndex += real.readableBytes();
-                } else {
-                    // if not equals, will reset the read index
-                    msgBuf.resetReaderIndex();
-
-                    result.writeByte(msgBuf.readByte());
-                    readIndex++;
-                }
-
-                budget.clear();
-            } else {
-                result.writeByte(msgBuf.readByte());
-                readIndex++;
-            }
-        }
-
-        ReferenceCountUtil.release(budget);
-
-        // write the left buffer
-        if (msgBuf.readableBytes() > 0) {
-            byte[] bytes = new byte[msgBuf.readableBytes()];
-            msgBuf.readBytes(bytes);
-            result.writeBytes(bytes);
-        }
-
-        return result;
-    }
-
-    private static boolean equalsAny(int index, ByteBuf msgBuf, ByteBuf... excludes) {
-        if (excludes.length == 0) {
-            return false;
-        }
-
-        for (ByteBuf exclude : excludes) {
-            for (int i = 0; i < exclude.readableBytes(); i++) {
-                try {
-                    if (msgBuf.getByte(index + i) != exclude.getByte(i)) {
-                        return false;
-                    }
-                } catch (IndexOutOfBoundsException indexOutOfBounds) {
+            byte[] sample = new byte[part.readableBytes()];
+            for (int i = 0; i < buf.readableBytes(); i++) {
+                if (buf.readableBytes() - i < sample.length) {
                     return false;
                 }
+                buf.getBytes(i, sample);
+                if (equalsContent(sample, part)) { return true; }
+            }
+
+            return false;
+        }
+
+        static boolean invalidByteBuf(ByteBuf buffer) {
+            return buffer == null || !buffer.isReadable();
+        }
+
+        static boolean containsInvalidByteBuf(ByteBuf... buffers) {
+            for (ByteBuf byteBuf : buffers) {
+                if (invalidByteBuf(byteBuf)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean equals(final Object o) {
+            if (o == this) { return true; }
+            if (!(o instanceof EscapeMap)) { return false; }
+            final EscapeMap other = (EscapeMap) o;
+            if (!other.canEqual((Object) this)) { return false; }
+            if (!java.util.Arrays.deepEquals(this.mappings, other.mappings)) { return false; }
+            return true;
+        }
+
+        protected boolean canEqual(final Object other) { return other instanceof EscapeMap; }
+
+        public int hashCode() {
+            final int PRIME  = 59;
+            int       result = 1;
+            result = result * PRIME + java.util.Arrays.deepHashCode(this.mappings);
+            return result;
+        }
+    }
+
+    protected static ByteBuf doEscape(ByteBuf msgBuf,
+                                      EscapeMap escapeMap,
+                                      Function<Pair<ByteBuf, ByteBuf>, ByteBuf> targetFn,
+                                      Function<Pair<ByteBuf, ByteBuf>, ByteBuf> replacementFn) {
+        Pair<ByteBuf, ByteBuf>[] mappings = escapeMap.getMappings();
+        if (ArrayUtil.isEmpty(mappings)) return msgBuf;
+
+        final ByteBuf escaped = msgBuf.alloc().buffer();
+        while (msgBuf.readableBytes() > 0) {
+            boolean match = false;
+            for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
+                ByteBuf target    = targetFn.apply(mapping);
+                int     tarLength = target.readableBytes();
+
+                if (msgBuf.readableBytes() >= tarLength) {
+                    switch (tarLength) {
+                        case 1:
+                        case 2:
+                            match = hasSimilar(msgBuf, target);
+                            break;
+                        default:
+                            match = hasSimilar(msgBuf, target) && equalsContent(
+                                    getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
+                            break;
+                    }
+
+                    if (match) {
+                        msgBuf.skipBytes(tarLength);
+                        escaped.writeBytes(replacementFn.apply(mapping).duplicate());
+                        // only support one to one mapping
+                        break;
+                    }
+                }
+            }
+            if (!match) escaped.writeByte(msgBuf.readByte());
+        }
+        return escaped;
+    }
+
+    static boolean equalsContent(byte[] bytes, ByteBuf buf) {
+        if (bytes.length != buf.readableBytes()) {
+            return false;
+        }
+
+        // compare content
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] != buf.getByte(i)) {
+                return false;
             }
         }
+
         return true;
     }
 
-    private static boolean invalidByteBuf(ByteBuf buffer) {
-        return buffer == null || buffer.readableBytes() == 0;
-    }
+    static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
+        int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
 
-    private static boolean containsInvalidByteBuf(ByteBuf... buffers) {
-        for (ByteBuf byteBuf : buffers) {
-            if (invalidByteBuf(byteBuf)) {
-                return true;
-            }
-        }
-        return false;
-    }
+        boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
+        if (tarLength == 1) { return sameHead; }
 
-    /**
-     * check if it has the same header-byte and tail-byte
-     *
-     * @param msgBuf reading message buffer
-     * @param target the target buffer
-     */
-    private static boolean hasSimilarBytes(int index, ByteBuf msgBuf, ByteBuf target) {
-        return msgBuf.getByte(index) == target.getByte(0)
-               &&
-               msgBuf.getByte(index + target.readableBytes() - 1) == target.getByte(target.readableBytes() - 1);
+        boolean sameTail = msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
+        return sameHead && sameTail;
     }
 }
