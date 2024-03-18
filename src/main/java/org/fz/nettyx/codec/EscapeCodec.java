@@ -44,9 +44,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         super(escapeDecoder, escapeEncoder);
     }
 
-    /**
-     * using {@link EscapeMap} to deal message
-     */
     @RequiredArgsConstructor
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
@@ -59,9 +56,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    /**
-     * using {@link EscapeMap} to deal message
-     */
     @RequiredArgsConstructor
     public static class EscapeEncoder extends MessageToByteEncoder<ByteBuf> {
 
