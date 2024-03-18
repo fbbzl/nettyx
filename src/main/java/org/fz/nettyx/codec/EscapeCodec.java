@@ -124,9 +124,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         // 1 check if byte buf is valid
         for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
             ByteBuf real = mapping.getKey(), replacement = mapping.getValue();
-            Throws.ifTrue(invalidByteBuf(real) || invalidByteBuf(replacement), "reals or replacements contains " +
-                                                                               "invalid buf," +
-                                                                               " please check");
+            Throws.ifTrue(invalid(real) || invalid(replacement), "reals or replacements contains " +
+                                                                 "invalid buf, please check");
         }
 
         // 2 check if intersection is not empty
@@ -159,7 +158,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
 
-    static boolean invalidByteBuf(ByteBuf buffer) {
+    static boolean invalid(ByteBuf buffer) {
         return buffer == null || !buffer.isReadable();
     }
 
