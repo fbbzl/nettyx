@@ -12,6 +12,7 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.fz.nettyx.handler.LoggerHandler;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static org.fz.nettyx.handler.LoggerHandler.Sl4jLevel.INFO;
 
 /**
  * @author fengbinbin
@@ -34,7 +35,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
                 , new StartEndFlagFrameCodec(1024 * 1024, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
                 , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
                 , new UserCodec()
-                , new LoggerHandler(log)
+                , new LoggerHandler(log, INFO)
                 , inboundAdvice);
     }
 }

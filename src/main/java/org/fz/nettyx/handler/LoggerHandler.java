@@ -171,82 +171,34 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         private final Function<Object, String> messageFormatter;
         private final Sl4jLevel                level;
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param topic the topic
-         */
         public OutboundLogger(String topic) {
             this(LoggerFactory.getLogger(topic));
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param topic            the topic
-         * @param messageFormatter the message formatter
-         */
         public OutboundLogger(String topic, Function<Object, String> messageFormatter) {
             this(LoggerFactory.getLogger(topic), messageFormatter);
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param topic the topic
-         * @param level the level
-         */
         public OutboundLogger(String topic, Sl4jLevel level) {
             this(LoggerFactory.getLogger(topic), level);
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param topic            the topic
-         * @param messageFormatter the message formatter
-         * @param level            the level
-         */
         public OutboundLogger(String topic, Function<Object, String> messageFormatter, Sl4jLevel level) {
             this(LoggerFactory.getLogger(topic), messageFormatter, level);
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param logger the logger
-         */
         public OutboundLogger(Logger logger) {
             this(logger, DEFAULT_FORMATTER);
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param logger the logger
-         * @param level  the level
-         */
         public OutboundLogger(Logger logger, Sl4jLevel level) {
             this(logger, DEFAULT_FORMATTER, level);
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param logger           the logger
-         * @param messageFormatter the message formatter
-         */
         public OutboundLogger(Logger logger, Function<Object, String> messageFormatter) {
             this(logger, messageFormatter, DEFAULT_LEVEL);
         }
 
-        /**
-         * Instantiates a new Outbound logger.
-         *
-         * @param logger           the logger
-         * @param messageFormatter the message formatter
-         * @param level            the level
-         */
         public OutboundLogger(Logger logger, Function<Object, String> messageFormatter, Sl4jLevel level) {
             this.logger           = logger;
             this.messageFormatter = messageFormatter;
