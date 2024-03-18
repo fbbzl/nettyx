@@ -267,8 +267,8 @@ public class ChannelAdvice {
             super.flush(ctx);
         }
 
-        @Setter
         @Slf4j
+        @Setter
         @NoArgsConstructor
         @AllArgsConstructor
         private static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
