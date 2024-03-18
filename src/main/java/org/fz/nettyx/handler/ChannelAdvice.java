@@ -1,34 +1,17 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.action.Actions.invokeAction;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.CombinedChannelDuplexHandler;
-import java.net.SocketAddress;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import io.netty.channel.*;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelBindAction;
-import org.fz.nettyx.action.ChannelConnectAction;
-import org.fz.nettyx.action.ChannelExceptionAction;
-import org.fz.nettyx.action.ChannelHandlerContextAction;
-import org.fz.nettyx.action.ChannelPromiseAction;
-import org.fz.nettyx.action.ChannelReadAction;
-import org.fz.nettyx.action.ChannelWriteAction;
-import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
-import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
+import org.fz.nettyx.action.*;
 import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
 import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
 import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
+
+import java.net.SocketAddress;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * @author fengbinbin
@@ -36,7 +19,7 @@ import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
  * @since 2024/2/27 10:58
  */
 
-public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, OutboundAdvice> {
+public class ChannelAdvice {
 
     /**
      * The type Inbound advice.
