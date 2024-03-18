@@ -7,11 +7,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
-import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
 
 import java.util.Arrays;
@@ -23,6 +22,7 @@ import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.getBytes;
 import static java.util.stream.Collectors.toList;
 import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.*;
+import static org.fz.nettyx.util.HexKit.decodeBuf;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -45,26 +45,50 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         super(escapeDecoder, escapeEncoder);
     }
 
-    @RequiredArgsConstructor
+    @Getter
+    @SuppressWarnings("all")
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
-        private final EscapeMap escapeMap;
+        private final Pair<ByteBuf, ByteBuf>[] mappings;
+
+        public static EscapeDecoder mapHexPairs(Pair<String, String>... realsReplacementsPair) {
+            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(decodeBuf(p.getKey()),
+                                                                                  decodeBuf(p.getValue()))).toArray(Pair[]::new));
+        }
+
+        public static EscapeDecoder mapPairs(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
+            return new EscapeDecoder(realsReplacementsPair);
+        }
+
+        public static EscapeDecoder mapHex(String realHex, String replacementHex) {
+            return map(decodeBuf(realHex), decodeBuf(replacementHex));
+        }
+
+        public static EscapeDecoder map(ByteBuf real, ByteBuf replacement) {
+            return new EscapeDecoder(Pair.of(real, replacement));
+        }
+
+        public EscapeDecoder(Pair<ByteBuf, ByteBuf>... mappings) {
+            checkMappings(mappings);
+            this.mappings = mappings;
+        }
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-            ByteBuf decode = doEscape(in, escapeMap, REPLACEMENT, REALS);
+            ByteBuf decode = doEscape(in, mappings, REPLACEMENT, REALS);
             out.add(decode);
         }
     }
 
+    @Getter
     @SuppressWarnings("all")
     public static class EscapeEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
         public static EscapeEncoder mapHexPairs(Pair<String, String>... realsReplacementsPair) {
-            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(HexKit.decodeBuf(p.getKey()),
-                                                                                  HexKit.decodeBuf(p.getValue()))).toArray(Pair[]::new));
+            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(decodeBuf(p.getKey()),
+                                                                                  decodeBuf(p.getValue()))).toArray(Pair[]::new));
         }
 
         public static EscapeEncoder mapPairs(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
@@ -72,14 +96,13 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         public static EscapeEncoder mapHex(String realHex, String replacementHex) {
-            return map(HexKit.decodeBuf(realHex), HexKit.decodeBuf(replacementHex));
+            return map(decodeBuf(realHex), decodeBuf(replacementHex));
         }
 
         public static EscapeEncoder map(ByteBuf real, ByteBuf replacement) {
             return new EscapeEncoder(Pair.of(real, replacement));
         }
 
-        @SafeVarargs
         public EscapeEncoder(Pair<ByteBuf, ByteBuf>... mappings) {
             checkMappings(mappings);
             this.mappings = mappings;
