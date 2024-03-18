@@ -71,27 +71,39 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
     private static final Function<Object, String> DEFAULT_FORMATTER = TO_STRING;
 
     public LoggerHandler(String topic) {
-        super(new InboundLogger(topic), new OutboundLogger(topic));
+        this(topic, DEFAULT_FORMATTER, DEFAULT_LEVEL);
     }
 
     public LoggerHandler(String topic, Function<Object, String> messageFormatter) {
-        super(new InboundLogger(topic, messageFormatter), new OutboundLogger(topic, messageFormatter));
+        this(topic, messageFormatter, DEFAULT_LEVEL);
+    }
+
+    public LoggerHandler(String topic, Sl4jLevel level) {
+        this(topic, DEFAULT_FORMATTER, level);
+    }
+
+    public LoggerHandler(String topic, Function<Object, String> messageFormatter, Sl4jLevel level) {
+        super(new InboundLogger(topic, messageFormatter, level), new OutboundLogger(topic, messageFormatter, level));
     }
 
     public LoggerHandler(Logger logger) {
-        super(new InboundLogger(logger), new OutboundLogger(logger));
+        this(logger, DEFAULT_FORMATTER, DEFAULT_LEVEL);
     }
 
     public LoggerHandler(Logger logger, Function<Object, String> messageFormatter) {
-        super(new InboundLogger(logger, messageFormatter), new OutboundLogger(logger, messageFormatter));
+        this(logger, messageFormatter, DEFAULT_LEVEL);
+    }
+
+    public LoggerHandler(Logger logger, Sl4jLevel level) {
+        this(logger, DEFAULT_FORMATTER, level);
     }
 
     public LoggerHandler(Logger logger, Function<Object, String> messageFormatter, Sl4jLevel level) {
         super(new InboundLogger(logger, messageFormatter, level), new OutboundLogger(logger, messageFormatter, level));
     }
 
-    @EqualsAndHashCode(callSuper = false)
     @Data
+    @EqualsAndHashCode(callSuper = false)
     public static class InboundLogger extends ChannelInboundHandlerAdapter {
         private final Logger                   logger;
         private final Function<Object, String> messageFormatter;
@@ -161,8 +173,8 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         }
     }
 
-    @EqualsAndHashCode(callSuper = false)
     @Data
+    @EqualsAndHashCode(callSuper = false)
     public static class OutboundLogger extends ChannelOutboundHandlerAdapter {
 
         private final Logger                   logger;
