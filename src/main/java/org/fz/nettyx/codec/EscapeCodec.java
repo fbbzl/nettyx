@@ -119,17 +119,17 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         }
 
-        public static EscapeMap mapHexPair(Pair<String, String>... realsReplacementsPair) {
-            return mapPair(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(HexKit.decodeBuf(p.getKey()),
+        public static EscapeMap mapHexPairs(Pair<String, String>... realsReplacementsPair) {
+            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(HexKit.decodeBuf(p.getKey()),
                                                                                  HexKit.decodeBuf(p.getValue()))).toArray(Pair[]::new));
         }
 
-        public static EscapeMap mapBytesPair(Pair<byte[], byte[]>... realsReplacementsPair) {
-            return mapPair(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(wrappedBuffer(p.getKey()),
+        public static EscapeMap mapBytesPairs(Pair<byte[], byte[]>... realsReplacementsPair) {
+            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(wrappedBuffer(p.getKey()),
                                                                                  wrappedBuffer(p.getValue()))).toArray(Pair[]::new));
         }
 
-        public static EscapeMap mapPair(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
+        public static EscapeMap mapPairs(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
             return new EscapeMap(realsReplacementsPair);
         }
 
