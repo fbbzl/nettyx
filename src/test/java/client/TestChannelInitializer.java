@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
+import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
+import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.fz.nettyx.handler.LoggerHandler;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
@@ -22,11 +24,17 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
 
     @Override
     protected void initChannel(C channel) {
-        ChannelInb
+        InboundAdvice inboundAdvice = new InboundAdvice(channel)
+                .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
+        OutboundAdvice outboundAdvice = new OutboundAdvice(channel);
+        outboundAdvice.whenExceptionCaught((c, t) -> System.err.println("out error: [" + t + "]"));
+
         channel.pipeline().addLast(
-            new StartEndFlagFrameCodec(1024 * 1024, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
-            , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-             , new UserCodec()
-            , new LoggerHandler(log));
+                outboundAdvice,
+                new StartEndFlagFrameCodec(1024 * 1024, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                , new UserCodec()
+                , new LoggerHandler(log),
+                inboundAdvice);
     }
 }
