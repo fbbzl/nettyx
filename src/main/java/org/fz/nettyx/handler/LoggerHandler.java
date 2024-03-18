@@ -70,40 +70,18 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
 
     private static final Function<Object, String> DEFAULT_FORMATTER = TO_STRING;
 
-    /**
-     * Instantiates a new Logger handler.
-     *
-     * @param topic the topic
-     */
     public LoggerHandler(String topic) {
         super(new InboundLogger(topic), new OutboundLogger(topic));
     }
 
-    /**
-     * Instantiates a new Logger handler.
-     *
-     * @param topic            the topic
-     * @param messageFormatter the message formatter
-     */
     public LoggerHandler(String topic, Function<Object, String> messageFormatter) {
         super(new InboundLogger(topic, messageFormatter), new OutboundLogger(topic, messageFormatter));
     }
 
-    /**
-     * Instantiates a new Logger handler.
-     *
-     * @param logger the logger
-     */
     public LoggerHandler(Logger logger) {
         super(new InboundLogger(logger), new OutboundLogger(logger));
     }
 
-    /**
-     * Instantiates a new Logger handler.
-     *
-     * @param logger           the logger
-     * @param messageFormatter the message formatter
-     */
     public LoggerHandler(Logger logger, Function<Object, String> messageFormatter) {
         super(new InboundLogger(logger, messageFormatter), new OutboundLogger(logger, messageFormatter));
     }
@@ -119,82 +97,34 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         // output the matching level log
         private final Sl4jLevel                level;
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param topic the topic
-         */
         public InboundLogger(String topic) {
             this(LoggerFactory.getLogger(topic));
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param topic            the topic
-         * @param messageFormatter the message formatter
-         */
         public InboundLogger(String topic, Function<Object, String> messageFormatter) {
             this(LoggerFactory.getLogger(topic), messageFormatter);
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param topic the topic
-         * @param level the level
-         */
         public InboundLogger(String topic, Sl4jLevel level) {
             this(LoggerFactory.getLogger(topic), level);
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param topic            the topic
-         * @param messageFormatter the message formatter
-         * @param level            the level
-         */
         public InboundLogger(String topic, Function<Object, String> messageFormatter, Sl4jLevel level) {
             this(LoggerFactory.getLogger(topic), messageFormatter, level);
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param logger the logger
-         */
         public InboundLogger(Logger logger) {
             this(logger, DEFAULT_FORMATTER);
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param logger the logger
-         * @param level  the level
-         */
         public InboundLogger(Logger logger, Sl4jLevel level) {
             this(logger, DEFAULT_FORMATTER, level);
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param logger           the logger
-         * @param messageFormatter the message formatter
-         */
         public InboundLogger(Logger logger, Function<Object, String> messageFormatter) {
             this(logger, messageFormatter, DEFAULT_LEVEL);
         }
 
-        /**
-         * Instantiates a new Inbound logger.
-         *
-         * @param logger           the logger
-         * @param messageFormatter the message formatter
-         * @param level            the level
-         */
         public InboundLogger(Logger logger, Function<Object, String> messageFormatter, Sl4jLevel level) {
             this.logger           = logger;
             this.messageFormatter = messageFormatter;
