@@ -1,7 +1,10 @@
 package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.*;
@@ -26,17 +29,16 @@ public class ChannelAdvice {
      */
     @Slf4j
     @Setter
-    @Getter
     @RequiredArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private final Channel channel;
-        private ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
+        private final Channel                     channel;
+        private       ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
                 whenChannelInactive, whenWritabilityChanged, whenChannelReadComplete;
-        private ChannelReadAction whenChannelRead;
-        private ChannelExceptionAction whenExceptionCaught;
-        private ActionableIdleStateHandler readIdleStateHandler;
+        private ChannelReadAction            whenChannelRead;
+        private ChannelExceptionAction       whenExceptionCaught;
+        private ActionableIdleStateHandler   readIdleStateHandler;
         private ActionableReadTimeoutHandler readTimeoutHandler;
 
         /**
@@ -148,19 +150,18 @@ public class ChannelAdvice {
      */
     @Slf4j
     @Setter
-    @Getter
     @RequiredArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
-        private final Channel channel;
-        private ChannelBindAction whenBind;
-        private ChannelConnectAction whenConnect;
-        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        private final Channel              channel;
+        private       ChannelBindAction    whenBind;
+        private       ChannelConnectAction whenConnect;
+        private       ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
-        private ChannelWriteAction whenWrite;
-        private ChannelExceptionAction whenExceptionCaught;
-        private ActionableIdleStateHandler writeIdleStateHandler;
+        private ChannelWriteAction            whenWrite;
+        private ChannelExceptionAction        whenExceptionCaught;
+        private ActionableIdleStateHandler    writeIdleStateHandler;
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
         /**
@@ -201,7 +202,7 @@ public class ChannelAdvice {
 
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
-                throws Exception {
+        throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                       localAddress);
             invokeAction(whenBind, ctx, localAddress, promise);
