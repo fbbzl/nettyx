@@ -1,11 +1,11 @@
 package client;
 
+import cn.hutool.core.lang.Pair;
 import codec.UserCodec;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec;
-import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
@@ -33,7 +33,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
         channel.pipeline().addLast(
                 outboundAdvice
                 , new StartEndFlagFrameCodec(1024 * 512, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
-                , new EscapeCodec(EscapeMap.mapHexPairs("7e", "7d", "7d5e"))
+                , new EscapeCodec(Pair.of("7e",   "7d5e"))
                 , new UserCodec()
                 , new LoggerHandler(log, INFO)
                 , inboundAdvice);
