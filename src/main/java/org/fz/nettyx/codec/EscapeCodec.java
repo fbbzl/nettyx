@@ -21,7 +21,6 @@ import java.util.function.Function;
 import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.getBytes;
 import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.*;
 import static org.fz.nettyx.util.HexKit.decodeBuf;
 
 /**
@@ -37,8 +36,17 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             REALS       = Pair::getKey,
             REPLACEMENT = Pair::getValue;
 
-    public EscapeCodec(EscapeMap escapeMap) {
-        this(new EscapeDecoder(escapeMap), new EscapeEncoder(escapeMap));
+    public EscapeCodec(ByteBuf real, ByteBuf replacement) {
+        this(EscapeDecoder.map(real, replacement), EscapeEncoder.map(real, replacement));
+    }
+
+    public EscapeCodec(String realHex, String replacementHex) {
+        this(EscapeDecoder.map(decodeBuf(realHex), decodeBuf(replacementHex)), EscapeEncoder.map(decodeBuf(realHex),
+                                                                                                 decodeBuf(replacementHex)));
+    }
+
+    public EscapeCodec(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
+        this(EscapeDecoder.mapPairs(realsReplacementsPair), EscapeEncoder.mapPairs(realsReplacementsPair));
     }
 
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder) {
@@ -51,24 +59,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
-        public static EscapeDecoder mapHexPairs(Pair<String, String>... realsReplacementsPair) {
-            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(decodeBuf(p.getKey()),
-                                                                                  decodeBuf(p.getValue()))).toArray(Pair[]::new));
-        }
-
         public static EscapeDecoder mapPairs(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
             return new EscapeDecoder(realsReplacementsPair);
-        }
-
-        public static EscapeDecoder mapHex(String realHex, String replacementHex) {
-            return map(decodeBuf(realHex), decodeBuf(replacementHex));
         }
 
         public static EscapeDecoder map(ByteBuf real, ByteBuf replacement) {
             return new EscapeDecoder(Pair.of(real, replacement));
         }
 
-        public EscapeDecoder(Pair<ByteBuf, ByteBuf>... mappings) {
+        protected EscapeDecoder(Pair<ByteBuf, ByteBuf>... mappings) {
             checkMappings(mappings);
             this.mappings = mappings;
         }
@@ -86,24 +85,21 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
-        public static EscapeEncoder mapHexPairs(Pair<String, String>... realsReplacementsPair) {
-            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(decodeBuf(p.getKey()),
-                                                                                  decodeBuf(p.getValue()))).toArray(Pair[]::new));
-        }
+//        public static EscapeEncoder mapHexPairs(Pair<String, String>... realsReplacementsPair) {
+//            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(decodeBuf(p.getKey()),
+//                                                                                  decodeBuf(p.getValue()))).toArray
+//                                                                                  (Pair[]::new));
+//        }
 
         public static EscapeEncoder mapPairs(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
             return new EscapeEncoder(realsReplacementsPair);
-        }
-
-        public static EscapeEncoder mapHex(String realHex, String replacementHex) {
-            return map(decodeBuf(realHex), decodeBuf(replacementHex));
         }
 
         public static EscapeEncoder map(ByteBuf real, ByteBuf replacement) {
             return new EscapeEncoder(Pair.of(real, replacement));
         }
 
-        public EscapeEncoder(Pair<ByteBuf, ByteBuf>... mappings) {
+        protected EscapeEncoder(Pair<ByteBuf, ByteBuf>... mappings) {
             checkMappings(mappings);
             this.mappings = mappings;
         }
