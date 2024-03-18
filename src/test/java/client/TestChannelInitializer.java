@@ -26,8 +26,8 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
     protected void initChannel(C channel) {
         InboundAdvice inboundAdvice = new InboundAdvice(channel)
                 .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
-        OutboundAdvice outboundAdvice = new OutboundAdvice(channel);
-        outboundAdvice.whenExceptionCaught((c, t) -> System.err.println("out error: [" + t + "]"));
+        OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
+                .whenExceptionCaught((c, t) -> System.err.println("out error: [" + t + "]"));
 
         channel.pipeline().addLast(
                 outboundAdvice
