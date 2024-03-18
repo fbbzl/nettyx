@@ -160,7 +160,6 @@ public class ChannelAdvice {
         private       ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction            whenWrite;
-        private ChannelExceptionAction        whenExceptionCaught;
         private ActionableIdleStateHandler    writeIdleStateHandler;
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
@@ -190,7 +189,6 @@ public class ChannelAdvice {
         }
 
         public final OutboundAdvice whenExceptionCaught(ChannelExceptionAction whenExceptionCaught) {
-            this.whenExceptionCaught = whenExceptionCaught;
             this.channel.pipeline().addFirst(new SimpleOutboundExceptionHandler(whenExceptionCaught));
             return this;
         }
