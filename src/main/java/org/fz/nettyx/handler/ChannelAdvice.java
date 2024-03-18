@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.*;
 import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
@@ -22,6 +23,7 @@ import static org.fz.nettyx.action.Actions.invokeAction;
  * @since 2024/2/27 10:58
  */
 
+@UtilityClass
 public class ChannelAdvice {
 
     /**
