@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
+    @Getter
+    @EqualsAndHashCode
     @SuppressWarnings("all")
     public static class EscapeMap {
 
@@ -80,7 +83,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             REALS       = Pair::getKey,
             REPLACEMENT = Pair::getValue;
 
-        @Getter
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
         private EscapeMap(Pair<ByteBuf, ByteBuf>... mappings) {
@@ -158,23 +160,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return buffer == null || !buffer.isReadable();
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) { return true; }
-            if (!(o instanceof EscapeMap)) { return false; }
-            final EscapeMap other = (EscapeMap) o;
-            if (!other.canEqual((Object) this)) { return false; }
-            if (!java.util.Arrays.deepEquals(this.mappings, other.mappings)) { return false; }
-            return true;
-        }
-
-        protected boolean canEqual(final Object other) { return other instanceof EscapeMap; }
-
-        public int hashCode() {
-            final int PRIME  = 59;
-            int       result = 1;
-            result = result * PRIME + java.util.Arrays.deepHashCode(this.mappings);
-            return result;
-        }
     }
 
     protected static ByteBuf doEscape(ByteBuf msgBuf,
