@@ -1,24 +1,12 @@
 package org.fz.nettyx.codec;
 
-import static cn.hutool.core.collection.CollUtil.intersection;
-import static io.netty.buffer.ByteBufUtil.getBytes;
-import static java.util.Arrays.asList;
-import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REALS;
-import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REPLACEMENT;
-
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +14,18 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 import org.fz.nettyx.util.Throws;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+
+import static cn.hutool.core.collection.CollUtil.intersection;
+import static io.netty.buffer.ByteBufUtil.getBytes;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REALS;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMap.REPLACEMENT;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -36,21 +36,10 @@ import org.fz.nettyx.util.Throws;
 @Slf4j
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
 
-    /**
-     * Instantiates a new Escape codec.
-     *
-     * @param escapeMap the escape map
-     */
     public EscapeCodec(EscapeMap escapeMap) {
         this(new EscapeDecoder(escapeMap), new EscapeEncoder(escapeMap));
     }
 
-    /**
-     * Instantiates a new Escape codec.
-     *
-     * @param escapeDecoder the escape decoder
-     * @param escapeEncoder the escape encoder
-     */
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder) {
         super(escapeDecoder, escapeEncoder);
     }
@@ -100,93 +89,60 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         @Getter
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
-        private EscapeMap(Pair<ByteBuf, ByteBuf>[] mappings) {
+        private EscapeMap(Pair<ByteBuf, ByteBuf>... mappings) {
+            checkMappings(mappings);
+
             this.mappings = mappings;
         }
 
-        public static EscapeMap mapEach(ByteBuf[] reals, ByteBuf[] replacements) {
-            // distinct each
-            reals        = ArrayUtil.distinct(reals);
-            replacements = ArrayUtil.distinct(replacements);
-
-            checkMappings(reals, replacements);
-
-            List<Pair<ByteBuf, ByteBuf>> mappings = new ArrayList<>(reals.length);
-            for (int i = 0; i < reals.length; i++) {
-                mappings.add(Pair.of(reals[i], replacements[i]));
+        void checkMappings(Pair<ByteBuf, ByteBuf>[] mappings) {
+            // 1 check if bytebuf is valid
+            for (Pair<ByteBuf, ByteBuf> mapping : mappings) {
+                ByteBuf real = mapping.getKey(), replacement = mapping.getValue();
+                Throws.ifTrue(invalidByteBuf(real) || invalidByteBuf(replacement), "reals or replacements contains " +
+                                                                                   "invalid buf," +
+                                                                                   " please check");
             }
 
-            return new EscapeMap(mappings.toArray(new Pair[0]));
-        }
-
-        public static EscapeMap mapEachHex(List<String> reals, List<String> replacements) {
-            return mapEachHex(reals.toArray(new String[]{}), replacements.toArray(new String[]{}));
-        }
-
-        public static EscapeMap mapEachHex(String[] realHexes, String[] replacementHexes) {
-            ByteBuf[] realBuffers = Stream.of(realHexes)
-                                          .map(HexKit::decode)
-                                          .map(Unpooled::wrappedBuffer)
-                                          .toArray(ByteBuf[]::new),
-                replacementBuffers = Stream.of(replacementHexes)
-                                           .map(HexKit::decode)
-                                           .map(Unpooled::wrappedBuffer)
-                                           .toArray(ByteBuf[]::new);
-
-            return mapEach(realBuffers, replacementBuffers);
-        }
-
-        public static EscapeMap mapEachBytes(List<byte[]> reals, List<byte[]> replacements) {
-            return mapEachBytes(reals.toArray(new byte[][]{}), replacements.toArray(new byte[][]{}));
-        }
-
-        public static EscapeMap mapEachBytes(byte[][] reals, byte[][] replacements) {
-            ByteBuf[] realBuffers = Stream.of(reals)
-                                          .map(Unpooled::wrappedBuffer)
-                                          .toArray(ByteBuf[]::new),
-                replacementBuffers = Stream.of(replacements)
-                                           .map(Unpooled::wrappedBuffer)
-                                           .toArray(ByteBuf[]::new);
-
-            return mapEach(realBuffers, replacementBuffers);
-        }
-
-        public static EscapeMap mapEach(List<ByteBuf> reals, List<ByteBuf> replacements) {
-            return mapEach(reals.toArray(new ByteBuf[]{}), replacements.toArray(new ByteBuf[]{}));
-        }
-
-        public static EscapeMap mapHex(String realHex, String replacementHex) {
-            return map(HexKit.decode(realHex), HexKit.decode(replacementHex));
-        }
-
-        public static EscapeMap map(byte[] realBytes, byte[] replacementBytes) {
-            return map(Unpooled.wrappedBuffer(realBytes), Unpooled.wrappedBuffer(replacementBytes));
-        }
-
-        public static EscapeMap map(ByteBuf real, ByteBuf replacement) {
-            return mapEach(new ByteBuf[]{real}, new ByteBuf[]{replacement});
-        }
-
-        static void checkMappings(ByteBuf[] reals, ByteBuf[] replacements) {
-            if (reals.length != replacements.length) {
-                throw new IllegalArgumentException(
-                    "the count of the reals must be the same as the count of replacements, reals count is ["
-                    + reals.length + "], the replacements count is [" + replacements.length + "]");
-            }
-
-            Throws.ifTrue(containsInvalidByteBuf(reals) || containsInvalidByteBuf(replacements), "reals or " +
-                                                                                                 "replacements " +
-                                                                                                 "contains invalid " +
-                                                                                                 "buf, please check");
-
-            Collection<ByteBuf> intersection = intersection(asList(reals), asList(replacements));
+            // 2 check if has intersection
+            List<ByteBuf> reals = Arrays.stream(mappings).map(Pair::getKey).collect(toList()),
+                    replacements = Arrays.stream(mappings).map(Pair::getValue).collect(toList());
+            Collection<ByteBuf> intersection = intersection(reals, replacements);
             Throws.ifNotEmpty(intersection, "do not let the reals intersect with the replacements, please check");
 
+            // 3 check if replacements contains the reals
             for (ByteBuf real : reals) {
                 for (ByteBuf replacement : replacements) {
                     Throws.ifTrue(containsContent(replacement, real), "do not let the replacements contain the reals");
                 }
             }
+
+        }
+
+        public static EscapeMap mapHexPair(Pair<String, String>... realsReplacementsPair) {
+            return mapPair(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(HexKit.decodeBuf(p.getKey()),
+                                                                                 HexKit.decodeBuf(p.getValue()))).toArray(Pair[]::new));
+        }
+
+        public static EscapeMap mapBytesPair(Pair<byte[], byte[]>... realsReplacementsPair) {
+            return mapPair(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(wrappedBuffer(p.getKey()),
+                                                                                 wrappedBuffer(p.getValue()))).toArray(Pair[]::new));
+        }
+
+        public static EscapeMap mapPair(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
+            return new EscapeMap(realsReplacementsPair);
+        }
+
+        public static EscapeMap mapHex(String realHex, String replacementHex) {
+            return map(HexKit.decodeBuf(realHex), HexKit.decodeBuf(replacementHex));
+        }
+
+        public static EscapeMap mapBytes(byte[] realBytes, byte[] replacementBytes) {
+            return map(wrappedBuffer(realBytes), wrappedBuffer(replacementBytes));
+        }
+
+        public static EscapeMap map(ByteBuf real, ByteBuf replacement) {
+            return new EscapeMap(Pair.of(real, replacement));
         }
 
         static boolean containsContent(ByteBuf buf, ByteBuf part) {
@@ -206,15 +162,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         static boolean invalidByteBuf(ByteBuf buffer) {
             return buffer == null || !buffer.isReadable();
-        }
-
-        static boolean containsInvalidByteBuf(ByteBuf... buffers) {
-            for (ByteBuf byteBuf : buffers) {
-                if (invalidByteBuf(byteBuf)) {
-                    return true;
-                }
-            }
-            return false;
         }
 
         public boolean equals(final Object o) {
