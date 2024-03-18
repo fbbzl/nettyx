@@ -1,34 +1,21 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.action.Actions.invokeAction;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.CombinedChannelDuplexHandler;
-import java.net.SocketAddress;
+import io.netty.channel.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelBindAction;
-import org.fz.nettyx.action.ChannelConnectAction;
-import org.fz.nettyx.action.ChannelExceptionAction;
-import org.fz.nettyx.action.ChannelHandlerContextAction;
-import org.fz.nettyx.action.ChannelPromiseAction;
-import org.fz.nettyx.action.ChannelReadAction;
-import org.fz.nettyx.action.ChannelWriteAction;
-import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
-import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
+import org.fz.nettyx.action.*;
 import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
 import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
 import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
+
+import java.net.SocketAddress;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * @author fengbinbin
@@ -36,24 +23,24 @@ import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
  * @since 2024/2/27 10:58
  */
 
-public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, OutboundAdvice> {
+@UtilityClass
+public class ChannelAdvice {
 
     /**
      * The type Inbound advice.
      */
     @Slf4j
     @Setter
-    @Getter
     @RequiredArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private final Channel channel;
-        private ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
+        private final Channel                     channel;
+        private       ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
                 whenChannelInactive, whenWritabilityChanged, whenChannelReadComplete;
-        private ChannelReadAction whenChannelRead;
-        private ChannelExceptionAction whenExceptionCaught;
-        private ActionableIdleStateHandler readIdleStateHandler;
+        private ChannelReadAction            whenChannelRead;
+        private ChannelExceptionAction       whenExceptionCaught;
+        private ActionableIdleStateHandler   readIdleStateHandler;
         private ActionableReadTimeoutHandler readTimeoutHandler;
 
         /**
@@ -165,19 +152,17 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
      */
     @Slf4j
     @Setter
-    @Getter
     @RequiredArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
-        private final Channel channel;
-        private ChannelBindAction whenBind;
-        private ChannelConnectAction whenConnect;
-        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        private final Channel              channel;
+        private       ChannelBindAction    whenBind;
+        private       ChannelConnectAction whenConnect;
+        private       ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
-        private ChannelWriteAction whenWrite;
-        private ChannelExceptionAction whenExceptionCaught;
-        private ActionableIdleStateHandler writeIdleStateHandler;
+        private ChannelWriteAction            whenWrite;
+        private ActionableIdleStateHandler    writeIdleStateHandler;
         private ActionableWriteTimeoutHandler writeTimeoutHandler;
 
         /**
@@ -206,7 +191,6 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
         }
 
         public final OutboundAdvice whenExceptionCaught(ChannelExceptionAction whenExceptionCaught) {
-            this.whenExceptionCaught = whenExceptionCaught;
             this.channel.pipeline().addFirst(new SimpleOutboundExceptionHandler(whenExceptionCaught));
             return this;
         }
@@ -218,7 +202,7 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
 
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
-                throws Exception {
+        throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                       localAddress);
             invokeAction(whenBind, ctx, localAddress, promise);
@@ -283,8 +267,8 @@ public class ChannelAdvice extends CombinedChannelDuplexHandler<InboundAdvice, O
             super.flush(ctx);
         }
 
-        @Setter
         @Slf4j
+        @Setter
         @NoArgsConstructor
         @AllArgsConstructor
         private static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
