@@ -86,9 +86,6 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         super(new InboundLogger(logger, messageFormatter), new OutboundLogger(logger, messageFormatter));
     }
 
-    /**
-     * The type Inbound logger.
-     */
     @EqualsAndHashCode(callSuper = false)
     @Data
     public static class InboundLogger extends ChannelInboundHandlerAdapter {
@@ -160,9 +157,6 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         }
     }
 
-    /**
-     * The type Outbound logger.
-     */
     @EqualsAndHashCode(callSuper = false)
     @Data
     public static class OutboundLogger extends ChannelOutboundHandlerAdapter {
