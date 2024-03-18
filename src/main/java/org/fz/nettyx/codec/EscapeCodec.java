@@ -35,12 +35,12 @@ import static java.util.stream.Collectors.toList;
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
 
     public EscapeCodec(ByteBuf real, ByteBuf replacement) {
-        this(new EscapeDecoder(EscapeMap.of(real, replacement)), new EscapeEncoder(EscapeMap.of(real, replacement)));
+        this(new EscapeDecoder(EscapeMap.map(real, replacement)), new EscapeEncoder(EscapeMap.map(real, replacement)));
     }
 
     public EscapeCodec(String realHex, String replacementHex) {
-        this(new EscapeDecoder(EscapeMap.ofHex(realHex, replacementHex)), new EscapeEncoder(EscapeMap.ofHex(realHex,
-                                                                                                            replacementHex)));
+        this(new EscapeDecoder(EscapeMap.mapHex(realHex, replacementHex)), new EscapeEncoder(EscapeMap.mapHex(realHex,
+                                                                                                              replacementHex)));
     }
 
     public EscapeCodec(EscapeMap... realsReplacements) {
@@ -211,16 +211,16 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return mapping.getValue();
         }
 
-        public static EscapeMap of(ByteBuf real, ByteBuf replacement) {
+        public static EscapeMap map(ByteBuf real, ByteBuf replacement) {
             return new EscapeMap(Pair.of(real, replacement));
         }
 
-        public static EscapeMap ofHex(String realHex, String replacementHex) {
-            return of(HexKit.decodeBuf(realHex), HexKit.decodeBuf(replacementHex));
+        public static EscapeMap mapHex(String realHex, String replacementHex) {
+            return map(HexKit.decodeBuf(realHex), HexKit.decodeBuf(replacementHex));
         }
 
-        public static EscapeMap ofBytes(byte[] real, byte[] replacement) {
-            return of(Unpooled.wrappedBuffer(real), Unpooled.wrappedBuffer(replacement));
+        public static EscapeMap mapBytes(byte[] real, byte[] replacement) {
+            return map(Unpooled.wrappedBuffer(real), Unpooled.wrappedBuffer(replacement));
         }
 
     }
