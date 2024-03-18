@@ -85,12 +85,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
-//        public static EscapeEncoder mapHexPairs(Pair<String, String>... realsReplacementsPair) {
-//            return mapPairs(Arrays.stream(realsReplacementsPair).map(p -> Pair.of(decodeBuf(p.getKey()),
-//                                                                                  decodeBuf(p.getValue()))).toArray
-//                                                                                  (Pair[]::new));
-//        }
-
         public static EscapeEncoder mapPairs(Pair<ByteBuf, ByteBuf>... realsReplacementsPair) {
             return new EscapeEncoder(realsReplacementsPair);
         }
