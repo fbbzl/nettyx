@@ -90,7 +90,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         private final Pair<ByteBuf, ByteBuf>[] mappings;
 
         private EscapeMap(Pair<ByteBuf, ByteBuf>... mappings) {
-            checkMappings(mappings);
+            this.checkMappings(mappings);
 
             this.mappings = mappings;
         }
