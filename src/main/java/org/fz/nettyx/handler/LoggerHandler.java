@@ -86,6 +86,10 @@ public class LoggerHandler extends CombinedChannelDuplexHandler<LoggerHandler.In
         super(new InboundLogger(logger, messageFormatter), new OutboundLogger(logger, messageFormatter));
     }
 
+    public LoggerHandler(Logger logger, Function<Object, String> messageFormatter, Sl4jLevel level) {
+        super(new InboundLogger(logger, messageFormatter, level), new OutboundLogger(logger, messageFormatter, level));
+    }
+
     @EqualsAndHashCode(callSuper = false)
     @Data
     public static class InboundLogger extends ChannelInboundHandlerAdapter {
