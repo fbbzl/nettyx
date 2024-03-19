@@ -57,21 +57,21 @@ public class User<T, W, G> {
 //    private Cppushort    cppushort;
     private CppBool cppBool;
 
-    @ToArray(length = 100)
+    @ToArray(length = 1)
     private Cppushort[] qqNames;
 
     private T       sonsbaba;
-    @ToLinkedList(size = 100)
+    @ToLinkedList(size = 1)
     private List<T> sons;
-    @ToArray(length = 100)
+    @ToArray(length = 1)
     private T[]     sons11;
 
     private W wwife;
-    @ToArrayList(size = 100)
+    @ToArrayList(size = 1)
     private List<W> wives;
-    @ToArray(length = 100)
+    @ToArray(length = 1)
     private W[] wives121212;
 
-    @ToArray(length = 500)
+    @ToArray(length = 1)
     private G[] gfs;
 }
