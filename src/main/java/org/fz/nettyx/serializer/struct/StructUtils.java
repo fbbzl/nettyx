@@ -177,7 +177,7 @@ public class StructUtils {
      */
     public static <S> S newStruct(Type structClass) {
         try {
-            return ReflectUtil.getConstructor(structClass).newInstance();
+            return ReflectUtil.getConstructor((Class<S>)structClass).newInstance();
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
