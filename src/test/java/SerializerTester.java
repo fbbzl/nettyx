@@ -1,12 +1,14 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
 import codec.model.GirlFriend;
+import codec.model.Son;
 import codec.model.User;
-import codec.model.Wife;
 import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
@@ -47,7 +49,7 @@ public class SerializerTester {
     public void testStructSerializer() {
         byte[] bytes = new byte[1024*1024];
         Arrays.fill(bytes, (byte) 1);
-        TypeRefer<User<Wife, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Wife, Wife, GirlFriend>>() {
+        TypeRefer<User<Son<Clong4, Clong8>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong8>, Clong4, GirlFriend>>() {
         };
 
         User  user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
