@@ -1,24 +1,25 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
-import static cn.hutool.core.collection.CollUtil.newLinkedList;
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
-
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.ParameterizedTypeException;
+import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.util.Throws;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
-import org.fz.nettyx.exception.ParameterizedTypeException;
-import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.util.Throws;
+
+import static cn.hutool.core.collection.CollUtil.newLinkedList;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
+import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
 
 /**
  * The interface To linked list.
@@ -55,7 +56,7 @@ public @interface ToLinkedList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
+                    (elementType = toLinkedList.elementType()) == Object.class ? getActualType(serializer.getRootType(), field)
                             : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
@@ -67,7 +68,7 @@ public @interface ToLinkedList {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
                             ByteBuf writing) {
             Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
+                    (elementType = toLinkedList.elementType()) == Object.class ? getActualType(serializer.getRootType(), field)
                             : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
