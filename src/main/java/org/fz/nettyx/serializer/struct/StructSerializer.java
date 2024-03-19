@@ -211,14 +211,11 @@ public final class StructSerializer implements Serializer {
                     writeHandled(field, fieldValue, this);
                 }
                 else if (isBasic(rootType, field)) {
-                    writeBasic(defaultIfNull(fieldValue,
-                                             () -> newEmptyBasic(
-                                                 (Class<?>) TypeUtil.getActualType(rootType, field))), writing);
+                    writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic((Class<?>) TypeUtil.getActualType(rootType, field))), writing);
                 }
                 else if (isStruct(rootType, field)) {
-                    writeStruct(rootType,
-                                defaultIfNull(fieldValue, () -> newStruct(TypeUtil.getActualType(rootType, field))),
-                                writing);
+                    Type actualType = TypeUtil.getActualType(rootType, field);
+                    writeStruct(actualType, defaultIfNull(fieldValue, () -> newStruct(actualType)), writing);
                 }
                 else { throw new TypeJudgmentException(field); }
             }
