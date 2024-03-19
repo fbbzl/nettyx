@@ -107,8 +107,9 @@ public interface StructFieldHandler<A extends Annotation> {
          * @return the final returned field length
          */
         default Object doRead(StructSerializer serializer, Field field, A annotation) {
-            if (isBasic(serializer.getRootType(), field)) { return readBasic(field, serializer.getByteBuf()); }
-            if (isStruct(serializer.getRootType(), field)) { return readStruct(field, serializer.getByteBuf()); }
+            Type rootType = serializer.getRootType();
+            if (isBasic(rootType, field)) { return readBasic(rootType, field, serializer.getByteBuf()); }
+            if (isStruct(rootType, field)) { return readStruct(rootType, field, serializer.getByteBuf()); }
 
             throw new TypeJudgmentException(field);
         }
