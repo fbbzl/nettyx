@@ -109,6 +109,10 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      read write splitter      ********************************************//
 
+    public static <T> ByteBuf write(T struct) {
+        return write(struct, struct.getClass());
+    }
+
     public static <T> ByteBuf write(T struct, Type rootType) {
         Throws.ifNull(struct, "struct can not be null when write");
 
@@ -118,6 +122,10 @@ public final class StructSerializer implements Serializer {
         else if (rootType instanceof TypeRefer) { return write(struct, ((TypeRefer<T>) rootType).getType()); }
         else if (rootType instanceof TypeReference) { return write(struct, ((TypeReference<T>) rootType).getType()); }
         else { throw new TypeJudgmentException(rootType); }
+    }
+
+    public static <T> byte[] writeBytes(T struct) {
+        return writeBytes(struct, struct.getClass());
     }
 
     public static <T> byte[] writeBytes(T struct, Type rootType) {
@@ -138,6 +146,10 @@ public final class StructSerializer implements Serializer {
 
     public static <T> ByteBuffer writeNioBuffer(T struct, Type rootType) {
         return ByteBuffer.wrap(writeBytes(struct, rootType));
+    }
+
+    public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
+        outputStream.write(writeBytes(struct, struct.getClass()));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream, Type rootType) throws IOException {
