@@ -1,15 +1,11 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.util.TypeUtil;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fz.nettyx.exception.TypeJudgmentException;
+
+import java.lang.reflect.*;
 
 /**
  * type parameter at the time of serialization
@@ -55,7 +51,9 @@ public abstract class TypeRefer<T> implements Type {
      * @return the field actual type
      */
     public static <T> Class<T> getFieldActualType(Type rootType, Field field) {
-        return getActualType(rootType, TypeUtil.getType(field));
+        Type t = TypeUtil.getType(field);
+        if (t instanceof Class<?> || t instanceof ParameterizedType) return (Class<T>) t;
+        else return getActualType(rootType, t);
     }
 
     /**
