@@ -328,35 +328,38 @@ public final class StructSerializer implements Serializer {
         return !isBasic(clazz);
     }
 
-    public static boolean isBasic(Type root, Field field) {
-        Type type = TypeUtil.getType(field);
-        if (type instanceof Class) {
-            return isBasic((Class<?>) type);
-        }
-        if (type instanceof TypeVariable) {
-            Type actualType = TypeUtil.getActualType(root, type);
-            if (actualType instanceof Class) {
-                return isBasic((Class<?>) actualType);
-            }
-        }
-
-        return false;
-    }
-
     public static boolean isBasic(Class<?> clazz) {
         return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
     }
 
-    public static boolean isNotStruct(Field field) {
-        return isNotStruct(field.getType());
+    public static boolean isBasic(Type root, Field field) {
+        return isBasic(root, TypeUtil.getType(field));
+    }
+
+    public static boolean isBasic(Type root, Type type) {
+        if (type instanceof Class) {
+            return isBasic((Class<?>) type);
+        }
+        if (type instanceof TypeVariable) {
+            return isBasic(root, TypeUtil.getActualType(root, type));
+        }
+
+        return false;
     }
 
     public static boolean isNotStruct(Class<?> clazz) {
         return !isStruct(clazz);
     }
 
+    public static boolean isStruct(Class<?> clazz) {
+        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
+    }
+
     public static boolean isStruct(Type root, Field field) {
-        Type type = TypeUtil.getType(field);
+        return isStruct(root, TypeUtil.getType(field));
+    }
+
+    public static boolean isStruct(Type root, Type type) {
         if (type instanceof Class) {
             return isStruct((Class<?>) type);
         }
@@ -364,14 +367,10 @@ public final class StructSerializer implements Serializer {
             return isStruct((Class<?>) ((ParameterizedType) type).getRawType());
         }
         if (type instanceof TypeVariable) {
-            return isStruct(getActualType(root, type));
+            return isStruct(root, TypeUtil.getActualType(root, type));
         }
 
         return false;
-    }
-
-    public static boolean isStruct(Class<?> clazz) {
-        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
     }
 
     /**
