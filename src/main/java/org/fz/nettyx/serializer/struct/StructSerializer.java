@@ -315,12 +315,13 @@ public final class StructSerializer implements Serializer {
     }
 
     public static boolean isBasic(Type root, Field field) {
+        //TODO
         Type type = TypeUtil.getType(field);
         if (type instanceof Class) {
             return isBasic((Class<?>) type);
         }
         if (type instanceof TypeVariable) {
-            return isBasic(getActualType(root, type));
+            return isBasic((Class<?>) TypeUtil.getActualType(root, type));
         }
 
         return false;
