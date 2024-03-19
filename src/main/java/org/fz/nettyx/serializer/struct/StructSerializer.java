@@ -120,15 +120,6 @@ public final class StructSerializer implements Serializer {
         else { throw new TypeJudgmentException(rootType); }
     }
 
-    public static <T> ByteBuf write(T struct) {
-        Throws.ifNull(struct, "struct can not be null when write");
-        return write(struct, struct.getClass());
-    }
-
-    public static <T> byte[] writeBytes(T struct) {
-        return writeBytes(struct, struct.getClass());
-    }
-
     public static <T> byte[] writeBytes(T struct, Type rootType) {
         ByteBuf writeBuf = write(struct, rootType);
         try {
@@ -147,10 +138,6 @@ public final class StructSerializer implements Serializer {
 
     public static <T> ByteBuffer writeNioBuffer(T struct, Type rootType) {
         return ByteBuffer.wrap(writeBytes(struct, rootType));
-    }
-
-    public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
-        outputStream.write(writeBytes(struct));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream, Type rootType) throws IOException {
@@ -216,8 +203,9 @@ public final class StructSerializer implements Serializer {
                                                  (Class<?>) TypeUtil.getActualType(rootType, field))), writing);
                 }
                 else if (isStruct(rootType, field)) {
-                    Type fieldActualType = TypeUtil.getActualType(rootType, field);
-                    writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
+                    writeStruct(rootType,
+                                defaultIfNull(fieldValue, () -> newStruct(TypeUtil.getActualType(rootType, field))),
+                                writing);
                 }
                 else { throw new TypeJudgmentException(field); }
             }
@@ -236,8 +224,9 @@ public final class StructSerializer implements Serializer {
         return StructUtils.newBasic((Class<?>) basicType, byteBuf);
     }
 
+    // TODO
     public static <S> S readStruct(Field structField, ByteBuf byteBuf) {
-        return StructSerializer.read(byteBuf, structField.getType());
+        return StructSerializer.read(byteBuf, TypeUtil.getType(structField));
     }
 
     public static <S> S readStruct(Type type, ByteBuf byteBuf) {
@@ -268,21 +257,10 @@ public final class StructSerializer implements Serializer {
         writingBuf.writeBytes(((B) (basicValue)).getBytes());
     }
 
-    /**
-     * write struct bytes
-     *
-     * @param structValue the structValue
-     */
-    public static <S> void writeStruct(S structValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(StructSerializer.write(structValue));
+    public static <S> void writeStruct(Type rootType, S structValue, ByteBuf writingBuf) {
+        writingBuf.writeBytes(StructSerializer.write(structValue, rootType));
     }
 
-    /**
-     * write using handler
-     *
-     * @param handleField     the handled field
-     * @param upperSerializer the upper serializer
-     */
     public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue,
                                                            StructSerializer upperSerializer) {
         WriteHandler<A> writeHandler      = StructUtils.getHandler(handleField);
