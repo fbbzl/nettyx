@@ -334,7 +334,10 @@ public final class StructSerializer implements Serializer {
             return isBasic((Class<?>) type);
         }
         if (type instanceof TypeVariable) {
-            return isBasic(getActualType(root, type));
+            Type actualType = TypeUtil.getActualType(root, type);
+            if (actualType instanceof Class) {
+                return isBasic((Class<?>) actualType);
+            }
         }
 
         return false;
