@@ -314,8 +314,8 @@ public final class StructSerializer implements Serializer {
         return isNotBasic(field.getType());
     }
 
-    public static boolean isNotBasic(Class<?> clazz) {
-        return !isBasic(clazz);
+    public static boolean isNotBasic(Type type) {
+        return !isBasic(type);
     }
 
     public static <T> boolean isBasic(T object) {
@@ -350,8 +350,15 @@ public final class StructSerializer implements Serializer {
         return isStruct(object.getClass());
     }
 
-    public static boolean isStruct(Class<?> clazz) {
-        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
+    public static boolean isStruct(Type type) {
+        if (type instanceof Class) {
+            return AnnotationUtil.hasAnnotation((Class<?>) type, Struct.class);
+        }
+        if (type instanceof ParameterizedType) {
+            return AnnotationUtil.hasAnnotation((Class<?>)((ParameterizedType) type).getRawType(), Struct.class);
+        }
+
+        return type instanceof Class && AnnotationUtil.hasAnnotation((Class<?>) type, Struct.class);
     }
 
     /**
