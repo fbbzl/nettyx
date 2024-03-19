@@ -49,7 +49,7 @@ public class SerializerTester {
     public void testStructSerializer() {
         byte[] bytes = new byte[1024*1024];
         Arrays.fill(bytes, (byte) 1);
-        TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
+        TypeRefer<User<Wife, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Wife, Wife, GirlFriend>>() {
         };
 
         User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
@@ -66,7 +66,7 @@ public class SerializerTester {
 
         final byte[] userWriteBytes = StructSerializer.writeBytes(user, typeRefer);
         System.err.println("userWriteBytes: " + userWriteBytes.length);
-        User<Son<Clong4, Clong4>, Wife, GirlFriend> turn = StructSerializer.read(userWriteBytes, typeRefer);
+        User  turn = StructSerializer.read(userWriteBytes, typeRefer);
 
         byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
         System.err.println("bytes1: " + bytes1.length);

@@ -162,7 +162,7 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue;
-                Class<?> fieldActualType;
+               // Class<?> fieldActualType = getActualType(this.getRootType(), field);
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
@@ -170,11 +170,12 @@ public final class StructSerializer implements Serializer {
                     fieldValue = readHandled(field, this);
                 }
                 else
-                if (isBasic(fieldActualType = getActualType(this.getRootType(), field))) {
-                    fieldValue = readBasic(fieldActualType, this.getByteBuf());
+                if (isBasic(field)) {
+                    fieldValue = readBasic(getActualType(this.getRootType(), field), this.getByteBuf());
                 }
                 else
-                if (isStruct(fieldActualType)) {
+                if (isStruct(rootType, field)) {
+                    Class<Object> fieldActualType = getActualType(this.getRootType(), field);
                     fieldValue = readStruct(fieldActualType, this.getByteBuf());
                 }
                 else throw new TypeJudgmentException(field);
@@ -322,8 +323,8 @@ public final class StructSerializer implements Serializer {
         return isBasic(object.getClass());
     }
 
-    public static boolean isBasic(Field field) {
-        return isBasic(field.getType());
+    public static boolean isBasic(Type root, Field field) {
+        return isBasic(getActualType(root, field));
     }
 
     public static boolean isBasic(Class<?> clazz) {
@@ -342,8 +343,8 @@ public final class StructSerializer implements Serializer {
         return !isStruct(clazz);
     }
 
-    public static boolean isStruct(Field field) {
-        return isStruct(field.getType());
+    public static boolean isStruct(Type root, Field field) {
+        return isStruct(getActualType(root, field));
     }
 
     public static <T> boolean isStruct(T object) {
