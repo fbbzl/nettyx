@@ -1,12 +1,9 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
-import codec.model.GirlFriend;
 import codec.model.Son;
 import codec.model.User;
 import codec.model.Wife;
 import io.netty.buffer.Unpooled;
-import java.io.File;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
@@ -17,6 +14,9 @@ import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.util.Arrays;
 
 /**
  * @author fengbinbin
@@ -49,10 +49,10 @@ public class SerializerTester {
     public void testStructSerializer() {
         byte[] bytes = new byte[268];
         Arrays.fill(bytes, (byte) 1);
-        TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
+        TypeRefer<User<Son<Clong4, Clong4>, Wife>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife>>() {
         };
 
-        User<Son<Clong4, Clong4>, Wife, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+        User<Son<Clong4, Clong4>, Wife> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
         System.err.println("read :" + user);
 //        user.setAddress(null);
@@ -66,7 +66,7 @@ public class SerializerTester {
 
         final byte[] userWriteBytes = StructSerializer.writeBytes(user, typeRefer);
         System.err.println("userWriteBytes: " + userWriteBytes.length);
-        User<Son<Clong4, Clong4>, Wife, GirlFriend> turn = StructSerializer.read(userWriteBytes, typeRefer);
+        User<Son<Clong4, Clong4>, Wife> turn = StructSerializer.read(userWriteBytes, typeRefer);
 
         byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
         System.err.println("bytes1: " + bytes1.length);
