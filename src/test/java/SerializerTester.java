@@ -3,6 +3,7 @@ import cn.hutool.core.lang.Dict;
 import codec.model.GirlFriend;
 import codec.model.Son;
 import codec.model.User;
+import codec.model.Wife;
 import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -49,7 +50,7 @@ public class SerializerTester {
     public void testStructSerializer() {
         byte[] bytes = new byte[1024*1024];
         Arrays.fill(bytes, (byte) 1);
-        TypeRefer<User<Son<Clong4, Clong8>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong8>, Clong4, GirlFriend>>() {
+        TypeRefer<User<Son<Wife, Clong8>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Wife, Clong8>, Clong4, GirlFriend>>() {
         };
 
         User  user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
