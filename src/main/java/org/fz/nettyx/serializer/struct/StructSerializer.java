@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -162,7 +163,6 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue;
-               // Class<?> fieldActualType = getActualType(this.getRootType(), field);
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
@@ -175,8 +175,8 @@ public final class StructSerializer implements Serializer {
                 }
                 else
                 if (isStruct(rootType, field)) {
-                    Class<Object> fieldActualType = getActualType(this.getRootType(), field);
-                    fieldValue = readStruct(fieldActualType, this.getByteBuf());
+                    Type actualType = TypeUtil.getActualType(this.getRootType(), field);
+                    fieldValue = readStruct(actualType, this.getByteBuf());
                 }
                 else throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
