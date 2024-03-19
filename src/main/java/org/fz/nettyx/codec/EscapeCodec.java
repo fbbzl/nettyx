@@ -39,8 +39,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     public EscapeCodec(String realHex, String replacementHex) {
-        this(new EscapeDecoder(EscapeMap.mapHex(realHex, replacementHex)), new EscapeEncoder(EscapeMap.mapHex(realHex,
-                                                                                                              replacementHex)));
+        this(new EscapeDecoder(EscapeMap.mapHex(realHex, replacementHex)), new EscapeEncoder(EscapeMap.mapHex(realHex, replacementHex)));
     }
 
     public EscapeCodec(EscapeMap... realsReplacements) {
