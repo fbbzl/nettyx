@@ -1,5 +1,15 @@
 package org.fz.nettyx.serializer.struct;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
+import static org.fz.nettyx.serializer.struct.StructUtils.newEmptyBasic;
+import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
+import static org.fz.nettyx.serializer.struct.StructUtils.useReadHandler;
+import static org.fz.nettyx.serializer.struct.StructUtils.useWriteHandler;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
@@ -7,6 +17,16 @@ import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.nio.ByteBuffer;
 import lombok.Getter;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
@@ -18,23 +38,6 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.nio.ByteBuffer;
-
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructUtils.*;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -76,14 +79,16 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> T read(ByteBuf byteBuf, Type rootType) {
-        if (rootType instanceof Class<?>)
-            return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).parseStruct();
-        else if (rootType instanceof ParameterizedType)
-            return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()),
+        if (rootType instanceof Class<?>) {
+            return new StructSerializer(byteBuf, newStruct(rootType), rootType).parseStruct();
+        }
+        else if (rootType instanceof ParameterizedType) {
+            return new StructSerializer(byteBuf, newStruct(((ParameterizedType) rootType).getRawType()),
                                         rootType).parseStruct();
-        else if (rootType instanceof TypeRefer) return read(byteBuf, ((TypeRefer<T>) rootType).getType());
-        else if (rootType instanceof TypeReference) return read(byteBuf, ((TypeReference<T>) rootType).getType());
-        else throw new TypeJudgmentException(rootType);
+        }
+        else if (rootType instanceof TypeRefer) { return read(byteBuf, ((TypeRefer<T>) rootType).getType()); }
+        else if (rootType instanceof TypeReference) { return read(byteBuf, ((TypeReference<T>) rootType).getType()); }
+        else { throw new TypeJudgmentException(rootType); }
     }
 
     public static <T> T read(byte[] bytes, Type type) {
@@ -108,11 +113,12 @@ public final class StructSerializer implements Serializer {
     public static <T> ByteBuf write(T struct, Type rootType) {
         Throws.ifNull(struct, "struct can not be null when write");
 
-        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType)
+        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) {
             return new StructSerializer(buffer(), struct, rootType).toByteBuf();
-        else if (rootType instanceof TypeRefer) return write(struct, ((TypeRefer<T>) rootType).getType());
-        else if (rootType instanceof TypeReference) return write(struct, ((TypeReference<T>) rootType).getType());
-        else throw new TypeJudgmentException(rootType);
+        }
+        else if (rootType instanceof TypeRefer) { return write(struct, ((TypeRefer<T>) rootType).getType()); }
+        else if (rootType instanceof TypeReference) { return write(struct, ((TypeReference<T>) rootType).getType()); }
+        else { throw new TypeJudgmentException(rootType); }
     }
 
     public static <T> ByteBuf write(T struct) {
@@ -166,16 +172,21 @@ public final class StructSerializer implements Serializer {
             try {
                 Object fieldValue;
                 // some fields may ignore
-                if (isIgnore(field)) continue;
+                if (isIgnore(field)) { continue; }
 
                 if (useReadHandler(field)) {
                     fieldValue = readHandled(field, this);
-                } else if (isBasic(rootType, field)) {
-                    fieldValue = readBasic(getActualType(this.getRootType(), field), this.getByteBuf());
-                } else if (isStruct(rootType, field)) {
+                }
+                else if (isBasic(rootType, field)) {
+                    Class<Object> actualType = getActualType(this.getRootType(), field);
+                    fieldValue = readBasic(actualType, this.getByteBuf());
+                }
+                else if (isStruct(rootType, field)) {
                     Type actualType = TypeUtil.getActualType(this.getRootType(), field);
                     fieldValue = readStruct(actualType, this.getByteBuf());
-                } else throw new TypeJudgmentException(field);
+                }
+                else { throw new TypeJudgmentException(field); }
+
                 StructUtils.writeField(struct, field, fieldValue);
             }
             catch (Exception exception) {
@@ -197,17 +208,20 @@ public final class StructSerializer implements Serializer {
                 Object fieldValue = StructUtils.readField(struct, field);
 
                 // some fields may ignore
-                if (isIgnore(field)) continue;
+                if (isIgnore(field)) { continue; }
 
                 if (useWriteHandler(field)) {
                     writeHandled(field, fieldValue, this);
-                } else if (isBasic(rootType, field)) {
+                }
+                else if (isBasic(rootType, field)) {
                     writeBasic(defaultIfNull(fieldValue,
                                              () -> newEmptyBasic(getActualType(this.getRootType(), field))), writing);
-                } else if (isStruct(rootType, field)) {
+                }
+                else if (isStruct(rootType, field)) {
                     Type fieldActualType = TypeUtil.getActualType(this.getRootType(), field);
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
-                } else throw new TypeJudgmentException(field);
+                }
+                else { throw new TypeJudgmentException(field); }
             }
             catch (Exception exception) {
                 throw new SerializeException("field write exception, field [" + field + "]", exception);
@@ -315,13 +329,12 @@ public final class StructSerializer implements Serializer {
     }
 
     public static boolean isBasic(Type root, Field field) {
-        //TODO
         Type type = TypeUtil.getType(field);
         if (type instanceof Class) {
             return isBasic((Class<?>) type);
         }
         if (type instanceof TypeVariable) {
-            return isBasic( getActualType(root, type));
+            return isBasic(getActualType(root, type));
         }
 
         return false;
