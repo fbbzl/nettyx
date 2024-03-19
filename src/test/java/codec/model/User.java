@@ -17,6 +17,8 @@ import java.util.List;
 @Struct
 public class User<T, W, G> {
 
+    private Bom<T> b;
+
     private Clong4 uid;
     private Cchar uname;
     private Cint isMarried;
