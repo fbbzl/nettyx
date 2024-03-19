@@ -1,30 +1,11 @@
 package org.fz.nettyx.serializer.struct;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructUtils.getStructFields;
-import static org.fz.nettyx.serializer.struct.StructUtils.newEmptyBasic;
-import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
-import static org.fz.nettyx.serializer.struct.StructUtils.useReadHandler;
-import static org.fz.nettyx.serializer.struct.StructUtils.useWriteHandler;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
-
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
 import lombok.Getter;
 import org.fz.nettyx.exception.HandlerException;
 import org.fz.nettyx.exception.SerializeException;
@@ -36,6 +17,22 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.nio.ByteBuffer;
+
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructUtils.*;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -329,8 +326,8 @@ public final class StructSerializer implements Serializer {
         return isBasic(field.getType());
     }
 
-    public static boolean isBasic(Class<?> clazz) {
-        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    public static boolean isBasic(Type type) {
+        return type instanceof Class && Basic.class.isAssignableFrom((Class<?>) type) && Basic.class != type;
     }
 
     public static boolean isNotStruct(Field field) {
