@@ -7,7 +7,6 @@ import static org.fz.nettyx.serializer.struct.StructUtils.newEmptyBasic;
 import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
 import static org.fz.nettyx.serializer.struct.StructUtils.useReadHandler;
 import static org.fz.nettyx.serializer.struct.StructUtils.useWriteHandler;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
 import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
 
 import cn.hutool.core.annotation.AnnotationUtil;
@@ -213,7 +212,8 @@ public final class StructSerializer implements Serializer {
                 }
                 else if (isBasic(rootType, field)) {
                     writeBasic(defaultIfNull(fieldValue,
-                                             () -> newEmptyBasic(getActualType(this.getRootType(), field))), writing);
+                                             () -> newEmptyBasic(
+                                                 (Class<?>) TypeUtil.getActualType(this.getRootType(), field))), writing);
                 }
                 else if (isStruct(rootType, field)) {
                     Type fieldActualType = TypeUtil.getActualType(this.getRootType(), field);
