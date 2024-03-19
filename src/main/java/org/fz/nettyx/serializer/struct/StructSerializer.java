@@ -167,7 +167,7 @@ public final class StructSerializer implements Serializer {
      * @return the t
      */
     <T> T parseStruct() {
-        for (Field field : getStructFields(getRawType(this.getRootType()))) {
+        for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue;
                 // some fields may ignore
@@ -177,10 +177,10 @@ public final class StructSerializer implements Serializer {
                     fieldValue = readHandled(field, this);
                 }
                 else if (isBasic(rootType, field)) {
-                    fieldValue = readBasic(TypeUtil.getActualType(this.getRootType(), field), this.getByteBuf());
+                    fieldValue = readBasic(TypeUtil.getActualType(rootType, field), this.getByteBuf());
                 }
                 else if (isStruct(rootType, field)) {
-                    fieldValue = readStruct(TypeUtil.getActualType(this.getRootType(), field), this.getByteBuf());
+                    fieldValue = readStruct(TypeUtil.getActualType(rootType, field), this.getByteBuf());
                 }
                 else { throw new TypeJudgmentException(field); }
 
@@ -200,7 +200,7 @@ public final class StructSerializer implements Serializer {
      */
     ByteBuf toByteBuf() {
         ByteBuf writing = this.getByteBuf();
-        for (Field field : getStructFields(getRawType(this.getRootType()))) {
+        for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
 
@@ -213,10 +213,10 @@ public final class StructSerializer implements Serializer {
                 else if (isBasic(rootType, field)) {
                     writeBasic(defaultIfNull(fieldValue,
                                              () -> newEmptyBasic(
-                                                 (Class<?>) TypeUtil.getActualType(this.getRootType(), field))), writing);
+                                                 (Class<?>) TypeUtil.getActualType(rootType, field))), writing);
                 }
                 else if (isStruct(rootType, field)) {
-                    Type fieldActualType = TypeUtil.getActualType(this.getRootType(), field);
+                    Type fieldActualType = TypeUtil.getActualType(rootType, field);
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
                 }
                 else { throw new TypeJudgmentException(field); }
