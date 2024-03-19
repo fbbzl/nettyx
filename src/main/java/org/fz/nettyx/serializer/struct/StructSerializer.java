@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -27,7 +26,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
@@ -308,60 +306,50 @@ public final class StructSerializer implements Serializer {
         return !isBasic(object);
     }
 
-    public static boolean isNotBasic(Field field) {
-        return !isBasic(field);
+    public static boolean isNotBasic(Type root, Field field) {
+        return !isBasic(root, field);
     }
 
-    public static boolean isNotBasic(Type type) {
-        return !isBasic(type);
+    public static boolean isNotBasic(Class<?> clazz) {
+        return !isBasic(clazz);
     }
 
     public static <T> boolean isBasic(T object) {
         return isBasic(object.getClass());
     }
 
-    public static boolean isBasic(Field field) {
-        return isBasic(TypeUtil.getType(field));
+    public static boolean isBasic(Type root, Field field) {
+        Class<?> fieldActualType = getFieldActualType(root, field);
+        return isBasic(fieldActualType);
     }
 
-    public static boolean isBasic(Type type) {
-        return Basic.class.isAssignableFrom((Class<?>) type) && Basic.class != type;
+    public static boolean isBasic(Class<?> type) {
+        return Basic.class.isAssignableFrom(type) && Basic.class != type;
     }
-
-    // struct start
 
     public static boolean isNotStruct(Type root, Field field) {
         return !isStruct(root, field);
     }
 
-    public static <T> boolean isNotStruct(Type root, T object) {
-        return !isStruct(root, object);
+    public static <T> boolean isNotStruct(T object) {
+        return !isStruct(object);
     }
 
-    public static boolean isNotStruct(Type root, Class<?> clazz) {
-        return !isStruct(root, clazz);
+    public static boolean isNotStruct(Class<?> clazz) {
+        return !isStruct(clazz);
     }
 
     public static boolean isStruct(Type root, Field field) {
-        return isStruct(root, TypeUtil.getType(field));
+        Class<?> fieldActualType = getFieldActualType(root, field);
+        return isStruct(fieldActualType);
     }
 
-    public static <T> boolean isStruct(Type root, T object) {
-        return isStruct(root, object.getClass());
+    public static <T> boolean isStruct(T object) {
+        return isStruct(object.getClass());
     }
 
-    public static boolean isStruct(Type root, Type type) {
-        if (type instanceof Class) {
-            return AnnotationUtil.hasAnnotation((Class<?>) type, Struct.class);
-        }
-        if (type instanceof ParameterizedType) {
-            return AnnotationUtil.hasAnnotation((Class<?>) ((ParameterizedType) type).getRawType(), Struct.class);
-        }
-        if (type instanceof TypeVariable) {
-            return AnnotationUtil.hasAnnotation((Class<?>) TypeUtil.getActualType(root, type), Struct.class);
-        }
-
-        return false;
+    public static boolean isStruct(Class<?> type) {
+        return AnnotationUtil.hasAnnotation(type, Struct.class);
     }
 
     /**
