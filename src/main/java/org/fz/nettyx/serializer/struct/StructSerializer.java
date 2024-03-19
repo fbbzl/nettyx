@@ -315,7 +315,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> boolean isBasic(T object) {
-        return isBasic(object.getClass());
+        return object != null && isBasic(object.getClass());
     }
 
     public static boolean isBasic(Type root, Field field) {
@@ -345,7 +345,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> boolean isStruct(T object) {
-        return isStruct(object.getClass());
+        return object != null && isStruct(object.getClass());
     }
 
     public static boolean isStruct(Class<?> type) {
