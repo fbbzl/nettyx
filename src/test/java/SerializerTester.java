@@ -1,5 +1,6 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
+import codec.model.Bill;
 import codec.model.GirlFriend;
 import codec.model.Son;
 import codec.model.User;
@@ -49,11 +50,11 @@ public class SerializerTester {
     public void testStructSerializer() {
         byte[] bytes = new byte[1024 * 1024];
         Arrays.fill(bytes, (byte) 67);
-        TypeRefer<User<Son<Cchar, Wife>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar, Wife>, Clong4
+        TypeRefer<User<Son<Cchar, Wife<Bill>>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar, Wife<Bill>>, Clong4
                 , GirlFriend>>() {
         };
 
-        User<Son<Cchar, Wife>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
+        User<Son<Cchar, Wife<Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
                                                                                 Unpooled.wrappedBuffer(bytes));
 
         System.err.println("read :" + user);
