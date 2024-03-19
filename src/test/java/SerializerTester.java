@@ -54,7 +54,7 @@ public class SerializerTester {
                 , GirlFriend>>() {
         };
 
-        User user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+        User<Son<Cchar, Wife>, Clong4, GirlFriend> user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
         System.err.println("read :" + user);
 //        user.setAddress(null);
