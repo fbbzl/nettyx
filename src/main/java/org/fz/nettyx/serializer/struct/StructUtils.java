@@ -177,7 +177,15 @@ public class StructUtils {
      */
     public static <S> S newStruct(Type structClass) {
         try {
-            return ReflectUtil.getConstructor((Class<S>)structClass).newInstance();
+            if (structClass instanceof Class) {
+                return ReflectUtil.getConstructor((Class<S>) structClass).newInstance();
+            }
+
+            if (structClass instanceof ParameterizedType) {
+                return ReflectUtil.getConstructor((Class<S>) ((ParameterizedType) structClass).getRawType()).newInstance();
+            }
+
+            throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
