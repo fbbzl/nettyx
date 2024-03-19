@@ -141,9 +141,7 @@ public interface StructFieldHandler<A extends Annotation> {
          */
         default void doWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
             if (isBasic(serializer.getRootType(), field)) writeBasic((Basic<?>) defaultIfNull(value,
-                                                                                              () -> StructUtils.newBasic(field,
-                                                                                                                                buffer())),
-                                                                     writing);
+                                                                                              () -> StructUtils.newBasic(field, buffer())), writing);
             if (isStruct(serializer.getRootType(), field)) writeStruct(defaultIfNull(value,
                                                                                      () -> StructUtils.newStruct(field)), writing);
 
