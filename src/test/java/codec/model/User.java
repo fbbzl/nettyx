@@ -2,13 +2,6 @@ package codec.model;
 
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
-import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
-
-import java.util.List;
 
 @Data
 @Struct
@@ -55,23 +48,23 @@ public class User<T, W, G> {
 //    private Cppulong8    cppulong8;
 //    private Cppulonglong cppulonglong;
 //    private Cppushort    cppushort;
-    private CppBool cppBool;
+//    private CppBool cppBool;
 
-    @ToArray(length = 1)
-    private Cppushort[] qqNames;
-
-    private T       sonsbaba;
-    @ToLinkedList(size = 1)
-    private List<T> sons;
-    @ToArray(length = 1)
-    private T[]     sons11;
-
-    private W wwife;
-    @ToArrayList(size = 1)
-    private List<W> wives;
-    @ToArray(length = 1)
-    private W[] wives121212;
-
-    @ToArray(length = 1)
-    private G[] gfs;
+//    @ToArray(length = 1)
+//    private Cppushort[] qqNames;
+//
+//    private T       sonsbaba;
+//    @ToLinkedList(size = 1)
+//    private List<T> sons;
+//    @ToArray(length = 1)
+//    private T[]     sons11;
+//
+//    private W wwife;
+//    @ToArrayList(size = 1)
+//    private List<W> wives;
+//    @ToArray(length = 1)
+//    private W[] wives121212;
+//
+//    @ToArray(length = 1)
+//    private G[] gfs;
 }
