@@ -49,16 +49,16 @@ import org.fz.nettyx.util.Throws;
 public final class StructSerializer implements Serializer {
 
     /**
-     * byteBuf ready for serialization/deserialization
-     */
-    @Getter
-    private final ByteBuf byteBuf;
-
-    /**
      * rootType of struct
      */
     @Getter
     private final Type rootType;
+
+    /**
+     * byteBuf ready for serialization/deserialization
+     */
+    @Getter
+    private final ByteBuf byteBuf;
 
     /**
      * an object ready for serialization/deserialization
@@ -71,13 +71,13 @@ public final class StructSerializer implements Serializer {
      * @param byteBuf the byte buf
      * @param struct  the struct
      */
-    StructSerializer(ByteBuf byteBuf, Object struct, Type rootType) {
+    StructSerializer(Type rootType, ByteBuf byteBuf, Object struct) {
+        this.rootType = rootType;
         this.byteBuf  = byteBuf;
         this.struct   = struct;
-        this.rootType = rootType;
     }
 
-    public static <T> T read(ByteBuf byteBuf, Type rootType) {
+    public static <T> T read(Type rootType, ByteBuf byteBuf) {
         if (rootType instanceof Class<?>) {
             return new StructSerializer(byteBuf, newStruct(rootType), rootType).parseStruct();
         }
@@ -85,17 +85,17 @@ public final class StructSerializer implements Serializer {
             return new StructSerializer(byteBuf, newStruct(((ParameterizedType) rootType).getRawType()),
                                         rootType).parseStruct();
         }
-        else if (rootType instanceof TypeRefer) { return read(byteBuf, ((TypeRefer<T>) rootType).getType()); }
-        else if (rootType instanceof TypeReference) { return read(byteBuf, ((TypeReference<T>) rootType).getType()); }
+        else if (rootType instanceof TypeRefer) { return read(((TypeRefer<T>) rootType).getType(), byteBuf); }
+        else if (rootType instanceof TypeReference) { return read(((TypeReference<T>) rootType).getType(), byteBuf); }
         else { throw new TypeJudgmentException(rootType); }
     }
 
     public static <T> T read(byte[] bytes, Type type) {
-        return read(Unpooled.wrappedBuffer(bytes), type);
+        return read(type, Unpooled.wrappedBuffer(bytes));
     }
 
     public static <T> T read(ByteBuffer byteBuffer, Type rootType) {
-        return read(Unpooled.wrappedBuffer(byteBuffer), rootType);
+        return read(rootType, Unpooled.wrappedBuffer(byteBuffer));
     }
 
     public static <T> T read(InputStream is, Type rootType) throws IOException {
@@ -211,7 +211,9 @@ public final class StructSerializer implements Serializer {
                     writeHandled(field, fieldValue, this);
                 }
                 else if (isBasic(rootType, field)) {
-                    writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic((Class<?>) TypeUtil.getActualType(rootType, field))), writing);
+                    writeBasic(defaultIfNull(fieldValue,
+                                             () -> newEmptyBasic((Class<?>) TypeUtil.getActualType(rootType, field))),
+                               writing);
                 }
                 else if (isStruct(rootType, field)) {
                     Type actualType = TypeUtil.getActualType(rootType, field);
@@ -232,7 +234,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <S> S readStruct(Type rootType, Field structField, ByteBuf byteBuf) {
-        return StructSerializer.read(byteBuf, TypeUtil.getActualType(rootType, structField));
+        return StructSerializer.read(TypeUtil.getActualType(rootType, structField), byteBuf);
     }
 
     public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
