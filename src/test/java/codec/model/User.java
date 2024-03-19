@@ -1,15 +1,19 @@
 package codec.model;
 
+import java.util.List;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 
 @Data
 @Struct
 public class User<T, W, G> {
 
-    private Bom<T>  b;
-//
-//    private Clong4       uid;
+    private Bom<T> b;
+    private Clong4 uid;
 //    private Cchar        uname;
 //    private Cint         isMarried;
 //    private Cchar   sex;
@@ -50,12 +54,12 @@ public class User<T, W, G> {
 //    private Cppushort    cppushort;
 //    private CppBool cppBool;
 
-//    @ToArray(length = 1)
-//    private Cppushort[] qqNames;
-//
-//    private T       sonsbaba;
-//    @ToLinkedList(size = 1)
-//    private List<T> sons;
+    @ToArray(length = 1)
+    private Cppushort[] qqNames;
+
+    private T       sonsbaba;
+    @ToLinkedList(size = 1)
+    private List<T> sons;
 //    @ToArray(length = 1)
 //    private T[]     sons11;
 //
