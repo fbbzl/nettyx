@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 @Struct
 public class User<T, W, G> {
 
-    private Bom<T, W>       b;
+    private Bom<T,W, G>       b;
     private Clong4       uid;
 //    private Cchar        uname;
 //    private Cint         isMarried;
