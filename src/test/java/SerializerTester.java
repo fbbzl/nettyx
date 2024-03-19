@@ -47,7 +47,7 @@ public class SerializerTester {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[1024];
+        byte[] bytes = new byte[1024*1024];
         Arrays.fill(bytes, (byte) 1);
         TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>> typeRefer = new TypeRefer<User<Son<Clong4, Clong4>, Wife, GirlFriend>>() {
         };
