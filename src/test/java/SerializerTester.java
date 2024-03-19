@@ -66,11 +66,11 @@ public class SerializerTester {
 //        user.setWives(null);
 //        user.setWwife(null);
 
-        final byte[] userWriteBytes = StructSerializer.writeBytes(user, typeRefer);
+        final byte[] userWriteBytes = StructSerializer.writeBytes(typeRefer, user);
         System.err.println("userWriteBytes: " + userWriteBytes.length);
-        User turn = StructSerializer.read(userWriteBytes, typeRefer);
+        User turn = StructSerializer.read(typeRefer, userWriteBytes);
 
-        byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
+        byte[] bytes1 = StructSerializer.writeBytes(typeRefer, turn);
         System.err.println("bytes1: " + bytes1.length);
         System.err.println(Arrays.toString(bytes1));
         System.err.println("turn :" + turn);

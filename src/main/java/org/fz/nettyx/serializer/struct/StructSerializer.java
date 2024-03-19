@@ -65,12 +65,6 @@ public final class StructSerializer implements Serializer {
      */
     private final Object struct;
 
-    /**
-     * Instantiates a new Typed byte buf serializer.
-     *
-     * @param byteBuf the byte buf
-     * @param struct  the struct
-     */
     StructSerializer(Type rootType, ByteBuf byteBuf, Object struct) {
         this.rootType = rootType;
         this.byteBuf  = byteBuf;
@@ -90,46 +84,46 @@ public final class StructSerializer implements Serializer {
         else { throw new TypeJudgmentException(rootType); }
     }
 
-    public static <T> T read(byte[] bytes, Type type) {
+    public static <T> T read(Type type, byte[] bytes) {
         return read(type, Unpooled.wrappedBuffer(bytes));
     }
 
-    public static <T> T read(ByteBuffer byteBuffer, Type rootType) {
+    public static <T> T read(Type rootType, ByteBuffer byteBuffer) {
         return read(rootType, Unpooled.wrappedBuffer(byteBuffer));
     }
 
-    public static <T> T read(InputStream is, Type rootType) throws IOException {
+    public static <T> T read(Type rootType, InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         for (int b = is.read(); b >= 0; b = is.read()) {
             baos.write(b);
         }
         is.close();
-        return read(baos.toByteArray(), rootType);
+        return read(rootType, baos.toByteArray());
     }
 
     //*************************************      read write splitter      ********************************************//
 
     public static <T> ByteBuf write(T struct) {
-        return write(struct, struct.getClass());
+        return write(struct.getClass(), struct);
     }
 
-    public static <T> ByteBuf write(T struct, Type rootType) {
+    public static <T> ByteBuf write(Type rootType, T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
 
         if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) {
             return new StructSerializer(rootType, buffer(), struct).toByteBuf();
         }
-        else if (rootType instanceof TypeRefer) { return write(struct, ((TypeRefer<T>) rootType).getType()); }
-        else if (rootType instanceof TypeReference) { return write(struct, ((TypeReference<T>) rootType).getType()); }
+        else if (rootType instanceof TypeRefer) { return write(((TypeRefer<T>) rootType).getType(), struct); }
+        else if (rootType instanceof TypeReference) { return write(((TypeReference<T>) rootType).getType(), struct); }
         else { throw new TypeJudgmentException(rootType); }
     }
 
     public static <T> byte[] writeBytes(T struct) {
-        return writeBytes(struct, struct.getClass());
+        return writeBytes(struct.getClass(), struct);
     }
 
-    public static <T> byte[] writeBytes(T struct, Type rootType) {
-        ByteBuf writeBuf = write(struct, rootType);
+    public static <T> byte[] writeBytes(Type rootType, T struct) {
+        ByteBuf writeBuf = write(rootType, struct);
         try {
             byte[] bytes = new byte[writeBuf.readableBytes()];
             writeBuf.readBytes(bytes);
@@ -141,19 +135,19 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> ByteBuffer writeNioBuffer(T struct) {
-        return writeNioBuffer(struct, struct.getClass());
+        return writeNioBuffer(struct.getClass(), struct);
     }
 
-    public static <T> ByteBuffer writeNioBuffer(T struct, Type rootType) {
-        return ByteBuffer.wrap(writeBytes(struct, rootType));
+    public static <T> ByteBuffer writeNioBuffer(Type rootType, T struct) {
+        return ByteBuffer.wrap(writeBytes(rootType, struct));
     }
 
     public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException {
-        outputStream.write(writeBytes(struct, struct.getClass()));
+        outputStream.write(writeBytes(struct.getClass(), struct));
     }
 
-    public static <T> void writeStream(T struct, OutputStream outputStream, Type rootType) throws IOException {
-        outputStream.write(writeBytes(struct, rootType));
+    public static <T> void writeStream(Type rootType, T struct, OutputStream outputStream) throws IOException {
+        outputStream.write(writeBytes(rootType, struct));
     }
 
     //*************************************      working code splitter      ******************************************//
@@ -200,7 +194,6 @@ public final class StructSerializer implements Serializer {
     ByteBuf toByteBuf() {
         ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getRawType(rootType))) {
-            System.err.println(field);
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
 
@@ -262,7 +255,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <S> void writeStruct(Type rootType, S structValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(StructSerializer.write(structValue, rootType));
+        writingBuf.writeBytes(StructSerializer.write(rootType, structValue));
     }
 
     public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue,
