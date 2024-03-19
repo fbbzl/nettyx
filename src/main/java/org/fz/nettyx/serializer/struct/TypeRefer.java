@@ -51,7 +51,11 @@ public abstract class TypeRefer<T> implements Type {
      * @return the field actual type
      */
     public static <T> Class<T> getActualType(Type rootType, Field field) {
-        return getActualType(rootType, TypeUtil.getType(field));
+        return getActualType(rootType, TypeUtil.getType(field), 0);
+    }
+
+    public static <T> Class<T> getActualType(Type rootType, Field field, int index) {
+        return getActualType(rootType, TypeUtil.getType(field), index);
     }
 
     /**
