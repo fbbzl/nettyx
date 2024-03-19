@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
 import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
@@ -60,15 +61,15 @@ public class User<T, W, G> {
     private T       sonsbaba;
     @ToLinkedList(size = 1)
     private List<T> sons;
-//    @ToArray(length = 1)
-//    private T[]     sons11;
-//
-//    private W wwife;
-//    @ToArrayList(size = 1)
-//    private List<W> wives;
-//    @ToArray(length = 1)
-//    private W[] wives121212;
-//
-//    @ToArray(length = 1)
-//    private G[] gfs;
+    @ToArray(length = 1)
+    private T[]     sons11;
+
+    private W wwife;
+    @ToArrayList(size = 1)
+    private List<W> wives;
+    @ToArray(length = 1)
+    private W[] wives121212;
+
+    @ToArray(length = 1)
+    private G[] gfs;
 }
