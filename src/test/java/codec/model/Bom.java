@@ -11,9 +11,9 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 
 @Data
 @Struct
-public class Bom<T > {
+public class Bom<T ,W> {
 
     private T  t;
-
+    private W gg;
 
 }
