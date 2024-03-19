@@ -8,8 +8,8 @@ import io.netty.buffer.Unpooled;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
@@ -40,7 +40,7 @@ public class SerializerTester {
         byte[] bytes = new byte[100];
         Arrays.fill(bytes, (byte) 0);
         Model model1 = XmlSerializerContext.findModel("school", "student");
-        Dict doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
+        Dict  doc    = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
 
         Assert.assertNotNull(doc);
         Console.print(doc);
@@ -48,12 +48,13 @@ public class SerializerTester {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[1024*1024];
+        byte[] bytes = new byte[1024 * 1024];
         Arrays.fill(bytes, (byte) 1);
-        TypeRefer<User<Son<Wife, Clong8>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Wife, Clong8>, Clong4, GirlFriend>>() {
+        TypeRefer<User<Son<Cchar, Wife>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar, Wife>, Clong4
+                , GirlFriend>>() {
         };
 
-        User  user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
+        User user = StructSerializer.read(Unpooled.wrappedBuffer(bytes), typeRefer);
 
         System.err.println("read :" + user);
 //        user.setAddress(null);
@@ -67,7 +68,7 @@ public class SerializerTester {
 
         final byte[] userWriteBytes = StructSerializer.writeBytes(user, typeRefer);
         System.err.println("userWriteBytes: " + userWriteBytes.length);
-        User  turn = StructSerializer.read(userWriteBytes, typeRefer);
+        User turn = StructSerializer.read(userWriteBytes, typeRefer);
 
         byte[] bytes1 = StructSerializer.writeBytes(turn, typeRefer);
         System.err.println("bytes1: " + bytes1.length);
