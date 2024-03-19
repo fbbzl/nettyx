@@ -150,7 +150,7 @@ public @interface ToArray {
             S[] structs = newArray(elementType, length);
 
             for (int i = 0; i < structs.length; i++) {
-                structs[i] = StructSerializer.read(arrayBuf, elementType);
+                structs[i] = StructSerializer.read(elementType, arrayBuf);
             }
 
             return structs;
