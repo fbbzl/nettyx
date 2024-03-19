@@ -5,6 +5,7 @@ import codec.model.Son;
 import codec.model.User;
 import codec.model.Wife;
 import io.netty.buffer.Unpooled;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
@@ -16,8 +17,6 @@ import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 /**
  * @author fengbinbin
@@ -49,7 +48,7 @@ public class SerializerTester {
     @Test
     public void testStructSerializer() {
         byte[] bytes = new byte[1024 * 1024];
-        Arrays.fill(bytes, (byte) 1);
+        Arrays.fill(bytes, (byte) 9);
         TypeRefer<User<Son<Cchar, Wife>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar, Wife>, Clong4
                 , GirlFriend>>() {
         };
