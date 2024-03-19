@@ -199,7 +199,7 @@ public final class StructSerializer implements Serializer {
      */
     ByteBuf toByteBuf() {
         ByteBuf writing = this.getByteBuf();
-        for (Field field : getStructFields(struct.getClass())) {
+        for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
 
