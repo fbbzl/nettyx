@@ -1,13 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.ANNOTATION_HANDLER_MAPPING;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.BASIC_BYTES_SIZE_CACHE;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.FIELD_READER_CACHE;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.FIELD_WRITER_CACHE;
-
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
@@ -16,20 +8,20 @@ import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.Arrays;
+import java.util.function.Predicate;
+
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
 /**
@@ -183,10 +175,17 @@ public class StructUtils {
      * @param structClass the struct class
      * @return the t
      */
-    public static <S> S newStruct(Class<S> structClass) {
+    public static <S> S newStruct(Type structClass) {
         try {
-            if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
-            else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
+            if (structClass instanceof Class) {
+                return ReflectUtil.getConstructor((Class<S>) structClass).newInstance();
+            }
+
+            if (structClass instanceof ParameterizedType) {
+                return ReflectUtil.getConstructor((Class<S>) ((ParameterizedType) structClass).getRawType()).newInstance();
+            }
+
+            throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
