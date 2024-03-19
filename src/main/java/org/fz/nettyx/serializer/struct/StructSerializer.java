@@ -307,20 +307,12 @@ public final class StructSerializer implements Serializer {
         return ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static <T> boolean isNotBasic(T object) {
-        return isNotBasic(object.getClass());
-    }
-
     public static boolean isNotBasic(Field field) {
         return isNotBasic(field.getType());
     }
 
     public static boolean isNotBasic(Class<?> clazz) {
         return !isBasic(clazz);
-    }
-
-    public static <T> boolean isBasic(T object) {
-        return isBasic(object.getClass());
     }
 
     public static boolean isBasic(Type root, Field field) {
@@ -335,20 +327,12 @@ public final class StructSerializer implements Serializer {
         return isNotStruct(field.getType());
     }
 
-    public static <T> boolean isNotStruct(T object) {
-        return isNotStruct(object.getClass());
-    }
-
     public static boolean isNotStruct(Class<?> clazz) {
         return !isStruct(clazz);
     }
 
     public static boolean isStruct(Type root, Field field) {
         return isStruct(getActualType(root, field));
-    }
-
-    public static <T> boolean isStruct(T object) {
-        return isStruct(object.getClass());
     }
 
     public static boolean isStruct(Class<?> clazz) {
