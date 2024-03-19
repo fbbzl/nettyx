@@ -79,8 +79,7 @@ public final class StructSerializer implements Serializer {
         if (rootType instanceof Class<?>)
             return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).parseStruct();
         else if (rootType instanceof ParameterizedType)
-            return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()),
-                                        rootType).parseStruct();
+            return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).parseStruct();
         else if (rootType instanceof TypeRefer) return read(byteBuf, ((TypeRefer<T>) rootType).getType());
         else if (rootType instanceof TypeReference) return read(byteBuf, ((TypeReference<T>) rootType).getType());
         else throw new TypeJudgmentException(rootType);
@@ -171,7 +170,7 @@ public final class StructSerializer implements Serializer {
 
                 if (useReadHandler(field)) {
                     fieldValue = readHandled(field, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                } else if (isBasic(rootType, fieldActualType = getFieldActualType(this.getRootType(), field))) {
                     fieldValue = readBasic(fieldActualType, this.getByteBuf());
                 } else if (isStruct(rootType, fieldActualType)) {
                     fieldValue = readStruct(fieldActualType, this.getByteBuf());
@@ -201,9 +200,9 @@ public final class StructSerializer implements Serializer {
 
                 if (useWriteHandler(field)) {
                     writeHandled(field, fieldValue, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                } else if (isBasic(rootType, fieldActualType = getFieldActualType(this.getRootType(), field))) {
                     writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
-                } else if (isStruct(fieldActualType)) {
+                } else if (isStruct(rootType, fieldActualType)) {
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
                 } else throw new TypeJudgmentException(field);
             }
