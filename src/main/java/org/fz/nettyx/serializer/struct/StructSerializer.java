@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -84,6 +85,13 @@ public final class StructSerializer implements Serializer {
         else throw new TypeJudgmentException(rootType);
     }
 
+    public static <T> T read(ByteBuf byteBuf, Object struct, Type rootType) {
+        if (rootType instanceof TypeRefer)     return read(byteBuf, ((TypeRefer<T>) rootType).getType());
+        else
+        if (rootType instanceof TypeReference) return read(byteBuf, ((TypeReference<T>) rootType).getType());
+        else                                   return new StructSerializer(byteBuf, struct, rootType).parseStruct();
+    }
+
     public static <T> T read(byte[] bytes, Type type) {
         return read(Unpooled.wrappedBuffer(bytes), type);
     }
@@ -152,27 +160,21 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      working code splitter      ******************************************//
 
-    /**
-     * parse ByteBuf to Object
-     *
-     * @param <T> the type parameter
-     *
-     * @return the t
-     */
     <T> T parseStruct() {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object   fieldValue;
-                Class<?> fieldActualType;
+                Class<?> fieldType;
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
                 if (useReadHandler(field)) {
                     fieldValue = readHandled(field, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
-                    fieldValue = readBasic(fieldActualType, this.getByteBuf());
-                } else if (isStruct(fieldActualType)) {
-                    fieldValue = readStruct(fieldActualType, this.getByteBuf());
+                } else if (isBasic(fieldType = getFieldActualType(rootType, field))) {
+                    fieldValue = readBasic(TypeUtil.getType(field), this.getByteBuf());
+                } else if (isStruct(fieldType)) {
+                    Type type = TypeUtil.getType(field);
+                    fieldValue = readStruct(type, this.getByteBuf());
                 } else throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
             }
@@ -199,7 +201,7 @@ public final class StructSerializer implements Serializer {
 
                 if (useWriteHandler(field)) {
                     writeHandled(field, fieldValue, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                } else if (isBasic(fieldActualType = getFieldActualType(rootType, field))) {
                     writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
                 } else if (isStruct(fieldActualType)) {
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
