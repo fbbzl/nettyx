@@ -79,11 +79,11 @@ public final class StructSerializer implements Serializer {
 
     public static <T> T read(Type rootType, ByteBuf byteBuf) {
         if (rootType instanceof Class<?>) {
-            return new StructSerializer(byteBuf, newStruct(rootType), rootType).parseStruct();
+            return new StructSerializer(rootType, byteBuf, newStruct(rootType)).parseStruct();
         }
         else if (rootType instanceof ParameterizedType) {
-            return new StructSerializer(byteBuf, newStruct(((ParameterizedType) rootType).getRawType()),
-                                        rootType).parseStruct();
+            return new StructSerializer(rootType, byteBuf, newStruct(((ParameterizedType) rootType).getRawType())
+            ).parseStruct();
         }
         else if (rootType instanceof TypeRefer) { return read(((TypeRefer<T>) rootType).getType(), byteBuf); }
         else if (rootType instanceof TypeReference) { return read(((TypeReference<T>) rootType).getType(), byteBuf); }
@@ -117,7 +117,7 @@ public final class StructSerializer implements Serializer {
         Throws.ifNull(struct, "struct can not be null when write");
 
         if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) {
-            return new StructSerializer(buffer(), struct, rootType).toByteBuf();
+            return new StructSerializer(rootType, buffer(), struct).toByteBuf();
         }
         else if (rootType instanceof TypeRefer) { return write(struct, ((TypeRefer<T>) rootType).getType()); }
         else if (rootType instanceof TypeReference) { return write(struct, ((TypeReference<T>) rootType).getType()); }
