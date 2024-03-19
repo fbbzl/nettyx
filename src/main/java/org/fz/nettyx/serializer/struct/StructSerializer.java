@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
 import static org.fz.nettyx.serializer.struct.TypeRefer.getRawType;
 
 /**
@@ -170,7 +170,7 @@ public final class StructSerializer implements Serializer {
                     fieldValue = readHandled(field, this);
                 }
                 else
-                if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                if (isBasic(fieldActualType = getActualType(this.getRootType(), field))) {
                     fieldValue = readBasic(fieldActualType, this.getByteBuf());
                 }
                 else
@@ -204,7 +204,7 @@ public final class StructSerializer implements Serializer {
                     writeHandled(field, fieldValue, this);
                 }
                 else
-                if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                if (isBasic(fieldActualType = getActualType(this.getRootType(), field))) {
                     writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
                 }
                 else
