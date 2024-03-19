@@ -197,7 +197,7 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
-                Class<?> fieldActualType ;
+
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
@@ -205,11 +205,12 @@ public final class StructSerializer implements Serializer {
                     writeHandled(field, fieldValue, this);
                 }
                 else
-                if (isBasic(fieldActualType = getActualType(this.getRootType(), field))) {
-                    writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
+                if (isBasic(rootType, field)) {
+                    writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(getActualType(this.getRootType(), field))), writing);
                 }
                 else
-                if (isStruct(fieldActualType)) {
+                if (isStruct(rootType, field)) {
+                    Type fieldActualType = TypeUtil.getActualType(this.getRootType(), field);
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
                 }
                 else throw new TypeJudgmentException(field);
