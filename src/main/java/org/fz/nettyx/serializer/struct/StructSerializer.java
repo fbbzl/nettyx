@@ -179,7 +179,7 @@ public final class StructSerializer implements Serializer {
                     fieldValue = readBasic(TypeUtil.getActualType(rootType, field), this.getByteBuf());
                 }
                 else if (isStruct(rootType, field)) {
-                    fieldValue = readStruct(TypeUtil.getActualType(rootType, field), this.getByteBuf());
+                    fieldValue = readStruct(rootType, field, this.getByteBuf());
                 }
                 else { throw new TypeJudgmentException(field); }
 
@@ -228,21 +228,13 @@ public final class StructSerializer implements Serializer {
         return writing;
     }
 
-    public static <B extends Basic<?>> B readBasic(Field basicField, ByteBuf byteBuf) {
-        return StructUtils.newBasic(basicField, byteBuf);
-    }
-
-    public static <B extends Basic<?>> B readBasic(Type basicType, ByteBuf byteBuf) {
+    public static <B extends Basic<?>> B readBasic(Type rootType, Field basicField, ByteBuf byteBuf) {
+        Type basicType = TypeUtil.getActualType(rootType, basicField);
         return StructUtils.newBasic((Class<?>) basicType, byteBuf);
     }
 
-    // TODO
-    public static <S> S readStruct(Field structField, ByteBuf byteBuf) {
-        return StructSerializer.read(byteBuf, TypeUtil.getType(structField));
-    }
-
-    public static <S> S readStruct(Type type, ByteBuf byteBuf) {
-        return StructSerializer.read(byteBuf, type);
+    public static <S> S readStruct(Type rootType, Field structField, ByteBuf byteBuf) {
+        return StructSerializer.read(byteBuf, TypeUtil.getActualType(rootType, structField));
     }
 
     public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
