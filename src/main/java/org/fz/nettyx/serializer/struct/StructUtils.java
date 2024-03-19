@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -177,7 +178,8 @@ public class StructUtils {
      */
     public static <S> S newStruct(Class<S> structClass) {
         try {
-            return ReflectUtil.getConstructor(structClass).newInstance();
+            if (isStruct(structClass)) return ReflectUtil.getConstructor(structClass).newInstance();
+            else                       throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);

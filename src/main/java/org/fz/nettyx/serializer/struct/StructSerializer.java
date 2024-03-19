@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ModifierUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -69,26 +68,20 @@ public final class StructSerializer implements Serializer {
      * @param struct  the struct
      */
     StructSerializer(ByteBuf byteBuf, Object struct, Type rootType) {
-        this.byteBuf  = byteBuf;
-        this.struct   = struct;
+        this.byteBuf = byteBuf;
+        this.struct = struct;
         this.rootType = rootType;
     }
 
     public static <T> T read(ByteBuf byteBuf, Type rootType) {
-        if (rootType instanceof Class<?>) return read(byteBuf, newStruct((Class<T>) rootType), rootType);
-        else if (rootType instanceof ParameterizedType)
-            return read(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType);
-        else if (rootType instanceof TypeRefer) return read(byteBuf, ((TypeRefer<T>) rootType).getType());
-        else if (rootType instanceof TypeReference) return read(byteBuf, ((TypeReference<T>) rootType).getType());
+        if (rootType instanceof Class<?>)          return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).parseStruct();
+        else
+        if (rootType instanceof ParameterizedType) return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).parseStruct();
+        else
+        if (rootType instanceof TypeRefer)         return read(byteBuf, ((TypeRefer<T>) rootType).getType());
+        else
+        if (rootType instanceof TypeReference)     return read(byteBuf, ((TypeReference<T>) rootType).getType());
         else throw new TypeJudgmentException(rootType);
-    }
-
-    public static <T> T read(ByteBuf byteBuf, Object struct, Type rootType) {
-        if (rootType instanceof TypeRefer)
-            return new StructSerializer(byteBuf, struct, ((TypeRefer<T>) rootType).getType()).parseStruct();
-        else if (rootType instanceof TypeReference)
-            return new StructSerializer(byteBuf, struct, ((TypeReference<T>) rootType).getType()).parseStruct();
-        else return new StructSerializer(byteBuf, struct, rootType).parseStruct();
     }
 
     public static <T> T read(byte[] bytes, Type type) {
@@ -113,10 +106,11 @@ public final class StructSerializer implements Serializer {
     public static <T> ByteBuf write(T struct, Type rootType) {
         Throws.ifNull(struct, "struct can not be null when write");
 
-        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType)
-            return new StructSerializer(buffer(), struct, rootType).toByteBuf();
-        else if (rootType instanceof TypeRefer) return write(struct, ((TypeRefer<T>) rootType).getType());
-        else if (rootType instanceof TypeReference) return write(struct, ((TypeReference<T>) rootType).getType());
+        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(buffer(), struct, rootType).toByteBuf();
+        else
+        if (rootType instanceof TypeRefer)                                         return write(struct, ((TypeRefer<T>) rootType).getType());
+        else
+        if (rootType instanceof TypeReference)                                     return write(struct, ((TypeReference<T>) rootType).getType());
         else throw new TypeJudgmentException(rootType);
     }
 
@@ -135,8 +129,7 @@ public final class StructSerializer implements Serializer {
             byte[] bytes = new byte[writeBuf.readableBytes()];
             writeBuf.readBytes(bytes);
             return bytes;
-        }
-        finally {
+        } finally {
             ReferenceCountUtil.release(writeBuf);
         }
     }
@@ -159,25 +152,34 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      working code splitter      ******************************************//
 
+    /**
+     * parse ByteBuf to Object
+     *
+     * @param <T> the type parameter
+     * @return the t
+     */
     <T> T parseStruct() {
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
-                Object   fieldValue;
-                Class<?> fieldType;
+                Object fieldValue;
+                Class<?> fieldActualType;
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
                 if (useReadHandler(field)) {
                     fieldValue = readHandled(field, this);
-                } else if (isBasic(fieldType = getFieldActualType(rootType, field))) {
-                    fieldValue = readBasic(fieldType, this.getByteBuf());
-                } else if (isStruct(fieldType)) {
-                    Type type = TypeUtil.getType(field);
-                    fieldValue = readStruct(rootType, type, this.getByteBuf());
-                } else throw new TypeJudgmentException(field);
+                }
+                else
+                if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
+                    fieldValue = readBasic(fieldActualType, this.getByteBuf());
+                }
+                else
+                if (isStruct(fieldActualType)) {
+                    fieldValue = readStruct(fieldActualType, this.getByteBuf());
+                }
+                else throw new TypeJudgmentException(field);
                 StructUtils.writeField(struct, field, fieldValue);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 throw new SerializeException("field read exception, field is [" + field + "]", exception);
             }
         }
@@ -193,20 +195,24 @@ public final class StructSerializer implements Serializer {
         ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getRawType(this.getRootType()))) {
             try {
-                Object   fieldValue = StructUtils.readField(struct, field);
-                Class<?> fieldActualType;
+                Object fieldValue = StructUtils.readField(struct, field);
+                Class<?> fieldActualType ;
                 // some fields may ignore
                 if (isIgnore(field)) continue;
 
                 if (useWriteHandler(field)) {
                     writeHandled(field, fieldValue, this);
-                } else if (isBasic(fieldActualType = getFieldActualType(rootType, field))) {
+                }
+                else
+                if (isBasic(fieldActualType = getFieldActualType(this.getRootType(), field))) {
                     writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
-                } else if (isStruct(fieldActualType)) {
+                }
+                else
+                if (isStruct(fieldActualType)) {
                     writeStruct(defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
-                } else throw new TypeJudgmentException(field);
-            }
-            catch (Exception exception) {
+                }
+                else throw new TypeJudgmentException(field);
+            } catch (Exception exception) {
                 throw new SerializeException("field write exception, field [" + field + "]", exception);
             }
         }
@@ -217,29 +223,27 @@ public final class StructSerializer implements Serializer {
         return StructUtils.newBasic(basicField, byteBuf);
     }
 
-    public static <B extends Basic<?>> B readBasic(Type basic, ByteBuf byteBuf) {
-        return StructUtils.newBasic((Class<?>) basic, byteBuf);
+    public static <B extends Basic<?>> B readBasic(Type basicType, ByteBuf byteBuf) {
+        return StructUtils.newBasic((Class<?>) basicType, byteBuf);
     }
 
-    public static <S> S readStruct(Type root, Field structField, ByteBuf byteBuf) {
-
-        return StructSerializer.read(byteBuf, structField.getType(), root);
+    public static <S> S readStruct(Field structField, ByteBuf byteBuf) {
+        return StructSerializer.read(byteBuf, structField.getType());
     }
 
-    public static <S> S readStruct(Type root, Type type, ByteBuf byteBuf) {
-        return StructSerializer.read(byteBuf, type, root);
+    public static <S> S readStruct(Type type, ByteBuf byteBuf) {
+        return StructSerializer.read(byteBuf, type);
     }
 
     public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
-        ReadHandler<A> readHandler       = StructUtils.getHandler(handleField);
-        A              handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        ReadHandler<A> readHandler = StructUtils.getHandler(handleField);
+        A handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
         try {
             readHandler.preReadHandle(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, handleField, handlerAnnotation);
             readHandler.postReadHandle(upperSerializer, handleField, handlerAnnotation);
             return handledValue;
-        }
-        catch (Exception readHandlerException) {
+        } catch (Exception readHandlerException) {
             readHandler.afterReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
             throw new HandlerException(handleField, readHandler.getClass(), readHandlerException);
         }
@@ -266,22 +270,21 @@ public final class StructSerializer implements Serializer {
     /**
      * write using handler
      *
-     * @param handleField     the handled field
+     * @param handleField the handled field
      * @param upperSerializer the upper serializer
      */
     public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue,
-                                                           StructSerializer upperSerializer) {
-        WriteHandler<A> writeHandler      = StructUtils.getHandler(handleField);
-        A               handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
-        ByteBuf         writing           = upperSerializer.getByteBuf();
+        StructSerializer upperSerializer) {
+        WriteHandler<A> writeHandler = StructUtils.getHandler(handleField);
+        A handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        ByteBuf writing = upperSerializer.getByteBuf();
         try {
             writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.doWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.postWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
-        }
-        catch (Exception writeHandlerException) {
+        } catch (Exception writeHandlerException) {
             writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing,
-                                         writeHandlerException);
+                writeHandlerException);
             throw new HandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
     }
@@ -291,7 +294,6 @@ public final class StructSerializer implements Serializer {
      * get the serializing struct object by this method
      *
      * @param <T> the type parameter
-     *
      * @return the t
      */
     public <T> T earlyStruct() {
@@ -305,11 +307,11 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> boolean isNotBasic(T object) {
-        return !isBasic(object);
+        return isNotBasic(object.getClass());
     }
 
-    public static boolean isNotBasic(Type root, Field field) {
-        return !isBasic(root, field);
+    public static boolean isNotBasic(Field field) {
+        return isNotBasic(field.getType());
     }
 
     public static boolean isNotBasic(Class<?> clazz) {
@@ -317,48 +319,45 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> boolean isBasic(T object) {
-        return object != null && isBasic(object.getClass());
+        return isBasic(object.getClass());
     }
 
-    public static boolean isBasic(Type root, Field field) {
-        Class<?> fieldActualType = getFieldActualType(root, field);
-        return isBasic(fieldActualType);
+    public static boolean isBasic(Field field) {
+        return isBasic(field.getType());
     }
 
-    public static boolean isBasic(Class<?> type) {
-        return Basic.class.isAssignableFrom(type) && Basic.class != type;
+    public static boolean isBasic(Class<?> clazz) {
+        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
     }
 
-    public static boolean isNotStruct(Type root, Field field) {
-        return !isStruct(root, field);
+    public static boolean isNotStruct(Field field) {
+        return isNotStruct(field.getType());
     }
 
     public static <T> boolean isNotStruct(T object) {
-        return !isStruct(object);
+        return isNotStruct(object.getClass());
     }
 
     public static boolean isNotStruct(Class<?> clazz) {
         return !isStruct(clazz);
     }
 
-    public static boolean isStruct(Type root, Field field) {
-        Class<?> fieldActualType = getFieldActualType(root, field);
-        return isStruct(fieldActualType);
+    public static boolean isStruct(Field field) {
+        return isStruct(field.getType());
     }
 
     public static <T> boolean isStruct(T object) {
-        return object != null && isStruct(object.getClass());
+        return isStruct(object.getClass());
     }
 
-    public static boolean isStruct(Class<?> type) {
-        return AnnotationUtil.hasAnnotation(type, Struct.class);
+    public static boolean isStruct(Class<?> clazz) {
+        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
     }
 
     /**
      * Is ignore boolean.
      *
      * @param field the field
-     *
      * @return the boolean
      */
     public static boolean isIgnore(Field field) {
