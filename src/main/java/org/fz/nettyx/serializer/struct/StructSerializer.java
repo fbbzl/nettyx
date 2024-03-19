@@ -339,7 +339,18 @@ public final class StructSerializer implements Serializer {
     }
 
     public static boolean isStruct(Type root, Field field) {
-        return isStruct(getActualType(root, field));
+        Type type = TypeUtil.getType(field);
+        if (type instanceof Class) {
+            return isStruct((Class<?>) type);
+        }
+        if (type instanceof ParameterizedType) {
+            return isStruct((Class<?>) ((ParameterizedType) type).getRawType());
+        }
+        if (type instanceof TypeVariable) {
+            return isStruct(getActualType(root, type));
+        }
+
+        return false;
     }
 
     public static boolean isStruct(Class<?> clazz) {
