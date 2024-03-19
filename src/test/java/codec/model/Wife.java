@@ -6,8 +6,10 @@ import org.fz.nettyx.serializer.struct.annotation.ToString;
 
 @Data
 @Struct
-public class Wife {
+public class Wife<V> {
 
     @ToString(bufferLength = 2)
     private String name;
+
+    private V vv;
 }
