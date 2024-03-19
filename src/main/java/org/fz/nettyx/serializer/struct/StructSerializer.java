@@ -79,7 +79,8 @@ public final class StructSerializer implements Serializer {
         if (rootType instanceof Class<?>)
             return new StructSerializer(byteBuf, newStruct((Class<T>) rootType), rootType).parseStruct();
         else if (rootType instanceof ParameterizedType)
-            return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()), rootType).parseStruct();
+            return new StructSerializer(byteBuf, newStruct((Class<T>) ((ParameterizedType) rootType).getRawType()),
+                                        rootType).parseStruct();
         else if (rootType instanceof TypeRefer) return read(byteBuf, ((TypeRefer<T>) rootType).getType());
         else if (rootType instanceof TypeReference) return read(byteBuf, ((TypeReference<T>) rootType).getType());
         else throw new TypeJudgmentException(rootType);
@@ -303,36 +304,28 @@ public final class StructSerializer implements Serializer {
         return ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static <T> boolean isNotBasic(Type root, T object) {
-        return !isBasic(root, object);
+    public static <T> boolean isNotBasic(T object) {
+        return !isBasic(object);
     }
 
-    public static boolean isNotBasic(Type root, Field field) {
-        return !isBasic(root, field);
+    public static boolean isNotBasic(Field field) {
+        return !isBasic(field);
     }
 
-    public static boolean isNotBasic(Type root, Type type) {
-        return !isBasic(root, type);
+    public static boolean isNotBasic(Type type) {
+        return !isBasic(type);
     }
 
-    public static <T> boolean isBasic(Type root, T object) {
-        return isBasic(root, object.getClass());
+    public static <T> boolean isBasic(T object) {
+        return isBasic(object.getClass());
     }
 
-    public static boolean isBasic(Type root, Field field) {
-        return isBasic(root, TypeUtil.getType(field));
+    public static boolean isBasic(Field field) {
+        return isBasic(TypeUtil.getType(field));
     }
 
-    public static boolean isBasic(Type root, Type type) {
-        if (type instanceof Class) {
-            return Basic.class.isAssignableFrom((Class<?>) type) && Basic.class != type;
-        }
-        if (type instanceof TypeVariable) {
-            Class<?> actualType = (Class<?>) TypeUtil.getActualType(root, type);
-            return Basic.class.isAssignableFrom(actualType) && Basic.class != actualType;
-        }
-
-        return false;
+    public static boolean isBasic(Type type) {
+        return Basic.class.isAssignableFrom((Class<?>) type) && Basic.class != type;
     }
 
     // struct start
