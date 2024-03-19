@@ -26,13 +26,6 @@ public abstract class TypeRefer<T> implements Type {
         return this.type.toString();
     }
 
-    /**
-     * Gets raw type.
-     *
-     * @param <T>  the type parameter
-     * @param type the type
-     * @return the raw type
-     */
     public static <T> Class<T> getRawType(Type type) {
         if (type instanceof Class<?>) {
             return (Class<T>) type;
@@ -42,14 +35,6 @@ public abstract class TypeRefer<T> implements Type {
         throw new TypeJudgmentException(type);
     }
 
-    /**
-     * Gets field actual type.
-     *
-     * @param <T>      the type parameter
-     * @param rootType the root type
-     * @param field    the field
-     * @return the field actual type
-     */
     public static <T> Class<T> getActualType(Type rootType, Field field) {
         return getActualType(rootType, TypeUtil.getType(field), 0);
     }
@@ -58,27 +43,10 @@ public abstract class TypeRefer<T> implements Type {
         return getActualType(rootType, TypeUtil.getType(field), index);
     }
 
-    /**
-     * Gets actual type.
-     *
-     * @param <T>  the type parameter
-     * @param root the root
-     * @param type the type
-     * @return the actual type
-     */
     public static <T> Class<T> getActualType(Type root, Type type) {
         return getActualType(root, type, 0);
     }
 
-    /**
-     * Gets actual type.
-     *
-     * @param <T>   the type parameter
-     * @param root  the root
-     * @param type  the type
-     * @param index the index
-     * @return the actual type
-     */
     public static <T> Class<T> getActualType(Type root, Type type, int index) {
         if (type instanceof Class) return (Class<T>) type;
         if (!(root instanceof ParameterizedType) || type instanceof WildcardType) return (Class<T>) Object.class;
