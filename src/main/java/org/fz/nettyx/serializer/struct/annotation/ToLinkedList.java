@@ -4,7 +4,7 @@ import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getFieldActualType;
+import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
 import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
 import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
 
@@ -55,8 +55,9 @@ public @interface ToLinkedList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
             Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
-                            : elementType;
+                (elementType = toLinkedList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
+                                                                                           field, 0)
+                                                                           : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
@@ -67,8 +68,9 @@ public @interface ToLinkedList {
         public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
                             ByteBuf writing) {
             Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getFieldActualType(serializer.getRootType(), field)
-                            : elementType;
+                (elementType = toLinkedList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
+                                                                                           field, 0)
+                                                                           : elementType;
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
