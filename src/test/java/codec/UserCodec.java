@@ -23,7 +23,6 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
-        System.err.println(msg.readableBytes());
         StopWatch s = new StopWatch();
         s.start("read");
         User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> read = StructSerializer.read(typeRefer, msg);
