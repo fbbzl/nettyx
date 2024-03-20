@@ -1,12 +1,7 @@
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
-import codec.model.Bill;
-import codec.model.GirlFriend;
-import codec.model.Son;
-import codec.model.User;
-import codec.model.Wife;
+import codec.model.*;
 import io.netty.buffer.Unpooled;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
@@ -19,6 +14,8 @@ import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 /**
  * @author fengbinbin
@@ -38,7 +35,7 @@ public class SerializerTester {
 
     @Test
     public void testXmlSerializer() {
-        byte[] bytes = new byte[100];
+        byte[] bytes = new byte[1024*2];
         Arrays.fill(bytes, (byte) 0);
         Model model1 = XmlSerializerContext.findModel("school", "student");
         Dict  doc    = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
@@ -49,7 +46,7 @@ public class SerializerTester {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[1024 * 1024];
+        byte[] bytes = new byte[1024 * 2];
         Arrays.fill(bytes, (byte) 67);
         TypeRefer<User<Son<Cchar, Wife<Cint,Bill>>, Clong4, GirlFriend >> typeRefer = new TypeRefer<User<Son<Cchar, Wife<Cint,Bill>>, Clong4
                 , GirlFriend>>() {
