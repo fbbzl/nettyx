@@ -8,6 +8,7 @@ import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cint;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
@@ -46,10 +47,10 @@ public class SerializerTester {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[1024 * 3];
+        byte[] bytes = new byte[1024 * 6];
         Arrays.fill(bytes, (byte) 67);
-        TypeRefer<User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar,
-                Wife<Cint, Bill>>, Clong4, GirlFriend>>() {
+        TypeRefer<User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend>> typeRefer = new TypeRefer<User<Clong4,
+                Wife<Culong8, Son<Clong4, Bill>>, GirlFriend>>() {
         };
 
         User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
