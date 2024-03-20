@@ -49,8 +49,7 @@ public class SerializerTester {
         byte[] bytes = new byte[1024 * 3];
         Arrays.fill(bytes, (byte) 67);
         TypeRefer<User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar,
-                Wife<Cint, Bill>>, Clong4
-                , GirlFriend>>() {
+                Wife<Cint, Bill>>, Clong4, GirlFriend>>() {
         };
 
         User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
