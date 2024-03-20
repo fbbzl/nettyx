@@ -35,7 +35,7 @@ public class SerializerTester {
 
     @Test
     public void testXmlSerializer() {
-        byte[] bytes = new byte[1024*2];
+        byte[] bytes = new byte[1024 * 2];
         Arrays.fill(bytes, (byte) 0);
         Model model1 = XmlSerializerContext.findModel("school", "student");
         Dict  doc    = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
@@ -46,14 +46,15 @@ public class SerializerTester {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[1024 * 2];
+        byte[] bytes = new byte[1024 * 3];
         Arrays.fill(bytes, (byte) 67);
-        TypeRefer<User<Son<Cchar, Wife<Cint,Bill>>, Clong4, GirlFriend >> typeRefer = new TypeRefer<User<Son<Cchar, Wife<Cint,Bill>>, Clong4
+        TypeRefer<User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar,
+                Wife<Cint, Bill>>, Clong4
                 , GirlFriend>>() {
         };
 
-        User<Son<Cchar, Wife<Cint,Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
-                                                                                Unpooled.wrappedBuffer(bytes));
+        User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
+                                                                                            Unpooled.wrappedBuffer(bytes));
 
         System.err.println("read :" + user);
 //        user.setAddress(null);
