@@ -27,7 +27,7 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         s.start("read");
         User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> read = StructSerializer.read(typeRefer, msg);
         s.stop();
-        System.err.println(read);
+
         Console.print(s.prettyPrint(TimeUnit.MILLISECONDS));
 
     }
