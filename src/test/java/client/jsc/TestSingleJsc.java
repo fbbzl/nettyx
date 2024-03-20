@@ -41,7 +41,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
     protected ChannelFutureAction whenConnectSuccess() {
         return cf -> {
             executor.scheduleAtFixedRate(() -> {
-                byte[] msg = new byte[1024 * 3];
+                byte[] msg = new byte[1024 * 4];
                 Arrays.fill(msg, (byte) 1);
                 this.writeAndFlush(Unpooled.wrappedBuffer(msg));
             }, 2, 30, TimeUnit.MILLISECONDS);
