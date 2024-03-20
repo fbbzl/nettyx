@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cint;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
@@ -50,7 +51,7 @@ public class SerializerTester {
     public void testStructSerializer() {
         byte[] bytes = new byte[1024 * 1024];
         Arrays.fill(bytes, (byte) 67);
-        TypeRefer<User<Son<Cchar, Wife<Bill>>, Clong4, GirlFriend>> typeRefer = new TypeRefer<User<Son<Cchar, Wife<Bill>>, Clong4
+        TypeRefer<User<Son<Cchar, Wife<Cint,Bill>>, Clong4, GirlFriend >> typeRefer = new TypeRefer<User<Son<Cchar, Wife<Bill>>, Clong4
                 , GirlFriend>>() {
         };
 
