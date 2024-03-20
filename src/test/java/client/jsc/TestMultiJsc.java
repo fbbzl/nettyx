@@ -1,8 +1,8 @@
 package client.jsc;
 
 import client.TestChannelInitializer;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
@@ -23,8 +23,8 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
     }
 
     @Override
-    protected ChannelInitializer<? extends Channel> channelInitializer() {
-        return new TestChannelInitializer();
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
     }
 
     @Override
