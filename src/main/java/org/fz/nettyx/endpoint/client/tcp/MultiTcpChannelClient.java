@@ -4,11 +4,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.AttributeKey;
-import java.net.InetSocketAddress;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
+
+import java.net.InetSocketAddress;
+import java.util.Map;
 
 /**
  * The type Multi channel client. use channel key to retrieve and use channels
@@ -30,11 +30,6 @@ public abstract class MultiTcpChannelClient<K> extends
     @Override
     protected EventLoopGroup newEventLoopGroup() {
         return new NioEventLoopGroup();
-    }
-
-    @Override
-    protected AttributeKey<K> getAttributeKey() {
-        return AttributeKey.valueOf("$multi_tcp_channel_key$");
     }
 
 }

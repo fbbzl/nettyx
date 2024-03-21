@@ -3,7 +3,6 @@ package org.fz.nettyx.endpoint.client.rxtx;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.rxtx.RxtxChannelConfig;
-import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
@@ -33,8 +32,4 @@ public abstract class MultiRxtxChannelClient<K> extends
         return new OioEventLoopGroup();
     }
 
-    @Override
-    protected AttributeKey<K> getAttributeKey() {
-        return AttributeKey.valueOf("$multi_rxtx_channel_key$");
-    }
 }
