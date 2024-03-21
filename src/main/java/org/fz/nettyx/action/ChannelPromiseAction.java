@@ -15,12 +15,6 @@ public interface ChannelPromiseAction {
 
     ChannelPromiseAction DO_NOTHING = (ctx, prom) -> {};
 
-    /**
-     * Act.
-     *
-     * @param ctx     the ctx
-     * @param promise the promise
-     */
     void act(ChannelHandlerContext ctx, ChannelPromise promise);
 
 }

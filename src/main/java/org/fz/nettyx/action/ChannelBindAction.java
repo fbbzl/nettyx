@@ -17,12 +17,5 @@ public interface ChannelBindAction {
 
     ChannelBindAction DO_NOTHING = (ctx, laddr, prom) -> {};
 
-    /**
-     * Act.
-     *
-     * @param ctx          the ctx
-     * @param localAddress the local address
-     * @param promise      the promise
-     */
     void act(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise);
 }

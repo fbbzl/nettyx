@@ -14,12 +14,6 @@ public interface ChannelEventAction {
 
     ChannelEventAction DO_NOTHING = (ctx, evt) -> {};
 
-    /**
-     * Act.
-     *
-     * @param ctx the ctx
-     * @param evt the evt
-     */
     void act(ChannelHandlerContext ctx, Object evt);
 
 }

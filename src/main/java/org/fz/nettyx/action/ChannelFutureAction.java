@@ -13,12 +13,7 @@ import io.netty.channel.ChannelFuture;
 public interface ChannelFutureAction {
 
     ChannelFutureAction DO_NOTHING = cf -> {};
-
-    /**
-     * Act.
-     *
-     * @param channelFuture the channel future
-     */
+    
     void act(ChannelFuture channelFuture);
 
 

@@ -14,10 +14,5 @@ public interface ChannelAction {
 
     ChannelAction DO_NOTHING = chl -> {};
 
-    /**
-     * Act.
-     *
-     * @param channel the channel
-     */
     void act(Channel channel);
 }
