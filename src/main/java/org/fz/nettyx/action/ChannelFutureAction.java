@@ -12,7 +12,7 @@ import io.netty.channel.ChannelFuture;
 @FunctionalInterface
 public interface ChannelFutureAction {
 
-    ChannelFutureAction NOTHING = ctx -> {};
+    ChannelFutureAction DO_NOTHING = ctx -> {};
 
     /**
      * Act.

@@ -18,7 +18,7 @@ import org.fz.nettyx.util.Try;
 import java.net.SocketAddress;
 import java.util.Map;
 
-import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
+import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
 
 /**
  * @author fengbinbin
@@ -149,19 +149,19 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
     }
 
     protected ChannelFutureAction whenConnectDone(K key) {
-        return NOTHING;
+        return DO_NOTHING;
     }
 
     protected ChannelFutureAction whenConnectCancel(K key) {
-        return NOTHING;
+        return DO_NOTHING;
     }
 
     protected ChannelFutureAction whenConnectSuccess(K key) {
-        return NOTHING;
+        return DO_NOTHING;
     }
 
     protected ChannelFutureAction whenConnectFailure(K key) {
-        return NOTHING;
+        return DO_NOTHING;
     }
 
 }
