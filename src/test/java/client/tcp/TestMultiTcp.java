@@ -1,17 +1,17 @@
 package client.tcp;
 
 
-
 import client.TestChannelInitializer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.fz.nettyx.action.ChannelFutureAction;
+import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
+
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
 
 /**
  * @author fengbinbin
@@ -53,7 +53,7 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
         Map<String, InetSocketAddress> map = new HashMap<>();
 
         map.put("a", new InetSocketAddress("127.0.0.1", 9081));
-        map.put("b", new InetSocketAddress("127.0.0.1", 9082));
+        map.put("b", new InetSocketAddress("127.0.0.1", 9081));
 
         TestMultiTcp testMultiTcp = new TestMultiTcp(map);
         testMultiTcp.connectAll();
