@@ -2,6 +2,7 @@ package org.fz.nettyx.action;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+
 import java.net.SocketAddress;
 
 /**
@@ -14,6 +15,8 @@ import java.net.SocketAddress;
 @FunctionalInterface
 public interface ChannelConnectAction {
 
+    ChannelConnectAction DO_NOTHING = (ctx, raddr, laddr, prom) -> {};
+
     /**
      * Act.
      *
@@ -22,6 +25,7 @@ public interface ChannelConnectAction {
      * @param localAddress  the local address
      * @param promise       the promise
      */
-    void act(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise);
+    void act(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
+             ChannelPromise promise);
 
 }

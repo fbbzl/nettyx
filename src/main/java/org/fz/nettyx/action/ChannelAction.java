@@ -12,6 +12,8 @@ import io.netty.channel.Channel;
 @FunctionalInterface
 public interface ChannelAction {
 
+    ChannelAction DO_NOTHING = chl -> {};
+
     /**
      * Act.
      *
