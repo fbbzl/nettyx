@@ -16,11 +16,14 @@ import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
  * @since 2021 /5/6 15:22
  */
 @Slf4j
-public abstract class SingleTcpChannelClient extends
-                                             AbstractSingleChannelClient<NioSocketChannel> {
+public abstract class SingleTcpChannelClient extends AbstractSingleChannelClient<NioSocketChannel> {
 
     protected SingleTcpChannelClient(InetSocketAddress address) {
         super(address);
+    }
+
+    protected SingleTcpChannelClient(String hostname, int port) {
+        super(new InetSocketAddress(hostname, port));
     }
 
     @Override
