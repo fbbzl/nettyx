@@ -136,16 +136,16 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
                 .handler(channelInitializer());
     }
 
-    public K channelKey(ChannelHandlerContext ctx) {
+    public static <T> T channelKey(ChannelHandlerContext ctx) {
         return channelKey(ctx.channel());
     }
 
-    public K channelKey(ChannelFuture channelFuture) {
+    public static <T> T channelKey(ChannelFuture channelFuture) {
         return channelKey(channelFuture.channel());
     }
 
-    public K channelKey(Channel channel) {
-        return (K) channel.attr(MULTI_CHANNEL_KEY).get();
+    public static <T> T channelKey(Channel channel) {
+        return (T) channel.attr(MULTI_CHANNEL_KEY).get();
     }
 
     protected ChannelFutureAction whenConnectDone(K key) {
