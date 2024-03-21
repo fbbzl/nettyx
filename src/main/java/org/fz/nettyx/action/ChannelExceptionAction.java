@@ -12,6 +12,8 @@ import io.netty.channel.ChannelHandlerContext;
 @FunctionalInterface
 public interface ChannelExceptionAction {
 
+    ChannelExceptionAction DO_NOTHING = (ctx, thro) -> {};
+
     /**
      * Act.
      *

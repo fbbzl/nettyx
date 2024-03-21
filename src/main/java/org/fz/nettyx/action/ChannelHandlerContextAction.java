@@ -12,6 +12,8 @@ import io.netty.channel.ChannelHandlerContext;
 @FunctionalInterface
 public interface ChannelHandlerContextAction {
 
+    ChannelHandlerContextAction DO_NOTHING = ctx -> {};
+
     /**
      * Act.
      *
