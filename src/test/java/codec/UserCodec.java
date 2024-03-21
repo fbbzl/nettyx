@@ -14,6 +14,8 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.fz.nettyx.endpoint.client.AbstractMultiChannelClient.channelKey;
+
 @Slf4j
 public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
 
@@ -24,7 +26,7 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
         StopWatch s = new StopWatch();
-        s.start("read");
+        s.start("read:" + channelKey(ctx));
         User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> read = StructSerializer.read(typeRefer, msg);
         s.stop();
 
