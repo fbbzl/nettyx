@@ -14,10 +14,5 @@ public interface ChannelHandlerContextAction {
 
     ChannelHandlerContextAction DO_NOTHING = ctx -> {};
 
-    /**
-     * Act.
-     *
-     * @param ctx the ctx
-     */
     void act(ChannelHandlerContext ctx);
 }

@@ -14,12 +14,6 @@ public interface ChannelExceptionAction {
 
     ChannelExceptionAction DO_NOTHING = (ctx, thro) -> {};
 
-    /**
-     * Act.
-     *
-     * @param t         the t
-     * @param throwable the throwable
-     */
-    void act(ChannelHandlerContext t, Throwable throwable);
+    void act(ChannelHandlerContext ctx, Throwable throwable);
 
 }

@@ -15,12 +15,5 @@ public interface ChannelWriteAction {
 
     ChannelWriteAction DO_NOTHING = (ctx, msg, prom) -> {};
 
-    /**
-     * Action.
-     *
-     * @param ctx     the ctx
-     * @param msg     the msg
-     * @param promise the promise
-     */
     void act(ChannelHandlerContext ctx, Object msg, ChannelPromise promise);
 }

@@ -17,14 +17,6 @@ public interface ChannelConnectAction {
 
     ChannelConnectAction DO_NOTHING = (ctx, raddr, laddr, prom) -> {};
 
-    /**
-     * Act.
-     *
-     * @param ctx           the ctx
-     * @param remoteAddress the remote address
-     * @param localAddress  the local address
-     * @param promise       the promise
-     */
     void act(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
              ChannelPromise promise);
 
