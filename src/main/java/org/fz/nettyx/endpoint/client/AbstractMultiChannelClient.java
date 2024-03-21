@@ -154,7 +154,6 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
 
     //********************************         public static start             ***************************************//
 
-
     protected ChannelFutureAction whenConnectDone(K key) {
         return NOTHING;
     }
