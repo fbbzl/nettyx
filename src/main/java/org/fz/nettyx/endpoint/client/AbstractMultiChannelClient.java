@@ -148,7 +148,7 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         return (T) channel.attr(getAttributeKey()).get();
     }
 
-    static <T> AttributeKey<T> getAttributeKey() {
+    protected AttributeKey<K> getAttributeKey() {
         return AttributeKey.valueOf("$multi_channel_key$");
     }
 
