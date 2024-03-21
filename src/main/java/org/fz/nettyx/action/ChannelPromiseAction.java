@@ -13,12 +13,8 @@ import io.netty.channel.ChannelPromise;
 @FunctionalInterface
 public interface ChannelPromiseAction {
 
-    /**
-     * Act.
-     *
-     * @param ctx     the ctx
-     * @param promise the promise
-     */
+    ChannelPromiseAction DO_NOTHING = (ctx, prom) -> {};
+
     void act(ChannelHandlerContext ctx, ChannelPromise promise);
 
 }
