@@ -32,6 +32,8 @@ import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
 public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                 Client<C> {
 
+    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("$multi_channel_key$");
+
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
     private final Map<K, Bootstrap>     bootstrapMap;
@@ -123,7 +125,7 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
 
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
-                .attr(getAttributeKey(), key)
+                .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
@@ -134,25 +136,17 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
                 .handler(channelInitializer());
     }
 
-    //********************************         public static start             ***************************************//
-
-    public static <T> T channelKey(ChannelHandlerContext ctx) {
+    public K channelKey(ChannelHandlerContext ctx) {
         return channelKey(ctx.channel());
     }
 
-    public static <T> T channelKey(ChannelFuture channelFuture) {
+    public K channelKey(ChannelFuture channelFuture) {
         return channelKey(channelFuture.channel());
     }
 
-    public static <T> T channelKey(Channel channel) {
-        return (T) channel.attr(getAttributeKey()).get();
+    public K channelKey(Channel channel) {
+        return (K) channel.attr(MULTI_CHANNEL_KEY).get();
     }
-
-    protected AttributeKey<K> getAttributeKey() {
-        return AttributeKey.valueOf("$multi_channel_key$");
-    }
-
-    //********************************         public static start             ***************************************//
 
     protected ChannelFutureAction whenConnectDone(K key) {
         return NOTHING;
