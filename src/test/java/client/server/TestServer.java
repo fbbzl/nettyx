@@ -4,7 +4,7 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.ServerSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -30,7 +30,7 @@ public class TestServer extends TcpServer {
     }
 
     @Override
-    protected ChannelInitializer<ServerSocketChannel> childChannelInitializer() {
+    protected ChannelInitializer<NioServerSocketChannel> childChannelInitializer() {
         return new TestChannelInitializer<>();
     }
 
