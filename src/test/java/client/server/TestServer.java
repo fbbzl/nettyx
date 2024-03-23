@@ -27,9 +27,8 @@ public class TestServer extends TcpServer {
     }
 
     public static void main(String[] args) {
-         new TestServer(9999).bind()
-
-
+        TestServer testServer = new TestServer(9999);
+        testServer
+            .bind().channel().closeFuture().addListener(cf -> testServer.shutdownGracefully());
     }
-
 }
