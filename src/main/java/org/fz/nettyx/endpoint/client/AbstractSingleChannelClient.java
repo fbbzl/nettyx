@@ -11,7 +11,7 @@ import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -34,7 +34,7 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
 
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
-        channelFuture.addListener(new ActionableChannelFutureListener().whenSuccess(this::storeChannel));
+        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess(this::storeChannel));
         return channelFuture;
     }
 

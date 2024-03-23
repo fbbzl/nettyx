@@ -23,7 +23,7 @@ import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -58,7 +58,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
     public static void main(String[] args) {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
+        ChannelFutureListener listener = new ActionChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];

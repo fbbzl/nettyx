@@ -2,16 +2,21 @@ package client.tcp;
 
 
 import client.TestChannelInitializer;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
-
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -19,6 +24,8 @@ import java.util.concurrent.TimeUnit;
  * @since 2024/2/29 14:58
  */
 public class TestMultiTcp extends MultiTcpChannelClient<String> {
+
+    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     protected TestMultiTcp(Map<String, InetSocketAddress> inetSocketAddressMap) {
         super(inetSocketAddressMap);
@@ -30,23 +37,8 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
     }
 
     @Override
-    protected ChannelFutureAction whenConnectSuccess(String key) {
-        return cf -> {
-            System.err.println(key +": ok");
-        };
-    }
-
-    @Override
     protected void doChannelConfig(String key, SocketChannelConfig channelConfig) {
         super.doChannelConfig(key, channelConfig);
-    }
-
-    @Override
-    protected ChannelFutureAction whenConnectFailure(String key) {
-        return cf -> {
-            System.err.println(key +": fail, " + cf.cause());
-            cf.channel().eventLoop().schedule(() -> connect(key), 2, TimeUnit.SECONDS);
-        };
     }
 
     public static void main(String[] args) {
@@ -56,6 +48,25 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
         map.put("b", new InetSocketAddress("127.0.0.1", 9081));
 
         TestMultiTcp testMultiTcp = new TestMultiTcp(map);
-        testMultiTcp.connectAll();
+        ChannelFutureListener listener = new ActionChannelFutureListener()
+            .whenSuccess(cf -> {
+                executor.scheduleAtFixedRate(() -> {
+                    byte[] msg = new byte[300];
+                    Arrays.fill(msg, (byte) 1);
+                    testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                }, 2, 30, TimeUnit.MILLISECONDS);
+
+                System.err.println(cf.channel().localAddress() + ": ok");
+            })
+            .whenCancel(cf -> System.err.println("cancel"))
+            .whenFailure(cf -> {
+                System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
+                cf.channel().eventLoop()
+                  .schedule(testSingleRxtx::connect, 2, TimeUnit.SECONDS);
+            })
+            .whenDone(cf -> System.err.println("done"));
+
+        Map<String, ChannelFuture> stringChannelFutureMap = testMultiTcp.connectAll();
+
     }
 }
