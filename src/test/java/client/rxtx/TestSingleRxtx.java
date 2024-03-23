@@ -23,7 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -56,7 +56,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
 
     public static void main(String[] args) {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
+        ChannelFutureListener listener = new ActionChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];
@@ -73,6 +73,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
                   .schedule(testSingleRxtx::connect, 2, TimeUnit.SECONDS);
             })
             .whenDone(cf -> System.err.println("done"));
+
         testSingleRxtx.connect().addListener(listener);
     }
 }

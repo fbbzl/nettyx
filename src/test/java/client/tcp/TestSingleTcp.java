@@ -3,6 +3,7 @@ package client.tcp;
 
 import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import java.net.InetSocketAddress;
@@ -12,7 +13,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.tcp.SingleTcpChannelClient;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
@@ -31,7 +32,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
     public static void main(String[] args) {
         TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9999));
 
-        ActionableChannelFutureListener listener = new ActionableChannelFutureListener()
+        ChannelFutureListener listener = new ActionChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];

@@ -19,7 +19,7 @@ import org.fz.nettyx.action.ChannelFutureAction;
 @Slf4j
 @Setter
 @Accessors(chain = true, fluent = true)
-public class ActionableChannelFutureListener implements ChannelFutureListener {
+public class ActionChannelFutureListener implements ChannelFutureListener {
 
     /**
      * When the different state of the channel is monitored, the corresponding method will be called
