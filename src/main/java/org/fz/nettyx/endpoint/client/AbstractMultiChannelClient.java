@@ -7,7 +7,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.ReflectiveChannelFactory;
@@ -46,25 +45,16 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
 
-    public void connectAll() {
-        addressMap.keySet().forEach(this::connect);
+    public Map<K, ChannelFuture> connectAll() {
+        return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
-    public void connect(K key) {
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-                .whenDone(whenConnectDone(key))
-                .whenCancel(whenConnectCancel(key))
-                .whenSuccess(cf -> {
-                    storeChannel(cf);
-                    whenConnectSuccess(key).act(cf);
-                })
-                .whenFailure(whenConnectFailure(key));
-
+    public ChannelFuture connect(K key) {
         Bootstrap bootstrap = getBootstrapMap().get(key);
         Throws.ifNull(bootstrap, "can not find config by key [" + key + "]");
-        bootstrap.clone()
-                 .connect()
-                 .addListener(listener);
+        ChannelFuture channelFuture = bootstrap.clone().connect();
+        channelFuture.addListener(new ActionableChannelFutureListener().whenSuccess(this::storeChannel));
+        return channelFuture;
     }
 
     public Channel getChannel(K key) {
@@ -127,15 +117,15 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
 
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
-                .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
-                .remoteAddress(remoteAddress)
-                .group(getEventLoopGroup())
-                .channelFactory(() -> {
-                    C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                    doChannelConfig(key, (F) chl.config());
-                    return chl;
-                })
-                .handler(channelInitializer());
+            .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
+            .remoteAddress(remoteAddress)
+            .group(getEventLoopGroup())
+            .channelFactory(() -> {
+                C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
+                doChannelConfig(key, (F) chl.config());
+                return chl;
+            })
+            .handler(channelInitializer());
     }
 
     public static <T> T channelKey(ChannelHandlerContext ctx) {
