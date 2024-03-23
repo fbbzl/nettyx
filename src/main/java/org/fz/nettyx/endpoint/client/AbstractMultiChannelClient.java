@@ -15,7 +15,6 @@ import io.netty.util.ReferenceCountUtil;
 import java.net.SocketAddress;
 import java.util.Map;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.util.ChannelStorage;
@@ -65,7 +64,6 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         storeChannel(channelKey, future.channel());
     }
 
-    @SneakyThrows({InterruptedException.class})
     protected void storeChannel(K key, Channel channel) {
         channelStorage.compute(key, Try.apply((k, old) -> {
             if (isActive(old)) {
