@@ -3,22 +3,25 @@ package org.fz.nettyx.endpoint.client;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelConfig;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.ReflectiveChannelFactory;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
+import java.util.Map;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
 import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
-
-import java.net.SocketAddress;
-import java.util.Map;
-
-import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
 
 /**
  * @author fengbinbin
@@ -72,13 +75,12 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         storeChannel(channelKey, future.channel());
     }
 
-    @SneakyThrows
+    @SneakyThrows({InterruptedException.class})
     protected void storeChannel(K key, Channel channel) {
         channelStorage.compute(key, Try.apply((k, old) -> {
             if (isActive(old)) {
                 old.close().sync();
             }
-
             log.info("has stored channel [{}]", channel);
             return channel;
         }));
@@ -146,22 +148,6 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
 
     public static <T> T channelKey(Channel channel) {
         return (T) channel.attr(MULTI_CHANNEL_KEY).get();
-    }
-
-    protected ChannelFutureAction whenConnectDone(K key) {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectCancel(K key) {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectSuccess(K key) {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectFailure(K key) {
-        return DO_NOTHING;
     }
 
 }
