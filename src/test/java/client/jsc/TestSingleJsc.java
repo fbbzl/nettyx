@@ -11,6 +11,7 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BI
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -53,7 +54,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
     public static void main(String[] args) {
         TestSingleJsc testSingleJsc = new TestSingleJsc();
-        ActionableChannelFutureListener listener = new ActionableChannelFutureListener()
+        ChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];
