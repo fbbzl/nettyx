@@ -3,9 +3,13 @@ package client.server;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 import codec.UserCodec;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import java.net.SocketAddress;
+import java.util.Arrays;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
@@ -19,6 +23,7 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
  * @since 2024/3/23 12:40
  */
 public class TestServer extends TcpServer {
+
 
     public TestServer(SocketAddress bindAddress) {
         super(bindAddress);
@@ -42,8 +47,17 @@ public class TestServer extends TcpServer {
                     outboundAdvice
                     , new StartEndFlagFrameCodec(320, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
                     , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                    ,new ChannelInboundHandlerAdapter(){
+                        @Override
+                        public void channelRead(ChannelHandlerContext ctx, Object in) throws Exception {
+                            byte[] msg = new byte[300];
+                            Arrays.fill(msg, (byte) 1);
+                            ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
+                            super.channelRead(ctx, in);
+                        }
+                    }
                     , new UserCodec()
-                 //   , new LoggerHandler(log, INFO)
+
                     , inboundAdvice);
             }
         };
