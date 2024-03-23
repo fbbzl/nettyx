@@ -4,7 +4,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 import codec.UserCodec;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.ServerSocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.SocketAddress;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
@@ -29,10 +29,10 @@ public class TestServer extends TcpServer {
     }
 
     @Override
-    protected ChannelInitializer<ServerSocketChannel> childChannelInitializer() {
-        return new ChannelInitializer<ServerSocketChannel>() {
+    protected ChannelInitializer<NioServerSocketChannel> childChannelInitializer() {
+        return new ChannelInitializer<NioServerSocketChannel>() {
             @Override
-            protected void initChannel(ServerSocketChannel channel) {
+            protected void initChannel(NioServerSocketChannel channel) {
                 InboundAdvice inboundAdvice = new InboundAdvice(channel)
                     .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
                 OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
