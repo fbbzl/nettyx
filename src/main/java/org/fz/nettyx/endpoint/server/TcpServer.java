@@ -1,9 +1,12 @@
 package org.fz.nettyx.endpoint.server;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.SocketAddress;
 import lombok.Getter;
@@ -27,14 +30,10 @@ public abstract class TcpServer {
 
     private final ServerBootstrap serverBootstrap;
 
-    protected TcpServer() {
+    protected TcpServer(SocketAddress socketAddress) {
         this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
-
-        this.serverBootstrap =
-            new ServerBootstrap()
-                .group(parentEventLoopGroup, childEventLoopGroup)
-                .channel(NioServerSocketChannel.class);
+        this.serverBootstrap      = newServerBootstrap(socketAddress);
     }
 
     protected EventLoopGroup parentEventLoopGroup() {
@@ -45,11 +44,28 @@ public abstract class TcpServer {
         return new NioEventLoopGroup();
     }
 
-    protected ServerBootstrap newServerBootstrap() {
-        return serverBootstrap.clone();
+    protected void doChannelConfig(ServerSocketChannel channel) {
+        // default is nothing
     }
 
-    public abstract ChannelFuture bind(SocketAddress socketAddress);
+    public ChannelFuture bind(SocketAddress socketAddress) {
+        this.
+
+    }
+
+    protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress) {
+        return new ServerBootstrap()
+            .group(parentEventLoopGroup, childEventLoopGroup)
+            .localAddress(bindAddress)
+            .channelFactory(() -> {
+                NioServerSocketChannel serverSocketChannel = new NioServerSocketChannel();
+                doChannelConfig(serverSocketChannel);
+                return serverSocketChannel;
+            })
+            .childHandler(childChannelInitializer());
+    }
+
+    protected abstract ChannelInitializer<? extends Channel> childChannelInitializer();
 
     protected void shutdownGracefully() {
         childEventLoopGroup.shutdownGracefully();
