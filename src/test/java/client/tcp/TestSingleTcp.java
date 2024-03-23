@@ -37,7 +37,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];
                     Arrays.fill(msg, (byte) 1);
-                    testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
                 }, 2, 30, TimeUnit.MILLISECONDS);
 
                 System.err.println(cf.channel().localAddress() + ": ok");
