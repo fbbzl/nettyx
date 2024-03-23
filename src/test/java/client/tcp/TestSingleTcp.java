@@ -2,6 +2,7 @@ package client.tcp;
 
 
 import client.TestChannelInitializer;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -36,7 +37,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];
                     Arrays.fill(msg, (byte) 1);
-                    //testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
                 }, 2, 30, TimeUnit.MILLISECONDS);
 
                 System.err.println(cf.channel().localAddress() + ": ok");
