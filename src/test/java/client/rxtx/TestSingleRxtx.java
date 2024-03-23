@@ -44,7 +44,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
                 byte[] msg = new byte[300];
                 Arrays.fill(msg, (byte) 1);
                 this.writeAndFlush(Unpooled.wrappedBuffer(msg));
-            }, 2, 500, TimeUnit.MILLISECONDS);
+            }, 2, 30, TimeUnit.MILLISECONDS);
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }
