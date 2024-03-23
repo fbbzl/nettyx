@@ -18,7 +18,7 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 @SuppressWarnings("deprecation")
 public abstract class SingleJscChannelClient extends AbstractSingleChannelClient<JscChannel> {
 
-    public SingleJscChannelClient(String commAddress) {
+    protected SingleJscChannelClient(String commAddress) {
         super(new JscDeviceAddress(commAddress));
     }
 
