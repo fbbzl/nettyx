@@ -23,15 +23,17 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 @Getter
 public abstract class AbstractSingleChannelClient<C extends Channel> extends Client<C> {
 
-    private final Bootstrap bootstrap;
-    private       Channel   channel;
+    private final SocketAddress remoteAddress;
+    private final Bootstrap     bootstrap;
+    private       Channel       channel;
 
-    protected AbstractSingleChannelClient() {
-        this.bootstrap = newBootstrap();
+    protected AbstractSingleChannelClient(SocketAddress remoteAddress) {
+        this.remoteAddress = remoteAddress;
+        this.bootstrap     = newBootstrap(remoteAddress);
     }
 
-    public ChannelFuture connect(SocketAddress remoteAddress) {
-        ChannelFuture channelFuture = this.getBootstrap().clone().connect(remoteAddress);
+    public ChannelFuture connect() {
+        ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListener(new ActionableChannelFutureListener().whenSuccess(this::storeChannel));
         return channelFuture;
     }
@@ -70,8 +72,9 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
         }
     }
 
-    protected Bootstrap newBootstrap() {
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
+            .remoteAddress(remoteAddress)
             .group(getEventLoopGroup())
             .channelFactory(() -> {
                 C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
