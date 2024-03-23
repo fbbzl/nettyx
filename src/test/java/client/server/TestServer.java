@@ -22,4 +22,8 @@ public class TestServer extends TcpServer {
         return new TestChannelInitializer<>();
     }
 
+    public static void main(String[] args) {
+
+    }
+
 }
