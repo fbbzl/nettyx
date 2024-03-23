@@ -1,11 +1,17 @@
 package client.server;
 
-import client.TestChannelInitializer;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+
+import codec.UserCodec;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.ServerSocketChannel;
 import java.net.SocketAddress;
-import java.util.Arrays;
+import org.fz.nettyx.codec.EscapeCodec;
+import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
+import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.server.TcpServer;
+import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
+import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 
 /**
  * @author fengbinbin
@@ -24,13 +30,24 @@ public class TestServer extends TcpServer {
 
     @Override
     protected ChannelInitializer<ServerSocketChannel> childChannelInitializer() {
-        return new TestChannelInitializer<>();
-    }
+        return new ChannelInitializer<ServerSocketChannel>() {
+            @Override
+            protected void initChannel(ServerSocketChannel channel) {
+                InboundAdvice inboundAdvice = new InboundAdvice(channel)
+                    .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
+                OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
+                    .whenExceptionCaught((c, t) -> System.err.println("out error: [" + t + "]"));
 
-    static byte[] msg = new byte[300];
+                channel.pipeline().addLast(
+                    outboundAdvice
+                    , new StartEndFlagFrameCodec(320, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                    , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                    , new UserCodec()
 
-    {
-        Arrays.fill(msg, (byte) 1);
+                    , inboundAdvice);
+            }
+
+        };
     }
 
     public static void main(String[] args) {
