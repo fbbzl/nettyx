@@ -46,7 +46,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
                 byte[] msg = new byte[300];
                 Arrays.fill(msg, (byte) 1);
                 this.writeAndFlush(Unpooled.wrappedBuffer(msg));
-            }, 2, 200, TimeUnit.MILLISECONDS);
+            }, 2, 500, TimeUnit.MILLISECONDS);
 
             System.err.println(cf.channel().localAddress() + ": ok");
         };
