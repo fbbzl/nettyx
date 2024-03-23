@@ -69,7 +69,7 @@ public abstract class TcpServer {
             .childHandler(childChannelInitializer());
     }
 
-    protected abstract ChannelInitializer<? extends Channel> childChannelInitializer();
+    protected abstract <C extends Channel> ChannelInitializer<C> childChannelInitializer();
 
     protected void shutdownGracefully() {
         childEventLoopGroup.shutdownGracefully();
