@@ -10,8 +10,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.ServerSocketChannel;
 import java.net.SocketAddress;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
@@ -25,8 +23,6 @@ import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
  * @since 2024/3/23 12:40
  */
 public class TestServer extends TcpServer {
-
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public TestServer(SocketAddress bindAddress) {
         super(bindAddress);
