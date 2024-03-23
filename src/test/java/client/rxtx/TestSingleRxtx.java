@@ -11,6 +11,7 @@ import static io.netty.channel.rxtx.RxtxChannelOption.STOP_BITS;
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
@@ -50,7 +51,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
 
     public static void main(String[] args) {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx();
-        ActionableChannelFutureListener listener = new ActionableChannelFutureListener()
+        ChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];
@@ -67,6 +68,6 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
                   .schedule(() -> testSingleRxtx.connect(cf.channel().remoteAddress()), 2, TimeUnit.SECONDS);
             })
             .whenDone(cf -> System.err.println("done"));
-        testSingleRxtx.connect("COM3");
+        testSingleRxtx.connect("COM3").addListener(listener);
     }
 }
