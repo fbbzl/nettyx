@@ -4,7 +4,6 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.ReflectiveChannelFactory;
 import io.netty.util.ReferenceCountUtil;
@@ -32,19 +31,9 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
     }
 
     public ChannelFuture connect(SocketAddress remoteAddress) {
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-            .whenDone(whenConnectDone())
-            .whenCancel(whenConnectCancel())
-            .whenSuccess(cf -> {
-                storeChannel(cf);
-                whenConnectSuccess().act(cf);
-            })
-            .whenFailure(whenConnectFailure());
-
-        return this.getBootstrap()
-                   .clone()
-                   .connect(remoteAddress)
-                   .addListener(listener);
+        ChannelFuture channelFuture = this.getBootstrap().clone().connect(remoteAddress);
+        channelFuture.addListener(new ActionableChannelFutureListener().whenSuccess(this::storeChannel));
+        return channelFuture;
     }
 
     protected void storeChannel(ChannelFuture cf) {
