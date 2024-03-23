@@ -4,7 +4,7 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.ServerSocketChannel;
 import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -30,7 +30,7 @@ public class TestServer extends TcpServer {
     }
 
     @Override
-    protected ChannelInitializer<NioServerSocketChannel> childChannelInitializer() {
+    protected ChannelInitializer<ServerSocketChannel> childChannelInitializer() {
         return new TestChannelInitializer<>();
     }
 
@@ -38,7 +38,6 @@ public class TestServer extends TcpServer {
         TestServer testServer = new TestServer(9999);
         Channel    channel    = testServer.bind().channel();
         channel.closeFuture().addListener(cf -> testServer.shutdownGracefully());
-        System.err.println(channel);
         executor.scheduleAtFixedRate(() -> {
             byte[] msg = new byte[300];
             Arrays.fill(msg, (byte) 1);
