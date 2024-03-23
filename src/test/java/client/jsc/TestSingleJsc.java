@@ -32,10 +32,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 @Slf4j
 public class TestSingleJsc extends SingleJscChannelClient {
 
-    protected TestSingleJsc(JscDeviceAddress remoteAddress) {
-        super(remoteAddress);
-    }
-
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
 
@@ -90,8 +86,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleJsc testSingleJsc = new TestSingleJsc(new JscDeviceAddress("COM2"));
-        testSingleJsc.connect();
+        TestSingleJsc testSingleJsc = new TestSingleJsc();
+        testSingleJsc.connect(new JscDeviceAddress("COM2"));
     }
 
 }
