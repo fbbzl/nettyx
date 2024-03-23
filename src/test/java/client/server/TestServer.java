@@ -2,17 +2,16 @@ package client.server;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
-import client.TestChannelInitializer;
 import codec.UserCodec;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.ServerSocketChannel;
 import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
@@ -39,7 +38,7 @@ public class TestServer extends TcpServer {
 
     @Override
     protected ChannelInitializer<ServerSocketChannel> childChannelInitializer() {
-        return new TestChannelInitializer<ServerSocketChannel>() {
+        return new ChannelInitializer<ServerSocketChannel>() {
             @Override
             protected void initChannel(ServerSocketChannel channel) {
                 InboundAdvice inboundAdvice = new InboundAdvice(channel)
@@ -51,6 +50,13 @@ public class TestServer extends TcpServer {
                     outboundAdvice
                     , new StartEndFlagFrameCodec(320, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
                     , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                    , new ChannelInboundHandlerAdapter() {
+                        @Override
+                        public void channelRead(ChannelHandlerContext ctx, Object inMsg) throws Exception {
+                            ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
+                            super.channelRead(ctx, inMsg);
+                        }
+                    }
                     , new UserCodec()
                     , inboundAdvice);
             }
@@ -58,14 +64,15 @@ public class TestServer extends TcpServer {
         };
     }
 
+    static byte[] msg = new byte[300];
+
+    {
+        Arrays.fill(msg, (byte) 1);
+    }
+
     public static void main(String[] args) {
         TestServer testServer = new TestServer(9999);
-        Channel    channel    = testServer.bind().channel();
-        channel.closeFuture().addListener(cf -> testServer.shutdownGracefully());
-        executor.scheduleAtFixedRate(() -> {
-            byte[] msg = new byte[300];
-            Arrays.fill(msg, (byte) 1);
-            channel.writeAndFlush(Unpooled.wrappedBuffer(msg));
-        }, 2, 30, TimeUnit.MILLISECONDS);
+        testServer.bind().channel().closeFuture().addListener(cf -> testServer.shutdownGracefully());
+
     }
 }
