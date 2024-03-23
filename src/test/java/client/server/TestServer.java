@@ -17,13 +17,17 @@ public class TestServer extends TcpServer {
         super(bindAddress);
     }
 
+    public TestServer(int bindPort) {
+        super(bindPort);
+    }
+
     @Override
     protected ChannelInitializer<ServerSocketChannel> childChannelInitializer() {
         return new TestChannelInitializer<>();
     }
 
     public static void main(String[] args) {
-        TestServer testServer = new TestServer(9999);
+         new TestServer(9999).bind()
 
 
     }

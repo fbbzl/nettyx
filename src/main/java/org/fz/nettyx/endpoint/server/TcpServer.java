@@ -53,8 +53,8 @@ public abstract class TcpServer {
         // default is nothing
     }
 
-    public ChannelFuture bind(SocketAddress bindAddress) {
-        return this.getServerBootstrap().clone().bind(bindAddress);
+    public ChannelFuture bind() {
+        return this.getServerBootstrap().clone().bind();
     }
 
     protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress) {
