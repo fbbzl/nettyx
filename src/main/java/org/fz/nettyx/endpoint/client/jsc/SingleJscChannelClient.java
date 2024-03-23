@@ -1,7 +1,6 @@
 package org.fz.nettyx.endpoint.client.jsc;
 
 
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,8 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 @SuppressWarnings("deprecation")
 public abstract class SingleJscChannelClient extends AbstractSingleChannelClient<JscChannel> {
 
-    public ChannelFuture connect(String commAddress) {
-        return super.connect(new JscDeviceAddress(commAddress));
+    public SingleJscChannelClient(String commAddress) {
+        super(new JscDeviceAddress(commAddress));
     }
 
     @Override

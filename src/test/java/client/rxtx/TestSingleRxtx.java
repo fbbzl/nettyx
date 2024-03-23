@@ -16,6 +16,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
+import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,14 +34,18 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+    public TestSingleRxtx(String commAddress) {
+        super(commAddress);
+    }
+
     @Override
     protected ChannelInitializer<XRxtxChannel> channelInitializer() {
         return new TestChannelInitializer<>();
     }
 
     @Override
-    protected Bootstrap newBootstrap() {
-        return super.newBootstrap()
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
+        return super.newBootstrap(remoteAddress)
                     .option(BAUD_RATE, 115200)
                     .option(DATA_BITS, Databits.DATABITS_8)
                     .option(STOP_BITS, Stopbits.STOPBITS_1)
@@ -50,7 +55,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx();
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
         ChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
@@ -65,9 +70,9 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
             .whenFailure(cf -> {
                 System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
                 cf.channel().eventLoop()
-                  .schedule(() -> testSingleRxtx.connect(cf.channel().remoteAddress()), 2, TimeUnit.SECONDS);
+                  .schedule(testSingleRxtx::connect, 2, TimeUnit.SECONDS);
             })
             .whenDone(cf -> System.err.println("done"));
-        testSingleRxtx.connect("COM3").addListener(listener);
+        testSingleRxtx.connect().addListener(listener);
     }
 }
