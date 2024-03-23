@@ -23,7 +23,7 @@ import org.fz.nettyx.event.ChannelEvents;
 @Getter
 @Setter
 @Accessors(fluent = true, chain = true)
-public class ActionableIdleStateHandler extends IdleStateHandler {
+public class ActionIdleStateHandler extends IdleStateHandler {
 
     private ChannelHandlerContextAction readIdleAction, writeIdleAction, allIdleAction;
     private final boolean fireNext;
@@ -61,8 +61,8 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionableIdleStateHandler newReadIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
-        return new ActionableIdleStateHandler(seconds, 0, 0).readIdleAction(idleAction);
+    public static ActionIdleStateHandler newReadIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
+        return new ActionIdleStateHandler(seconds, 0, 0).readIdleAction(idleAction);
     }
 
     /**
@@ -72,8 +72,8 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionableIdleStateHandler newWriteIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
-        return new ActionableIdleStateHandler(0, seconds, 0).writeIdleAction(idleAction);
+    public static ActionIdleStateHandler newWriteIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
+        return new ActionIdleStateHandler(0, seconds, 0).writeIdleAction(idleAction);
     }
 
     /**
@@ -83,8 +83,8 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionableIdleStateHandler newAllIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
-        return new ActionableIdleStateHandler(0, 0, seconds).allIdleAction(idleAction);
+    public static ActionIdleStateHandler newAllIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
+        return new ActionIdleStateHandler(0, 0, seconds).allIdleAction(idleAction);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
 
     //********************************************        constructor start          **********************************************//
 
-    public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
+    public ActionIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, true);
     }
 
@@ -121,7 +121,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param allIdleTime    the all idle time
      * @param unit           the unit
      */
-    public ActionableIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+    public ActionIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
         this(false, readerIdleTime, writerIdleTime, allIdleTime, unit, true);
     }
 
@@ -133,7 +133,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param allIdleTimeSeconds    the all idle time seconds
      * @param fireNext              the fire next
      */
-    public ActionableIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds, boolean fireNext) {
+    public ActionIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds, boolean fireNext) {
         this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, TimeUnit.SECONDS, fireNext);
     }
 
@@ -146,7 +146,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param unit           the unit
      * @param fireNext       the fire next
      */
-    public ActionableIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
+    public ActionIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
         this(false, readerIdleTime, writerIdleTime, allIdleTime, unit, fireNext);
     }
 
@@ -159,7 +159,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param allIdleTime    the all idle time
      * @param unit           the unit
      */
-    public ActionableIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+    public ActionIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
         this(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit, true);
     }
 
@@ -173,7 +173,7 @@ public class ActionableIdleStateHandler extends IdleStateHandler {
      * @param unit           the unit
      * @param fireNext       the fire next
      */
-    public ActionableIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
+    public ActionIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
         super(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit);
         this.fireNext = fireNext;
     }
