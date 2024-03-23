@@ -1,17 +1,21 @@
 package org.fz.nettyx.endpoint.client;
 
+import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
+
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.ReflectiveChannelFactory;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
-
-import java.net.SocketAddress;
-
-import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
 
 /**
  * @author fengbinbin
@@ -101,8 +105,6 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
     protected void doChannelConfig(C channel) {
         // default is nothing
     }
-
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
 
     protected ChannelFutureAction whenConnectDone() {
         return DO_NOTHING;
