@@ -49,6 +49,8 @@ public class TestServer extends TcpServer {
                     , new ChannelInboundHandlerAdapter() {
                         @Override
                         public void channelRead(ChannelHandlerContext ctx, Object inMsg) throws Exception {
+                            byte[] msg = new byte[300];
+                            Arrays.fill(msg, (byte) 1);
                             ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
                             super.channelRead(ctx, inMsg);
                         }
@@ -58,12 +60,6 @@ public class TestServer extends TcpServer {
             }
 
         };
-    }
-
-    static byte[] msg = new byte[300];
-
-    {
-        Arrays.fill(msg, (byte) 1);
     }
 
     public static void main(String[] args) {
