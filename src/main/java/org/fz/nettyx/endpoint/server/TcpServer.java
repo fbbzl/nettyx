@@ -6,9 +6,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.SocketAddress;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,24 +60,6 @@ public abstract class TcpServer {
     protected void syncShutdownGracefully() throws InterruptedException {
         childEventLoopGroup.shutdownGracefully().sync();
         parentEventLoopGroup.shutdownGracefully().sync();
-    }
-
-    public <T> ScheduledFuture<T> schedule(Runnable command, long delay, TimeUnit unit) {
-        return (ScheduledFuture<T>) getParentEventLoopGroup().schedule(command, delay, unit);
-    }
-
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-        return getParentEventLoopGroup().schedule(callable, delay, unit);
-    }
-
-    public <T> ScheduledFuture<T> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleAtFixedRate(command, initialDelay, period, unit);
-    }
-
-    public <T> ScheduledFuture<T> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay,
-                                                         TimeUnit unit) {
-        return (ScheduledFuture<T>) getParentEventLoopGroup().scheduleWithFixedDelay(command, initialDelay, delay,
-                                                                                     unit);
     }
 
 }
