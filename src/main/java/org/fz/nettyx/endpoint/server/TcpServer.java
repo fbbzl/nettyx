@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,10 @@ public abstract class TcpServer {
 
     protected void doChannelConfig(ServerSocketChannel channel) {
         // default is nothing
+    }
+
+    public ChannelFuture bind(int port) {
+        return this.getServerBootstrap().clone().bind(new InetSocketAddress(port));
     }
 
     public ChannelFuture bind(SocketAddress bindAddress) {
