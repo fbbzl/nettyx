@@ -1,15 +1,19 @@
 package client.jsc;
 
 import client.TestChannelInitializer;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
-import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
+import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -17,6 +21,8 @@ import java.util.concurrent.TimeUnit;
  * @since 2024/3/1 22:58
  */
 public class TestMultiJsc extends MultiJscChannelClient<String> {
+
+    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public TestMultiJsc(Map<String, JscDeviceAddress> stringJscDeviceAddressMap) {
         super(stringJscDeviceAddressMap);
@@ -27,17 +33,6 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         return new TestChannelInitializer<>();
     }
 
-    @Override
-    protected ChannelFutureAction whenConnectFailure(String key) {
-        return cf -> {
-            // handle by assigned key value
-            if (key.equals("5")) {
-                return;
-            }
-            System.err.println(key + ": fail, " + cf.cause());
-            cf.channel().eventLoop().schedule(() -> connect(key), 2, TimeUnit.SECONDS);
-        };
-    }
 
     public static void main(String[] args) {
         Map<String, JscDeviceAddress> map = new HashMap<>();
@@ -46,7 +41,24 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         map.put("6", new JscDeviceAddress("COM6"));
 
         TestMultiJsc testMultiJsc = new TestMultiJsc(map);
-        testMultiJsc.connectAll();
+        ChannelFutureListener listener = new ActionChannelFutureListener()
+            .whenSuccess(cf -> {
+                executor.scheduleAtFixedRate(() -> {
+                    byte[] msg = new byte[300];
+                    Arrays.fill(msg, (byte) 1);
+                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
+                }, 2, 30, TimeUnit.MILLISECONDS);
+
+                System.err.println(cf.channel().localAddress() + ": ok");
+            })
+            .whenCancel(cf -> System.err.println("cancel"))
+            .whenFailure(cf -> {
+                System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
+                cf.channel().eventLoop().schedule(() -> testMultiJsc.connect(channelKey(cf)), 2, TimeUnit.SECONDS);
+            })
+            .whenDone(cf -> System.err.println("done"));
+
+        testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener)); ;
     }
 
 
