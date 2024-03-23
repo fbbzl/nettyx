@@ -22,6 +22,10 @@ public abstract class SingleRxtxChannelClient extends AbstractSingleChannelClien
         super(new XRxtxDeviceAddress(commAddress));
     }
 
+    protected SingleRxtxChannelClient(XRxtxDeviceAddress commAddress) {
+        super(commAddress);
+    }
+
     @Override
     protected EventLoopGroup newEventLoopGroup() {
         return new OioEventLoopGroup();

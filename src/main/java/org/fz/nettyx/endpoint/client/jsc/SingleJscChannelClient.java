@@ -22,6 +22,10 @@ public abstract class SingleJscChannelClient extends AbstractSingleChannelClient
         super(new JscDeviceAddress(commAddress));
     }
 
+    protected SingleJscChannelClient(JscDeviceAddress commAddress) {
+        super(commAddress);
+    }
+
     @Override
     protected EventLoopGroup newEventLoopGroup() {
         return new OioEventLoopGroup();
