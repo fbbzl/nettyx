@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
-@SuppressWarnings("unchecked")
 public abstract class TcpServer {
 
     private final EventLoopGroup
