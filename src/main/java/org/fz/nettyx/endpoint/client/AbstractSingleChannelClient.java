@@ -40,11 +40,9 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
         storeChannel(cf.channel());
     }
 
-    @SneakyThrows
+    @SneakyThrows({InterruptedException.class})
     protected void storeChannel(Channel channel) {
-        if (isActive(this.channel)) {
-            this.channel.close().sync();
-        }
+        if (isActive(this.channel)) { this.channel.close().sync(); }
         this.channel = channel;
     }
 
