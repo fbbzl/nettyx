@@ -22,6 +22,10 @@ public abstract class SingleTcpChannelClient extends AbstractSingleChannelClient
         super(address);
     }
 
+    public SingleTcpChannelClient(String hostname, int port) {
+        super(new InetSocketAddress(hostname, port));
+    }
+    
     @Override
     protected EventLoopGroup newEventLoopGroup() {
         return new NioEventLoopGroup();
