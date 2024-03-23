@@ -4,7 +4,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
 
 import codec.UserCodec;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.SocketChannel;
 import java.net.SocketAddress;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
@@ -29,10 +29,10 @@ public class TestServer extends TcpServer {
     }
 
     @Override
-    protected ChannelInitializer<NioServerSocketChannel> childChannelInitializer() {
-        return new ChannelInitializer<NioServerSocketChannel>() {
+    protected ChannelInitializer<SocketChannel> childChannelInitializer() {
+        return new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(NioServerSocketChannel channel) {
+            protected void initChannel(SocketChannel channel) {
                 InboundAdvice inboundAdvice = new InboundAdvice(channel)
                     .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
                 OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
@@ -51,14 +51,11 @@ public class TestServer extends TcpServer {
 
     public static void main(String[] args) {
         TestServer testServer = new TestServer(9888);
-        testServer.bind().addListener(cf -> {
-            System.err.println(cf);
-           // System.err.println("关闭了");
+
+        testServer.bind().channel().closeFuture().addListener(cf -> {
+            System.err.println("关闭了");
+            testServer.shutdownGracefully();
         });
-//        testServer.bind().channel().closeFuture().addListener(cf -> {
-//            System.err.println("关闭了");
-//            testServer.shutdownGracefully();
-//        });
 
     }
 }
