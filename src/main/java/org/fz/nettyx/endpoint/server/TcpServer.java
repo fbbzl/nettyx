@@ -30,10 +30,10 @@ public abstract class TcpServer {
 
     private final ServerBootstrap serverBootstrap;
 
-    protected TcpServer(SocketAddress socketAddress) {
+    protected TcpServer(SocketAddress bindAddress) {
         this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
-        this.serverBootstrap      = newServerBootstrap(socketAddress);
+        this.serverBootstrap      = newServerBootstrap(bindAddress);
     }
 
     protected EventLoopGroup parentEventLoopGroup() {
@@ -48,9 +48,8 @@ public abstract class TcpServer {
         // default is nothing
     }
 
-    public ChannelFuture bind(SocketAddress socketAddress) {
-        this.
-
+    public ChannelFuture bind(SocketAddress bindAddress) {
+        return this.getServerBootstrap().clone().bind(bindAddress);
     }
 
     protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress) {
