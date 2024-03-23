@@ -30,7 +30,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9999));
+        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9888));
 
         ChannelFutureListener listener = new ActionChannelFutureListener()
             .whenSuccess(cf -> {
