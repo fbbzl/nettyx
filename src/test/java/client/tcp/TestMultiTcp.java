@@ -3,7 +3,6 @@ package client.tcp;
 
 import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannelConfig;
@@ -61,12 +60,11 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
             .whenCancel(cf -> System.err.println("cancel"))
             .whenFailure(cf -> {
                 System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                cf.channel().eventLoop()
-                  .schedule(testSingleRxtx::connect, 2, TimeUnit.SECONDS);
+                cf.channel().eventLoop().schedule(testSingleRxtx::connect, 2, TimeUnit.SECONDS);
             })
             .whenDone(cf -> System.err.println("done"));
 
-        Map<String, ChannelFuture> stringChannelFutureMap = testMultiTcp.connectAll();
+        testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));
 
     }
 }
