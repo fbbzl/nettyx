@@ -23,6 +23,8 @@ public class TestServer extends TcpServer {
     }
 
     public static void main(String[] args) {
+        TestServer testServer = new TestServer(9999);
+
 
     }
 

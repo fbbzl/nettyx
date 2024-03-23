@@ -31,6 +31,10 @@ public abstract class TcpServer {
 
     private final ServerBootstrap serverBootstrap;
 
+    protected TcpServer(int bindPort) {
+        this(new InetSocketAddress(bindPort));
+    }
+
     protected TcpServer(SocketAddress bindAddress) {
         this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
@@ -47,10 +51,6 @@ public abstract class TcpServer {
 
     protected void doChannelConfig(ServerSocketChannel channel) {
         // default is nothing
-    }
-
-    public ChannelFuture bind(int port) {
-        return this.getServerBootstrap().clone().bind(new InetSocketAddress(port));
     }
 
     public ChannelFuture bind(SocketAddress bindAddress) {
