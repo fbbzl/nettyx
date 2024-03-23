@@ -12,19 +12,16 @@ import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.rxtx.RxtxChannelConfig;
 import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
-import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
+import org.fz.nettyx.listener.ActionableChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -33,34 +30,7 @@ import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
  */
 public class TestSingleRxtx extends SingleRxtxChannelClient {
 
-    protected TestSingleRxtx(XRxtxDeviceAddress remoteAddress) {
-        super(remoteAddress);
-    }
-    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    @Override
-    protected ChannelFutureAction whenConnectSuccess() {
-        return cf -> {
-            executor.scheduleAtFixedRate(() -> {
-                byte[] msg = new byte[300];
-                Arrays.fill(msg, (byte) 1);
-                this.writeAndFlush(Unpooled.wrappedBuffer(msg));
-            }, 2, 30, TimeUnit.MILLISECONDS);
-            System.err.println(cf.channel().localAddress() + ": ok");
-        };
-    }
-
-    @Override
-    protected ChannelFutureAction whenConnectFailure() {
-        return cf -> {
-            System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-            cf.channel().eventLoop().schedule(this::connect, 2, TimeUnit.SECONDS);
-        };
-    }
-
-    @Override
-    protected void doChannelConfig(XRxtxChannel channel) {
-        RxtxChannelConfig config = channel.config();
-    }
+    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Override
     protected ChannelInitializer<XRxtxChannel> channelInitializer() {
@@ -68,8 +38,8 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     @Override
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
-        return super.newBootstrap(remoteAddress)
+    protected Bootstrap newBootstrap() {
+        return super.newBootstrap()
                     .option(BAUD_RATE, 115200)
                     .option(DATA_BITS, Databits.DATABITS_8)
                     .option(STOP_BITS, Stopbits.STOPBITS_1)
@@ -79,7 +49,24 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx(new XRxtxDeviceAddress("COM3"));
-        testSingleRxtx.connect();
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx();
+        ActionableChannelFutureListener listener = new ActionableChannelFutureListener()
+            .whenSuccess(cf -> {
+                executor.scheduleAtFixedRate(() -> {
+                    byte[] msg = new byte[300];
+                    Arrays.fill(msg, (byte) 1);
+                    testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                }, 2, 30, TimeUnit.MILLISECONDS);
+
+                System.err.println(cf.channel().localAddress() + ": ok");
+            })
+            .whenCancel(cf -> System.err.println("cancel"))
+            .whenFailure(cf -> {
+                System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
+                cf.channel().eventLoop()
+                  .schedule(() -> testSingleRxtx.connect(cf.channel().remoteAddress()), 2, TimeUnit.SECONDS);
+            })
+            .whenDone(cf -> System.err.println("done"));
+        testSingleRxtx.connect("COM3");
     }
 }
