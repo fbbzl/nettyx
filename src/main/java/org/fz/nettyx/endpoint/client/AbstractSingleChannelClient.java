@@ -1,7 +1,5 @@
 package org.fz.nettyx.endpoint.client;
 
-import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelException;
@@ -14,7 +12,6 @@ import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelFutureAction;
 import org.fz.nettyx.listener.ActionableChannelFutureListener;
 
 /**
@@ -25,20 +22,16 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 
 @Slf4j
 @Getter
-@SuppressWarnings("unchecked")
-public abstract class AbstractSingleChannelClient<C extends Channel> extends
-                                                                     Client<C> {
+public abstract class AbstractSingleChannelClient<C extends Channel> extends Client<C> {
 
-    private final SocketAddress remoteAddress;
-    private final Bootstrap     bootstrap;
-    private       Channel       channel;
+    private final Bootstrap bootstrap;
+    private       Channel   channel;
 
-    protected AbstractSingleChannelClient(SocketAddress remoteAddress) {
-        this.remoteAddress = remoteAddress;
-        this.bootstrap     = newBootstrap(remoteAddress);
+    protected AbstractSingleChannelClient() {
+        this.bootstrap = newBootstrap();
     }
 
-    public void connect() {
+    public ChannelFuture connect(SocketAddress remoteAddress) {
         ChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenDone(whenConnectDone())
             .whenCancel(whenConnectCancel())
@@ -48,10 +41,10 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
             })
             .whenFailure(whenConnectFailure());
 
-        this.getBootstrap()
-            .clone()
-            .connect()
-            .addListener(listener);
+        return this.getBootstrap()
+                   .clone()
+                   .connect(remoteAddress)
+                   .addListener(listener);
     }
 
     protected void storeChannel(ChannelFuture cf) {
@@ -90,9 +83,8 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
         }
     }
 
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap() {
         return new Bootstrap()
-            .remoteAddress(remoteAddress)
             .group(getEventLoopGroup())
             .channelFactory(() -> {
                 C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
@@ -104,22 +96,6 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
 
     protected void doChannelConfig(C channel) {
         // default is nothing
-    }
-
-    protected ChannelFutureAction whenConnectDone() {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectCancel() {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectSuccess() {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectFailure() {
-        return DO_NOTHING;
     }
 
 }

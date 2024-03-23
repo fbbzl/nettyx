@@ -1,6 +1,14 @@
 package org.fz.nettyx.handler;
 
-import io.netty.channel.*;
+import static org.fz.nettyx.action.Actions.invokeAction;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import java.net.SocketAddress;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +16,16 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.*;
-import org.fz.nettyx.handler.actionable.ActionableIdleStateHandler;
-import org.fz.nettyx.handler.actionable.ActionableReadTimeoutHandler;
-import org.fz.nettyx.handler.actionable.ActionableWriteTimeoutHandler;
-
-import java.net.SocketAddress;
-
-import static org.fz.nettyx.action.Actions.invokeAction;
+import org.fz.nettyx.action.ChannelBindAction;
+import org.fz.nettyx.action.ChannelConnectAction;
+import org.fz.nettyx.action.ChannelExceptionAction;
+import org.fz.nettyx.action.ChannelHandlerContextAction;
+import org.fz.nettyx.action.ChannelPromiseAction;
+import org.fz.nettyx.action.ChannelReadAction;
+import org.fz.nettyx.action.ChannelWriteAction;
+import org.fz.nettyx.handler.actionable.ActionIdleStateHandler;
+import org.fz.nettyx.handler.actionable.ActionReadTimeoutHandler;
+import org.fz.nettyx.handler.actionable.ActionWriteTimeoutHandler;
 
 /**
  * @author fengbinbin
@@ -40,8 +50,8 @@ public class ChannelAdvice {
                 whenChannelInactive, whenWritabilityChanged, whenChannelReadComplete;
         private ChannelReadAction            whenChannelRead;
         private ChannelExceptionAction       whenExceptionCaught;
-        private ActionableIdleStateHandler   readIdleStateHandler;
-        private ActionableReadTimeoutHandler readTimeoutHandler;
+        private ActionIdleStateHandler   readIdleStateHandler;
+        private ActionReadTimeoutHandler readTimeoutHandler;
 
         /**
          * When read idle inbound advice.
@@ -52,7 +62,7 @@ public class ChannelAdvice {
          * @return the inbound advice
          */
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
-            this.readIdleStateHandler = ActionableIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
+            this.readIdleStateHandler = ActionIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
             this.channel.pipeline().addFirst(this.readIdleStateHandler);
             return this;
         }
@@ -71,7 +81,7 @@ public class ChannelAdvice {
          */
         public final InboundAdvice whenReadTimeout(int timeoutSeconds, boolean fireTimeout,
                                                    ChannelExceptionAction timeoutAction) {
-            this.readTimeoutHandler = new ActionableReadTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
+            this.readTimeoutHandler = new ActionReadTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
             this.channel.pipeline().addFirst(this.readTimeoutHandler);
             return this;
         }
@@ -162,8 +172,8 @@ public class ChannelAdvice {
         private       ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction            whenWrite;
-        private ActionableIdleStateHandler    writeIdleStateHandler;
-        private ActionableWriteTimeoutHandler writeTimeoutHandler;
+        private ActionIdleStateHandler    writeIdleStateHandler;
+        private ActionWriteTimeoutHandler writeTimeoutHandler;
 
         /**
          * When write idle outbound advice.
@@ -174,7 +184,7 @@ public class ChannelAdvice {
          * @return the outbound advice
          */
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
-            this.writeIdleStateHandler = ActionableIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
+            this.writeIdleStateHandler = ActionIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
             this.channel.pipeline().addFirst(this.writeIdleStateHandler);
             return this;
         }
@@ -185,7 +195,7 @@ public class ChannelAdvice {
 
         public final OutboundAdvice whenWriteTimeout(int timeoutSeconds, boolean fireTimeout,
                                                      ChannelExceptionAction timeoutAction) {
-            this.writeTimeoutHandler = new ActionableWriteTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
+            this.writeTimeoutHandler = new ActionWriteTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
             this.channel.pipeline().addFirst(this.writeTimeoutHandler);
             return this;
         }

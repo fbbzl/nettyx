@@ -3,8 +3,8 @@ package org.fz.nettyx.handler.actionable;
 import static org.fz.nettyx.action.Actions.invokeAction;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.timeout.ReadTimeoutException;
-import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutException;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,75 +12,77 @@ import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ChannelExceptionAction;
 
 /**
- * The type Actionable read timeout handler.
+ * The type Actionable write timeout handler.
  *
  * @author fengbinbin
  * @version 1.0
- * @since 1 /27/2022 1:58 PM
+ * @since 1 /27/2022 1:59 PM
  */
 @Getter
 @Setter
 @Accessors(fluent = true, chain = true)
-public class ActionableReadTimeoutHandler extends ReadTimeoutHandler {
+public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
 
     private final ChannelExceptionAction timeoutAction;
     private final boolean fireNext;
 
     /**
-     * Instantiates a new Actionable read timeout handler.
+     * Instantiates a new Actionable write timeout handler.
      *
      * @param timeoutSeconds the timeout seconds
      * @param timeoutAction  the timeout action
      */
-    public ActionableReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
+    public ActionWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
         this(timeoutSeconds, timeoutAction, true);
     }
 
     /**
-     * Instantiates a new Actionable read timeout handler.
+     * Instantiates a new Actionable write timeout handler.
      *
      * @param timeout       the timeout
      * @param unit          the unit
      * @param timeoutAction the timeout action
      */
-    public ActionableReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction) {
+    public ActionWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction) {
         this(timeout, unit, timeoutAction, true);
     }
 
     /**
-     * Instantiates a new Actionable read timeout handler.
+     * Instantiates a new Actionable write timeout handler.
      *
      * @param timeoutSeconds the timeout seconds
      * @param timeoutAction  the timeout action
      * @param fireNext       the fire next
      */
-    public ActionableReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction, boolean fireNext) {
         this(timeoutSeconds, TimeUnit.SECONDS, timeoutAction, fireNext);
     }
 
     /**
-     * Instantiates a new Actionable read timeout handler.
+     * Instantiates a new Actionable write timeout handler.
      *
      * @param timeout       the timeout
      * @param unit          the unit
      * @param timeoutAction the timeout action
      * @param fireNext      the fire next
      */
-    public ActionableReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction,
+                                     boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
         this.fireNext = fireNext;
     }
 
     @Override
-    protected void readTimedOut(ChannelHandlerContext ctx) throws Exception {
+    protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
         invokeAction(timeoutAction, ctx,
-                     new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
-        if (fireNext) super.readTimedOut(ctx);
+                     new WriteTimeoutException("has got write-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
+        if (fireNext) super.writeTimedOut(ctx);
     }
 
     @Override
     public boolean isSharable() {
         return true;
     }
+
 }
