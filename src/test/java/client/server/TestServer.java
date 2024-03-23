@@ -38,6 +38,7 @@ public class TestServer extends TcpServer {
         TestServer testServer = new TestServer(9999);
         Channel    channel    = testServer.bind().channel();
         channel.closeFuture().addListener(cf -> testServer.shutdownGracefully());
+        System.err.println(channel);
         executor.scheduleAtFixedRate(() -> {
             byte[] msg = new byte[300];
             Arrays.fill(msg, (byte) 1);
