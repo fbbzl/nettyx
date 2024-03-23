@@ -1,7 +1,6 @@
 package org.fz.nettyx.endpoint.server;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -69,7 +68,7 @@ public abstract class TcpServer {
             .childHandler(childChannelInitializer());
     }
 
-    protected abstract <C extends Channel> ChannelInitializer<C> childChannelInitializer();
+    protected abstract ChannelInitializer<NioServerSocketChannel> childChannelInitializer();
 
     protected void shutdownGracefully() {
         childEventLoopGroup.shutdownGracefully();
