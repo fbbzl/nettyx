@@ -2,7 +2,6 @@ package org.fz.nettyx.codec;
 
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
@@ -69,8 +68,6 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
             if (decodedByteBuf != null) {
                 if (decodedByteBuf.readableBytes() > 0) {
-                    System.err.println("read: " + ByteBufUtil.hexDump(decodedByteBuf));
-                    System.err.println("read: "+decodedByteBuf.readableBytes());
                     if (stripStartEndDelimiter) return decodedByteBuf;
                     // must use ByteBuf.retainedDuplicate, if you use ByteBuf.duplicate(), it will also be release, and will never be usable
                     return Unpooled.wrappedBuffer(startFlag.retainedDuplicate(), decodedByteBuf, endFlag.retainedDuplicate());
