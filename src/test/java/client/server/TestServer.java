@@ -32,7 +32,7 @@ public class TestServer extends TcpServer {
     protected ChannelInitializer<NioServerSocketChannel> childChannelInitializer() {
         return new ChannelInitializer<NioServerSocketChannel>() {
             @Override
-            protected void initChannel(NioServerSocketChannel channel) throws Exception {
+            protected void initChannel(NioServerSocketChannel channel) {
                 InboundAdvice inboundAdvice = new InboundAdvice(channel)
                     .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
                 OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
@@ -51,10 +51,14 @@ public class TestServer extends TcpServer {
 
     public static void main(String[] args) {
         TestServer testServer = new TestServer(9888);
-        testServer.bind().channel().closeFuture().addListener(cf -> {
-            System.err.println("关闭了");
-            testServer.shutdownGracefully();
+        testServer.bind().addListener(cf -> {
+            System.err.println(cf);
+           // System.err.println("关闭了");
         });
+//        testServer.bind().channel().closeFuture().addListener(cf -> {
+//            System.err.println("关闭了");
+//            testServer.shutdownGracefully();
+//        });
 
     }
 }
