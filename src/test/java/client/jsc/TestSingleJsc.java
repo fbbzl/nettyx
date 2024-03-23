@@ -13,6 +13,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,15 +36,18 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+    public TestSingleJsc(String commAddress) {
+        super(commAddress);
+    }
+
     @Override
     protected ChannelInitializer<JscChannel> channelInitializer() {
         return new TestChannelInitializer<>();
     }
 
-
     @Override
-    protected Bootstrap newBootstrap() {
-        return super.newBootstrap()
+    protected Bootstrap newBootstrap(SocketAddress jscDeviceAddress) {
+        return super.newBootstrap(jscDeviceAddress)
                     .option(BAUD_RATE, 115200)
                     .option(DATA_BITS, 8)
                     .option(STOP_BITS, StopBits.ONE_STOP_BIT)
@@ -53,7 +57,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleJsc testSingleJsc = new TestSingleJsc();
+        TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenSuccess(cf -> {
                 executor.scheduleAtFixedRate(() -> {
@@ -68,11 +72,11 @@ public class TestSingleJsc extends SingleJscChannelClient {
             .whenFailure(cf -> {
                 System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
                 cf.channel().eventLoop()
-                  .schedule(() -> testSingleJsc.connect(cf.channel().remoteAddress()), 2, TimeUnit.SECONDS);
+                  .schedule(testSingleJsc::connect, 2, TimeUnit.SECONDS);
             })
             .whenDone(cf -> System.err.println("done"));
 
-        testSingleJsc.connect("COM2").addListener(listener);
+        testSingleJsc.connect().addListener(listener);
     }
 
 }

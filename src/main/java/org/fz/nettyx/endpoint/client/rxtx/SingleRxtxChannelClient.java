@@ -1,6 +1,5 @@
 package org.fz.nettyx.endpoint.client.rxtx;
 
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,8 @@ import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 @SuppressWarnings("deprecation")
 public abstract class SingleRxtxChannelClient extends AbstractSingleChannelClient<XRxtxChannel> {
 
-    public ChannelFuture connect(String commAddress) {
-        return super.connect(new XRxtxDeviceAddress(commAddress));
+    public SingleRxtxChannelClient(String commAddress) {
+        super(new XRxtxDeviceAddress(commAddress));
     }
 
     @Override
