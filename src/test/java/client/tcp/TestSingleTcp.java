@@ -17,6 +17,10 @@ import org.fz.nettyx.listener.ActionableChannelFutureListener;
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
 
+    public TestSingleTcp(InetSocketAddress address) {
+        super(address);
+    }
+
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Override
@@ -25,7 +29,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleTcp testClient = new TestSingleTcp();
+        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress("127.0.0.1", 9999));
 
         ActionableChannelFutureListener listener = new ActionableChannelFutureListener()
             .whenSuccess(cf -> {
@@ -41,10 +45,10 @@ public class TestSingleTcp extends SingleTcpChannelClient {
             .whenFailure(cf -> {
                 System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
                 cf.channel().eventLoop()
-                  .schedule(() -> testClient.connect(cf.channel().remoteAddress()), 2, TimeUnit.SECONDS);
+                  .schedule(testClient::connect, 2, TimeUnit.SECONDS);
             })
             .whenDone(cf -> System.err.println("done"));
 
-        testClient.connect(new InetSocketAddress("127.0.0.1", 9999)).addListener(listener);
+        testClient.connect().addListener(listener);
     }
 }
