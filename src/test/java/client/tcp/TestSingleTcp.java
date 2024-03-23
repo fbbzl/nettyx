@@ -21,6 +21,10 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         super(address);
     }
 
+    public TestSingleTcp(String hostname, int port) {
+        super(new InetSocketAddress(hostname, port));
+    }
+
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Override
