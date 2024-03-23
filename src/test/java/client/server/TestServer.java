@@ -1,10 +1,17 @@
 package client.server;
 
-import client.TestChannelInitializer;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+
+import codec.UserCodec;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.SocketAddress;
+import org.fz.nettyx.codec.EscapeCodec;
+import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
+import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.endpoint.server.TcpServer;
+import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
+import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 
 /**
  * @author fengbinbin
@@ -23,7 +30,23 @@ public class TestServer extends TcpServer {
 
     @Override
     protected ChannelInitializer<NioServerSocketChannel> childChannelInitializer() {
-        return new TestChannelInitializer<>();
+        return new ChannelInitializer<NioServerSocketChannel>() {
+            @Override
+            protected void initChannel(NioServerSocketChannel channel) throws Exception {
+                InboundAdvice inboundAdvice = new InboundAdvice(channel)
+                    .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
+                OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
+                    .whenExceptionCaught((c, t) -> System.err.println("out error: [" + t + "]"));
+
+                channel.pipeline().addLast(
+                    outboundAdvice
+                    , new StartEndFlagFrameCodec(320, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                    , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                    , new UserCodec()
+                 //   , new LoggerHandler(log, INFO)
+                    , inboundAdvice);
+            }
+        };
     }
 
     public static void main(String[] args) {
