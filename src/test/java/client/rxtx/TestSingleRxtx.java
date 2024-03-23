@@ -41,10 +41,10 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     protected ChannelFutureAction whenConnectSuccess() {
         return cf -> {
             executor.scheduleAtFixedRate(() -> {
-                byte[] msg = new byte[256];
+                byte[] msg = new byte[300];
                 Arrays.fill(msg, (byte) 1);
                 this.writeAndFlush(Unpooled.wrappedBuffer(msg));
-            }, 2, 200, TimeUnit.MILLISECONDS);
+            }, 2, 500, TimeUnit.MILLISECONDS);
             System.err.println(cf.channel().localAddress() + ": ok");
         };
     }
