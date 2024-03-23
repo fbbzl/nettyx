@@ -1,15 +1,14 @@
 package client.rxtx;
 
 import client.TestChannelInitializer;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.fz.nettyx.action.ChannelFutureAction;
+import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
+import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 
 /**
  * @author fengbinbin
@@ -23,7 +22,7 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
     }
 
     @Override
-    protected ChannelInitializer<? extends Channel> channelInitializer() {
+    protected ChannelInitializer<XRxtxChannel> channelInitializer() {
         return new TestChannelInitializer();
     }
 
