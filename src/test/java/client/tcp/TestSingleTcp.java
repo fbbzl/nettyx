@@ -21,8 +21,6 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         super(address);
     }
 
-
-
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     @Override
