@@ -16,11 +16,14 @@ import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleRxtxChannelClient extends
-                                              AbstractSingleChannelClient<XRxtxChannel> {
+public abstract class SingleRxtxChannelClient extends AbstractSingleChannelClient<XRxtxChannel> {
 
-    protected SingleRxtxChannelClient(XRxtxDeviceAddress remoteAddress) {
-        super(remoteAddress);
+    protected SingleRxtxChannelClient(String commAddress) {
+        super(new XRxtxDeviceAddress(commAddress));
+    }
+
+    protected SingleRxtxChannelClient(XRxtxDeviceAddress commAddress) {
+        super(commAddress);
     }
 
     @Override
