@@ -12,11 +12,7 @@ import io.netty.channel.ChannelHandlerContext;
 @FunctionalInterface
 public interface ChannelReadAction {
 
-    /**
-     * Act.
-     *
-     * @param t   the t
-     * @param msg the msg
-     */
-    void act(ChannelHandlerContext t, Object msg);
+    ChannelReadAction DO_NOTHING = (ctx, msg) -> {};
+
+    void act(ChannelHandlerContext ctx, Object msg);
 }

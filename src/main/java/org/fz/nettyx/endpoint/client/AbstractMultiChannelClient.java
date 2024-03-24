@@ -1,7 +1,5 @@
 package org.fz.nettyx.endpoint.client;
 
-import static org.fz.nettyx.action.ChannelFutureAction.NOTHING;
-
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.bootstrap.Bootstrap;
@@ -9,7 +7,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelException;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.ReflectiveChannelFactory;
@@ -18,10 +15,8 @@ import io.netty.util.ReferenceCountUtil;
 import java.net.SocketAddress;
 import java.util.Map;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
@@ -38,6 +33,8 @@ import org.fz.nettyx.util.Try;
 public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                 Client<C> {
 
+    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("$multi_channel_key$");
+
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
     private final Map<K, Bootstrap>     bootstrapMap;
@@ -47,25 +44,16 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
 
-    public void connectAll() {
-        addressMap.keySet().forEach(this::connect);
+    public Map<K, ChannelFuture> connectAll() {
+        return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
-    public void connect(K key) {
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-            .whenDone(whenConnectDone(key))
-            .whenCancel(whenConnectCancel(key))
-            .whenSuccess(cf -> {
-                storeChannel(cf);
-                whenConnectSuccess(key).act(cf);
-            })
-            .whenFailure(whenConnectFailure(key));
-
+    public ChannelFuture connect(K key) {
         Bootstrap bootstrap = getBootstrapMap().get(key);
         Throws.ifNull(bootstrap, "can not find config by key [" + key + "]");
-        bootstrap.clone()
-                 .connect()
-                 .addListener(listener);
+        ChannelFuture channelFuture = bootstrap.clone().connect();
+        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess(this::storeChannel));
+        return channelFuture;
     }
 
     public Channel getChannel(K key) {
@@ -76,13 +64,11 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         storeChannel(channelKey, future.channel());
     }
 
-    @SneakyThrows
     protected void storeChannel(K key, Channel channel) {
         channelStorage.compute(key, Try.apply((k, old) -> {
             if (isActive(old)) {
                 old.close().sync();
             }
-
             log.info("has stored channel [{}]", channel);
             return channel;
         }));
@@ -123,29 +109,13 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         channelStorage.clear();
     }
 
-    protected K channelKey(ChannelHandlerContext ctx) {
-        return ctx.channel().attr(getAttributeKey()).get();
-    }
-
-    protected K channelKey(ChannelFuture channelFuture) {
-        return channelFuture.channel().attr(getAttributeKey()).get();
-    }
-
-    protected K channelKey(Channel channel) {
-        return channel.attr(getAttributeKey()).get();
-    }
-
-    protected AttributeKey<K> getAttributeKey() {
-        return AttributeKey.valueOf("$multi_channel_key$");
-    }
-
     protected void doChannelConfig(K targetChannelKey, F channelConfig) {
         // default is nothing
     }
 
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
-            .attr(getAttributeKey(), key)
+            .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
             .remoteAddress(remoteAddress)
             .group(getEventLoopGroup())
             .channelFactory(() -> {
@@ -156,20 +126,16 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
             .handler(channelInitializer());
     }
 
-    protected ChannelFutureAction whenConnectDone(K key) {
-        return NOTHING;
+    public static <T> T channelKey(ChannelHandlerContext ctx) {
+        return channelKey(ctx.channel());
     }
 
-    protected ChannelFutureAction whenConnectCancel(K key) {
-        return NOTHING;
+    public static <T> T channelKey(ChannelFuture channelFuture) {
+        return channelKey(channelFuture.channel());
     }
 
-    protected ChannelFutureAction whenConnectSuccess(K key) {
-        return NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectFailure(K key) {
-        return NOTHING;
+    public static <T> T channelKey(Channel channel) {
+        return (T) channel.attr(MULTI_CHANNEL_KEY).get();
     }
 
 }

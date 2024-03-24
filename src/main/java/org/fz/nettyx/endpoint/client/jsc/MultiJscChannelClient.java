@@ -3,7 +3,6 @@ package org.fz.nettyx.endpoint.client.jsc;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import io.netty.util.AttributeKey;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
@@ -30,8 +29,4 @@ public abstract class MultiJscChannelClient<K> extends AbstractMultiChannelClien
         return new OioEventLoopGroup();
     }
 
-    @Override
-    protected AttributeKey<K> getAttributeKey() {
-        return AttributeKey.valueOf("$multi_jsc_channel_key$");
-    }
 }
