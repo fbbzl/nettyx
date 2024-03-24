@@ -12,12 +12,8 @@ import io.netty.channel.ChannelHandlerContext;
 @FunctionalInterface
 public interface ChannelExceptionAction {
 
-    /**
-     * Act.
-     *
-     * @param t         the t
-     * @param throwable the throwable
-     */
-    void act(ChannelHandlerContext t, Throwable throwable);
+    ChannelExceptionAction DO_NOTHING = (ctx, thro) -> {};
+
+    void act(ChannelHandlerContext ctx, Throwable throwable);
 
 }
