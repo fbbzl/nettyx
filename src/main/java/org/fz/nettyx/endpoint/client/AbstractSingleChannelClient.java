@@ -1,17 +1,17 @@
 package org.fz.nettyx.endpoint.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelException;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.ReflectiveChannelFactory;
 import io.netty.util.ReferenceCountUtil;
+import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelFutureAction;
-import org.fz.nettyx.listener.ActionableChannelFutureListener;
-
-import java.net.SocketAddress;
-
-import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 /**
  * @author fengbinbin
@@ -21,9 +21,7 @@ import static org.fz.nettyx.action.ChannelFutureAction.DO_NOTHING;
 
 @Slf4j
 @Getter
-@SuppressWarnings("unchecked")
-public abstract class AbstractSingleChannelClient<C extends Channel> extends
-                                                                     Client<C> {
+public abstract class AbstractSingleChannelClient<C extends Channel> extends Client<C> {
 
     private final SocketAddress remoteAddress;
     private final Bootstrap     bootstrap;
@@ -34,31 +32,19 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
         this.bootstrap     = newBootstrap(remoteAddress);
     }
 
-    public void connect() {
-        ChannelFutureListener listener = new ActionableChannelFutureListener()
-            .whenDone(whenConnectDone())
-            .whenCancel(whenConnectCancel())
-            .whenSuccess(cf -> {
-                storeChannel(cf);
-                whenConnectSuccess().act(cf);
-            })
-            .whenFailure(whenConnectFailure());
-
-        this.getBootstrap()
-            .clone()
-            .connect()
-            .addListener(listener);
+    public ChannelFuture connect() {
+        ChannelFuture channelFuture = this.getBootstrap().clone().connect();
+        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess(this::storeChannel));
+        return channelFuture;
     }
 
     protected void storeChannel(ChannelFuture cf) {
         storeChannel(cf.channel());
     }
 
-    @SneakyThrows
+    @SneakyThrows({InterruptedException.class})
     protected void storeChannel(Channel channel) {
-        if (isActive(this.channel)) {
-            this.channel.close().sync();
-        }
+        if (isActive(this.channel)) { this.channel.close().sync(); }
         this.channel = channel;
     }
 
@@ -100,24 +86,6 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends
 
     protected void doChannelConfig(C channel) {
         // default is nothing
-    }
-
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
-
-    protected ChannelFutureAction whenConnectDone() {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectCancel() {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectSuccess() {
-        return DO_NOTHING;
-    }
-
-    protected ChannelFutureAction whenConnectFailure() {
-        return DO_NOTHING;
     }
 
 }
