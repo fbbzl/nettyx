@@ -1,3 +1,5 @@
+package serializer;
+
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
 import codec.model.*;
