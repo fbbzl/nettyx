@@ -1,4 +1,4 @@
-package client.server;
+package server;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
