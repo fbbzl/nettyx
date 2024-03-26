@@ -20,24 +20,26 @@ import io.netty.channel.*;
 
 import java.util.Map;
 
-
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 
 /**
  * Default configuration class for RXTX device connections.
  *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/3/1 14:44
  */
 final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements RxtxChannelConfig {
 
-    private volatile int baudrate = 115200;
-    private volatile boolean dtr;
-    private volatile boolean rts;
-    private volatile Stopbits stopbits = Stopbits.STOPBITS_1;
-    private volatile Databits databits = Databits.DATABITS_8;
-    private volatile Paritybit paritybit = Paritybit.NONE;
-    private volatile int waitTime;
-    private volatile int readTimeout = 1000;
+    private volatile int       baudrate    = 115200;
+    private volatile boolean   dtr;
+    private volatile boolean   rts;
+    private volatile Stopbits  stopbits    = Stopbits.STOPBITS_1;
+    private volatile Databits  databits    = Databits.DATABITS_8;
+    private volatile Paritybit paritybit   = Paritybit.NONE;
+    private volatile int       waitTime;
+    private volatile int       readTimeout = 1000;
 
     DefaultRxtxChannelConfig(RxtxChannel channel) {
         super(channel);
@@ -85,21 +87,29 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
 
         if (option == BAUD_RATE) {
             setBaudrate((Integer) value);
-        } else if (option == DTR) {
+        }
+        else if (option == DTR) {
             setDtr((Boolean) value);
-        } else if (option == RTS) {
+        }
+        else if (option == RTS) {
             setRts((Boolean) value);
-        } else if (option == STOP_BITS) {
+        }
+        else if (option == STOP_BITS) {
             setStopbits((Stopbits) value);
-        } else if (option == DATA_BITS) {
+        }
+        else if (option == DATA_BITS) {
             setDatabits((Databits) value);
-        } else if (option == PARITY_BIT) {
+        }
+        else if (option == PARITY_BIT) {
             setParitybit((Paritybit) value);
-        } else if (option == WAIT_TIME) {
+        }
+        else if (option == WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
-        } else if (option == READ_TIMEOUT) {
+        }
+        else if (option == READ_TIMEOUT) {
             setReadTimeout((Integer) value);
-        } else {
+        }
+        else {
             return super.setOption(option, value);
         }
         return true;
@@ -126,7 +136,7 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     @Override
     public RxtxChannelConfig setParitybit(final Paritybit paritybit) {
         this.paritybit = paritybit;
-        return  this;
+        return this;
     }
 
     @Override

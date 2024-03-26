@@ -12,7 +12,7 @@ import java.util.Map;
 
 
 /**
- * A multi-channel client that uses channel-key to retrieve and manipulate the specified channel
+ * A multichannel client that uses channel-key to retrieve and manipulate the specified channel
  *
  * @author fengbinbin
  * @since 2022-01-26 20:26

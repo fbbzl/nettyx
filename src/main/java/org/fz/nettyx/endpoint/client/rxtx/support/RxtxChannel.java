@@ -6,7 +6,6 @@ import gnu.io.SerialPort;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.OioByteStreamChannel;
-
 import io.netty.util.concurrent.DefaultEventExecutor;
 
 import java.net.SocketAddress;
@@ -28,7 +27,7 @@ public class RxtxChannel extends OioByteStreamChannel {
 
     private final RxtxChannelConfig config;
 
-    private boolean open = true;
+    private boolean           open = true;
     private RxtxDeviceAddress deviceAddress;
     private SerialPort        serialPort;
 
@@ -110,6 +109,7 @@ public class RxtxChannel extends OioByteStreamChannel {
     protected void doDisconnect() throws Exception {
         doClose();
     }
+
     @Override
     protected boolean isInputShutdown() {
         return !open;
@@ -144,20 +144,23 @@ public class RxtxChannel extends OioByteStreamChannel {
                                 if (!wasActive && isActive()) {
                                     pipeline().fireChannelActive();
                                 }
-                            } catch (Throwable t) {
+                            }
+                            catch (Throwable t) {
                                 safeSetFailure(promise, t);
                                 closeIfClosed();
                             }
                         }
                     }, waitTime, TimeUnit.MILLISECONDS);
-                } else {
+                }
+                else {
                     doInit();
                     safeSetSuccess(promise);
                     if (!wasActive && isActive()) {
                         pipeline().fireChannelActive();
                     }
                 }
-            } catch (Throwable t) {
+            }
+            catch (Throwable t) {
                 safeSetFailure(promise, t);
                 closeIfClosed();
             }
@@ -176,7 +179,8 @@ public class RxtxChannel extends OioByteStreamChannel {
         open = false;
         try {
             super.doClose();
-        } finally {
+        }
+        finally {
             if (serialPort != null) {
                 serialPort.removeEventListener();
                 serialPort.close();
