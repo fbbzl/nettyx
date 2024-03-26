@@ -1,4 +1,4 @@
-package org.fz.nettyx.handler;
+package org.fz.nettyx.handler.actionable;
 
 import static org.fz.nettyx.action.Actions.invokeAction;
 
