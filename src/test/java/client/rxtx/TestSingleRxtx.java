@@ -36,6 +36,25 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
         super(commAddress);
     }
 
+    public static void main(String[] args) {
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
+        ChannelFutureListener listener = new ActionChannelFutureListener()
+                .whenSuccess((l, cf) -> {
+                    executor.scheduleAtFixedRate(() -> {
+                        byte[] msg = new byte[300];
+                        Arrays.fill(msg, (byte) 1);
+                        testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    }, 2, 30, TimeUnit.MILLISECONDS);
+
+                    System.err.println(cf.channel().localAddress() + ": ok");
+                })
+                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
+                .whenDone((l, cf) -> System.err.println("done"));
+
+        testSingleRxtx.connect().addListener(listener);
+    }
+
     @Override
     protected ChannelInitializer<XRxtxChannel> channelInitializer() {
         return new TestChannelInitializer<>();
@@ -50,24 +69,5 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
                     .option(PARITY_BIT, Paritybit.NONE)
                     .option(DTR, false)
                     .option(RTS, false);
-    }
-
-    public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
-        ChannelFutureListener listener = new ActionChannelFutureListener()
-            .whenSuccess((l, cf) -> {
-                executor.scheduleAtFixedRate(() -> {
-                    byte[] msg = new byte[300];
-                    Arrays.fill(msg, (byte) 1);
-                    testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
-                }, 2, 30, TimeUnit.MILLISECONDS);
-
-                System.err.println(cf.channel().localAddress() + ": ok");
-            })
-            .whenCancel((l, cf) -> System.err.println("cancel"))
-            .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
-            .whenDone((l, cf) -> System.err.println("done"));
-
-        testSingleRxtx.connect().addListener(listener);
     }
 }

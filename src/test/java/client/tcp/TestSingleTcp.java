@@ -22,15 +22,10 @@ import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
 
-    public TestSingleTcp(InetSocketAddress address) {
-        super(address);
-    }
-
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
+    public TestSingleTcp(InetSocketAddress address) {
+        super(address);
     }
 
     public static void main(String[] args) {
@@ -51,5 +46,10 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                 .whenDone((ls, cf) -> System.err.println("done"));
 
         testClient.connect().addListener(listener);
+    }
+
+    @Override
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
     }
 }

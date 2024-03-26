@@ -32,12 +32,6 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         super(stringJscDeviceAddressMap);
     }
 
-    @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
-    }
-
-
     public static void main(String[] args) {
         Map<String, JscDeviceAddress> map = new HashMap<>();
 
@@ -46,20 +40,26 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
 
         TestMultiJsc testMultiJsc = new TestMultiJsc(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
-            .whenSuccess((l, cf) -> {
-                executor.scheduleAtFixedRate(() -> {
-                    byte[] msg = new byte[300];
-                    Arrays.fill(msg, (byte) 1);
-                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
-                }, 2, 30, TimeUnit.MILLISECONDS);
+                .whenSuccess((l, cf) -> {
+                    executor.scheduleAtFixedRate(() -> {
+                        byte[] msg = new byte[300];
+                        Arrays.fill(msg, (byte) 1);
+                        cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    }, 2, 30, TimeUnit.MILLISECONDS);
 
-                System.err.println(cf.channel().localAddress() + ": ok");
-            })
-            .whenCancel((l, cf) -> System.err.println("cancel"))
-            .whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
-            .whenDone((l, cf) -> System.err.println("done"));
+                    System.err.println(cf.channel().localAddress() + ": ok");
+                })
+                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
+                .whenDone((l, cf) -> System.err.println("done"));
 
-        testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener)); ;
+        testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
+        ;
+    }
+
+    @Override
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
     }
 
 
