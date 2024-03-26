@@ -8,7 +8,7 @@ import org.fz.nettyx.serializer.struct.annotation.ToString;
 @Struct
 public class Wife<I, V> {
 
-    private I intt;
+    private I      intt;
     @ToString(bufferLength = 2)
     private String name;
 

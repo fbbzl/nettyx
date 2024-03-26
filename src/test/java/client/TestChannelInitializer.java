@@ -1,8 +1,5 @@
 package client;
 
-import static io.netty.buffer.Unpooled.wrappedBuffer;
-import static org.fz.nettyx.handler.LoggerHandler.Sl4jLevel.INFO;
-
 import codec.UserCodec;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -13,6 +10,9 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.fz.nettyx.handler.LoggerHandler;
+
+import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static org.fz.nettyx.handler.LoggerHandler.Sl4jLevel.INFO;
 
 /**
  * @author fengbinbin
