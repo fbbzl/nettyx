@@ -5,6 +5,7 @@ import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxDeviceAddress;
 
 /**
  * single channel rxtx client
@@ -18,10 +19,10 @@ import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 public abstract class SingleRxtxChannelClient extends AbstractSingleChannelClient<RxtxChannel> {
 
     protected SingleRxtxChannelClient(String commAddress) {
-        super(new XRxtxDeviceAddress(commAddress));
+        super(new RxtxDeviceAddress(commAddress));
     }
 
-    protected SingleRxtxChannelClient(XRxtxDeviceAddress commAddress) {
+    protected SingleRxtxChannelClient(RxtxDeviceAddress commAddress) {
         super(commAddress);
     }
 
