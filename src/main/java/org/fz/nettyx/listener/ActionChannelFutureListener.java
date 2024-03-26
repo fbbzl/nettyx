@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * The type Actionable channel future listener.
@@ -56,6 +57,14 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
             channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
         };
     }
+    public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
+        return (ls, cf) -> {
+            Channel channel = cf.channel();
+            log.info("doing re-connect, remote-address is [{}]", channel.remoteAddress());
+            channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
+        };
+    }
+
 
     public interface ListenerAction {
         void act(ChannelFutureListener listener, ChannelFuture channelFuture);
