@@ -15,7 +15,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
  * @version 1.0
  * @since 2024/3/2 13:29
  */
-@SuppressWarnings({"unused", "deprecation"})
 public final class JscChannelOption<T> extends ChannelOption<T> {
 
     public static final ChannelOption<Integer>   BAUD_RATE    = valueOf(JscChannelOption.class, "BAUD_RATE");
