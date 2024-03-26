@@ -1,9 +1,17 @@
-# nettyx
+# Nettyx
+
+## Express gratitude
+First of all, I would like to thank my family for giving me enough time to focus on this project, then I would like to thank JetBrain for giving me the Ultimate Edition of the Idea, and finally I would like to thank myself.
+Hopefully, this framework will save you even a minute of development time
+
+## Links
+JetBrain Website: https://www.jetbrains.com
+Github address: https://github.com/fbbzl/nettyx
+Gitee address: https://gitee.com/fbbzl/nettyx
+for more use cases please refer to: https://blog.csdn.net/fbbwht
 
 #### Introduce
 Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, providing some tools and basic templates, as well as additional serial communication templates to help you quickly build netty-based server/client applications and serial port based applications
-
-for more use cases please refer to: https://blog.csdn.net/fbbwht
 
 #### Installation Tutorial
 1. Add Maven Dependency：
@@ -11,7 +19,7 @@ for more use cases please refer to: https://blog.csdn.net/fbbwht
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.12-RELEASE</version>
+    <version>2.2.13-RELEASE</version>
 </dependency>
 ```
 ## api
