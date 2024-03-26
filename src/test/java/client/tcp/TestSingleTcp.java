@@ -16,6 +16,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
+
 @Slf4j
 public class TestSingleTcp extends SingleTcpChannelClient {
 
@@ -44,10 +47,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                     System.err.println(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancel((ls, cf) -> System.err.println("cancel"))
-                .whenFailure((ls, cf) -> {
-                    System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                    cf.channel().eventLoop().schedule(() -> testClient.connect().addListener(ls), 2, TimeUnit.SECONDS);
-                })
+                .whenFailure(redo(testClient::connect, 2, SECONDS))
                 .whenDone((ls, cf) -> System.err.println("done"));
 
         testClient.connect().addListener(listener);
