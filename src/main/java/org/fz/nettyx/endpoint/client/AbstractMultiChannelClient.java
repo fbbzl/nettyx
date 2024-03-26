@@ -17,6 +17,8 @@ import java.net.SocketAddress;
 import java.util.Map;
 
 /**
+ * multichannel client
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 14:44
