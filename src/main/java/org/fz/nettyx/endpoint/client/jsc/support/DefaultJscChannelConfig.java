@@ -1,22 +1,11 @@
 package org.fz.nettyx.endpoint.client.jsc.support;
 
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.BAUD_RATE;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DATA_BITS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DTR;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.PARITY_BIT;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.READ_TIMEOUT;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.RTS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BITS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.WAIT_TIME;
-
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.DefaultChannelConfig;
-import io.netty.channel.MessageSizeEstimator;
-import io.netty.channel.PreferHeapByteBufAllocator;
-import io.netty.channel.RecvByteBufAllocator;
-import io.netty.channel.WriteBufferWaterMark;
+import io.netty.channel.*;
+
 import java.util.Map;
+
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 
 /**
@@ -25,7 +14,6 @@ import java.util.Map;
  * @since 2024/3/2 13:29
  */
 
-@SuppressWarnings("deprecation")
 final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscChannelConfig {
 
     private volatile int       baudRate    = 115200;
