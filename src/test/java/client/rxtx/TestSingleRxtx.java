@@ -20,6 +20,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static io.netty.channel.rxtx.RxtxChannelOption.*;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**
  * @author fengbinbin
@@ -63,11 +65,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
                 System.err.println(cf.channel().localAddress() + ": ok");
             })
             .whenCancel((l, cf) -> System.err.println("cancel"))
-            .whenFailure((l, cf) -> {
-                System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                cf.channel().eventLoop()
-                  .schedule(testSingleRxtx::connect, 2, TimeUnit.SECONDS);
-            })
+            .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
             .whenDone((l, cf) -> System.err.println("done"));
 
         testSingleRxtx.connect().addListener(listener);
