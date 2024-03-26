@@ -11,9 +11,9 @@ import java.net.SocketAddress;
  * @since 2024/3/2 13:29
  */
 public class JscDeviceAddress extends SocketAddress {
+    private static final long serialVersionUID = 9220926966590843746L;
 
-    private static final long   serialVersionUID = -1205670554044857244L;
-    private final        String value;
+    private final String value;
 
     /**
      * Creates a RxtxDeviceAddress representing the address of the serial port.

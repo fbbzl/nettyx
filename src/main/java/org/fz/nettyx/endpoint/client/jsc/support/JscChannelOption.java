@@ -15,7 +15,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
  * @version 1.0
  * @since 2024/3/2 13:29
  */
-@SuppressWarnings({"unused", "deprecation"})
 public final class JscChannelOption<T> extends ChannelOption<T> {
 
     public static final ChannelOption<Integer>   BAUD_RATE    = valueOf(JscChannelOption.class, "BAUD_RATE");
@@ -27,7 +26,7 @@ public final class JscChannelOption<T> extends ChannelOption<T> {
     public static final ChannelOption<Integer>   WAIT_TIME    = valueOf(JscChannelOption.class, "WAIT_TIME");
     public static final ChannelOption<Integer>   READ_TIMEOUT = valueOf(JscChannelOption.class, "READ_TIMEOUT");
 
-
+    @SuppressWarnings("deprecation")
     private JscChannelOption() {
         super("jsc-config");
     }
