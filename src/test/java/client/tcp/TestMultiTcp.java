@@ -5,7 +5,6 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -37,11 +36,6 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
     @Override
     protected ChannelInitializer<NioSocketChannel> channelInitializer() {
         return new TestChannelInitializer<>();
-    }
-
-    @Override
-    protected void doChannelConfig(String key, SocketChannelConfig channelConfig) {
-        super.doChannelConfig(key, channelConfig);
     }
 
     public static void main(String[] args) {
