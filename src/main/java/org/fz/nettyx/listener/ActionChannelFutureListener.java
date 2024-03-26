@@ -6,6 +6,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
 /**
  * The type Actionable channel future listener.
  *
@@ -40,6 +43,12 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         else
         // canceled
         if (channelFuture.isCancelled()) invokeAction(whenCancel, this, channelFuture);
+    }
+
+    public static ListenerAction reconnect(Supplier<ChannelFuture> connect, long delay, TimeUnit unit) {
+        return (ls, cf) -> {
+            cf.channel().eventLoop().schedule(() -> connect.get().addListener(ls), delay, unit);
+        };
     }
 
 
