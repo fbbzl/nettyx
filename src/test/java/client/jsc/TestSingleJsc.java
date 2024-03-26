@@ -2,6 +2,7 @@ package client.jsc;
 
 
 import client.TestChannelInitializer;
+import cn.hutool.core.lang.Console;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -50,7 +51,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
                         testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
-                    System.err.println(cf.channel().localAddress() + ": ok");
+                    Console.log(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancel((l, cf) -> System.err.println("cancel"))
                 .whenFailure(redo(testSingleJsc::connect, 2, SECONDS))

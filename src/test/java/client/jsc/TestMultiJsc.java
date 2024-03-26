@@ -54,7 +54,6 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
                 .whenDone((l, cf) -> System.err.println("done"));
 
         testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
-        ;
     }
 
     @Override
