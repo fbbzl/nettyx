@@ -32,6 +32,11 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
         super(stringRxtxDeviceAddressMap);
     }
 
+    @Override
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
     public static void main(String[] args) {
         Map<String, RxtxDeviceAddress> map = new HashMap<>();
 
@@ -54,10 +59,5 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
                 .whenDone((l, cf) -> System.err.println("done"));
 
         testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));
-    }
-
-    @Override
-    protected ChannelInitializer<RxtxChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
     }
 }
