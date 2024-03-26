@@ -46,6 +46,9 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         if (channelFuture.isCancelled()) invokeAction(whenCancel, this, channelFuture);
     }
 
+    /**
+     * will re-execute the action after assigned delay and timeUnit
+     */
     public static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
