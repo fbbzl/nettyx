@@ -23,9 +23,7 @@ import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Stopbits;
 /**
  * Option for configuring a serial port connection
  *
- * @deprecated this transport will be removed in the next major version.
  */
-@Deprecated
 public final class RxtxChannelOption<T> extends ChannelOption<T> {
 
     public static final ChannelOption<Integer>  BAUD_RATE = valueOf(RxtxChannelOption.class, "BAUD_RATE");

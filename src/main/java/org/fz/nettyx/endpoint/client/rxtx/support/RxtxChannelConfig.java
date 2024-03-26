@@ -50,9 +50,7 @@ import io.netty.channel.WriteBufferWaterMark;
  * </tr>
  * </table>
  *
- * @deprecated this transport will be removed in the next major version.
  */
-@Deprecated
 public interface RxtxChannelConfig extends ChannelConfig {
     enum Stopbits {
         /**
