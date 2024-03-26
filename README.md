@@ -11,7 +11,7 @@ for more use cases please refer to: https://blog.csdn.net/fbbwht
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.11-RELEASE</version>
+    <version>2.2.12-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -65,9 +65,9 @@ handler                             Provided some basic channel handler implemen
   interceptor
      ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
      ---ChannelInterceptors               Channel interceptor utils
-  ---ActionIdleStateHandler     Actionable Idle State Handler
-  ---ActionReadTimeoutHandler   Actionable ReadTimeout Handler
-  ---ActionWriteTimeoutHandler  Actionable WriteTimeout Handler
+  ---ActionIdleStateHandler            Actionable Idle State Handler
+  ---ActionReadTimeoutHandler          Actionable ReadTimeout Handler
+  ---ActionWriteTimeoutHandler         Actionable WriteTimeout Handler
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log

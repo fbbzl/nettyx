@@ -3,17 +3,9 @@ package org.fz.nettyx.endpoint.client;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelConfig;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.ReflectiveChannelFactory;
+import io.netty.channel.*;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
-import java.net.SocketAddress;
-import java.util.Map;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -21,7 +13,12 @@ import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
 
+import java.net.SocketAddress;
+import java.util.Map;
+
 /**
+ * multichannel client
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 14:44
@@ -52,7 +49,7 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         Bootstrap bootstrap = getBootstrapMap().get(key);
         Throws.ifNull(bootstrap, "can not find config by key [" + key + "]");
         ChannelFuture channelFuture = bootstrap.clone().connect();
-        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess(this::storeChannel));
+        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
         return channelFuture;
     }
 
