@@ -18,6 +18,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -59,10 +62,7 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
                     System.err.println(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancel((l, cf) -> System.err.println("cancel"))
-                .whenFailure((l, cf) -> {
-                    System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                    cf.channel().eventLoop().schedule(() -> testMultiTcp.connect(channelKey(cf)), 2, TimeUnit.SECONDS);
-                })
+                .whenFailure(redo(cf -> testMultiTcp.connect(channelKey(cf)), 2, SECONDS))
                 .whenDone((l, cf) -> System.err.println("done"));
 
         testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));

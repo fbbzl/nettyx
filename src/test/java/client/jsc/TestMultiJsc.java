@@ -56,11 +56,7 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
                 System.err.println(cf.channel().localAddress() + ": ok");
             })
             .whenCancel((l, cf) -> System.err.println("cancel"))
-            .whenFailure((l, cf) -> {
-                System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                cf.channel().eventLoop().schedule(() -> testMultiJsc.connect(channelKey(cf)), 2, TimeUnit.SECONDS);
-            })
-            .whenFailure(redo(() -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
+            .whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
             .whenDone((l, cf) -> System.err.println("done"));
 
         testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener)); ;
