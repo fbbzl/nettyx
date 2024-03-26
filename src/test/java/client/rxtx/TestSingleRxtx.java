@@ -37,7 +37,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM1");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
