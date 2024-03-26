@@ -27,9 +27,7 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 /**
  * Default configuration class for RXTX device connections.
  *
- * @deprecated this transport will be removed in the next major version.
  */
-@Deprecated
 final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements RxtxChannelConfig {
 
     private volatile int baudrate = 115200;
