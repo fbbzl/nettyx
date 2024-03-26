@@ -49,7 +49,7 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
 
         TestMultiTcp testMultiTcp = new TestMultiTcp(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
-                .whenSuccess(cf -> {
+                .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
                         byte[] msg = new byte[300];
                         Arrays.fill(msg, (byte) 1);
@@ -58,12 +58,12 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
 
                     System.err.println(cf.channel().localAddress() + ": ok");
                 })
-                .whenCancel(cf -> System.err.println("cancel"))
-                .whenFailure(cf -> {
+                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenFailure((l, cf) -> {
                     System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
                     cf.channel().eventLoop().schedule(() -> testMultiTcp.connect(channelKey(cf)), 2, TimeUnit.SECONDS);
                 })
-                .whenDone(cf -> System.err.println("done"));
+                .whenDone((l, cf) -> System.err.println("done"));
 
         testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));
 

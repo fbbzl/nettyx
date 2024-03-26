@@ -1,17 +1,14 @@
 package org.fz.nettyx.endpoint.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.ReflectiveChannelFactory;
+import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
-import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+
+import java.net.SocketAddress;
 
 /**
  * @author fengbinbin
@@ -34,7 +31,7 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
 
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
-        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess(this::storeChannel));
+        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
         return channelFuture;
     }
 

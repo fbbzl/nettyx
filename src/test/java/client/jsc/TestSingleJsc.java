@@ -1,29 +1,27 @@
 package client.jsc;
 
 
-import static io.netty.channel.rxtx.RxtxChannelOption.DTR;
-import static io.netty.channel.rxtx.RxtxChannelOption.RTS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.BAUD_RATE;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.DATA_BITS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.PARITY_BIT;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.STOP_BITS;
-
 import client.TestChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import java.net.SocketAddress;
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+
+import java.net.SocketAddress;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static io.netty.channel.rxtx.RxtxChannelOption.DTR;
+import static io.netty.channel.rxtx.RxtxChannelOption.RTS;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 /**
  * @author fengbinbin
@@ -59,7 +57,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
     public static void main(String[] args) {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
-            .whenSuccess(cf -> {
+            .whenSuccess((l, cf) -> {
                 executor.scheduleAtFixedRate(() -> {
                     byte[] msg = new byte[300];
                     Arrays.fill(msg, (byte) 1);
@@ -68,13 +66,13 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
                 System.err.println(cf.channel().localAddress() + ": ok");
             })
-            .whenCancel(cf -> System.err.println("cancel"))
-            .whenFailure(cf -> {
+            .whenCancel((l, cf) -> System.err.println("cancel"))
+            .whenFailure((l, cf) -> {
                 System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
                 cf.channel().eventLoop()
                   .schedule(testSingleJsc::connect, 2, TimeUnit.SECONDS);
             })
-            .whenDone(cf -> System.err.println("done"));
+            .whenDone((l, cf) -> System.err.println("done"));
 
         testSingleJsc.connect().addListener(listener);
     }

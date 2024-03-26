@@ -34,7 +34,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress(9888));
 
         ChannelFutureListener listener = new ActionChannelFutureListener()
-                .whenSuccess(cf -> {
+                .whenSuccess((ls, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
                         byte[] msg = new byte[300];
                         Arrays.fill(msg, (byte) 1);
@@ -43,12 +43,12 @@ public class TestSingleTcp extends SingleTcpChannelClient {
 
                     System.err.println(cf.channel().localAddress() + ": ok");
                 })
-                .whenCancel(cf -> System.err.println("cancel"))
-                .whenFailure(cf -> {
+                .whenCancel((ls, cf) -> System.err.println("cancel"))
+                .whenFailure((ls, cf) -> {
                     System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                    cf.channel().eventLoop().schedule(() -> testClient.connect().addListener(listener), 2, TimeUnit.SECONDS);
+                    cf.channel().eventLoop().schedule(() -> testClient.connect().addListener(ls), 2, TimeUnit.SECONDS);
                 })
-                .whenDone(cf -> System.err.println("done"));
+                .whenDone((ls, cf) -> System.err.println("done"));
 
         testClient.connect().addListener(listener);
     }
