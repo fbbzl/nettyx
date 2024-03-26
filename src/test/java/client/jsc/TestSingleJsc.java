@@ -39,6 +39,22 @@ public class TestSingleJsc extends SingleJscChannelClient {
         super(commAddress);
     }
 
+    @Override
+    protected ChannelInitializer<JscChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
+    @Override
+    protected Bootstrap newBootstrap(SocketAddress jscDeviceAddress) {
+        return super.newBootstrap(jscDeviceAddress)
+                    .option(BAUD_RATE, 115200)
+                    .option(DATA_BITS, 8)
+                    .option(STOP_BITS, StopBits.ONE_STOP_BIT)
+                    .option(PARITY_BIT, ParityBit.NO_PARITY)
+                    .option(DTR, false)
+                    .option(RTS, false);
+    }
+
     public static void main(String[] args) {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
@@ -57,21 +73,4 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
         testSingleJsc.connect().addListener(listener);
     }
-
-    @Override
-    protected ChannelInitializer<JscChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
-    }
-
-    @Override
-    protected Bootstrap newBootstrap(SocketAddress jscDeviceAddress) {
-        return super.newBootstrap(jscDeviceAddress)
-                    .option(BAUD_RATE, 115200)
-                    .option(DATA_BITS, 8)
-                    .option(STOP_BITS, StopBits.ONE_STOP_BIT)
-                    .option(PARITY_BIT, ParityBit.NO_PARITY)
-                    .option(DTR, false)
-                    .option(RTS, false);
-    }
-
 }
