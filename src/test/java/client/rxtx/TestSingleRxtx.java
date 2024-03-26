@@ -10,7 +10,7 @@ import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
 import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
 import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.SocketAddress;
@@ -56,7 +56,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     @Override
-    protected ChannelInitializer<XRxtxChannel> channelInitializer() {
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
         return new TestChannelInitializer<>();
     }
 
