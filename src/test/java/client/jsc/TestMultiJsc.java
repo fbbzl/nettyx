@@ -32,6 +32,11 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         super(stringJscDeviceAddressMap);
     }
 
+    @Override
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
     public static void main(String[] args) {
         Map<String, JscDeviceAddress> map = new HashMap<>();
 
@@ -55,11 +60,5 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
 
         testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
     }
-
-    @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
-    }
-
 
 }
