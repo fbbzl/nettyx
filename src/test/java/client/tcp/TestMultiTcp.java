@@ -34,6 +34,16 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
         super(inetSocketAddressMap);
     }
 
+    @Override
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
+    @Override
+    protected void doChannelConfig(String key, SocketChannelConfig channelConfig) {
+        super.doChannelConfig(key, channelConfig);
+    }
+
     public static void main(String[] args) {
         Map<String, InetSocketAddress> map = new HashMap<>();
 
@@ -57,15 +67,5 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
 
         testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));
 
-    }
-
-    @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
-    }
-
-    @Override
-    protected void doChannelConfig(String key, SocketChannelConfig channelConfig) {
-        super.doChannelConfig(key, channelConfig);
     }
 }
