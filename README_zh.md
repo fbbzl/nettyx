@@ -12,7 +12,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.11-RELEASE</version>
+    <version>2.2.12-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -66,9 +66,9 @@ handler                             提供了一些基本的通道处理程序�
   interceptor
      ---ChannelInterceptor                信道拦截器，适用于通信前握手等预操作
      ---ChannelInterceptors               通道拦截器实用程序
-  ---ActionIdleStateHandler     可操作的空闲状态处理程序
-  ---ActioneReadTimeoutHandler   可操作的 读取超时 处理程序
-  ---ActionWriteTimeoutHandler  可操作的 写超时 处理程序
+  ---ActionIdleStateHandler            可操作的空闲状态处理程序
+  ---ActioneReadTimeoutHandler         可操作的 读取超时 处理程序
+  ---ActionWriteTimeoutHandler         可操作的 写超时 处理程序
   ---ChannelAdvice                     包含入站建言和出站建言
   ---IdledHeartBeater                  闲置后的心跳器
   ---LoggerHandler                     进入和退出消息日志
