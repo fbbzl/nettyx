@@ -28,6 +28,11 @@ public class TestSingleTcp extends SingleTcpChannelClient {
         super(address);
     }
 
+    @Override
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
     public static void main(String[] args) {
         TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress(9888));
 
@@ -46,10 +51,5 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                 .whenDone((ls, cf) -> System.err.println("done"));
 
         testClient.connect().addListener(listener);
-    }
-
-    @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
     }
 }
