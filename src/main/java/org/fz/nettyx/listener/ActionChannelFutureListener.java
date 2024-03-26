@@ -46,11 +46,8 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     }
 
     public static ListenerAction reconnect(Supplier<ChannelFuture> connect, long delay, TimeUnit unit) {
-        return (ls, cf) -> {
-            cf.channel().eventLoop().schedule(() -> connect.get().addListener(ls), delay, unit);
-        };
+        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> connect.get().addListener(ls), delay, unit);
     }
-
 
     public interface ListenerAction {
         void act(ChannelFutureListener listener, ChannelFuture channelFuture);
