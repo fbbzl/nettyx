@@ -5,8 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
@@ -57,7 +56,7 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
     }
 
     @Override
-    protected ChannelInitializer<XRxtxChannel> channelInitializer() {
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
         return new TestChannelInitializer<>();
     }
 }

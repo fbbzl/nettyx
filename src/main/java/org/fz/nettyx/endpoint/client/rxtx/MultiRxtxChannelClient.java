@@ -6,8 +6,7 @@ import io.netty.channel.rxtx.RxtxChannelConfig;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxChannel;
-import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 
 
 /**
@@ -19,7 +18,7 @@ import org.fz.nettyx.endpoint.client.rxtx.support.XRxtxDeviceAddress;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiRxtxChannelClient<K> extends AbstractMultiChannelClient<K, XRxtxChannel, RxtxChannelConfig> {
+public abstract class MultiRxtxChannelClient<K> extends AbstractMultiChannelClient<K, RxtxChannel, RxtxChannelConfig> {
 
     protected MultiRxtxChannelClient(Map<K, XRxtxDeviceAddress> addressMap) {
         super(addressMap);

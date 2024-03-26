@@ -73,6 +73,12 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>${netty-all.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-rxtx</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
