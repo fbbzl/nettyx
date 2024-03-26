@@ -26,7 +26,7 @@ public final class JscChannelOption<T> extends ChannelOption<T> {
     public static final ChannelOption<Integer>   WAIT_TIME    = valueOf(JscChannelOption.class, "WAIT_TIME");
     public static final ChannelOption<Integer>   READ_TIMEOUT = valueOf(JscChannelOption.class, "READ_TIMEOUT");
 
-
+    @SuppressWarnings("deprecation")
     private JscChannelOption() {
         super("jsc-config");
     }
