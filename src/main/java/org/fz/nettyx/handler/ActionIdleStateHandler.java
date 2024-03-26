@@ -1,17 +1,18 @@
-package org.fz.nettyx.handler.actionable;
-
-import static org.fz.nettyx.action.Actions.invokeAction;
+package org.fz.nettyx.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelHandlerContextAction;
 import org.fz.nettyx.event.ChannelEvents;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Actionable idle state handler.

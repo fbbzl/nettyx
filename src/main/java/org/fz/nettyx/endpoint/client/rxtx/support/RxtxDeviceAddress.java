@@ -26,8 +26,7 @@ import java.net.SocketAddress;
  * @since 2024/3/1 14:44
  */
 public class RxtxDeviceAddress extends SocketAddress {
-
-    private static final long serialVersionUID = -2907820090993709523L;
+    private static final long serialVersionUID = 4121676836494585005L;
 
     private final String value;
 
