@@ -135,20 +135,17 @@ public class RxtxChannel extends OioByteStreamChannel {
 
                 int waitTime = config().getOption(WAIT_TIME);
                 if (waitTime > 0) {
-                    eventLoop().schedule(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                doInit();
-                                safeSetSuccess(promise);
-                                if (!wasActive && isActive()) {
-                                    pipeline().fireChannelActive();
-                                }
+                    eventLoop().schedule(() -> {
+                        try {
+                            doInit();
+                            safeSetSuccess(promise);
+                            if (!wasActive && isActive()) {
+                                pipeline().fireChannelActive();
                             }
-                            catch (Throwable t) {
-                                safeSetFailure(promise, t);
-                                closeIfClosed();
-                            }
+                        }
+                        catch (Throwable t) {
+                            safeSetFailure(promise, t);
+                            closeIfClosed();
                         }
                     }, waitTime, TimeUnit.MILLISECONDS);
                 }
