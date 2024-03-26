@@ -6,11 +6,11 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.rxtx.RxtxChannelConfig.Databits;
-import io.netty.channel.rxtx.RxtxChannelConfig.Paritybit;
-import io.netty.channel.rxtx.RxtxChannelConfig.Stopbits;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Databits;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Paritybit;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Stopbits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.SocketAddress;
@@ -19,8 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static io.netty.channel.rxtx.RxtxChannelOption.*;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**

@@ -20,8 +20,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static io.netty.channel.rxtx.RxtxChannelOption.DTR;
-import static io.netty.channel.rxtx.RxtxChannelOption.RTS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
