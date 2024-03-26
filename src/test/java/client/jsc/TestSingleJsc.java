@@ -21,7 +21,9 @@ import java.util.concurrent.TimeUnit;
 
 import static io.netty.channel.rxtx.RxtxChannelOption.DTR;
 import static io.netty.channel.rxtx.RxtxChannelOption.RTS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
+import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**
  * @author fengbinbin
@@ -57,22 +59,18 @@ public class TestSingleJsc extends SingleJscChannelClient {
     public static void main(String[] args) {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
-            .whenSuccess((l, cf) -> {
-                executor.scheduleAtFixedRate(() -> {
-                    byte[] msg = new byte[300];
-                    Arrays.fill(msg, (byte) 1);
-                    testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
-                }, 2, 30, TimeUnit.MILLISECONDS);
+                .whenSuccess((l, cf) -> {
+                    executor.scheduleAtFixedRate(() -> {
+                        byte[] msg = new byte[300];
+                        Arrays.fill(msg, (byte) 1);
+                        testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    }, 2, 30, TimeUnit.MILLISECONDS);
 
-                System.err.println(cf.channel().localAddress() + ": ok");
-            })
-            .whenCancel((l, cf) -> System.err.println("cancel"))
-            .whenFailure((l, cf) -> {
-                System.err.println(cf.channel().localAddress() + ": fail, " + cf.cause());
-                cf.channel().eventLoop()
-                  .schedule(testSingleJsc::connect, 2, TimeUnit.SECONDS);
-            })
-            .whenDone((l, cf) -> System.err.println("done"));
+                    System.err.println(cf.channel().localAddress() + ": ok");
+                })
+                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenFailure(redo(testSingleJsc::connect, 2, SECONDS))
+                .whenDone((l, cf) -> System.err.println("done"));
 
         testSingleJsc.connect().addListener(listener);
     }
