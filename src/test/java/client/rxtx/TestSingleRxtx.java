@@ -36,6 +36,22 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
         super(commAddress);
     }
 
+    @Override
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
+    @Override
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
+        return super.newBootstrap(remoteAddress)
+                    .option(BAUD_RATE, 115200)
+                    .option(DATA_BITS, Databits.DATABITS_8)
+                    .option(STOP_BITS, Stopbits.STOPBITS_1)
+                    .option(PARITY_BIT, Paritybit.NONE)
+                    .option(DTR, false)
+                    .option(RTS, false);
+    }
+
     public static void main(String[] args) {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
         ChannelFutureListener listener = new ActionChannelFutureListener()
@@ -53,21 +69,5 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
                 .whenDone((l, cf) -> System.err.println("done"));
 
         testSingleRxtx.connect().addListener(listener);
-    }
-
-    @Override
-    protected ChannelInitializer<RxtxChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
-    }
-
-    @Override
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
-        return super.newBootstrap(remoteAddress)
-                    .option(BAUD_RATE, 115200)
-                    .option(DATA_BITS, Databits.DATABITS_8)
-                    .option(STOP_BITS, Stopbits.STOPBITS_1)
-                    .option(PARITY_BIT, Paritybit.NONE)
-                    .option(DTR, false)
-                    .option(RTS, false);
     }
 }
