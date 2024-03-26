@@ -65,7 +65,6 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         };
     }
 
-
     public interface ListenerAction {
         void act(ChannelFutureListener listener, ChannelFuture channelFuture);
     }
