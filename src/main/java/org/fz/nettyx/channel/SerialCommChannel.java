@@ -112,7 +112,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
         throw new UnsupportedOperationException();
     }
 
-    protected abstract void doInit() throws Exception;
+    protected abstract void doInit();
 
     protected abstract int waitTime(ChannelConfig config);
 
