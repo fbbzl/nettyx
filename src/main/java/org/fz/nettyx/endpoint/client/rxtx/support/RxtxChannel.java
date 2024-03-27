@@ -3,7 +3,7 @@ package org.fz.nettyx.endpoint.client.rxtx.support;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
-import org.fz.nettyx.channel.SerialCommPortChannel;
+import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;
 
@@ -16,7 +16,7 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
  * @since 2024/3/4 19:29
  */
 
-public class RxtxChannel extends SerialCommPortChannel {
+public class RxtxChannel extends SerialCommChannel {
 
     private static final RxtxDeviceAddress LOCAL_ADDRESS = new RxtxDeviceAddress("localhost");
 

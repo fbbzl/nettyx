@@ -1,0 +1,230 @@
+package org.fz.nettyx.channel;
+
+
+import com.fazecast.jSerialComm.SerialPort;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.ChannelConfig;
+import io.netty.channel.MessageSizeEstimator;
+import io.netty.channel.RecvByteBufAllocator;
+import io.netty.channel.WriteBufferWaterMark;
+
+import java.util.Arrays;
+
+/**
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/3/2 13:29
+ */
+public interface SerialCommChannelConfig extends ChannelConfig {
+
+    /**
+     * @return The configured baud rate, defaulting to 115200 if unset
+     */
+    int getBaudRate();
+
+    /**
+     * Sets the baud rate (ie. bits per second) for communication with the serial device. The baud rate will include
+     * bits for framing (in the form of stop bits and parity), such that the effective data rate will be lower than this
+     * value.
+     *
+     * @param baudRate The baud rate (in bits per second)
+     */
+    SerialCommChannelConfig setBaudRate(int baudRate);
+
+    /**
+     * @return The configured stop bits, defaulting to {@link StopBits#ONE_STOP_BIT} if unset
+     */
+    StopBits getStopBits();
+
+    /**
+     * Sets the number of stop bits to include at the end of every character to aid the serial device in synchronising
+     * with the data.
+     *
+     * @param stopBits The number of stop bits to use
+     */
+    SerialCommChannelConfig setStopBits(StopBits stopBits);
+
+    /**
+     * @return The configured data bits, defaulting to 8 if unset
+     */
+    int getDataBits();
+
+    /**
+     * Sets the number of data bits to use to make up each character sent to the serial device.
+     *
+     * @param dataBits The number of data bits to use
+     */
+    SerialCommChannelConfig setDataBits(int dataBits);
+
+    /**
+     * @return The configured parity bit, defaulting to {@link ParityBit#NO_PARITY} if unset
+     */
+    ParityBit getParityBit();
+
+    /**
+     * Sets the type of parity bit to be used when communicating with the serial device.
+     *
+     * @param parityBit The type of parity bit to be used
+     */
+    SerialCommChannelConfig setParityBit(ParityBit parityBit);
+
+    /**
+     * @return true if the serial device should support the Data Terminal Ready signal
+     */
+    boolean isDtr();
+
+    /**
+     * Sets whether the serial device supports the Data Terminal Ready signal, used for flow control
+     *
+     * @param dtr true if DTR is supported, false otherwise
+     */
+    SerialCommChannelConfig setDtr(boolean dtr);
+
+    /**
+     * @return true if the serial device should support the Ready to Send signal
+     */
+    boolean isRts();
+
+    /**
+     * Sets whether the serial device supports the Request To Send signal, used for flow control
+     *
+     * @param rts true if RTS is supported, false otherwise
+     */
+    SerialCommChannelConfig setRts(boolean rts);
+
+    /**
+     * @return The number of milliseconds to wait between opening the serial port and initialising.
+     */
+    int getWaitTimeMillis();
+
+    /**
+     * Sets the time to wait after opening the serial port and before sending it any configuration information or data.
+     * A value of 0 indicates that no waiting should occur.
+     *
+     * @param waitTimeMillis The number of milliseconds to wait, defaulting to 0 (no wait) if unset
+     *
+     * @throws IllegalArgumentException if the supplied value is &lt; 0
+     */
+    SerialCommChannelConfig setWaitTimeMillis(int waitTimeMillis);
+
+    /**
+     * Return the maximal time (in ms) to block and wait for something to be ready to read.
+     */
+    int getReadTimeout();
+
+    /**
+     * Sets the maximal time (in ms) to block while try to read from the serial port. Default is 1000ms
+     */
+    SerialCommChannelConfig setReadTimeout(int readTimeout);
+
+    @Override
+    SerialCommChannelConfig setConnectTimeoutMillis(int connectTimeoutMillis);
+
+    @Override
+    @Deprecated
+    SerialCommChannelConfig setMaxMessagesPerRead(int maxMessagesPerRead);
+
+    @Override
+    SerialCommChannelConfig setWriteSpinCount(int writeSpinCount);
+
+    @Override
+    SerialCommChannelConfig setAllocator(ByteBufAllocator allocator);
+
+    @Override
+    SerialCommChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator);
+
+    @Override
+    SerialCommChannelConfig setAutoRead(boolean autoRead);
+
+    @Override
+    SerialCommChannelConfig setAutoClose(boolean autoClose);
+
+    @Override
+    SerialCommChannelConfig setWriteBufferHighWaterMark(int writeBufferHighWaterMark);
+
+    @Override
+    SerialCommChannelConfig setWriteBufferLowWaterMark(int writeBufferLowWaterMark);
+
+    @Override
+    SerialCommChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator);
+
+    @Override
+    SerialCommChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark);
+
+    enum StopBits {
+        /**
+         * 1 stop bit will be sent at the end of every character
+         */
+        ONE_STOP_BIT(SerialPort.ONE_STOP_BIT),
+        /**
+         * 2 stop bits will be sent at the end of every character
+         */
+        TWO_STOP_BITS(SerialPort.TWO_STOP_BITS),
+        /**
+         * 1.5 stop bits will be sent at the end of every character
+         */
+        ONE_POINT_FIVE_STOP_BITS(SerialPort.ONE_POINT_FIVE_STOP_BITS);
+
+        private final int value;
+
+        StopBits(int value) {
+            this.value = value;
+        }
+
+        public static StopBits valueOf(int value) {
+            return Arrays.stream(StopBits.values())
+                         .filter(stopBit -> stopBit.value == value)
+                         .findFirst()
+                         .orElseThrow(() -> new IllegalArgumentException(
+                             "unknown " + StopBits.class.getSimpleName() + " value: " + value));
+        }
+
+        public int value() {
+            return value;
+        }
+    }
+
+    enum ParityBit {
+        /**
+         * No parity bit will be sent with each data character at all
+         */
+        NO_PARITY(SerialPort.NO_PARITY),
+        /**
+         * An odd parity bit will be sent with each data character, ie. will be set to 1 if the data character contains
+         * an even number of bits set to 1.
+         */
+        ODD_PARITY(SerialPort.ODD_PARITY),
+        /**
+         * An even parity bit will be sent with each data character, ie. will be set to 1 if the data character contains
+         * an odd number of bits set to 1.
+         */
+        EVEN_PARITY(SerialPort.EVEN_PARITY),
+        /**
+         * A mark parity bit (ie. always 1) will be sent with each data character
+         */
+        MARK_PARITY(SerialPort.MARK_PARITY),
+        /**
+         * A space parity bit (ie. always 0) will be sent with each data character
+         */
+        SPACE_PARITY(SerialPort.SPACE_PARITY);
+
+        private final int value;
+
+        ParityBit(int value) {
+            this.value = value;
+        }
+
+        public static ParityBit valueOf(int value) {
+            for (ParityBit paritybit : ParityBit.values()) {
+                if (paritybit.value == value) {
+                    return paritybit;
+                }
+            }
+            throw new IllegalArgumentException("unknown " + ParityBit.class.getSimpleName() + " value: " + value);
+        }
+
+        public int value() {
+            return value;
+        }
+    }
+}
