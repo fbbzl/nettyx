@@ -38,7 +38,6 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
         SslContext serverSslContext = new OpenSslContextFactory(serverSslConfig).getServerSslContext();
 
         channel.pipeline().addLast(
-                // 如果程序 既要接收ssl又要接收非ssl, 可以使用OptionalSslHandler
                 new OptionalSslHandler(serverSslContext)
                 , new StartEndFlagFrameCodec(320, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
                 , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
