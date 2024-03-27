@@ -35,6 +35,7 @@ public class SerializerTester {
         File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
         File file2 = new File("C:\\Users\\" + u + "\\Desktop\\bank.xml");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
+
     }
 
     @Test
