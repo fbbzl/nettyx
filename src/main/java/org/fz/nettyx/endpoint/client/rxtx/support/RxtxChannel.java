@@ -21,7 +21,6 @@ public class RxtxChannel extends SerialCommPortChannel {
     private static final RxtxDeviceAddress LOCAL_ADDRESS = new RxtxDeviceAddress("localhost");
 
     private final RxtxChannelConfig config;
-
     private RxtxDeviceAddress deviceAddress;
     private SerialPort        serialPort;
 
