@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
-import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
-import org.fz.nettyx.endpoint.client.jsc.support.JscDeviceAddress;
 
 /**
  * @author fengbinbin

@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxDeviceAddress;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
