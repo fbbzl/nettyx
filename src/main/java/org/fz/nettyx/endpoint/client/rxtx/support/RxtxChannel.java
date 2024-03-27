@@ -5,7 +5,6 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import io.netty.util.concurrent.DefaultEventExecutor;
 import org.fz.nettyx.channel.SerialCommPortChannel;
 
 import java.net.SocketAddress;
@@ -30,8 +29,6 @@ public class RxtxChannel extends SerialCommPortChannel {
     private boolean           open = true;
     private RxtxDeviceAddress deviceAddress;
     private SerialPort        serialPort;
-
-    private final DefaultEventExecutor rxtxEventExecutors = new DefaultEventExecutor();
 
 
     public RxtxChannel() {
@@ -165,13 +162,6 @@ public class RxtxChannel extends SerialCommPortChannel {
     }
 
     @Override
-    public void doRead() {
-        // do not use method reference!!!
-        Runnable runnable = () -> RxtxChannel.super.doRead();
-        rxtxEventExecutors.execute(runnable);
-    }
-
-    @Override
     protected void doClose() throws Exception {
         open = false;
         try {
@@ -183,8 +173,6 @@ public class RxtxChannel extends SerialCommPortChannel {
                 serialPort.close();
                 serialPort = null;
             }
-
-            this.rxtxEventExecutors.shutdownGracefully();
         }
 
     }
