@@ -67,7 +67,6 @@ public class RxtxChannel extends SerialCommChannel {
         } catch (IOException _) {
             throw new UnsupportedOperationException("can get input/output stream, please check", _);
         }
-
     }
 
     @Override
