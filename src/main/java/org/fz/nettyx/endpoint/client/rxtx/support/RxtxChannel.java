@@ -3,6 +3,7 @@ package org.fz.nettyx.endpoint.client.rxtx.support;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
+import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.SerialCommAddress;
 import org.fz.nettyx.channel.SerialCommChannel;
 
@@ -22,11 +23,15 @@ public class RxtxChannel extends SerialCommChannel {
     private static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
     private final RxtxChannelConfig config;
-    private SerialCommAddress deviceAddress;
-    private SerialPort        serialPort;
+    private       SerialPort        serialPort;
 
     public RxtxChannel() {
         config = new DefaultRxtxChannelConfig(this);
+    }
+
+    @Override
+    protected int waitTime(ChannelConfig config) {
+        return config.getOption(WAIT_TIME);
     }
 
     @Override

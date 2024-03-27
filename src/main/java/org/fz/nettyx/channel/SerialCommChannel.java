@@ -2,6 +2,7 @@ package org.fz.nettyx.channel;
 
 import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
@@ -10,8 +11,6 @@ import io.netty.util.concurrent.DefaultEventExecutor;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
-
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.WAIT_TIME;
 
 
 /**
@@ -116,6 +115,8 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
 
     protected abstract void doInit() throws Exception;
 
+    protected abstract int waitTime(ChannelConfig config);
+
     protected final class SerialCommPortUnsafe extends AbstractUnsafe {
         @Override
         public void connect(
@@ -129,7 +130,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
                 final boolean wasActive = isActive();
                 doConnect(remoteAddress, localAddress);
 
-                int waitTime = config().getOption(WAIT_TIME);
+                int waitTime = waitTime(config());
                 if (waitTime > 0) {
                     eventLoop().schedule(() -> {
                         try {
