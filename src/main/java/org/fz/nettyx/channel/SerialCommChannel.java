@@ -22,15 +22,15 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.WAIT_
  */
 
 @SuppressWarnings("deprecation")
-public abstract class SerialCommPortChannel extends OioByteStreamChannel {
+public abstract class SerialCommChannel extends OioByteStreamChannel {
 
-    protected static final SerialCommPortAddress LOCAL_ADDRESS = new SerialCommPortAddress("localhost");
+    protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
-    protected SerialCommPortAddress deviceAddress;
+    protected SerialCommAddress deviceAddress;
 
     private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
 
-    protected SerialCommPortChannel() {
+    protected SerialCommChannel() {
         super(null);
     }
 
@@ -47,22 +47,22 @@ public abstract class SerialCommPortChannel extends OioByteStreamChannel {
     }
 
     @Override
-    public SerialCommPortAddress localAddress() {
-        return (SerialCommPortAddress) super.localAddress();
+    public SerialCommAddress localAddress() {
+        return (SerialCommAddress) super.localAddress();
     }
 
     @Override
-    public SerialCommPortAddress remoteAddress() {
-        return (SerialCommPortAddress) super.remoteAddress();
+    public SerialCommAddress remoteAddress() {
+        return (SerialCommAddress) super.remoteAddress();
     }
 
     @Override
-    protected SerialCommPortAddress localAddress0() {
+    protected SerialCommAddress localAddress0() {
         return LOCAL_ADDRESS;
     }
 
     @Override
-    protected SerialCommPortAddress remoteAddress0() {
+    protected SerialCommAddress remoteAddress0() {
         return deviceAddress;
     }
 
@@ -84,7 +84,7 @@ public abstract class SerialCommPortChannel extends OioByteStreamChannel {
     @Override
     public void doRead() {
         // do not use method reference!!!
-        Runnable runnable = () -> SerialCommPortChannel.super.doRead();
+        Runnable runnable = () -> SerialCommChannel.super.doRead();
         jscEventExecutors.execute(runnable);
     }
 

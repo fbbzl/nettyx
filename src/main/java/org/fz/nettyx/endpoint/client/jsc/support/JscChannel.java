@@ -2,8 +2,8 @@ package org.fz.nettyx.endpoint.client.jsc.support;
 
 
 import com.fazecast.jSerialComm.SerialPort;
-import org.fz.nettyx.channel.SerialCommPortAddress;
-import org.fz.nettyx.channel.SerialCommPortChannel;
+import org.fz.nettyx.channel.SerialCommAddress;
+import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;
 
@@ -16,7 +16,7 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
  * @since 2024/3/2 13:29
  */
 
-public class JscChannel extends SerialCommPortChannel {
+public class JscChannel extends SerialCommChannel {
 
     private final JscChannelConfig config;
     private       SerialPort       serialPort;
@@ -32,8 +32,8 @@ public class JscChannel extends SerialCommPortChannel {
 
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) {
-        SerialCommPortAddress remote   = (SerialCommPortAddress) remoteAddress;
-        SerialPort            commPort = SerialPort.getCommPort(remote.value());
+        SerialCommAddress remote   = (SerialCommAddress) remoteAddress;
+        SerialPort        commPort = SerialPort.getCommPort(remote.value());
 
         if (!commPort.openPort()) {
             throw new IllegalArgumentException("Unable to open [" + remote.value() + "] port");

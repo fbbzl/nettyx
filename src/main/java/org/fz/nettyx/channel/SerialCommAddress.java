@@ -10,7 +10,7 @@ import java.net.SocketAddress;
  * @since 2024/3/27 15:57
  */
 @RequiredArgsConstructor
-public class SerialCommPortAddress extends SocketAddress {
+public class SerialCommAddress extends SocketAddress {
 
     private static final long   serialVersionUID = -870353013039000250L;
     private final        String value;
