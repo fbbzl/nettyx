@@ -79,7 +79,6 @@ public class RxtxChannel extends SerialCommPortChannel {
         return deviceAddress;
     }
 
-
     @Override
     protected void doClose() throws Exception {
         open = false;
