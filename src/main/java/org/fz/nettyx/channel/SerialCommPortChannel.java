@@ -1,5 +1,7 @@
 package org.fz.nettyx.channel;
 
+import com.fazecast.jSerialComm.SerialPortTimeoutException;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
@@ -22,6 +24,10 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.WAIT_
 @SuppressWarnings("deprecation")
 public abstract class SerialCommPortChannel extends OioByteStreamChannel {
 
+    protected static final SerialCommPortAddress LOCAL_ADDRESS = new SerialCommPortAddress("localhost");
+
+    protected SerialCommPortAddress deviceAddress;
+
     private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
 
     protected SerialCommPortChannel() {
@@ -41,8 +47,38 @@ public abstract class SerialCommPortChannel extends OioByteStreamChannel {
     }
 
     @Override
+    public SerialCommPortAddress localAddress() {
+        return (SerialCommPortAddress) super.localAddress();
+    }
+
+    @Override
+    public SerialCommPortAddress remoteAddress() {
+        return (SerialCommPortAddress) super.remoteAddress();
+    }
+
+    @Override
+    protected SerialCommPortAddress localAddress0() {
+        return LOCAL_ADDRESS;
+    }
+
+    @Override
+    protected SerialCommPortAddress remoteAddress0() {
+        return deviceAddress;
+    }
+
+    @Override
     protected boolean isInputShutdown() {
         return !open;
+    }
+
+    @Override
+    protected int doReadBytes(ByteBuf buf) throws Exception {
+        try {
+            return super.doReadBytes(buf);
+        }
+        catch (SerialPortTimeoutException e) {
+            return 0;
+        }
     }
 
     @Override

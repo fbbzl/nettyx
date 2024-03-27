@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxDeviceAddress;
 
 import java.util.Map;
 
