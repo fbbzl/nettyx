@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.channel.SerialCommAddress;
+import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
@@ -28,7 +28,7 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    public TestMultiJsc(Map<String, SerialCommAddress> stringJscDeviceAddressMap) {
+    public TestMultiJsc(Map<String, SerialCommChannel.SerialCommAddress> stringJscDeviceAddressMap) {
         super(stringJscDeviceAddressMap);
     }
 
@@ -38,10 +38,10 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
     }
 
     public static void main(String[] args) {
-        Map<String, SerialCommAddress> map = new HashMap<>();
+        Map<String, SerialCommChannel.SerialCommAddress> map = new HashMap<>();
 
-        map.put("5", new SerialCommAddress("COM5"));
-        map.put("6", new SerialCommAddress("COM6"));
+        map.put("5", new SerialCommChannel.SerialCommAddress("COM5"));
+        map.put("6", new SerialCommChannel.SerialCommAddress("COM6"));
 
         TestMultiJsc testMultiJsc = new TestMultiJsc(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()

@@ -4,7 +4,6 @@ import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import io.netty.channel.ChannelConfig;
-import org.fz.nettyx.channel.SerialCommAddress;
 import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;

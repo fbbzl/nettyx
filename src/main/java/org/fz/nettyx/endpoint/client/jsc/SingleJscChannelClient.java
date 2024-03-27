@@ -4,7 +4,7 @@ package org.fz.nettyx.endpoint.client.jsc;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.channel.SerialCommAddress;
+import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 
@@ -19,10 +19,10 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 public abstract class SingleJscChannelClient extends AbstractSingleChannelClient<JscChannel> {
 
     protected SingleJscChannelClient(String commAddress) {
-        super(new SerialCommAddress(commAddress));
+        super(new SerialCommChannel.SerialCommAddress(commAddress));
     }
 
-    protected SingleJscChannelClient(SerialCommAddress commAddress) {
+    protected SingleJscChannelClient(SerialCommChannel.SerialCommAddress commAddress) {
         super(commAddress);
     }
 
