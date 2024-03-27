@@ -41,6 +41,11 @@ public abstract class SerialCommPortChannel extends OioByteStreamChannel {
     }
 
     @Override
+    protected boolean isInputShutdown() {
+        return !open;
+    }
+
+    @Override
     public void doRead() {
         // do not use method reference!!!
         Runnable runnable = () -> SerialCommPortChannel.super.doRead();
