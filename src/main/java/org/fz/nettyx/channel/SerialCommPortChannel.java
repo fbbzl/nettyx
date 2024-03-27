@@ -13,6 +13,7 @@ import io.netty.util.concurrent.DefaultEventExecutor;
  * @since 2024/3/27 14:27
  */
 
+@SuppressWarnings("deprecation")
 public abstract class SerialCommPortChannel extends OioByteStreamChannel {
 
     private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();

@@ -19,7 +19,6 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
  * @since 2024/3/4 19:29
  */
 
-@SuppressWarnings("deprecation")
 public class RxtxChannel extends SerialCommPortChannel {
 
     private static final RxtxDeviceAddress LOCAL_ADDRESS = new RxtxDeviceAddress("localhost");
@@ -29,7 +28,6 @@ public class RxtxChannel extends SerialCommPortChannel {
     private boolean           open = true;
     private RxtxDeviceAddress deviceAddress;
     private SerialPort        serialPort;
-
 
     public RxtxChannel() {
         super(null);
