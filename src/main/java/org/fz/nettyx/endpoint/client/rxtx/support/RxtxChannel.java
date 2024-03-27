@@ -3,6 +3,7 @@ package org.fz.nettyx.endpoint.client.rxtx.support;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
+import org.fz.nettyx.channel.SerialCommAddress;
 import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;
@@ -18,10 +19,10 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 
 public class RxtxChannel extends SerialCommChannel {
 
-    private static final RxtxDeviceAddress LOCAL_ADDRESS = new RxtxDeviceAddress("localhost");
+    private static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
     private final RxtxChannelConfig config;
-    private RxtxDeviceAddress deviceAddress;
+    private SerialCommAddress deviceAddress;
     private SerialPort        serialPort;
 
     public RxtxChannel() {
@@ -35,7 +36,7 @@ public class RxtxChannel extends SerialCommChannel {
 
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
-        RxtxDeviceAddress        remote   = (RxtxDeviceAddress) remoteAddress;
+        SerialCommAddress        remote   = (SerialCommAddress) remoteAddress;
         final CommPortIdentifier cpi      = CommPortIdentifier.getPortIdentifier(remote.value());
         final CommPort           commPort = cpi.open(getClass().getName(), 1000);
         commPort.enableReceiveTimeout(config().getOption(READ_TIMEOUT));
@@ -59,22 +60,22 @@ public class RxtxChannel extends SerialCommChannel {
     }
 
     @Override
-    public RxtxDeviceAddress localAddress() {
-        return (RxtxDeviceAddress) super.localAddress();
+    public SerialCommAddress localAddress() {
+        return (SerialCommAddress) super.localAddress();
     }
 
     @Override
-    public RxtxDeviceAddress remoteAddress() {
-        return (RxtxDeviceAddress) super.remoteAddress();
+    public SerialCommAddress remoteAddress() {
+        return (SerialCommAddress) super.remoteAddress();
     }
 
     @Override
-    protected RxtxDeviceAddress localAddress0() {
+    protected SerialCommAddress localAddress0() {
         return LOCAL_ADDRESS;
     }
 
     @Override
-    protected RxtxDeviceAddress remoteAddress0() {
+    protected SerialCommAddress remoteAddress0() {
         return deviceAddress;
     }
 
