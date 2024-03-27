@@ -3,9 +3,11 @@ package org.fz.nettyx.endpoint.client.rxtx.support;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
+import gnu.io.UnsupportedCommOperationException;
 import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.SerialCommChannel;
 
+import java.io.IOException;
 import java.net.SocketAddress;
 
 import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
@@ -48,17 +50,24 @@ public class RxtxChannel extends SerialCommChannel {
     }
 
     @Override
-    protected void doInit() throws Exception {
-        serialPort.setSerialPortParams(
-                config().getOption(BAUD_RATE),
-                config().getOption(DATA_BITS).value(),
-                config().getOption(STOP_BITS).value(),
-                config().getOption(PARITY_BIT).value()
-                                      );
-        serialPort.setDTR(config().getOption(DTR));
-        serialPort.setRTS(config().getOption(RTS));
+    protected void doInit() {
+        try {
+            serialPort.setSerialPortParams(
+                    config().getOption(BAUD_RATE),
+                    config().getOption(DATA_BITS).value(),
+                    config().getOption(STOP_BITS).value(),
+                    config().getOption(PARITY_BIT).value()
+            );
+            serialPort.setDTR(config().getOption(DTR));
+            serialPort.setRTS(config().getOption(RTS));
 
-        activate(serialPort.getInputStream(), serialPort.getOutputStream());
+            activate(serialPort.getInputStream(), serialPort.getOutputStream());
+        } catch (UnsupportedCommOperationException _) {
+            throw new IllegalArgumentException("can not open comm port", _);
+        } catch (IOException _) {
+            throw new UnsupportedOperationException("can get input/output stream, please check", _);
+        }
+
     }
 
     @Override
