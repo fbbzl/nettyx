@@ -110,8 +110,4 @@ public class JscChannel extends SerialCommPortChannel {
         }
     }
 
-    @Override
-    protected boolean isInputShutdown() {
-        return !open;
-    }
 }
