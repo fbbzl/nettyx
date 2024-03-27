@@ -5,7 +5,7 @@ import io.netty.channel.*;
 
 import java.util.Map;
 
-import static org.fz.nettyx.channel.SerialCommChannelOption.*;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 
 /**

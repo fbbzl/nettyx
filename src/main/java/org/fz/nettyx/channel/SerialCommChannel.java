@@ -11,7 +11,7 @@ import io.netty.util.concurrent.DefaultEventExecutor;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import static org.fz.nettyx.channel.SerialCommChannelOption.WAIT_TIME;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.WAIT_TIME;
 
 
 /**
