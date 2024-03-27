@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -30,10 +31,10 @@ public class SerializerTester {
 
     @BeforeClass
     public static void initContext() {
-//        String u = "fengbinbin";
-//        File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
-//        File file2 = new File("C:\\Users\\" + u + "\\Desktop\\bank.xml");
-//        XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
+        String u = "fengbinbin";
+        File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
+        File file2 = new File("C:\\Users\\" + u + "\\Desktop\\bank.xml");
+        XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
     }
 
     @Test
