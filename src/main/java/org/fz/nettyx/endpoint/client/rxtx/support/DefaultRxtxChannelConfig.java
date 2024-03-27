@@ -21,7 +21,7 @@ import io.netty.channel.*;
 import java.util.Map;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
-import static org.fz.nettyx.channel.SerialCommChannelOption.*;
+import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 /**
  * Default configuration class for RXTX device connections.
