@@ -5,8 +5,8 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
+import org.fz.nettyx.channel.SerialCommPortChannel;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +21,7 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
  */
 
 @SuppressWarnings("deprecation")
-public class RxtxChannel extends OioByteStreamChannel {
+public class RxtxChannel extends SerialCommPortChannel {
 
     private static final RxtxDeviceAddress LOCAL_ADDRESS = new RxtxDeviceAddress("localhost");
 
