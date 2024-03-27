@@ -30,8 +30,6 @@ public class JscChannel extends SerialCommPortChannel {
     private       SerialPort       serialPort;
 
     public JscChannel() {
-        super(null);
-
         config = new DefaultJscChannelConfig(this);
     }
 
