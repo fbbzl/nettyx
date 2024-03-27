@@ -20,8 +20,6 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 
 public class RxtxChannel extends SerialCommChannel {
 
-    private static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
-
     private final RxtxChannelConfig config;
     private       SerialPort        serialPort;
 
@@ -45,8 +43,8 @@ public class RxtxChannel extends SerialCommChannel {
         final CommPortIdentifier cpi      = CommPortIdentifier.getPortIdentifier(remote.value());
         final CommPort           commPort = cpi.open(getClass().getName(), 1000);
         commPort.enableReceiveTimeout(config().getOption(READ_TIMEOUT));
-        deviceAddress = remote;
 
+        deviceAddress = remote;
         serialPort = (SerialPort) commPort;
     }
 
@@ -62,26 +60,6 @@ public class RxtxChannel extends SerialCommChannel {
         serialPort.setRTS(config().getOption(RTS));
 
         activate(serialPort.getInputStream(), serialPort.getOutputStream());
-    }
-
-    @Override
-    public SerialCommAddress localAddress() {
-        return (SerialCommAddress) super.localAddress();
-    }
-
-    @Override
-    public SerialCommAddress remoteAddress() {
-        return (SerialCommAddress) super.remoteAddress();
-    }
-
-    @Override
-    protected SerialCommAddress localAddress0() {
-        return LOCAL_ADDRESS;
-    }
-
-    @Override
-    protected SerialCommAddress remoteAddress0() {
-        return deviceAddress;
     }
 
     @Override
