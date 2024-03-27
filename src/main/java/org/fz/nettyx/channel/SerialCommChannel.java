@@ -8,6 +8,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
+import lombok.RequiredArgsConstructor;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -75,8 +76,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
     protected int doReadBytes(ByteBuf buf) throws Exception {
         try {
             return super.doReadBytes(buf);
-        }
-        catch (SerialPortTimeoutException e) {
+        } catch (SerialPortTimeoutException e) {
             return 0;
         }
     }
@@ -92,8 +92,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
     protected void doClose() throws Exception {
         try {
             super.doClose();
-        }
-        finally {
+        } finally {
             this.eventExecutors.shutdownGracefully();
         }
     }
@@ -139,25 +138,43 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
                             if (!wasActive && isActive()) {
                                 pipeline().fireChannelActive();
                             }
-                        }
-                        catch (Throwable t) {
+                        } catch (Throwable t) {
                             safeSetFailure(promise, t);
                             closeIfClosed();
                         }
                     }, waitTime, TimeUnit.MILLISECONDS);
-                }
-                else {
+                } else {
                     doInit();
                     safeSetSuccess(promise);
                     if (!wasActive && isActive()) {
                         pipeline().fireChannelActive();
                     }
                 }
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 safeSetFailure(promise, t);
                 closeIfClosed();
             }
+        }
+    }
+
+    @RequiredArgsConstructor
+    public static class SerialCommAddress extends SocketAddress {
+
+        private static final long serialVersionUID = -870353013039000250L;
+        private final String value;
+
+        /**
+         * @return The serial port address of the device (e.g. COM1, /dev/ttyUSB0, ...)
+         */
+        public String value() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return "SerialCommPortAddress{" +
+                    "value='" + value + '\'' +
+                    '}';
         }
     }
 }

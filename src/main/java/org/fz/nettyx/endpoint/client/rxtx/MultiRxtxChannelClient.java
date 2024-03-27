@@ -3,7 +3,7 @@ package org.fz.nettyx.endpoint.client.rxtx;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.channel.SerialCommAddress;
+import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
@@ -22,7 +22,7 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 public abstract class MultiRxtxChannelClient<K> extends AbstractMultiChannelClient<K, RxtxChannel, RxtxChannelConfig> {
 
-    protected MultiRxtxChannelClient(Map<K, SerialCommAddress> addressMap) {
+    protected MultiRxtxChannelClient(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
         super(addressMap);
     }
 

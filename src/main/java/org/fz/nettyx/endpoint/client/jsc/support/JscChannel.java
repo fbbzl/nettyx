@@ -3,7 +3,6 @@ package org.fz.nettyx.endpoint.client.jsc.support;
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.channel.ChannelConfig;
-import org.fz.nettyx.channel.SerialCommAddress;
 import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;
