@@ -6,7 +6,7 @@ import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import io.netty.channel.oio.OioByteStreamChannel;
+import org.fz.nettyx.channel.SerialCommPortChannel;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +21,7 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
  */
 
 @SuppressWarnings("deprecation")
-public class JscChannel extends OioByteStreamChannel {
+public class JscChannel extends SerialCommPortChannel {
 
     private static final JscDeviceAddress LOCAL_ADDRESS = new JscDeviceAddress("localhost");
 

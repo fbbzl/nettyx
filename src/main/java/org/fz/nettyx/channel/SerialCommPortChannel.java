@@ -13,7 +13,7 @@ import io.netty.util.concurrent.DefaultEventExecutor;
  * @since 2024/3/27 14:27
  */
 
-public abstract class NettyxOioByteStreamChannel extends OioByteStreamChannel {
+public abstract class SerialCommPortChannel extends OioByteStreamChannel {
 
     private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
 
@@ -23,14 +23,14 @@ public abstract class NettyxOioByteStreamChannel extends OioByteStreamChannel {
      * @param parent the parent {@link Channel} which was used to create this instance. This can be null if the
      *               {@link} has no parent as it was created by your self.
      */
-    protected NettyxOioByteStreamChannel(Channel parent) {
+    protected SerialCommPortChannel(Channel parent) {
         super(parent);
     }
 
     @Override
     public void doRead() {
         // do not use method reference!!!
-        Runnable runnable = () -> NettyxOioByteStreamChannel.super.doRead();
+        Runnable runnable = () -> SerialCommPortChannel.super.doRead();
         jscEventExecutors.execute(runnable);
     }
 
