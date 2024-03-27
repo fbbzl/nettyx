@@ -30,8 +30,6 @@ public class RxtxChannel extends SerialCommPortChannel {
     private SerialPort        serialPort;
 
     public RxtxChannel() {
-        super(null);
-
         config = new DefaultRxtxChannelConfig(this);
     }
 
