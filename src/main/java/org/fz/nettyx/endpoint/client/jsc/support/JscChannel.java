@@ -2,6 +2,7 @@ package org.fz.nettyx.endpoint.client.jsc.support;
 
 
 import com.fazecast.jSerialComm.SerialPort;
+import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.SerialCommAddress;
 import org.fz.nettyx.channel.SerialCommChannel;
 
@@ -23,6 +24,11 @@ public class JscChannel extends SerialCommChannel {
 
     public JscChannel() {
         config = new DefaultJscChannelConfig(this);
+    }
+
+    @Override
+    protected int waitTime(ChannelConfig config) {
+        return config().getOption(WAIT_TIME);
     }
 
     @Override
