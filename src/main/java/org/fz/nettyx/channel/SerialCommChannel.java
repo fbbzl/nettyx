@@ -11,7 +11,8 @@ import io.netty.util.concurrent.DefaultEventExecutor;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
 
-import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.WAIT_TIME;
+import static org.fz.nettyx.channel.SerialCommChannelOption.WAIT_TIME;
+
 
 /**
  * cause of {@link AbstractOioChannel sync read task}
@@ -28,7 +29,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
 
     protected SerialCommAddress deviceAddress;
 
-    private final DefaultEventExecutor jscEventExecutors = new DefaultEventExecutor();
+    private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
 
     protected SerialCommChannel() {
         super(null);
@@ -85,7 +86,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
     public void doRead() {
         // do not use method reference!!!
         Runnable runnable = () -> SerialCommChannel.super.doRead();
-        jscEventExecutors.execute(runnable);
+        eventExecutors.execute(runnable);
     }
 
     @Override
@@ -94,7 +95,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
             super.doClose();
         }
         finally {
-            this.jscEventExecutors.shutdownGracefully();
+            this.eventExecutors.shutdownGracefully();
         }
     }
 
