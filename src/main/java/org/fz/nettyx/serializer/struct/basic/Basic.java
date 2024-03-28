@@ -97,7 +97,6 @@ public abstract class Basic<V> {
             buf.readBytes(this.bytes);
             ReferenceCountUtil.release(buf);
         }
-
         return bytes;
     }
 
@@ -105,7 +104,6 @@ public abstract class Basic<V> {
         if (this.bytes != null && this.value == null) {
             this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
         }
-
         return value;
     }
 
