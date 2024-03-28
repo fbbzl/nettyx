@@ -33,7 +33,20 @@ public abstract class Basic<V> {
 
     private V value;
 
+    public V getValue() {
+        if (this.bytes != null && this.value == null) {
+            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
+        }
+        return value;
+    }
 
+    protected Basic(ByteBuf byteBuf, int size) {
+        this.size = size;
+        Throws.ifLess(byteBuf.readableBytes(), size, new TooLessBytesException(size, byteBuf.readableBytes()));
+
+        this.bytes = new byte[this.size];
+        byteBuf.readBytes(this.bytes);
+    }
 
     /**
      * Has singed boolean.
@@ -98,21 +111,6 @@ public abstract class Basic<V> {
             ReferenceCountUtil.release(buf);
         }
         return bytes;
-    }
-
-    public V getValue() {
-        if (this.bytes != null && this.value == null) {
-            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
-        }
-        return value;
-    }
-
-    protected Basic(ByteBuf byteBuf, int size) {
-        this.size = size;
-        Throws.ifLess(byteBuf.readableBytes(), size, new TooLessBytesException(size, byteBuf.readableBytes()));
-
-        this.bytes = new byte[this.size];
-        byteBuf.readBytes(this.bytes);
     }
 
     private void fill(ByteBuf buf, int requiredSize) {
