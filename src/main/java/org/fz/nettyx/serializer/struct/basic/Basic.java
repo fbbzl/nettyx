@@ -29,9 +29,11 @@ public abstract class Basic<V> {
 
     private final int size;
 
-    private final byte[] bytes;
+    private byte[] bytes;
 
-    private final V value;
+    private V value;
+
+
 
     /**
      * Has singed boolean.
@@ -85,15 +87,26 @@ public abstract class Basic<V> {
     protected Basic(V value, int size) {
         this.size = size;
         this.value = value;
+    }
 
-        this.bytes = new byte[this.size];
-
-        if (this.value != null) {
+    public byte[] getBytes() {
+        if (this.value != null && this.bytes == null) {
+            this.bytes = new byte[this.size];
             ByteBuf buf = this.toByteBuf(this.value, this.size);
             this.fill(buf, this.size);
             buf.readBytes(this.bytes);
             ReferenceCountUtil.release(buf);
         }
+
+        return bytes;
+    }
+
+    public V getValue() {
+        if (this.bytes != null && this.value == null) {
+            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
+        }
+
+        return value;
     }
 
     protected Basic(ByteBuf byteBuf, int size) {
@@ -102,7 +115,6 @@ public abstract class Basic<V> {
 
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);
-        this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
     }
 
     private void fill(ByteBuf buf, int requiredSize) {
