@@ -1,6 +1,5 @@
 package org.fz.nettyx.channel;
 
-import com.fazecast.jSerialComm.SerialPortTimeoutException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
@@ -76,7 +75,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
     protected int doReadBytes(ByteBuf buf) throws Exception {
         try {
             return super.doReadBytes(buf);
-        } catch (SerialPortTimeoutException e) {
+        } catch (Exception e) {
             return 0;
         }
     }
