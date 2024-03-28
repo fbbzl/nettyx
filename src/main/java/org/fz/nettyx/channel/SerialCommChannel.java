@@ -72,7 +72,7 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
     }
 
     @Override
-    protected int doReadBytes(ByteBuf buf) throws Exception {
+    protected int doReadBytes(ByteBuf buf) {
         try {
             return super.doReadBytes(buf);
         } catch (Exception e) {
