@@ -1,19 +1,20 @@
 package org.fz.nettyx.serializer.struct.basic;
 
-import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
-
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
+import lombok.Getter;
+import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.util.Throws;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import lombok.Getter;
-import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.util.Throws;
+
+import static org.fz.nettyx.serializer.struct.StructUtils.filterConstructor;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -28,9 +29,11 @@ public abstract class Basic<V> {
 
     private final int size;
 
-    private final byte[] bytes;
+    private byte[] bytes;
 
-    private final V value;
+    private V value;
+
+
 
     /**
      * Has singed boolean.
@@ -81,39 +84,35 @@ public abstract class Basic<V> {
         return ByteBuffer.wrap(this.getBytes());
     }
 
-    /**
-     * Instantiates a new Basic.
-     *
-     * @param value the value
-     * @param size the size
-     */
     protected Basic(V value, int size) {
         this.size = size;
         this.value = value;
+    }
 
-        this.bytes = new byte[this.size];
-
-        if (this.value != null) {
+    public byte[] getBytes() {
+        if (this.value != null && this.bytes == null) {
+            this.bytes = new byte[this.size];
             ByteBuf buf = this.toByteBuf(this.value, this.size);
             this.fill(buf, this.size);
             buf.readBytes(this.bytes);
             ReferenceCountUtil.release(buf);
         }
+        return bytes;
     }
 
-    /**
-     * Instantiates a new Basic.
-     *
-     * @param byteBuf the byte buf
-     * @param size the size
-     */
+    public V getValue() {
+        if (this.bytes != null && this.value == null) {
+            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
+        }
+        return value;
+    }
+
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
         Throws.ifLess(byteBuf.readableBytes(), size, new TooLessBytesException(size, byteBuf.readableBytes()));
 
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);
-        this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
     }
 
     private void fill(ByteBuf buf, int requiredSize) {
