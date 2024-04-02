@@ -5,9 +5,9 @@ First of all, I would like to thank my family for giving me enough time to focus
 Hopefully, this framework will save you even a minute of development time
 
 ## Links
-JetBrain Website: https://www.jetbrains.com
-Github address: https://github.com/fbbzl/nettyx
-Gitee address: https://gitee.com/fbbzl/nettyx
+JetBrain Website: https://www.jetbrains.com<br>
+Github address: https://github.com/fbbzl/nettyx<br>
+Gitee address: https://gitee.com/fbbzl/nettyx<br>
 for more use cases please refer to: https://blog.csdn.net/fbbwht
 
 #### Introduce
