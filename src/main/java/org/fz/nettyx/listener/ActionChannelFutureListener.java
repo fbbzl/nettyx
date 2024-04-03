@@ -1,6 +1,5 @@
 package org.fz.nettyx.listener;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Setter;
@@ -33,7 +32,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
             whenDone;
 
     @Override
-    public void operationComplete(ChannelFuture channelFuture) {
+    public void operationComplete(ChannelFuture channelFuture) throws Exception {
         // success
         if (channelFuture.isSuccess()) invokeAction(whenSuccess, this, channelFuture);
         else
@@ -51,25 +50,18 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
      * will re-execute the action after assigned delay and timeUnit
      */
     public static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> {
-            Channel channel = cf.channel();
-            log.info("doing re-connect, remote-address is [{}]", channel.remoteAddress());
-            channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
-        };
+        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
     }
+
     public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> {
-            Channel channel = cf.channel();
-            log.info("doing re-connect, remote-address is [{}]", channel.remoteAddress());
-            channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
-        };
+        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
     }
 
     public interface ListenerAction {
-        void act(ChannelFutureListener listener, ChannelFuture channelFuture);
+        void act(ChannelFutureListener listener, ChannelFuture channelFuture) throws Exception;
     }
 
-    public static void invokeAction(ListenerAction action, ChannelFutureListener listener, ChannelFuture cf) {
+    public static void invokeAction(ListenerAction action, ChannelFutureListener listener, ChannelFuture cf) throws Exception {
         if (action != null) {
             action.act(listener, cf);
         }
