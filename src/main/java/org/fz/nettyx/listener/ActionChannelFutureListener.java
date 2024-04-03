@@ -67,13 +67,16 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         return (ls, cf) -> {
             Channel channel = cf.channel();
             SocketAddress remoteAddress = channel.remoteAddress();
+            AttributeKey<Integer> key = AttributeKey.valueOf(remoteAddress + "_channel_redo_" + getMethodName(fn));
 
-            Attribute<Integer> redoTimesAttr = channel.attr(AttributeKey.valueOf(remoteAddress + "_channel_redo_" + getMethodName(fn)));
-            int redoTimes = redoTimesAttr.setIfAbsent(times);
-
+            Attribute<Integer> redoTimesAttr = channel.attr(key);
+            System.err.println(redoTimesAttr.get());
+            redoTimesAttr.setIfAbsent(times);
+            Integer redoTimes = redoTimesAttr.get();
             if (redoTimes > 0) {
+                System.err.println(redoTimes);
                 channel.eventLoop().schedule(() -> fn.call(cf).addListener(ls), delay, unit);
-                redoTimesAttr.set(redoTimes--);
+                redoTimesAttr.set(--redoTimes);
             }
         };
     }
