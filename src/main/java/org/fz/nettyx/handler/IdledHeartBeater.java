@@ -1,14 +1,14 @@
 package org.fz.nettyx.handler;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.fz.nettyx.action.Actions.invokeAction;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelHandlerContextAction;
 import org.fz.nettyx.event.ChannelEvents;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Heart beater.
@@ -30,13 +30,13 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
 
     abstract boolean condition(IdleStateEvent evt);
 
-    abstract String state();
+    abstract String stateName();
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (condition(evt)) {
             log.warn(
-                    "start [" + state() + "] heartbeat on address [{}], next round will after [{}] seconds",
+                    "start [" + stateName() + "] heartbeat on address [{}], next round will after [{}] seconds",
                     ctx.channel().remoteAddress(),
                     getReaderIdleSeconds());
 
@@ -50,7 +50,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
      */
     public static class ReadIdleHeartBeater extends IdledHeartBeater {
         @Override
-        String state() {
+        String stateName() {
             return "read-idle";
         }
 
@@ -71,7 +71,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
 
         @Override
-        String state() {
+        String stateName() {
             return "write-idle";
         }
 
@@ -87,7 +87,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
 
         @Override
-        String state() {
+        String stateName() {
             return "all-idle";
         }
 
