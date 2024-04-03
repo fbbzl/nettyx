@@ -73,7 +73,6 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
 
             if (redoTimes > 0) {
                 channel.eventLoop().schedule(() -> fn.call(cf).addListener(ls), delay, unit);
-                log.info("redoing, remote-address is [{}], now redo-times is [{}]", remoteAddress, redoTimes);
                 redoTimesAttr.set(redoTimes--);
             }
         };
@@ -84,6 +83,9 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     public static ListenerAction redo(Func1<ChannelFuture, ChannelFuture> fn, long initialDelay, LongBinaryOperator step, long maxDelay, TimeUnit unit) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
+            SocketAddress remoteAddress = channel.remoteAddress();
+            Attribute<Integer> redoTimesAttr = channel.attr(AttributeKey.valueOf(remoteAddress + "_channel_lbo_redo_" + getMethodName(fn)));
+
             log.info("redoing, remote-address is [{}]", channel.remoteAddress());
             channel.eventLoop().schedule(() -> fn.call(cf).addListener(ls), 1, unit);
         };
