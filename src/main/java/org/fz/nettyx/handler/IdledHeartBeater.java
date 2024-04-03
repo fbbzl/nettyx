@@ -30,13 +30,13 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
 
     abstract boolean condition(IdleStateEvent evt);
 
-    abstract String state();
+    abstract String stateName();
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (condition(evt)) {
             log.warn(
-                    "start [" + state() + "] heartbeat on address [{}], next round will after [{}] seconds",
+                    "start [" + stateName() + "] heartbeat on address [{}], next round will after [{}] seconds",
                     ctx.channel().remoteAddress(),
                     getReaderIdleSeconds());
 
@@ -50,7 +50,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
      */
     public static class ReadIdleHeartBeater extends IdledHeartBeater {
         @Override
-        String state() {
+        String stateName() {
             return "read-idle";
         }
 
@@ -71,7 +71,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
 
         @Override
-        String state() {
+        String stateName() {
             return "write-idle";
         }
 
@@ -87,7 +87,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
 
         @Override
-        String state() {
+        String stateName() {
             return "all-idle";
         }
 
