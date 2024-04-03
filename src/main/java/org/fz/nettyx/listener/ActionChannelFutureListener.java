@@ -1,15 +1,23 @@
 package org.fz.nettyx.listener;
 
+import cn.hutool.core.lang.func.Func1;
+import cn.hutool.core.lang.func.LambdaUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.SocketAddress;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
+import java.util.stream.IntStream;
+
+import static cn.hutool.core.lang.func.LambdaUtil.getMethodName;
 
 /**
  * The type Actionable channel future listener.
@@ -53,18 +61,46 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     public static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
-            log.info("doing re-connect, remote-address is [{}]", channel.remoteAddress());
             channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
-        };
-    }
-    public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> {
-            Channel channel = cf.channel();
-            log.info("doing re-connect, remote-address is [{}]", channel.remoteAddress());
-            channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
+            log.info("redoing, remote-address is [{}]", channel.remoteAddress());
         };
     }
 
+    public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
+        return (ls, cf) -> {
+            Channel channel = cf.channel();
+            channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
+            log.info("redoing, remote-address is [{}]", channel.remoteAddress());
+        };
+    }
+
+    public static ListenerAction redo(Func1<ChannelFuture, ChannelFuture> did, long delay, TimeUnit unit, int times) {
+        return (ls, cf) -> {
+            Channel channel = cf.channel();
+            SocketAddress remoteAddress = channel.remoteAddress();
+
+            Attribute<Integer> redoTimesAttr = channel.attr(AttributeKey.valueOf(remoteAddress + "_channel_redo_" + getMethodName(did)));
+            int redoTimes = redoTimesAttr.setIfAbsent(times);
+
+            if (redoTimes > 0) {
+                channel.eventLoop().schedule(() -> did.call(cf).addListener(ls), delay, unit);
+                log.info("redoing, remote-address is [{}], now redo-times is [{}]", remoteAddress, redoTimes);
+                redoTimesAttr.set(redoTimes--);
+            }
+        };
+    }
+
+    ///TODO
+    // 渐进
+    public static ListenerAction redo(Func1<ChannelFuture, ChannelFuture> did, long initialDelay, LongBinaryOperator step, long maxDelay, TimeUnit unit) {
+        return (ls, cf) -> {
+            Channel channel = cf.channel();
+            log.info("redoing, remote-address is [{}]", channel.remoteAddress());
+            channel.eventLoop().schedule(() -> did.call(cf).addListener(ls), 1, unit);
+        };
+    }
+
+    /////////////////////123123
     public interface ListenerAction {
         void act(ChannelFutureListener listener, ChannelFuture channelFuture);
     }
