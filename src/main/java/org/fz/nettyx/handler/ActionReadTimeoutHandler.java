@@ -1,15 +1,16 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.action.Actions.invokeAction;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ChannelExceptionAction;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Actionable read timeout handler.
@@ -79,8 +80,4 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
         if (fireNext) super.readTimedOut(ctx);
     }
 
-    @Override
-    public boolean isSharable() {
-        return true;
-    }
 }
