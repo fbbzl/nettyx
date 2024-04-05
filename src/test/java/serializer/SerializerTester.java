@@ -18,6 +18,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -30,10 +31,10 @@ public class SerializerTester {
 
     @BeforeClass
     public static void initContext() {
-//        String u = "fengbinbin";
-//        File file = new File("C:\\Users\\" + u + "\\Desktop\\school.xml");
-//        File file2 = new File("C:\\Users\\" + u + "\\Desktop\\bank.xml");
-//        XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
+        String u = "pc";
+        File file = new File("C:\\Users\\" + u + "\\Desktop");
+        File file2 = new File("C:\\Users\\" + u + "\\Desktop");
+        XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
     }
 
@@ -42,7 +43,7 @@ public class SerializerTester {
         byte[] bytes = new byte[1024 * 2];
         Arrays.fill(bytes, (byte) 0);
         Model model1 = XmlSerializerContext.findModel("school", "student");
-        Dict  doc    = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
+        Dict doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
 
         Assert.assertNotNull(doc);
         Console.print(doc);
@@ -57,7 +58,7 @@ public class SerializerTester {
         };
 
         User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
-                                                                                            Unpooled.wrappedBuffer(bytes));
+                Unpooled.wrappedBuffer(bytes));
 
         System.err.println("read :" + user);
 //        user.setAddress(null);

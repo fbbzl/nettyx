@@ -1,14 +1,6 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.action.Actions.invokeAction;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelOutboundHandlerAdapter;
-import io.netty.channel.ChannelPromise;
-import java.net.SocketAddress;
+import io.netty.channel.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +8,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.action.ChannelBindAction;
-import org.fz.nettyx.action.ChannelConnectAction;
-import org.fz.nettyx.action.ChannelExceptionAction;
-import org.fz.nettyx.action.ChannelHandlerContextAction;
-import org.fz.nettyx.action.ChannelPromiseAction;
-import org.fz.nettyx.action.ChannelReadAction;
-import org.fz.nettyx.action.ChannelWriteAction;
+import org.fz.nettyx.action.*;
+
+import java.net.SocketAddress;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * @author fengbinbin
@@ -81,11 +71,6 @@ public class ChannelAdvice {
             this.readTimeoutHandler = new ActionReadTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
             this.channel.pipeline().addFirst(this.readTimeoutHandler);
             return this;
-        }
-
-        @Override
-        public boolean isSharable() {
-            return true;
         }
 
         @Override
@@ -200,11 +185,6 @@ public class ChannelAdvice {
         public final OutboundAdvice whenExceptionCaught(ChannelExceptionAction whenExceptionCaught) {
             this.channel.pipeline().addFirst(new SimpleOutboundExceptionHandler(whenExceptionCaught));
             return this;
-        }
-
-        @Override
-        public boolean isSharable() {
-            return true;
         }
 
         @Override

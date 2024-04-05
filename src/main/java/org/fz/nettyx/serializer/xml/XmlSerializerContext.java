@@ -1,40 +1,12 @@
 package org.fz.nettyx.serializer.xml;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static cn.hutool.core.text.CharSequenceUtil.endWithIgnoreCase;
-import static cn.hutool.core.text.CharSequenceUtil.splitToArray;
-import static cn.hutool.core.text.CharSequenceUtil.subBefore;
-import static cn.hutool.core.text.CharSequenceUtil.subBetween;
-import static java.util.Collections.emptyMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ARRAY_LENGTH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_EXP;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_HANDLER;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_LENGTH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_OFFSET;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_ORDER;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.ATTR_TYPE;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_ENUM;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_MODEL;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.EL_SWITCH;
-import static org.fz.nettyx.serializer.xml.dtd.Dtd.NAMESPACE;
-import static org.fz.nettyx.util.EndianKit.LE;
-
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.PathUtil;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.ClassUtil;
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Delegate;
@@ -48,6 +20,20 @@ import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.EndianKit;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static cn.hutool.core.text.CharSequenceUtil.*;
+import static java.util.Collections.emptyMap;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.serializer.xml.dtd.Dtd.*;
+import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
  * application must config this
@@ -88,11 +74,12 @@ public class XmlSerializerContext {
 
     public synchronized void doScan() {
         SAXReader reader = SAXReader.createDefault();
+
         // first add the doc mapping
-        List<Document> docs = Arrays.stream(this.paths)
-                                    .map(Path::toFile)
-                                    .map(Try.apply(f -> reader.read(f)))
-                                    .collect(toList());
+        List<Document> docs = Arrays.stream(this.paths).flatMap(p -> {
+            if (PathUtil.isDirectory(p)) return PathUtil.loopFiles(p, f -> f.getName().endsWith("xml")).stream();
+            else return Stream.of(p.toFile());
+        }).filter(FileUtil::isNotEmpty).map(Try.apply(f -> reader.read(f))).collect(toList());
 
         // scan namespaces
         docs.forEach(this::scanNamespaces);
@@ -123,10 +110,7 @@ public class XmlSerializerContext {
 
         Map<String, String[]> enums = new HashMap<>(64);
         for (Element el : enumEl.elements()) {
-            enums.put(XmlUtils.name(el),
-                      Arrays.stream(splitToArray(XmlUtils.text(el), ","))
-                            .map(CharSequenceUtil::removeAllLineBreaks)
-                            .map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
+            enums.put(XmlUtils.name(el), Arrays.stream(splitToArray(XmlUtils.text(el), ",")).map(CharSequenceUtil::removeAllLineBreaks).map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
         }
 
         ENUMS.putAll(enums);
@@ -140,10 +124,7 @@ public class XmlSerializerContext {
 
         Map<String, String[]> switches = new HashMap<>(64);
         for (Element el : switchEl.elements()) {
-            switches.put(XmlUtils.name(el),
-                         Arrays.stream(splitToArray(XmlUtils.textTrim(el), ","))
-                               .map(CharSequenceUtil::removeAllLineBreaks)
-                               .map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
+            switches.put(XmlUtils.name(el), Arrays.stream(splitToArray(XmlUtils.textTrim(el), ",")).map(CharSequenceUtil::removeAllLineBreaks).map(CharSequenceUtil::cleanBlank).toArray(String[]::new));
         }
 
         SWITCHES.putAll(switches);
@@ -152,10 +133,7 @@ public class XmlSerializerContext {
     protected void scanModels(Element rootElement) {
         Element models = rootElement.element(EL_MODEL);
 
-        Map<String, Model> modelMap =
-                XmlUtils.elements(models).stream()
-                        .map(Model::new)
-                        .collect(Collectors.toMap(Model::getName, identity()));
+        Map<String, Model> modelMap = XmlUtils.elements(models).stream().map(Model::new).collect(Collectors.toMap(Model::getName, identity()));
 
         MODELS.putIfAbsent(XmlUtils.attrValue(rootElement, NAMESPACE), modelMap);
     }
@@ -163,11 +141,7 @@ public class XmlSerializerContext {
     protected void scanTypeHandlers() {
         Set<Class<?>> handlerClasses = ClassScanner.scanPackageBySuper(EMPTY, PropTypeHandler.class);
 
-        Map<String, PropTypeHandler> handlers =
-                handlerClasses.stream()
-                              .filter(ClassUtil::isNormalClass)
-                              .map(hc -> (PropTypeHandler) Singleton.get(hc))
-                              .collect(Collectors.toMap(PropTypeHandler::forType, identity()));
+        Map<String, PropTypeHandler> handlers = handlerClasses.stream().filter(ClassUtil::isNormalClass).map(hc -> (PropTypeHandler) Singleton.get(hc)).collect(Collectors.toMap(PropTypeHandler::forType, identity()));
 
         PROP_TYPE_CONVERTERS.putAll(handlers);
     }

@@ -1,15 +1,16 @@
 package org.fz.nettyx.handler;
 
-import static org.fz.nettyx.action.Actions.invokeAction;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ChannelExceptionAction;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
  * The type Actionable write timeout handler.
@@ -78,11 +79,6 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
         invokeAction(timeoutAction, ctx,
                      new WriteTimeoutException("has got write-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.writeTimedOut(ctx);
-    }
-
-    @Override
-    public boolean isSharable() {
-        return true;
     }
 
 }
