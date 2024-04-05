@@ -29,11 +29,6 @@ public class ActionIdleStateHandler extends IdleStateHandler {
     private ChannelHandlerContextAction readIdleAction, writeIdleAction, allIdleAction;
     private final boolean fireNext;
 
-    @Override
-    public boolean isSharable() {
-        return true;
-    }
-
     /**
      * Gets reader idle seconds.
      *
