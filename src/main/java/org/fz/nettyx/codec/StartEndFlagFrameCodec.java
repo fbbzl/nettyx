@@ -43,11 +43,6 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         private final ByteBuf startFlag, endFlag;
         private final boolean stripStartEndDelimiter;
 
-        @Override
-        public final boolean isSharable() {
-            return false;
-        }
-
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag) {
             super(maxFrameLength, true, startEndSameFlag);
 
@@ -87,11 +82,6 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
 
         private final ByteBuf startFlag;
         private final ByteBuf endFlag;
-
-        @Override
-        public final boolean isSharable() {
-            return false;
-        }
 
         /**
          * Instantiates a new Start end flag frame encoder.

@@ -1,11 +1,12 @@
 package org.fz.nettyx.util;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import lombok.experimental.UtilityClass;
 
 /**
- * The type Hex bins.
+ * The Hex util.
  *
  * @author fengbinbin
  * @since 2022 -01-29 21:07
@@ -25,56 +26,6 @@ public class HexKit {
         }
     }
 
-    /**
-     * To binary string.
-     *
-     * @param hex the hex
-     *
-     * @return the string
-     */
-    public String toBinary(String hex) {
-        if (hex == null || hex.length() % 2 != 0) return null;
-
-        StringBuilder bString = new StringBuilder();
-        String        tmp;
-        for (int i = 0; i < hex.length(); i++) {
-            tmp = "0000" + Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 1), 16));
-            bString.append(tmp.substring(tmp.length() - 4));
-        }
-
-        return bString.toString();
-    }
-
-    /**
-     * From binary string.
-     *
-     * @param binaryString the binary string
-     *
-     * @return the string
-     */
-    public String fromBinary(String binaryString) {
-        if (binaryString == null || binaryString.isEmpty() || binaryString.length() % 8 != 0) {
-            return null;
-        }
-        StringBuilder tmp = new StringBuilder();
-        int           iTmp;
-        for (int i = 0; i < binaryString.length(); i += 4) {
-            iTmp = 0;
-            for (int j = 0; j < 4; j++) {
-                iTmp += Integer.parseInt(binaryString.substring(i + j, i + j + 1)) << (4 - j - 1);
-            }
-            tmp.append(Integer.toHexString(iTmp));
-        }
-        return tmp.toString();
-    }
-
-    /**
-     * Encode a byte array to hex string
-     *
-     * @param bytes array of byte to encode
-     *
-     * @return return encoded string
-     */
     public static String encode(byte... bytes) {
         if (bytes == null) return null;
 
@@ -93,13 +44,10 @@ public class HexKit {
         return new String(encodedData);
     }
 
-    /**
-     * To byte byte.
-     *
-     * @param hex the hex
-     *
-     * @return the byte
-     */
+    public static String encode(ByteBuf buf) {
+        return ByteBufUtil.hexDump(buf);
+    }
+
     public static byte toByte(String hex) {
         return (byte) Integer.parseInt(hex, 16);
     }
@@ -108,13 +56,6 @@ public class HexKit {
         return Unpooled.wrappedBuffer(decode(hex));
     }
 
-    /**
-     * Decode hex string to a byte array
-     *
-     * @param hex hex string
-     *
-     * @return return array of byte to encode
-     */
     public static byte[] decode(String hex) {
         int    hexLen = hex.length();
         byte[] result;
