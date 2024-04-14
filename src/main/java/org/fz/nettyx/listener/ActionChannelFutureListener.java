@@ -57,14 +57,30 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
     }
 
+    public static ListenerAction redo(Supplier<ChannelFuture> did, long count) {
+        return (ls, cf) -> {
+            for (long i = 0; i < count; i++) {
+                did.get().awaitUninterruptibly();
+                log.info("redo total count is [{}], left [{}] times", count, i);
+            }
+        };
+    }
+
+    public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long count) {
+        return (ls, cf) -> {
+            for (long i = 0; i < count; i++) {
+                did.apply(cf).awaitUninterruptibly();
+                log.info("redo total count is [{}], left [{}] times", count, i);
+            }
+        };
+    }
+
     public interface ListenerAction {
         void act(ChannelFutureListener listener, ChannelFuture channelFuture) throws Exception;
     }
 
     public static void invokeAction(ListenerAction action, ChannelFutureListener listener, ChannelFuture cf) throws Exception {
-        if (action != null) {
-            action.act(listener, cf);
-        }
+        if (action != null) action.act(listener, cf);
     }
 
 }
