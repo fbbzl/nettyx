@@ -61,6 +61,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         return (ls, cf) -> {
             for (long i = 0; i < count; i++) {
                 did.get().awaitUninterruptibly();
+                log.info("redo total count is [{}], left [{}] times", count, i);
             }
         };
     }
@@ -69,6 +70,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
         return (ls, cf) -> {
             for (long i = 0; i < count; i++) {
                 did.apply(cf).awaitUninterruptibly();
+                log.info("redo total count is [{}], left [{}] times", count, i);
             }
         };
     }
