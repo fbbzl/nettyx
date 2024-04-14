@@ -46,7 +46,10 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                     System.err.println(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancel((ls, cf) -> System.err.println("cancel"))
-                .whenFailure(redo(testClient::connect, 2))
+                .whenFailure(redo(() -> {
+                    log.error("redo");
+                    return testClient.connect();
+                }, 2))
                 .whenDone((ls, cf) -> System.err.println("done"));
 
         testClient.connect().addListener(listener);
