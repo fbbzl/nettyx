@@ -20,7 +20,7 @@ Gitee地址: https://gitee.com/fbbzl/nettyx
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.2.17-RELEASE</version>
+    <version>2.2.18-RELEASE</version>
 </dependency>
 ```
 ## api

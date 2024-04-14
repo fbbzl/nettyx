@@ -3,6 +3,7 @@ package org.fz.nettyx.action;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+
 import java.net.SocketAddress;
 
 /**
@@ -18,9 +19,7 @@ public interface Actions {
      * @param ctx           the ctx
      */
      static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
-        if (channelAction != null) {
-            channelAction.act(ctx);
-        }
+        if (channelAction != null) channelAction.act(ctx);
     }
 
     /**
@@ -32,9 +31,7 @@ public interface Actions {
      * @param promise           the promise
      */
      static void invokeAction(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
-        if (channelBindAction != null) {
-            channelBindAction.act(ctx, localAddress, promise);
-        }
+        if (channelBindAction != null) channelBindAction.act(ctx, localAddress, promise);
     }
 
     /**
@@ -48,9 +45,7 @@ public interface Actions {
      */
      static void invokeAction(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
         ChannelPromise promise) {
-        if (channelConnectAction != null) {
-            channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
-        }
+        if (channelConnectAction != null) channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
     }
 
     /**
@@ -61,9 +56,7 @@ public interface Actions {
      * @param promise              the promise
      */
      static void invokeAction(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
-        if (channelPromiseAction != null) {
-            channelPromiseAction.act(ctx, promise);
-        }
+        if (channelPromiseAction != null) channelPromiseAction.act(ctx, promise);
     }
 
     /**
@@ -75,9 +68,7 @@ public interface Actions {
      * @param promise            the promise
      */
      static void invokeAction(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-        if (channelWriteAction != null) {
-            channelWriteAction.act(ctx, msg, promise);
-        }
+        if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
     }
 
     static void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture channelFuture) {
@@ -92,15 +83,11 @@ public interface Actions {
      * @param msg               the msg
      */
      static void invokeAction(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
-        if (channelReadAction != null) {
-            channelReadAction.act(ctx, msg);
-        }
+        if (channelReadAction != null) channelReadAction.act(ctx, msg);
     }
 
     static void invokeAction(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable throwable) {
-        if (exceptionAction != null) {
-            exceptionAction.act(ctx, throwable);
-        }
+        if (exceptionAction != null) exceptionAction.act(ctx, throwable);
     }
 
     static void invokeActionAndClose(ChannelExceptionAction exceptionAction, ChannelHandlerContext ctx, Throwable cause) {
