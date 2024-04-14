@@ -62,9 +62,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     }
 
     public static void invokeAction(ListenerAction action, ChannelFutureListener listener, ChannelFuture cf) throws Exception {
-        if (action != null) {
-            action.act(listener, cf);
-        }
+        if (action != null) action.act(listener, cf);
     }
 
 }
