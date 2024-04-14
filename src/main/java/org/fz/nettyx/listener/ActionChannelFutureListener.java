@@ -60,7 +60,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     public static ListenerAction redo(Supplier<ChannelFuture> did, long count) {
         return (ls, cf) -> {
             for (long i = 0; i < count; i++) {
-                did.get();
+                did.get().awaitUninterruptibly();
             }
         };
     }
@@ -68,8 +68,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long count) {
         return (ls, cf) -> {
             for (long i = 0; i < count; i++) {
-                did.apply(cf).syncUninterruptibly();
-                System.err.println(1);
+                did.apply(cf).awaitUninterruptibly();
             }
         };
     }
