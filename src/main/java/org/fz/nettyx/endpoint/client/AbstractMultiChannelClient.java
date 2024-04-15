@@ -66,7 +66,7 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
             if (isActive(old)) {
                 old.close().sync();
             }
-            log.info("has stored channel [{}]", channel);
+            log.debug("has stored channel [{}]", channel);
             return channel;
         }));
     }

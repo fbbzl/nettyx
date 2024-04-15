@@ -93,7 +93,7 @@ public class ChannelAdvice {
 
         @Override
         public final void channelActive(ChannelHandlerContext ctx) throws Exception {
-            log.info("channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
+            log.debug("channel active event triggered, address is [{}]", ctx.channel().remoteAddress());
             invokeAction(whenChannelActive, ctx);
             super.channelActive(ctx);
         }
