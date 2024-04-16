@@ -49,7 +49,7 @@ public class TestSingleTcp extends SingleTcpChannelClient {
                 .whenFailure(redo(() -> {
                     log.error("redo");
                     return testClient.connect();
-                }, 190000))
+                }, 2, TimeUnit.MILLISECONDS))
                 .whenDone((ls, cf) -> System.err.println("done"));
 
         testClient.connect().addListener(listener);
