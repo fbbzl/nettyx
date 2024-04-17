@@ -15,14 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("unchecked")
 public class MessageFilter extends ChannelHandlerAdapter {
 
-    public static MessageFilter getStealer(Channel channel) {
-        return getStealer(channel.pipeline());
-    }
-
-    public static MessageFilter getStealer(ChannelPipeline pipeline) {
-        return pipeline.get(MessageFilter.class);
-    }
-
     public static abstract class InboundFilter<M> extends ChannelInboundHandlerAdapter {
 
         public abstract boolean filterable(M msg);
