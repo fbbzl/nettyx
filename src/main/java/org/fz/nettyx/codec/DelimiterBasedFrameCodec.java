@@ -19,12 +19,6 @@ import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
 public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<DelimiterBasedFrameDecoder,
         DelimiterBasedFrameEncoder> {
 
-    /**
-     * Instantiates a new Delimiter based frame codec.
-     *
-     * @param decoder the decoder
-     * @param encoder the encoder
-     */
     public DelimiterBasedFrameCodec(DelimiterBasedFrameDecoder decoder, DelimiterBasedFrameEncoder encoder) {
         super(decoder, encoder);
     }
