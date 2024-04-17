@@ -1,8 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import static org.apache.logging.log4j.util.Strings.EMPTY;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
-
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
@@ -10,6 +7,10 @@ import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.Basic;
+
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -19,9 +20,9 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+
+import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
 
 /**
  * The type Struct cache.
@@ -57,7 +58,7 @@ public final class StructSerializerContext {
      * @param packageNames the packages with struct or basic
      */
     public synchronized static void doScan(String... packageNames) {
-        log.info("will scan " + Arrays.toString(packageNames) + " packages");
+        log.debug("will scan " + Arrays.toString(packageNames) + " packages");
         try {
             for (String packageName : packageNames) {
                 Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
