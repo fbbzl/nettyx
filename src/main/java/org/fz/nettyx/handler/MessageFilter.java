@@ -27,7 +27,7 @@ public class MessageFilter extends ChannelHandlerAdapter {
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             if (fireCondition.test((M) msg)) super.channelRead(ctx, msg);
             else {
-                ReferenceCountUtil.release(msg);
+                ReferenceCountUtil.safeRelease(msg);
                 log.debug("has filter inbound-message [{}]", msg);
             }
         }
@@ -42,7 +42,7 @@ public class MessageFilter extends ChannelHandlerAdapter {
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
             if (fireCondition.test((M) msg)) super.write(ctx, msg, promise);
             else {
-                ReferenceCountUtil.release(msg);
+                ReferenceCountUtil.safeRelease(msg);
                 promise.setFailure(new UnsupportedOperationException("message has been filtered"));
 
                 log.debug("has filter outbound-message [{}]", msg);
