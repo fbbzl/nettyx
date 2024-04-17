@@ -12,76 +12,26 @@ import lombok.extern.slf4j.Slf4j;
  * @since 4 /14/2022 7:30 PM
  */
 @Slf4j
-public class MessageStealer extends ChannelDuplexHandler {
+public class MessageFilter extends ChannelDuplexHandler {
 
-    /**
-     * true: steal and release message with log
-     * false: steal and release message without log
-     */
-    private final boolean quiet;
-
-    private boolean stealable;
-
-    /**
-     * Instantiates a new Message stealer.
-     */
-    public MessageStealer() {
+    public MessageFilter() {
         this.quiet = false;
-        this.stealable = false;
     }
 
-    /**
-     * Instantiates a new Message stealer.
-     *
-     * @param quiet     the quiet
-     * @param stealable the stealable
-     */
-    public MessageStealer(boolean quiet, boolean stealable) {
+    public MessageFilter(boolean quiet, boolean stealable) {
         this.quiet = quiet;
-        this.stealable = stealable;
     }
 
-    /**
-     * Stealable boolean.
-     *
-     * @return the boolean
-     */
     public boolean stealable() {
         return stealable;
     }
 
-    /**
-     * End steal.
-     */
-    public void endSteal() {
-        stealable = false;
-    }
-
-    /**
-     * Start steal.
-     */
-    public void startSteal() {
-        stealable = true;
-    }
-
-    /**
-     * Gets stealer.
-     *
-     * @param channel the channel
-     * @return the stealer
-     */
-    public static MessageStealer getStealer(Channel channel) {
+    public static MessageFilter getStealer(Channel channel) {
         return getStealer(channel.pipeline());
     }
 
-    /**
-     * Gets stealer.
-     *
-     * @param pipeline the pipeline
-     * @return the stealer
-     */
-    public static MessageStealer getStealer(ChannelPipeline pipeline) {
-        return pipeline.get(MessageStealer.class);
+    public static MessageFilter getStealer(ChannelPipeline pipeline) {
+        return pipeline.get(MessageFilter.class);
     }
 
     @Override
@@ -116,31 +66,15 @@ public class MessageStealer extends ChannelDuplexHandler {
         }
     }
 
-    /**
-     * The type Inbound stolen exception.
-     */
     public static class InboundStolenException extends RuntimeException {
 
-        /**
-         * Instantiates a new Inbound stolen exception.
-         *
-         * @param message the message
-         */
         public InboundStolenException(Object message) {
             super("inbound message has been stolen [" + message + "]");
         }
     }
 
-    /**
-     * The type Outbound stolen exception.
-     */
     public static class OutboundStolenException extends RuntimeException {
 
-        /**
-         * Instantiates a new Outbound stolen exception.
-         *
-         * @param message the message
-         */
         public OutboundStolenException(Object message) {
             super("outbound message has been stolen [" + message + "]");
         }
