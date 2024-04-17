@@ -12,19 +12,8 @@ import lombok.extern.slf4j.Slf4j;
  * @since 4 /14/2022 7:30 PM
  */
 @Slf4j
-public class MessageFilter extends ChannelDuplexHandler {
-
-    public MessageFilter() {
-        this.quiet = false;
-    }
-
-    public MessageFilter(boolean quiet, boolean stealable) {
-        this.quiet = quiet;
-    }
-
-    public boolean stealable() {
-        return stealable;
-    }
+@SuppressWarnings("unchecked")
+public class MessageFilter extends ChannelHandlerAdapter {
 
     public static MessageFilter getStealer(Channel channel) {
         return getStealer(channel.pipeline());
@@ -34,49 +23,31 @@ public class MessageFilter extends ChannelDuplexHandler {
         return pipeline.get(MessageFilter.class);
     }
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (stealable) {
-            // import to release msg
-            ReferenceCountUtil.release(msg);
-            if (!quiet) {
-                log.debug("has stolen inbound-message [{}]", msg, new InboundStolenException(msg));
-            }
-        }
-        // else the msg will still goon
-        else {
-            super.channelRead(ctx, msg);
+    public static abstract class InboundFilter<M> extends ChannelInboundHandlerAdapter {
+
+        public abstract boolean filterable(M msg);
+
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            if (filterable((M) msg)) {
+                ReferenceCountUtil.release(msg);
+                log.debug("has filter inbound-message [{}]", msg);
+            } else super.channelRead(ctx, msg);
         }
     }
 
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        if (stealable) {
-            promise.setFailure(new OutboundStolenException(msg));
+    public static abstract class OutboundFilter<M> extends ChannelOutboundHandlerAdapter {
 
-            // import to release msg
-            ReferenceCountUtil.release(msg);
-            if (!quiet) {
-                log.debug("has stolen outbound-message [{}]", msg);
-            }
-        }
-        // else the msg will still goon
-        else {
-            super.write(ctx, msg, promise);
-        }
-    }
+        public abstract boolean filterable(M msg);
 
-    public static class InboundStolenException extends RuntimeException {
+        @Override
+        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+            if (filterable((M) msg)) {
+                ReferenceCountUtil.release(msg);
+                promise.setFailure(new UnsupportedOperationException("message has been filtered"));
 
-        public InboundStolenException(Object message) {
-            super("inbound message has been stolen [" + message + "]");
-        }
-    }
-
-    public static class OutboundStolenException extends RuntimeException {
-
-        public OutboundStolenException(Object message) {
-            super("outbound message has been stolen [" + message + "]");
+                log.debug("has filter outbound-message [{}]", msg);
+            } else super.write(ctx, msg, promise);
         }
     }
 }
