@@ -30,11 +30,6 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
 
         private final ByteBuf delimiter;
 
-        /**
-         * Instantiates a new Delimiter based frame encoder.
-         *
-         * @param delimiter the delimiter
-         */
         public DelimiterBasedFrameEncoder(ByteBuf delimiter) {
             this.delimiter = delimiter;
         }
