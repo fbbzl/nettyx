@@ -21,30 +21,32 @@ public class MessageFilter extends ChannelHandlerAdapter {
     @RequiredArgsConstructor
     public static class InboundFilter<M> extends ChannelInboundHandlerAdapter {
 
-        private final Predicate<M> filterCondition;
+        private final Predicate<M> fireCondition;
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            if (!filterCondition.test((M) msg)) {
+            if (fireCondition.test((M) msg)) super.channelRead(ctx, msg);
+            else {
                 ReferenceCountUtil.release(msg);
                 log.debug("has filter inbound-message [{}]", msg);
-            } else super.channelRead(ctx, msg);
+            }
         }
     }
 
     @RequiredArgsConstructor
     public static class OutboundFilter<M> extends ChannelOutboundHandlerAdapter {
 
-        private final Predicate<M> filterCondition;
+        private final Predicate<M> fireCondition;
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            if (!filterCondition.test((M) msg)) {
+            if (fireCondition.test((M) msg)) super.write(ctx, msg, promise);
+            else {
                 ReferenceCountUtil.release(msg);
                 promise.setFailure(new UnsupportedOperationException("message has been filtered"));
 
                 log.debug("has filter outbound-message [{}]", msg);
-            } else super.write(ctx, msg, promise);
+            }
         }
     }
 }
