@@ -8,7 +8,7 @@ Hopefully, this framework will save you even a minute of development time
 JetBrain Website: https://www.jetbrains.com<br>
 Github address: https://github.com/fbbzl/nettyx<br>
 Gitee address: https://gitee.com/fbbzl/nettyx<br>
-for more use cases please refer to: https://blog.csdn.net/fbbwht<br>
+for more use cases please refer to: https://blog.csdn.net/fbbwht
 
 #### Introduce
 Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, providing some tools and basic templates, as well as additional serial communication templates to help you quickly build netty-based server/client applications and serial port based applications
@@ -79,7 +79,7 @@ handler                             Provided some basic channel handler implemen
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log
-  ---MessageStealer                    use to discard message
+  ---MessageFilter                     use to filter message
 
 listener
   ---ActionableChannelFutureListener   Actionable channel future listener
