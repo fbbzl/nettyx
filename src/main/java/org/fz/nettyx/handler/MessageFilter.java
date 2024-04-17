@@ -2,7 +2,10 @@ package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.function.Predicate;
 
 /**
  * The type Message stealer.Can be used to filter parts of the message you don't need
@@ -15,26 +18,28 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings("unchecked")
 public class MessageFilter extends ChannelHandlerAdapter {
 
-    public static abstract class InboundFilter<M> extends ChannelInboundHandlerAdapter {
+    @RequiredArgsConstructor
+    public static class InboundFilter<M> extends ChannelInboundHandlerAdapter {
 
-        public abstract boolean filterable(M msg);
+        private final Predicate<M> filterCondition;
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            if (filterable((M) msg)) {
+            if (!filterCondition.test((M) msg)) {
                 ReferenceCountUtil.release(msg);
                 log.debug("has filter inbound-message [{}]", msg);
             } else super.channelRead(ctx, msg);
         }
     }
 
-    public static abstract class OutboundFilter<M> extends ChannelOutboundHandlerAdapter {
+    @RequiredArgsConstructor
+    public static class OutboundFilter<M> extends ChannelOutboundHandlerAdapter {
 
-        public abstract boolean filterable(M msg);
+        private final Predicate<M> filterCondition;
 
         @Override
         public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-            if (filterable((M) msg)) {
+            if (!filterCondition.test((M) msg)) {
                 ReferenceCountUtil.release(msg);
                 promise.setFailure(new UnsupportedOperationException("message has been filtered"));
 
