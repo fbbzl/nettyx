@@ -5,10 +5,10 @@
  希望此框架能够为大家节省哪怕一分钟的开发时间
 
 ## 链接
-JetBrain官网: https://www.jetbrains.com
-Github地址: https://github.com/fbbzl/nettyx
-Gitee地址: https://gitee.com/fbbzl/nettyx
-更多使用案例: https://blog.csdn.net/fbbwht
+JetBrain官网: https://www.jetbrains.com<br>
+Github地址: https://github.com/fbbzl/nettyx<br>
+Gitee地址: https://gitee.com/fbbzl/nettyx<br>
+更多使用案例: https://blog.csdn.net/fbbwht<br>
 
 ### 介绍
 基于[netty4.1.X.Final]进行了超轻量级的封装, 提供了一些工具和基础模板, 并额外提供串口通信模板, 帮助你快速搭建基于netty的服务端/客户端应用 及 基于串口的应用
