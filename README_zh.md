@@ -80,7 +80,7 @@ handler                             提供了一些基本的通道处理程序�
   ---ChannelAdvice                     包含入站建言和出站建言
   ---IdledHeartBeater                  闲置后的心跳器
   ---LoggerHandler                     进入和退出消息日志
-  ---MessageStealer                    用于丢弃消息
+  ---MessageFilter                     用于过滤消息
 listener
   ---ActionableChannelFutureListener   可操作的频道未来侦听器
 serializer                             序列化工具

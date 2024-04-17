@@ -79,7 +79,7 @@ handler                             Provided some basic channel handler implemen
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---IdledHeartBeater                  will do heartbeat after idle
   ---LoggerHandler                     Entry and exit message log
-  ---MessageStealer                    use to discard message
+  ---MessageFilter                     use to filter message
 
 listener
   ---ActionableChannelFutureListener   Actionable channel future listener
