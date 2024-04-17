@@ -19,28 +19,27 @@ import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
 public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<DelimiterBasedFrameDecoder,
         DelimiterBasedFrameEncoder> {
 
-    /**
-     * Instantiates a new Delimiter based frame codec.
-     *
-     * @param decoder the decoder
-     * @param encoder the encoder
-     */
     public DelimiterBasedFrameCodec(DelimiterBasedFrameDecoder decoder, DelimiterBasedFrameEncoder encoder) {
         super(decoder, encoder);
     }
 
-    /**
-     * The type Delimiter based frame encoder.
-     */
+    public DelimiterBasedFrameCodec(int maxFrameLength, ByteBuf delimiter) {
+        this(new DelimiterBasedFrameDecoder(maxFrameLength, delimiter), new DelimiterBasedFrameEncoder(delimiter));
+    }
+
+    public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, ByteBuf delimiter) {
+        this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, true, delimiter), new DelimiterBasedFrameEncoder(delimiter));
+    }
+
+    public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, boolean failFast, ByteBuf delimiter) {
+        this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, failFast, new ByteBuf[]{
+                delimiter.slice(delimiter.readerIndex(), delimiter.readableBytes())}), new DelimiterBasedFrameEncoder(delimiter));
+    }
+
     public static class DelimiterBasedFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final ByteBuf delimiter;
 
-        /**
-         * Instantiates a new Delimiter based frame encoder.
-         *
-         * @param delimiter the delimiter
-         */
         public DelimiterBasedFrameEncoder(ByteBuf delimiter) {
             this.delimiter = delimiter;
         }
