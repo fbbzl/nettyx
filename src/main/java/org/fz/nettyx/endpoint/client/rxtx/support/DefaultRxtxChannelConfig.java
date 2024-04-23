@@ -210,7 +210,6 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     }
 
     @Override
-    @Deprecated
     public RxtxChannelConfig setMaxMessagesPerRead(int maxMessagesPerRead) {
         super.setMaxMessagesPerRead(maxMessagesPerRead);
         return this;
