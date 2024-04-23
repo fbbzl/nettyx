@@ -177,7 +177,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return escaped;
     }
 
-    private static boolean tryMatch(ByteBuf msgBuf, int tarLength, ByteBuf target) {
+    static boolean tryMatch(ByteBuf msgBuf, int tarLength, ByteBuf target) {
         boolean isMatch;
         switch (tarLength) {
             case 1:
