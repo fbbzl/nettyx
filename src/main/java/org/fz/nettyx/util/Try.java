@@ -1,15 +1,11 @@
 package org.fz.nettyx.util;
 
 
-import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Objects;
+import java.util.function.*;
 
 /**
  * Use Lambda to handle exceptions gracefully, temporarily provide two implementations
@@ -27,8 +23,7 @@ public class Try {
         return () -> {
             try {
                 runnable.run();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -40,8 +35,7 @@ public class Try {
         return t -> {
             try {
                 return function.apply(t);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -53,8 +47,7 @@ public class Try {
         return (t, u) -> {
             try {
                 return function.apply(t, u);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -66,8 +59,7 @@ public class Try {
         return t -> {
             try {
                 consumer.accept(t);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -79,8 +71,7 @@ public class Try {
         return (k, v) -> {
             try {
                 consumer.accept(k, v);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -92,8 +83,7 @@ public class Try {
         return () -> {
             try {
                 return supplier.get();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -105,8 +95,7 @@ public class Try {
         return t -> {
             try {
                 return predicate.test(t);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 log.debug(e.getMessage());
                 throw new LambdasException(e);
             }
@@ -121,8 +110,7 @@ public class Try {
         return () -> {
             try {
                 run.run();
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 log.error(exception.getMessage());
             }
         };
@@ -132,8 +120,7 @@ public class Try {
         return t -> {
             try {
                 consumer.accept(t);
-            }
-            catch (Exception exception) {
+            } catch (Exception exception) {
                 log.error(exception.getMessage());
             }
         };

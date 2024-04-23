@@ -15,7 +15,8 @@ import java.net.SocketAddress;
 @FunctionalInterface
 public interface ChannelConnectAction {
 
-    ChannelConnectAction DO_NOTHING = (ctx, raddr, laddr, prom) -> {};
+    ChannelConnectAction DO_NOTHING = (ctx, raddr, laddr, prom) -> {
+    };
 
     void act(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
              ChannelPromise promise);

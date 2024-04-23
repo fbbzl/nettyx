@@ -8,10 +8,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 /**
  * basic server abstraction
@@ -26,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class TcpServer {
 
     private final EventLoopGroup
-        parentEventLoopGroup,
-        childEventLoopGroup;
+            parentEventLoopGroup,
+            childEventLoopGroup;
 
     private final ServerBootstrap serverBootstrap;
 
@@ -59,14 +60,14 @@ public abstract class TcpServer {
 
     protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress) {
         return new ServerBootstrap()
-            .group(parentEventLoopGroup, childEventLoopGroup)
-            .localAddress(bindAddress)
-            .channelFactory(() -> {
-                NioServerSocketChannel serverSocketChannel = new NioServerSocketChannel();
-                doChannelConfig(serverSocketChannel);
-                return serverSocketChannel;
-            })
-            .childHandler(childChannelInitializer());
+                .group(parentEventLoopGroup, childEventLoopGroup)
+                .localAddress(bindAddress)
+                .channelFactory(() -> {
+                    NioServerSocketChannel serverSocketChannel = new NioServerSocketChannel();
+                    doChannelConfig(serverSocketChannel);
+                    return serverSocketChannel;
+                })
+                .childHandler(childChannelInitializer());
     }
 
     protected abstract ChannelInitializer<? extends Channel> childChannelInitializer();

@@ -67,8 +67,7 @@ public final class StructSerializerContext {
                 scanBasics(classes);
                 scanStructs(classes);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new NotInitedException("init serializer context failed please check", e);
         }
     }

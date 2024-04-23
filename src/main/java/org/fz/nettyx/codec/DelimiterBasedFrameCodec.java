@@ -32,8 +32,7 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
     }
 
     public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, boolean failFast, ByteBuf delimiter) {
-        this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, failFast, new ByteBuf[]{
-                delimiter.slice(delimiter.readerIndex(), delimiter.readableBytes())}), new DelimiterBasedFrameEncoder(delimiter));
+        this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, failFast, delimiter.slice(delimiter.readerIndex(), delimiter.readableBytes())), new DelimiterBasedFrameEncoder(delimiter));
     }
 
     public static class DelimiterBasedFrameEncoder extends MessageToByteEncoder<ByteBuf> {
