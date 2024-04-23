@@ -1,15 +1,11 @@
 package org.fz.nettyx.endpoint.client;
 
 import cn.hutool.core.util.TypeUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.DefaultChannelPromise;
-import io.netty.channel.EventLoopGroup;
-import java.lang.reflect.Type;
+import io.netty.channel.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Type;
 
 /**
  * top level client based on netty
@@ -56,7 +52,7 @@ public abstract class Client<C extends Channel> {
 
     protected abstract EventLoopGroup newEventLoopGroup();
 
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+    protected abstract ChannelInitializer<C> channelInitializer();
 
     protected boolean isRegistered(Channel channel)  { return channel != null && channel.isRegistered(); }
 

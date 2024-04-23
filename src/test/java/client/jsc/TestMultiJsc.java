@@ -4,9 +4,9 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
+import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
@@ -33,7 +33,7 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
     }
 
     @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+    protected ChannelInitializer<JscChannel> channelInitializer() {
         return new TestChannelInitializer<>();
     }
 
