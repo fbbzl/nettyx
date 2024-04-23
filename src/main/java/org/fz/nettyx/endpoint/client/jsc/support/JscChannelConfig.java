@@ -7,6 +7,7 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.MessageSizeEstimator;
 import io.netty.channel.RecvByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
+
 import java.util.Arrays;
 
 /**
@@ -120,7 +121,6 @@ public interface JscChannelConfig extends ChannelConfig {
     JscChannelConfig setConnectTimeoutMillis(int connectTimeoutMillis);
 
     @Override
-    @Deprecated
     JscChannelConfig setMaxMessagesPerRead(int maxMessagesPerRead);
 
     @Override
