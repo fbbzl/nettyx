@@ -162,16 +162,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 int     tarLength = target.readableBytes();
 
                 if (msgBuf.readableBytes() >= tarLength) {
-                    switch (tarLength) {
-                        case 1:
-                        case 2:
-                            match = hasSimilar(msgBuf, target);
-                            break;
-                        default:
-                            match = hasSimilar(msgBuf, target) && equalsContent(
-                                    getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
-                            break;
-                    }
+                    match = tryMatch(msgBuf, tarLength, target);
 
                     if (match) {
                         msgBuf.skipBytes(tarLength);
@@ -184,6 +175,22 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             if (!match) escaped.writeByte(msgBuf.readByte());
         }
         return escaped;
+    }
+
+    private static boolean tryMatch(ByteBuf msgBuf, int tarLength, ByteBuf target) {
+        boolean isMatch;
+        switch (tarLength) {
+            case 1:
+            case 2:
+                isMatch = hasSimilar(msgBuf, target);
+                break;
+            default:
+                isMatch = hasSimilar(msgBuf, target) && equalsContent(
+                        getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
+                break;
+        }
+
+        return isMatch;
     }
 
 
