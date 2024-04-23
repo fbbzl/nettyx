@@ -1,16 +1,10 @@
 package org.fz.nettyx.serializer.xml;
 
-import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
-
 import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.MapUtil;
 import io.netty.buffer.ByteBuf;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.Serializer;
@@ -21,6 +15,13 @@ import org.fz.nettyx.serializer.xml.handler.PropHandler;
 import org.fz.nettyx.serializer.xml.handler.PropTypeHandler;
 import org.fz.nettyx.util.Throws;
 import org.mvel2.MVEL;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.fz.nettyx.util.Exceptions.newIllegalArgException;
 
 
 /**
@@ -35,7 +36,7 @@ import org.mvel2.MVEL;
 public final class XmlSerializer implements Serializer {
 
     private final ByteBuf byteBuf;
-    private final Model model;
+    private final Model   model;
 
     public static Dict read(ByteBuf byteBuf, Model model) {
         Throws.ifNull(model, "model can not be null");
@@ -43,8 +44,8 @@ public final class XmlSerializer implements Serializer {
     }
 
     Dict parse() {
-        Model currentModel = getModel();
-        ByteBuf reading = getByteBuf();
+        Model   currentModel = getModel();
+        ByteBuf reading      = getByteBuf();
 
         Map<String, Object> map = new LinkedHashMap<>();
 
@@ -60,8 +61,7 @@ public final class XmlSerializer implements Serializer {
                     value = readArray(prop, reading);
                 } else if (XmlSerializerContext.containsType(type.getValue())) {
                     value = XmlSerializerContext.getTypeHandler(type.getValue()).read(prop, reading);
-                }
-                else throw new IllegalArgumentException("type not recognized [" + type + "]");
+                } else throw new IllegalArgumentException("type not recognized [" + type + "]");
 
                 if (prop.hasExpression()) {
                     value = MVEL.eval(prop.getExpression(), MapUtil.of("$v", value));
@@ -84,7 +84,7 @@ public final class XmlSerializer implements Serializer {
         int arrayBytesLength = prop.getLength(), arrayLength = prop.getArrayLength();
 
         Throws.ifTrue(prop.getLength() % arrayLength != 0, newIllegalArgException(
-            "illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is ["
+                "illegal array config, array bytes length is [" + arrayBytesLength + "], nut array element size is ["
                 + arrayLength + "]"));
 
         PropType type = prop.getType();

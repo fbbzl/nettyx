@@ -1,11 +1,12 @@
 package org.fz.nettyx.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * Exception tool class All static methods are composed of an expression and an exceptionMessage. When the expression

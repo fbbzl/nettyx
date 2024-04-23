@@ -2,17 +2,17 @@ package org.fz.nettyx.util;
 
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.channel.Channel;
+import lombok.experimental.Delegate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import lombok.experimental.Delegate;
 
 /**
  * Used to store channels, using key-length pairs
  *
  * @param <K> the type parameter
- *
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /4/29 10:19
@@ -144,7 +144,6 @@ public class ChannelStorage<K> {
      * Find all list.
      *
      * @param channelPredicate the channel predicate
-     *
      * @return the list
      */
     public List<Channel> findAll(Predicate<Channel> channelPredicate) {
@@ -159,7 +158,6 @@ public class ChannelStorage<K> {
      * Is all boolean.
      *
      * @param channelPredicate the channel predicate
-     *
      * @return the boolean
      */
     public boolean isAll(Predicate<Channel> channelPredicate) {
