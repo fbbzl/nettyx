@@ -1,14 +1,14 @@
 package org.fz.nettyx.serializer.xml.handler;
 
-import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.util.EndianKit.LE;
-
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 import org.fz.nettyx.util.EndianKit;
 import org.fz.nettyx.util.Throws;
+
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
+import static org.fz.nettyx.util.EndianKit.LE;
 
 /**
  * read int value to the enum which defined in the XML, NOT java enum
@@ -40,14 +40,14 @@ public class EnumHandler implements PropTypeHandler {
 
     @Override
     public void write(Prop prop, ByteBuf writing) {
-        int ordinary = Integer.parseInt(prop.getText());
+        int       ordinary  = Integer.parseInt(prop.getText());
         EndianKit endianKit = prop.getEndianKit();
 
         endianKit.fromInt(ordinary);
     }
 
     protected int findEnumOrdinary(Prop prop, ByteBuf buf) {
-        byte[] bytes = this.readBytes(prop, buf);
+        byte[]    bytes     = this.readBytes(prop, buf);
         EndianKit endianKit = prop.getEndianKit();
 
         if (bytes.length < 4) {

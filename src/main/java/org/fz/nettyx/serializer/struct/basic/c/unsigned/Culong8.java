@@ -3,8 +3,9 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 import cn.hutool.core.util.PrimitiveArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import java.math.BigInteger;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+
+import java.math.BigInteger;
 
 /**
  * The type Culong 8.
@@ -24,7 +25,7 @@ public class Culong8 extends CBasic<BigInteger> {
      * The constant MAX_VALUE.
      */
     public static final Culong8 MAX_VALUE = new Culong8(
-        BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
+            BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
 
     /**
      * Instantiates a new Culong 8.

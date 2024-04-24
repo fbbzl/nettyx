@@ -1,22 +1,18 @@
 package org.fz.nettyx.serializer.struct;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.isStruct;
-import static org.fz.nettyx.serializer.struct.StructSerializer.readBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.readStruct;
-import static org.fz.nettyx.serializer.struct.StructSerializer.writeBasic;
-import static org.fz.nettyx.serializer.struct.StructSerializer.writeStruct;
-
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.serializer.struct.basic.Basic;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
+import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructSerializer.*;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -50,7 +46,6 @@ public interface StructFieldHandler<A extends Annotation> {
      * Is read handler boolean.
      *
      * @param clazz the clazz
-     *
      * @return the boolean
      */
     static <S extends StructFieldHandler<?>> boolean isReadHandler(Class<S> clazz) {
@@ -61,7 +56,6 @@ public interface StructFieldHandler<A extends Annotation> {
      * Is write handler boolean.
      *
      * @param clazz the clazz
-     *
      * @return the boolean
      */
     static <S extends StructFieldHandler<?>> boolean isWriteHandler(Class<S> clazz) {
@@ -72,7 +66,6 @@ public interface StructFieldHandler<A extends Annotation> {
      * Is read handler boolean.
      *
      * @param handler the handler
-     *
      * @return the boolean
      */
     static <S extends StructFieldHandler<?>> boolean isReadHandler(S handler) {
@@ -83,7 +76,6 @@ public interface StructFieldHandler<A extends Annotation> {
      * Is write handler boolean.
      *
      * @param handler the handler
-     *
      * @return the boolean
      */
     static <S extends StructFieldHandler<?>> boolean isWriteHandler(S handler) {
@@ -103,13 +95,16 @@ public interface StructFieldHandler<A extends Annotation> {
          *
          * @param serializer the serializer
          * @param field      the field
-         *
          * @return the final returned field length
          */
         default Object doRead(StructSerializer serializer, Field field, A annotation) {
             Type rootType = serializer.getRootType();
-            if (isBasic(rootType, field)) { return readBasic(rootType, field, serializer.getByteBuf()); }
-            if (isStruct(rootType, field)) { return readStruct(rootType, field, serializer.getByteBuf()); }
+            if (isBasic(rootType, field)) {
+                return readBasic(rootType, field, serializer.getByteBuf());
+            }
+            if (isStruct(rootType, field)) {
+                return readStruct(rootType, field, serializer.getByteBuf());
+            }
 
             throw new TypeJudgmentException(field);
         }
@@ -150,9 +145,9 @@ public interface StructFieldHandler<A extends Annotation> {
             }
             if (isStruct(rootType, field)) {
                 writeStruct(rootType, defaultIfNull(value, () -> StructUtils.newStruct(field)), writing);
+            } else {
+                throw new TypeJudgmentException(field);
             }
-
-            else { throw new TypeJudgmentException(field); }
         }
 
         default void preWriteHandle(StructSerializer serializer, Field field, Object value, A annotation,

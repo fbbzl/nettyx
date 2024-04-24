@@ -1,7 +1,8 @@
 package org.fz.nettyx.exception;
 
-import java.lang.reflect.Field;
 import lombok.Getter;
+
+import java.lang.reflect.Field;
 
 /**
  * @author fengbinbin
@@ -17,7 +18,7 @@ public class HandlerException extends RuntimeException {
 
     public HandlerException(Field field, Class<?> handlerClass, Throwable throwable) {
         super("handler cause exception please check [" + handlerClass + "], this handler is on field [" + field + "]", throwable);
-        this.field = field;
+        this.field        = field;
         this.handlerClass = handlerClass;
     }
 }

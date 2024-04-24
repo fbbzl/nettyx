@@ -58,7 +58,7 @@ public class StructUtils {
     /**
      * Find handler annotation a.
      *
-     * @param <A> the type parameter
+     * @param <A>     the type parameter
      * @param element the element
      * @return the a
      */
@@ -75,7 +75,7 @@ public class StructUtils {
     /**
      * Gets serializer handler.
      *
-     * @param <H> the type parameter
+     * @param <H>     the type parameter
      * @param element the element
      * @return the serializer handler
      */
@@ -83,7 +83,7 @@ public class StructUtils {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
         if (handlerAnnotation != null) {
             Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
-                handlerAnnotation.annotationType());
+                    handlerAnnotation.annotationType());
             return (H) newHandler(handlerClass);
         }
         return null;
@@ -92,7 +92,7 @@ public class StructUtils {
     /**
      * New handler instance t.
      *
-     * @param <H> the type parameter
+     * @param <H>   the type parameter
      * @param clazz the struct class
      * @return the t
      */
@@ -119,9 +119,9 @@ public class StructUtils {
     /**
      * New basic instance t.
      *
-     * @param <B> the type parameter
+     * @param <B>        the type parameter
      * @param basicField the basic field
-     * @param buf the buf
+     * @param buf        the buf
      * @return the t
      */
     public static <B extends Basic<?>> B newBasic(Field basicField, ByteBuf buf) {
@@ -131,9 +131,9 @@ public class StructUtils {
     /**
      * New basic instance t.
      *
-     * @param <B> the type parameter
+     * @param <B>        the type parameter
      * @param basicClass the basic class
-     * @param buf the buf
+     * @param buf        the buf
      * @return the t
      */
     public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
@@ -145,14 +145,14 @@ public class StructUtils {
                 throw new SerializeException(cause.getMessage());
             } else {
                 throw new SerializeException(
-                    "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf)
+                        "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf)
                         + "]", cause);
             }
         }
     }
 
     public static <B extends Basic<?>> Constructor<B> filterConstructor(Class<?> basicClass,
-        Predicate<Constructor<B>> filter) {
+                                                                        Predicate<Constructor<B>> filter) {
         Constructor<B>[] constructors = (Constructor<B>[]) ReflectUtil.getConstructors(basicClass);
         return Arrays.stream(constructors).filter(filter).findFirst().orElse(null);
     }
@@ -160,7 +160,7 @@ public class StructUtils {
     /**
      * New struct instance t.
      *
-     * @param <S> the type parameter
+     * @param <S>         the type parameter
      * @param structField the struct field
      * @return the t
      */
@@ -171,7 +171,7 @@ public class StructUtils {
     /**
      * New struct instance t.
      *
-     * @param <S> the type parameter
+     * @param <S>         the type parameter
      * @param structClass the struct class
      * @return the t
      */
@@ -186,21 +186,20 @@ public class StructUtils {
             }
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
-        }
-        catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
+        } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
         }
     }
 
     public static void writeField(Object object, Field field, Object value) {
         Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field,
-            f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getWriteMethod());
+                                                                f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getWriteMethod());
         MethodHandleUtil.invoke(object, writeMethod, value);
     }
 
     public static <T> T readField(Object object, Field field) {
         Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field,
-            f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
+                                                               f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
         return MethodHandleUtil.invoke(object, readMethod);
     }
 

@@ -10,7 +10,6 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
  * Option for configuring a serial port connection.
  *
  * @param <T>
- *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/2 13:29
