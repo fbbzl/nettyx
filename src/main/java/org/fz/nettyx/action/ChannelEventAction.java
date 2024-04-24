@@ -12,7 +12,8 @@ import io.netty.channel.ChannelHandlerContext;
 @FunctionalInterface
 public interface ChannelEventAction {
 
-    ChannelEventAction DO_NOTHING = (ctx, evt) -> {};
+    ChannelEventAction DO_NOTHING = (ctx, evt) -> {
+    };
 
     void act(ChannelHandlerContext ctx, Object evt);
 

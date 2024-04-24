@@ -66,7 +66,7 @@ public abstract class Basic<V> {
      * To byte buf.
      *
      * @param value the value
-     * @param size the size
+     * @param size  the size
      * @return the byte buf
      */
     protected abstract ByteBuf toByteBuf(V value, int size);
@@ -98,7 +98,7 @@ public abstract class Basic<V> {
     }
 
     protected Basic(V value, int size) {
-        this.size = size;
+        this.size  = size;
         this.value = value;
     }
 
@@ -121,13 +121,13 @@ public abstract class Basic<V> {
     }
 
     public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass)
-        throws InvocationTargetException, InstantiationException, IllegalAccessException {
+            throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Constructor<? extends Basic<?>> basicConstructor = filterConstructor(basicClass,
-            c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
+                                                                             c -> ArrayUtil.equals(c.getParameterTypes(), new Class[]{ByteBuf.class}));
 
         if (basicConstructor == null) {
             throw new IllegalArgumentException(
-                "can not find basic type [" + basicClass + "] constructor with bytebuf arg, please check");
+                    "can not find basic type [" + basicClass + "] constructor with bytebuf arg, please check");
         }
 
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);

@@ -13,16 +13,16 @@ public class Dtd {
     public static final String NAMESPACE = "namespace", NAMESPACE_SYMBOL = ".";
 
     public static final String EL_MODEL = "model",
-            EL_ENUM = "enum",
-            EL_SWITCH = "switch";
+            EL_ENUM                     = "enum",
+            EL_SWITCH                   = "switch";
 
     public static final String
-            ATTR_OFFSET = ":offset",
-            ATTR_LENGTH = ":length",
-            ATTR_TYPE = ":type",
+            ATTR_OFFSET       = ":offset",
+            ATTR_LENGTH       = ":length",
+            ATTR_TYPE         = ":type",
             ATTR_ARRAY_LENGTH = ":array-length",
-            ATTR_EXP = ":exp",
-            ATTR_ORDER = ":order",
-            ATTR_HANDLER = ":handler";
+            ATTR_EXP          = ":exp",
+            ATTR_ORDER        = ":order",
+            ATTR_HANDLER      = ":handler";
 
 }

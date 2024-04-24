@@ -2,9 +2,10 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
 /**
  * The type Cchar.
