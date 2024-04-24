@@ -1,11 +1,8 @@
 package org.fz.nettyx.handler.interceptor;
 
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandler;
-import io.netty.channel.ChannelOutboundHandler;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+
 import java.net.SocketAddress;
 
 /**
@@ -57,35 +54,35 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
     public static class InboundInterceptor<M> extends ChannelInterceptor implements ChannelInboundHandler {
 
         @Override
-        public final void channelRegistered(ChannelHandlerContext ctx)  {
+        public final void channelRegistered(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.fireChannelRegistered();
             } else this.preChannelRegistered(ctx);
         }
 
         @Override
-        public final void channelUnregistered(ChannelHandlerContext ctx)  {
+        public final void channelUnregistered(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.fireChannelUnregistered();
             } else this.preChannelUnregistered(ctx);
         }
 
         @Override
-        public final void channelActive(ChannelHandlerContext ctx)  {
+        public final void channelActive(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.fireChannelActive();
             } else this.preChannelActive(ctx);
         }
 
         @Override
-        public final void channelInactive(ChannelHandlerContext ctx)  {
+        public final void channelInactive(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.fireChannelInactive();
             } else this.preChannelInactive(ctx);
         }
 
         @Override
-        public final void channelRead(ChannelHandlerContext ctx, Object msg)  {
+        public final void channelRead(ChannelHandlerContext ctx, Object msg) {
             if (isFreed()) {
                 ctx.fireChannelRead(msg);
                 return;
@@ -100,21 +97,21 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void channelReadComplete(ChannelHandlerContext ctx)  {
+        public final void channelReadComplete(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.fireChannelReadComplete();
             } else this.preChannelReadComplete(ctx);
         }
 
         @Override
-        public final void userEventTriggered(ChannelHandlerContext ctx, Object evt)  {
+        public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
             if (isFreed()) {
                 ctx.fireUserEventTriggered(evt);
             } else this.preUserEventTriggered(ctx, evt);
         }
 
         @Override
-        public final void channelWritabilityChanged(ChannelHandlerContext ctx)  {
+        public final void channelWritabilityChanged(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.fireChannelWritabilityChanged();
             } else this.preChannelWritabilityChanged(ctx);
@@ -122,7 +119,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
         @Override
         @SuppressWarnings("deprecation")
-        public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)  {
+        public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             if (isFreed()) {
                 ctx.fireExceptionCaught(cause);
             } else this.preExceptionCaught(ctx, cause);
@@ -164,92 +161,92 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             ctx.fireExceptionCaught(cause);
         }
 
-        protected void freeAndFireRegistered(ChannelHandlerContext ctx)  {
+        protected void freeAndFireRegistered(ChannelHandlerContext ctx) {
             this.free();
             this.channelRegistered(ctx);
         }
 
-        protected void freeAndFireUnregistered(ChannelHandlerContext ctx)  {
+        protected void freeAndFireUnregistered(ChannelHandlerContext ctx) {
             this.free();
             this.channelUnregistered(ctx);
         }
 
-        protected void freeAndFireActive(ChannelHandlerContext ctx)  {
+        protected void freeAndFireActive(ChannelHandlerContext ctx) {
             this.free();
             this.channelActive(ctx);
         }
 
-        protected void freeAndFireInactive(ChannelHandlerContext ctx)  {
+        protected void freeAndFireInactive(ChannelHandlerContext ctx) {
             this.free();
             this.channelInactive(ctx);
         }
 
-        protected void freeAndFireRead(ChannelHandlerContext ctx, M msg)  {
+        protected void freeAndFireRead(ChannelHandlerContext ctx, M msg) {
             this.free();
             this.channelRead(ctx, msg);
         }
 
-        protected void freeAndFireReadComplete(ChannelHandlerContext ctx)  {
+        protected void freeAndFireReadComplete(ChannelHandlerContext ctx) {
             this.free();
             this.channelReadComplete(ctx);
         }
 
-        protected void freeAndFireUserEventTriggered(ChannelHandlerContext ctx, Object evt)  {
+        protected void freeAndFireUserEventTriggered(ChannelHandlerContext ctx, Object evt) {
             this.free();
             this.userEventTriggered(ctx, evt);
         }
 
-        protected void freeAndFireWritabilityChanged(ChannelHandlerContext ctx)  {
+        protected void freeAndFireWritabilityChanged(ChannelHandlerContext ctx) {
             this.free();
             this.channelWritabilityChanged(ctx);
         }
 
-        protected void freeAndFireExceptionCaught(ChannelHandlerContext ctx, Throwable cause)  {
+        protected void freeAndFireExceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             this.free();
             this.exceptionCaught(ctx, cause);
         }
 
-        protected void resetAndFireRegistered(ChannelHandlerContext ctx)  {
+        protected void resetAndFireRegistered(ChannelHandlerContext ctx) {
             this.reset();
             this.channelRegistered(ctx);
         }
 
-        protected void resetAndFireUnregistered(ChannelHandlerContext ctx)  {
+        protected void resetAndFireUnregistered(ChannelHandlerContext ctx) {
             this.reset();
             this.channelUnregistered(ctx);
         }
 
-        protected void resetAndFireActive(ChannelHandlerContext ctx)  {
+        protected void resetAndFireActive(ChannelHandlerContext ctx) {
             this.reset();
             this.channelActive(ctx);
         }
 
-        protected void resetAndFireInactive(ChannelHandlerContext ctx)  {
+        protected void resetAndFireInactive(ChannelHandlerContext ctx) {
             this.reset();
             this.channelInactive(ctx);
         }
 
-        protected void resetAndFireRead(ChannelHandlerContext ctx, Object msg)  {
+        protected void resetAndFireRead(ChannelHandlerContext ctx, Object msg) {
             this.reset();
             this.channelRead(ctx, msg);
         }
 
-        protected void resetAndFireReadComplete(ChannelHandlerContext ctx)  {
+        protected void resetAndFireReadComplete(ChannelHandlerContext ctx) {
             this.reset();
             this.channelReadComplete(ctx);
         }
 
-        protected void resetAndFireUserEventTriggered(ChannelHandlerContext ctx, Object evt)  {
+        protected void resetAndFireUserEventTriggered(ChannelHandlerContext ctx, Object evt) {
             this.reset();
             this.userEventTriggered(ctx, evt);
         }
 
-        protected void resetAndFireWritabilityChanged(ChannelHandlerContext ctx)  {
+        protected void resetAndFireWritabilityChanged(ChannelHandlerContext ctx) {
             this.reset();
             this.channelWritabilityChanged(ctx);
         }
 
-        protected void resetAndFireExceptionCaught(ChannelHandlerContext ctx, Throwable cause)  {
+        protected void resetAndFireExceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             this.reset();
             this.exceptionCaught(ctx, cause);
         }
@@ -293,14 +290,14 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void read(ChannelHandlerContext ctx)  {
+        public final void read(ChannelHandlerContext ctx) {
             if (isFreed()) {
                 ctx.read();
             } else this.preRead(ctx);
         }
 
         @Override
-        public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)  {
+        public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
             if (isFreed()) {
                 ctx.write(msg, promise);
             } else this.preWrite(ctx, msg, promise);
@@ -360,7 +357,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             this.disconnect(ctx, promise);
         }
 
-        protected void freeAndClose(ChannelHandlerContext ctx, ChannelPromise promise)  {
+        protected void freeAndClose(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.free();
             this.close(ctx, promise);
         }
@@ -370,12 +367,12 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             this.deregister(ctx, promise);
         }
 
-        protected void freeAndRead(ChannelHandlerContext ctx)  {
+        protected void freeAndRead(ChannelHandlerContext ctx) {
             this.free();
             this.read(ctx);
         }
 
-        protected void freeAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)  {
+        protected void freeAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
             this.free();
             this.write(ctx, msg, promise);
         }
@@ -390,17 +387,17 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             this.bind(ctx, localAddress, promise);
         }
 
-        protected void resetAndConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise)  {
+        protected void resetAndConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
             this.reset();
             this.connect(ctx, remoteAddress, localAddress, promise);
         }
 
-        protected void resetAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise)  {
+        protected void resetAndDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.reset();
             this.disconnect(ctx, promise);
         }
 
-        protected void resetAndClose(ChannelHandlerContext ctx, ChannelPromise promise)  {
+        protected void resetAndClose(ChannelHandlerContext ctx, ChannelPromise promise) {
             this.reset();
             this.close(ctx, promise);
         }
@@ -410,12 +407,12 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             this.deregister(ctx, promise);
         }
 
-        protected void resetAndRead(ChannelHandlerContext ctx)  {
+        protected void resetAndRead(ChannelHandlerContext ctx) {
             this.reset();
             this.read(ctx);
         }
 
-        protected void resetAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)  {
+        protected void resetAndWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
             this.reset();
             this.write(ctx, msg, promise);
         }

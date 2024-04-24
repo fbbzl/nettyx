@@ -46,7 +46,7 @@ public class RxtxChannel extends SerialCommChannel {
         commPort.enableReceiveTimeout(config().getOption(READ_TIMEOUT));
 
         deviceAddress = remote;
-        serialPort = (SerialPort) commPort;
+        serialPort    = (SerialPort) commPort;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RxtxChannel extends SerialCommChannel {
                     config().getOption(DATA_BITS).value(),
                     config().getOption(STOP_BITS).value(),
                     config().getOption(PARITY_BIT).value()
-            );
+                                          );
             serialPort.setDTR(config().getOption(DTR));
             serialPort.setRTS(config().getOption(RTS));
 
@@ -74,8 +74,7 @@ public class RxtxChannel extends SerialCommChannel {
         open = false;
         try {
             super.doClose();
-        }
-        finally {
+        } finally {
             if (serialPort != null) {
                 serialPort.removeEventListener();
                 serialPort.close();

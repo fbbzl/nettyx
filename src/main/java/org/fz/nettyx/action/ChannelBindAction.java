@@ -15,7 +15,8 @@ import java.net.SocketAddress;
 @FunctionalInterface
 public interface ChannelBindAction {
 
-    ChannelBindAction DO_NOTHING = (ctx, laddr, prom) -> {};
+    ChannelBindAction DO_NOTHING = (ctx, laddr, prom) -> {
+    };
 
     void act(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise);
 }

@@ -1,8 +1,9 @@
 package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import java.math.BigInteger;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
+
+import java.math.BigInteger;
 
 /**
  * The type Culong 8.

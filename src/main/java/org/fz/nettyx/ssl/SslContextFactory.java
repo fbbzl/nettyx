@@ -1,18 +1,19 @@
 package org.fz.nettyx.ssl;
 
 
-import static lombok.AccessLevel.PACKAGE;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.UtilityClass;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyStore;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.UtilityClass;
+
+import static lombok.AccessLevel.PACKAGE;
 
 /**
  * SSL context factory, provide one-way/two-way
@@ -240,8 +241,8 @@ public class SslContextFactory {
          */
         public SSLContext getContext(String path, char[] pwd, String trustPath, char[] trustPwd) {
             try (
-                InputStream in      = Files.newInputStream(Paths.get(path));
-                InputStream trustIn = Files.newInputStream(Paths.get(trustPath))) {
+                    InputStream in = Files.newInputStream(Paths.get(path));
+                    InputStream trustIn = Files.newInputStream(Paths.get(trustPath))) {
 
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
