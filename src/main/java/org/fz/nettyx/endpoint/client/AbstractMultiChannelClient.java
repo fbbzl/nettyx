@@ -76,11 +76,15 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
     }
 
     public void closeChannelGracefully(K key) {
-        if (Client.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(); }
+        if (Client.gracefullyCloseable(getChannel(key))) {
+            this.getChannel(key).close();
+        }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Client.gracefullyCloseable(getChannel(key))) { this.getChannel(key).close(promise); }
+        if (Client.gracefullyCloseable(getChannel(key))) {
+            this.getChannel(key).close(promise);
+        }
     }
 
     public ChannelPromise writeAndFlush(K channelKey, Object message) {
@@ -95,8 +99,7 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
 
         try {
             return (ChannelPromise) channel.writeAndFlush(message);
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], address is " +
                                        "[" + channel.remoteAddress() + "]", exception);
         }
@@ -112,15 +115,15 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
 
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
-            .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
-            .remoteAddress(remoteAddress)
-            .group(getEventLoopGroup())
-            .channelFactory(() -> {
-                C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                doChannelConfig(key, (F) chl.config());
-                return chl;
-            })
-            .handler(channelInitializer());
+                .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
+                .remoteAddress(remoteAddress)
+                .group(getEventLoopGroup())
+                .channelFactory(() -> {
+                    C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
+                    doChannelConfig(key, (F) chl.config());
+                    return chl;
+                })
+                .handler(channelInitializer());
     }
 
     public static <T> T channelKey(ChannelHandlerContext ctx) {

@@ -35,8 +35,8 @@ public class ChannelAdvice {
         private final Channel                     channel;
         private       ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
                 whenChannelInactive, whenWritabilityChanged, whenChannelReadComplete;
-        private ChannelReadAction            whenChannelRead;
-        private ChannelExceptionAction       whenExceptionCaught;
+        private ChannelReadAction        whenChannelRead;
+        private ChannelExceptionAction   whenExceptionCaught;
         private ActionIdleStateHandler   readIdleStateHandler;
         private ActionReadTimeoutHandler readTimeoutHandler;
 
@@ -45,7 +45,6 @@ public class ChannelAdvice {
          *
          * @param idleSeconds the idle seconds
          * @param readIdleAct the read idle action
-         *
          * @return the inbound advice
          */
         public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct) {
@@ -63,7 +62,6 @@ public class ChannelAdvice {
          *
          * @param timeoutSeconds the timeout seconds
          * @param timeoutAction  the timeout action
-         *
          * @return the inbound advice
          */
         public final InboundAdvice whenReadTimeout(int timeoutSeconds, boolean fireTimeout,
@@ -153,7 +151,7 @@ public class ChannelAdvice {
         private       ChannelConnectAction whenConnect;
         private       ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
-        private ChannelWriteAction            whenWrite;
+        private ChannelWriteAction        whenWrite;
         private ActionIdleStateHandler    writeIdleStateHandler;
         private ActionWriteTimeoutHandler writeTimeoutHandler;
 
@@ -162,7 +160,6 @@ public class ChannelAdvice {
          *
          * @param idleSeconds  the idle seconds
          * @param writeIdleAct the write idle action
-         *
          * @return the outbound advice
          */
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct) {
@@ -189,7 +186,7 @@ public class ChannelAdvice {
 
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
-        throws Exception {
+                throws Exception {
             log.debug("channel binding, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                       localAddress);
             invokeAction(whenBind, ctx, localAddress, promise);

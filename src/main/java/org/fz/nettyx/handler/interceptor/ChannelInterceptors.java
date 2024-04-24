@@ -4,10 +4,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
+import lombok.experimental.UtilityClass;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.experimental.UtilityClass;
 
 /**
  * tool class used with ChannelInterceptor
@@ -22,7 +23,6 @@ public class ChannelInterceptors {
      *
      * @param <T>     the type parameter
      * @param channel the channel
-     *
      * @return the interceptors
      */
     public static <T extends ChannelInterceptor> List<T> getInterceptors(Channel channel) {
@@ -34,7 +34,6 @@ public class ChannelInterceptors {
      *
      * @param <T> the type parameter
      * @param ctx the ctx
-     *
      * @return the interceptors
      */
     public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelHandlerContext ctx) {
@@ -46,7 +45,6 @@ public class ChannelInterceptors {
      *
      * @param <T>      the type parameter
      * @param pipeline the pipeline
-     *
      * @return the interceptors
      */
     @SuppressWarnings("unchecked")

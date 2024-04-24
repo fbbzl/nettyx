@@ -102,7 +102,6 @@ public interface JscChannelConfig extends ChannelConfig {
      * A value of 0 indicates that no waiting should occur.
      *
      * @param waitTimeMillis The number of milliseconds to wait, defaulting to 0 (no wait) if unset
-     *
      * @throws IllegalArgumentException if the supplied value is &lt; 0
      */
     JscChannelConfig setWaitTimeMillis(int waitTimeMillis);
@@ -175,7 +174,7 @@ public interface JscChannelConfig extends ChannelConfig {
                          .filter(stopBit -> stopBit.value == value)
                          .findFirst()
                          .orElseThrow(() -> new IllegalArgumentException(
-                             "unknown " + StopBits.class.getSimpleName() + " value: " + value));
+                                 "unknown " + StopBits.class.getSimpleName() + " value: " + value));
         }
 
         public int value() {

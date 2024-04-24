@@ -71,8 +71,7 @@ public class JscChannel extends SerialCommChannel {
         open = false;
         try {
             super.doClose();
-        }
-        finally {
+        } finally {
             if (serialPort != null) {
                 serialPort.removeDataListener();
                 serialPort.closePort();

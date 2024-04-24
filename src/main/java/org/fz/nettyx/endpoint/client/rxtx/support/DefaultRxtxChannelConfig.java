@@ -87,29 +87,21 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
 
         if (option == BAUD_RATE) {
             setBaudrate((Integer) value);
-        }
-        else if (option == DTR) {
+        } else if (option == DTR) {
             setDtr((Boolean) value);
-        }
-        else if (option == RTS) {
+        } else if (option == RTS) {
             setRts((Boolean) value);
-        }
-        else if (option == STOP_BITS) {
+        } else if (option == STOP_BITS) {
             setStopbits((Stopbits) value);
-        }
-        else if (option == DATA_BITS) {
+        } else if (option == DATA_BITS) {
             setDatabits((Databits) value);
-        }
-        else if (option == PARITY_BIT) {
+        } else if (option == PARITY_BIT) {
             setParitybit((Paritybit) value);
-        }
-        else if (option == WAIT_TIME) {
+        } else if (option == WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
-        }
-        else if (option == READ_TIMEOUT) {
+        } else if (option == READ_TIMEOUT) {
             setReadTimeout((Integer) value);
-        }
-        else {
+        } else {
             return super.setOption(option, value);
         }
         return true;

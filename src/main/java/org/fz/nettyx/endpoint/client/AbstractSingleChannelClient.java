@@ -41,16 +41,22 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
 
     @SneakyThrows({InterruptedException.class})
     protected void storeChannel(Channel channel) {
-        if (isActive(this.channel)) { this.channel.close().sync(); }
+        if (isActive(this.channel)) {
+            this.channel.close().sync();
+        }
         this.channel = channel;
     }
 
     public void closeChannelGracefully() {
-        if (gracefullyCloseable(channel)) { this.getChannel().close(); }
+        if (gracefullyCloseable(channel)) {
+            this.getChannel().close();
+        }
     }
 
     public void closeChannelGracefully(ChannelPromise promise) {
-        if (gracefullyCloseable(channel)) { this.getChannel().close(promise); }
+        if (gracefullyCloseable(channel)) {
+            this.getChannel().close(promise);
+        }
     }
 
     public ChannelPromise writeAndFlush(Object message) {
@@ -62,8 +68,7 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
 
         try {
             return (ChannelPromise) channel.writeAndFlush(message);
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new ChannelException("exception occurred while sending the message [" + message + "], address is ["
                                        + channel.remoteAddress() + "]", exception);
         }
@@ -71,14 +76,14 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
 
     protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
-            .remoteAddress(remoteAddress)
-            .group(getEventLoopGroup())
-            .channelFactory(() -> {
-                C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                doChannelConfig(chl);
-                return chl;
-            })
-            .handler(channelInitializer());
+                .remoteAddress(remoteAddress)
+                .group(getEventLoopGroup())
+                .channelFactory(() -> {
+                    C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
+                    doChannelConfig(chl);
+                    return chl;
+                })
+                .handler(channelInitializer());
     }
 
     protected void doChannelConfig(C channel) {

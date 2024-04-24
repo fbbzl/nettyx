@@ -84,8 +84,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             ByteBuf encoded = doEscape(msg, mappings, EscapeMap::getReal, EscapeMap::getReplacement);
             try {
                 out.writeBytes(encoded);
-            }
-            finally {
+            } finally {
                 encoded.release();
             }
         }
@@ -134,7 +133,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     static boolean containsContent(ByteBuf buf, ByteBuf part) {
-        if (buf.readableBytes() < part.readableBytes()) { return false; }
+        if (buf.readableBytes() < part.readableBytes()) {
+            return false;
+        }
 
         byte[] sample = new byte[part.readableBytes()];
         for (int i = 0; i < buf.readableBytes(); i++) {
@@ -142,7 +143,9 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 return false;
             }
             buf.getBytes(i, sample);
-            if (equalsContent(sample, part)) { return true; }
+            if (equalsContent(sample, part)) {
+                return true;
+            }
         }
 
         return false;
@@ -199,7 +202,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
         if (tarLength == 1 || !sameHead) return sameHead;
-        else                             return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
+        else return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
     }
 
     @RequiredArgsConstructor

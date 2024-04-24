@@ -1,8 +1,9 @@
 package org.fz.nettyx.serializer.struct.basic.c;
 
 import io.netty.buffer.ByteBuf;
-import java.nio.ByteOrder;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+
+import java.nio.ByteOrder;
 
 
 /**
@@ -15,14 +16,14 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
  */
 public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implements Comparable<CBasic<V>> {
 
-    private static final boolean C_DEFAULT_SINGED = true;
+    private static final boolean   C_DEFAULT_SINGED = true;
     private static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
 
     /**
      * Instantiates a new C basic.
      *
      * @param value the length
-     * @param size the size
+     * @param size  the size
      */
     protected CBasic(V value, int size) {
         super(value, size);
@@ -31,7 +32,7 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implement
     /**
      * Instantiates a new C basic.
      *
-     * @param buf the buf
+     * @param buf  the buf
      * @param size the size
      */
     protected CBasic(ByteBuf buf, int size) {
@@ -59,9 +60,9 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implement
 
         if (anotherObj instanceof CBasic<?>) {
             CBasic<?> anotherCBasic = (CBasic<?>) anotherObj;
-            if (   this.getSize()   != anotherCBasic.getSize()
+            if (this.getSize() != anotherCBasic.getSize()
                 || this.hasSinged() != anotherCBasic.hasSinged()
-                || this.order()     != anotherCBasic.order()) {
+                || this.order() != anotherCBasic.order()) {
                 return false;
             }
 
