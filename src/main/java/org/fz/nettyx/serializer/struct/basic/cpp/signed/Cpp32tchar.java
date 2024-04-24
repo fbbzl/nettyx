@@ -2,8 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import java.nio.charset.Charset;
 import org.fz.nettyx.serializer.struct.basic.cpp.CppBasic;
+
+import java.nio.charset.Charset;
 
 /**
  * @author fengbinbin

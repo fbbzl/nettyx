@@ -1,21 +1,16 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.util.TypeUtil;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.fz.nettyx.exception.TypeJudgmentException;
+
+import java.lang.reflect.*;
 
 /**
  * type parameter at the time of serialization
  *
  * @param <T> the type parameter
- *
  * @author fengbinbin
  * @version 1.0
  * @since 2024 /1/15 11:24
@@ -34,8 +29,7 @@ public abstract class TypeRefer<T> implements Type {
     public static <T> Class<T> getRawType(Type type) {
         if (type instanceof Class<?>) {
             return (Class<T>) type;
-        }
-        else if (type instanceof ParameterizedType) {
+        } else if (type instanceof ParameterizedType) {
             return (Class<T>) ((ParameterizedType) type).getRawType();
         }
         throw new TypeJudgmentException(type);
@@ -50,8 +44,12 @@ public abstract class TypeRefer<T> implements Type {
     }
 
     public static <T> Class<T> getActualType(Type root, Type type, int index) {
-        if (type instanceof Class) { return (Class<T>) type; }
-        if (!(root instanceof ParameterizedType) || type instanceof WildcardType) { return (Class<T>) Object.class; }
+        if (type instanceof Class) {
+            return (Class<T>) type;
+        }
+        if (!(root instanceof ParameterizedType) || type instanceof WildcardType) {
+            return (Class<T>) Object.class;
+        }
 
         if (type instanceof TypeVariable) {
             return getActualType(root, TypeUtil.getActualType(root, type));

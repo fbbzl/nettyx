@@ -18,7 +18,7 @@ public interface Actions {
      * @param channelAction the channel action
      * @param ctx           the ctx
      */
-     static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
+    static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx) {
         if (channelAction != null) channelAction.act(ctx);
     }
 
@@ -30,7 +30,7 @@ public interface Actions {
      * @param localAddress      the local address
      * @param promise           the promise
      */
-     static void invokeAction(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
+    static void invokeAction(ChannelBindAction channelBindAction, ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
         if (channelBindAction != null) channelBindAction.act(ctx, localAddress, promise);
     }
 
@@ -43,8 +43,8 @@ public interface Actions {
      * @param localAddress         the local address
      * @param promise              the promise
      */
-     static void invokeAction(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
-        ChannelPromise promise) {
+    static void invokeAction(ChannelConnectAction channelConnectAction, ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress,
+                             ChannelPromise promise) {
         if (channelConnectAction != null) channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
     }
 
@@ -55,7 +55,7 @@ public interface Actions {
      * @param ctx                  the ctx
      * @param promise              the promise
      */
-     static void invokeAction(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
+    static void invokeAction(ChannelPromiseAction channelPromiseAction, ChannelHandlerContext ctx, ChannelPromise promise) {
         if (channelPromiseAction != null) channelPromiseAction.act(ctx, promise);
     }
 
@@ -67,7 +67,7 @@ public interface Actions {
      * @param msg                the msg
      * @param promise            the promise
      */
-     static void invokeAction(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
+    static void invokeAction(ChannelWriteAction channelWriteAction, ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
         if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
     }
 
@@ -82,7 +82,7 @@ public interface Actions {
      * @param ctx               the ctx
      * @param msg               the msg
      */
-     static void invokeAction(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
+    static void invokeAction(ChannelReadAction channelReadAction, ChannelHandlerContext ctx, Object msg) {
         if (channelReadAction != null) channelReadAction.act(ctx, msg);
     }
 

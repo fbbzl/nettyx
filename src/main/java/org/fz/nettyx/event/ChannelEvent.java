@@ -6,9 +6,10 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-import java.net.SocketAddress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.net.SocketAddress;
 
 /**
  * wrap channel event to ChannelEvent, keep channel event could propagate in ApplicationContext and the others
@@ -22,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public abstract class ChannelEvent<T> {
 
-    private final long happenTime = System.currentTimeMillis();
-    private T source;
+    private final long                  happenTime = System.currentTimeMillis();
+    private       T                     source;
     private final ChannelHandlerContext ctx;
 
     /**
@@ -34,7 +35,7 @@ public abstract class ChannelEvent<T> {
      */
     protected ChannelEvent(T source, ChannelHandlerContext ctx) {
         this.source = source;
-        this.ctx = ctx;
+        this.ctx    = ctx;
     }
 
     /**
@@ -250,7 +251,7 @@ public abstract class ChannelEvent<T> {
      * @param <T> the type parameter
      */
     @Getter
-    public static class UserEventTriggered<T> extends ChannelEvent<T>  {
+    public static class UserEventTriggered<T> extends ChannelEvent<T> {
 
         private Object event;
 
@@ -452,7 +453,7 @@ public abstract class ChannelEvent<T> {
          */
         public Bind(ChannelHandlerContext ctx, SocketAddress socketAddress, ChannelPromise channelPromise) {
             super(ctx);
-            this.socketAddress = socketAddress;
+            this.socketAddress  = socketAddress;
             this.channelPromise = channelPromise;
         }
 
@@ -466,7 +467,7 @@ public abstract class ChannelEvent<T> {
          */
         public Bind(T source, ChannelHandlerContext ctx, SocketAddress socketAddress, ChannelPromise channelPromise) {
             super(source, ctx);
-            this.socketAddress = socketAddress;
+            this.socketAddress  = socketAddress;
             this.channelPromise = channelPromise;
         }
 
@@ -514,7 +515,7 @@ public abstract class ChannelEvent<T> {
     @Getter
     public static class Connect<T> extends ChannelEvent<T> {
 
-        private SocketAddress  localAddress, remoteAddress;
+        private SocketAddress localAddress, remoteAddress;
         private ChannelPromise channelPromise;
 
         /**
@@ -526,7 +527,7 @@ public abstract class ChannelEvent<T> {
          */
         public Connect(ChannelHandlerContext ctx, SocketAddress localAddress, SocketAddress remoteAddress) {
             super(ctx);
-            this.localAddress = localAddress;
+            this.localAddress  = localAddress;
             this.remoteAddress = remoteAddress;
         }
 
@@ -540,7 +541,7 @@ public abstract class ChannelEvent<T> {
          */
         public Connect(T source, ChannelHandlerContext ctx, SocketAddress localAddress, SocketAddress remoteAddress) {
             super(source, ctx);
-            this.localAddress = localAddress;
+            this.localAddress  = localAddress;
             this.remoteAddress = remoteAddress;
         }
 
@@ -565,8 +566,8 @@ public abstract class ChannelEvent<T> {
          */
         public Connect(ChannelHandlerContext ctx, SocketAddress localAddress, SocketAddress remoteAddress, ChannelPromise channelPromise) {
             super(ctx);
-            this.localAddress = localAddress;
-            this.remoteAddress = remoteAddress;
+            this.localAddress   = localAddress;
+            this.remoteAddress  = remoteAddress;
             this.channelPromise = channelPromise;
         }
 
@@ -581,8 +582,8 @@ public abstract class ChannelEvent<T> {
          */
         public Connect(T source, ChannelHandlerContext ctx, SocketAddress localAddress, SocketAddress remoteAddress, ChannelPromise channelPromise) {
             super(source, ctx);
-            this.localAddress = localAddress;
-            this.remoteAddress = remoteAddress;
+            this.localAddress   = localAddress;
+            this.remoteAddress  = remoteAddress;
             this.channelPromise = channelPromise;
         }
 
@@ -851,7 +852,7 @@ public abstract class ChannelEvent<T> {
          */
         public Write(ChannelHandlerContext ctx, Object msg, ChannelPromise channelPromise) {
             super(ctx);
-            this.msg = msg;
+            this.msg            = msg;
             this.channelPromise = channelPromise;
         }
 
@@ -865,7 +866,7 @@ public abstract class ChannelEvent<T> {
          */
         public Write(T source, ChannelHandlerContext ctx, Object msg, ChannelPromise channelPromise) {
             super(source, ctx);
-            this.msg = msg;
+            this.msg            = msg;
             this.channelPromise = channelPromise;
         }
     }

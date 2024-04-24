@@ -67,7 +67,6 @@ public final class Exceptions {
      * API, this method is provided
      *
      * @param exceptionMessage exception message
-     *
      * @return exception supplier
      */
     public static Supplier<RuntimeException> exception(String exceptionMessage) {

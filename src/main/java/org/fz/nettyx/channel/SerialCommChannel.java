@@ -159,8 +159,8 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
     @RequiredArgsConstructor
     public static class SerialCommAddress extends SocketAddress {
 
-        private static final long serialVersionUID = -870353013039000250L;
-        private final String value;
+        private static final long   serialVersionUID = -870353013039000250L;
+        private final        String value;
 
         /**
          * @return The serial port address of the device (e.g. COM1, /dev/ttyUSB0, ...)
@@ -172,8 +172,8 @@ public abstract class SerialCommChannel extends OioByteStreamChannel {
         @Override
         public String toString() {
             return "SerialCommPortAddress{" +
-                    "value='" + value + '\'' +
-                    '}';
+                   "value='" + value + '\'' +
+                   '}';
         }
     }
 }

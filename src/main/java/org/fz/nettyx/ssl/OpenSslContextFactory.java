@@ -3,12 +3,13 @@ package org.fz.nettyx.ssl;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import javax.net.ssl.SSLException;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.net.ssl.SSLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * use to get OpenSslContext
@@ -43,7 +44,7 @@ public class OpenSslContextFactory {
     }
 
     protected SslContext getServerSslContext(Path certChainPath, Path keyPath, String keypass, Path rootPath)
-    throws SSLException {
+            throws SSLException {
         return SslContextBuilder.forServer(certChainPath.toFile(), keyPath.toFile(), keypass)
                                 .trustManager(rootPath.toFile()).clientAuth(ClientAuth.REQUIRE).build();
     }
@@ -56,7 +57,7 @@ public class OpenSslContextFactory {
     }
 
     protected SslContext getClientSslContext(Path certChainPath, Path keyPath, String keypass, Path rootPath)
-    throws SSLException {
+            throws SSLException {
         return SslContextBuilder.forClient().keyManager(certChainPath.toFile(), keyPath.toFile(), keypass)
                                 .trustManager(rootPath.toFile()).build();
     }

@@ -12,8 +12,9 @@ import io.netty.channel.ChannelFuture;
 @FunctionalInterface
 public interface ChannelFutureAction {
 
-    ChannelFutureAction DO_NOTHING = cf -> {};
-    
+    ChannelFutureAction DO_NOTHING = cf -> {
+    };
+
     void act(ChannelFuture channelFuture);
 
 
