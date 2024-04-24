@@ -27,7 +27,7 @@ import java.util.Arrays;
  * @since 2023/5/23 21:35
  */
 @Slf4j
-public class SerializerTester {
+public class SerializerTest {
 
     @BeforeClass
     public static void initContext() {
@@ -78,6 +78,8 @@ public class SerializerTester {
         System.err.println("bytes1: " + bytes1.length);
         System.err.println(Arrays.toString(bytes1));
         System.err.println("turn :" + turn);
+
+        Assert.assertNotNull(turn);
     }
 
 }

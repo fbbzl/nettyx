@@ -30,6 +30,8 @@ import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
  * @version 1.0
  * @since 2024/3/1 14:44
  */
+
+@SuppressWarnings("deprecation")
 final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements RxtxChannelConfig {
 
     private volatile int       baudrate    = 115200;

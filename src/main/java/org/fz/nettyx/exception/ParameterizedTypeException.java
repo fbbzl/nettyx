@@ -10,17 +10,20 @@ import java.lang.reflect.Method;
  */
 public class ParameterizedTypeException extends RuntimeException {
 
+    static String toExceptionMessage(Object entry) {
+        return "can not determine field [" + entry + "] parameterized type";
+    }
+
     public ParameterizedTypeException(Field field) {
-        super("can not determine field [" + field + "] parameterized type");
+        super(toExceptionMessage(field));
     }
 
     public ParameterizedTypeException(Method method) {
-        super("can not determine method [" + method + "] parameterized type");
+        super(toExceptionMessage(method));
     }
 
     public ParameterizedTypeException(Class<?> clazz) {
-        super("can not determine clazz [" + clazz + "] parameterized type");
+        super(toExceptionMessage(clazz));
     }
-
 
 }
