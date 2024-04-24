@@ -59,6 +59,21 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
         }
     }
 
+    public ChannelPromise write(Object message) {
+        if (this.notActive(channel) || notWritable(channel)) {
+            log.debug("channel not in usable status, message will be discard: {}", message);
+            ReferenceCountUtil.safeRelease(message);
+            return failurePromise(channel, "channel: [" + channel + "] is not usable");
+        }
+
+        try {
+            return (ChannelPromise) channel.write(message);
+        } catch (Exception exception) {
+            throw new ChannelException("exception occurred while sending the message [" + message + "], address is ["
+                                       + channel.remoteAddress() + "]", exception);
+        }
+    }
+
     public ChannelPromise writeAndFlush(Object message) {
         if (this.notActive(channel) || notWritable(channel)) {
             log.debug("channel not in usable status, message will be discard: {}", message);

@@ -87,6 +87,24 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
         }
     }
 
+    public ChannelPromise write(K channelKey, Object message) {
+        Channel channel = channelStorage.get(channelKey);
+
+        if (notActive(channel) || notWritable(channel)) {
+            log.debug("channel not in usable status, channel key is [{}], message will be discard: {}", channelKey,
+                      message);
+            ReferenceCountUtil.safeRelease(message);
+            return failurePromise(channel, "channel: [" + channel + "] is not usable");
+        }
+
+        try {
+            return (ChannelPromise) channel.write(message);
+        } catch (Exception exception) {
+            throw new ChannelException("exception occurred while sending the message [" + message + "], address is " +
+                                       "[" + channel.remoteAddress() + "]", exception);
+        }
+    }
+
     public ChannelPromise writeAndFlush(K channelKey, Object message) {
         Channel channel = channelStorage.get(channelKey);
 
