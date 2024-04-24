@@ -57,8 +57,8 @@ public @interface ToString {
                         "buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "], field is [" + field
                         + "]");
             }
-            byte[] bytes;
-            byteBuf.readBytes(bytes = new byte[toString.bufferLength()]);
+            byte[] bytes = new byte[toString.bufferLength()];
+            byteBuf.readBytes(bytes);
             return new String(bytes, Charset.forName(charset));
         }
 
