@@ -1,15 +1,11 @@
 package org.fz.nettyx.endpoint.client;
 
 import cn.hutool.core.util.TypeUtil;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelException;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.DefaultChannelPromise;
-import io.netty.channel.EventLoopGroup;
-import java.lang.reflect.Type;
+import io.netty.channel.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Type;
 
 /**
  * top level client based on netty
@@ -31,13 +27,13 @@ public abstract class Client<C extends Channel> {
 
     public static boolean gracefullyCloseable(Channel channel) {
         return
-            channel != null
-            &&
-            !channel.isActive()
-            &&
-            !channel.isOpen()
-            &&
-            !channel.isWritable();
+                channel != null
+                &&
+                !channel.isActive()
+                &&
+                !channel.isOpen()
+                &&
+                !channel.isWritable();
     }
 
     protected Class<C> findChannelClass() {
@@ -56,23 +52,39 @@ public abstract class Client<C extends Channel> {
 
     protected abstract EventLoopGroup newEventLoopGroup();
 
-    protected abstract ChannelInitializer<? extends Channel> channelInitializer();
+    protected abstract ChannelInitializer<C> channelInitializer();
 
-    protected boolean isRegistered(Channel channel)  { return channel != null && channel.isRegistered(); }
+    protected boolean isRegistered(Channel channel) {
+        return channel != null && channel.isRegistered();
+    }
 
-    protected boolean isOpen(Channel channel)        { return channel != null && channel.isOpen(); }
+    protected boolean isOpen(Channel channel) {
+        return channel != null && channel.isOpen();
+    }
 
-    protected boolean isActive(Channel channel)      { return channel != null && channel.isActive(); }
+    protected boolean isActive(Channel channel) {
+        return channel != null && channel.isActive();
+    }
 
-    protected boolean isWritable(Channel channel)    { return channel != null && channel.isWritable(); }
+    protected boolean isWritable(Channel channel) {
+        return channel != null && channel.isWritable();
+    }
 
-    protected boolean notRegistered(Channel channel) { return !isRegistered(channel); }
+    protected boolean notRegistered(Channel channel) {
+        return !isRegistered(channel);
+    }
 
-    protected boolean notOpen(Channel channel)       { return !isOpen(channel); }
+    protected boolean notOpen(Channel channel) {
+        return !isOpen(channel);
+    }
 
-    protected boolean notActive(Channel channel)     { return !isActive(channel); }
+    protected boolean notActive(Channel channel) {
+        return !isActive(channel);
+    }
 
-    protected boolean notWritable(Channel channel)   { return !isWritable(channel); }
+    protected boolean notWritable(Channel channel) {
+        return !isWritable(channel);
+    }
 
     protected ChannelPromise failurePromise(Channel channel) {
         return failurePromise(channel, "channel failure promise occur, channel: [" + channel + "]");

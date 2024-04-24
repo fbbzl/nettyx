@@ -25,7 +25,7 @@ import static org.fz.nettyx.action.Actions.invokeAction;
 public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
 
     private final ChannelExceptionAction timeoutAction;
-    private final boolean fireNext;
+    private final boolean                fireNext;
 
     /**
      * Instantiates a new Actionable write timeout handler.
@@ -71,7 +71,7 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
                                      boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
-        this.fireNext = fireNext;
+        this.fireNext      = fireNext;
     }
 
     @Override

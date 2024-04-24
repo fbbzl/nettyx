@@ -262,7 +262,6 @@ public interface RxtxChannelConfig extends ChannelConfig {
      *
      * @param waitTimeMillis The number of milliseconds to wait, defaulting to 0 (no
      *                       wait) if unset
-     *
      * @throws IllegalArgumentException if the supplied value is &lt; 0
      */
     RxtxChannelConfig setWaitTimeMillis(int waitTimeMillis);
@@ -281,7 +280,6 @@ public interface RxtxChannelConfig extends ChannelConfig {
     RxtxChannelConfig setConnectTimeoutMillis(int connectTimeoutMillis);
 
     @Override
-    @Deprecated
     RxtxChannelConfig setMaxMessagesPerRead(int maxMessagesPerRead);
 
     @Override

@@ -2,15 +2,17 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
 import org.fz.nettyx.util.Throws;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+
 /**
  * switch means the bit-switch
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/6 22:20
@@ -26,7 +28,7 @@ public class SwitchHandler implements PropTypeHandler {
     public String read(Prop prop, ByteBuf reading) {
         String[] switches = XmlSerializerContext.findSwitch(prop);
 
-        byte[] bytes = readBytes(prop, reading);
+        byte[] bytes  = readBytes(prop, reading);
         BitSet bitSet = BitSet.valueOf(bytes);
         Throws.ifTrue(bitSet.length() > switches.length, "bits length [" + bitSet.length() + "] is more then switches length [" + switches.length + "]");
 
@@ -36,7 +38,7 @@ public class SwitchHandler implements PropTypeHandler {
     @Override
     public void write(Prop prop, ByteBuf writing) {
         String[] switchValues = CharSequenceUtil.splitToArray(prop.getText(), ",");
-        String[] switches = XmlSerializerContext.findSwitch(prop);
+        String[] switches     = XmlSerializerContext.findSwitch(prop);
 
         byte[] bytes = writeSwitches(switches, switchValues);
 
@@ -55,7 +57,7 @@ public class SwitchHandler implements PropTypeHandler {
     }
 
     private static byte[] writeSwitches(String[] switches, String... switchesValues) {
-        byte[] bytes = new byte[switches.length];
+        byte[] bytes  = new byte[switches.length];
         BitSet bitSet = BitSet.valueOf(bytes);
 
         for (int i = 0; i < switchesValues.length; i++) {

@@ -1,8 +1,9 @@
 package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import java.nio.charset.StandardCharsets;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author fengbinbin

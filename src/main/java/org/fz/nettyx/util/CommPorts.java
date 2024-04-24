@@ -1,24 +1,21 @@
 package org.fz.nettyx.util;
 
-import static cn.hutool.core.collection.CollUtil.newArrayList;
-import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
-
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.system.OsInfo;
 import cn.hutool.system.SystemUtil;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
+
+import static cn.hutool.core.collection.CollUtil.newArrayList;
+import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
 
 
 /**
@@ -34,11 +31,15 @@ public class CommPorts {
     static final Supplier<List<String>> GET_COM_PORT;
 
     static {
-        if (OS_INFO.isLinux()) { GET_COM_PORT = CommPorts::getComPortsLinux; } else if (OS_INFO.isWindows()) {
+        if (OS_INFO.isLinux()) {
+            GET_COM_PORT = CommPorts::getComPortsLinux;
+        } else if (OS_INFO.isWindows()) {
             GET_COM_PORT = CommPorts::getComPortsWindows;
         }
         // default is linux
-        else { GET_COM_PORT = CommPorts::getComPortsLinux; }
+        else {
+            GET_COM_PORT = CommPorts::getComPortsLinux;
+        }
     }
 
     public static List<String> getLocalComPorts() {
@@ -77,8 +78,7 @@ public class CommPorts {
                 }
                 index++;
             }
-        }
-        catch (IOException ioException) {
+        } catch (IOException ioException) {
             throw new UnsupportedOperationException("exception occur while reading windows regedit, command: " + command);
         }
 
@@ -105,8 +105,7 @@ public class CommPorts {
                 }
             }
             return newArrayList(ttys);
-        }
-        catch (IOException exception) {
+        } catch (IOException exception) {
             throw new UnsupportedOperationException("can not find comm-ports please check");
         }
     }

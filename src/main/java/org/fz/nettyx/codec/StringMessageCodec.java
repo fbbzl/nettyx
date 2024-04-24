@@ -3,10 +3,11 @@ package org.fz.nettyx.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import java.nio.charset.Charset;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * basic string codec

@@ -14,6 +14,7 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
  * @since 2024/3/2 13:29
  */
 
+@SuppressWarnings("deprecation")
 final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscChannelConfig {
 
     private volatile int       baudRate    = 115200;
@@ -38,14 +39,30 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getOption(ChannelOption<T> option) {
-        if (option == BAUD_RATE) { return (T) Integer.valueOf(getBaudRate()); }
-        if (option == DTR) { return (T) Boolean.valueOf(isDtr()); }
-        if (option == RTS) { return (T) Boolean.valueOf(isRts()); }
-        if (option == STOP_BITS) { return (T) getStopBits(); }
-        if (option == DATA_BITS) { return (T) Integer.valueOf(getDataBits()); }
-        if (option == PARITY_BIT) { return (T) getParityBit(); }
-        if (option == WAIT_TIME) { return (T) Integer.valueOf(getWaitTimeMillis()); }
-        if (option == READ_TIMEOUT) { return (T) Integer.valueOf(getReadTimeout()); }
+        if (option == BAUD_RATE) {
+            return (T) Integer.valueOf(getBaudRate());
+        }
+        if (option == DTR) {
+            return (T) Boolean.valueOf(isDtr());
+        }
+        if (option == RTS) {
+            return (T) Boolean.valueOf(isRts());
+        }
+        if (option == STOP_BITS) {
+            return (T) getStopBits();
+        }
+        if (option == DATA_BITS) {
+            return (T) Integer.valueOf(getDataBits());
+        }
+        if (option == PARITY_BIT) {
+            return (T) getParityBit();
+        }
+        if (option == WAIT_TIME) {
+            return (T) Integer.valueOf(getWaitTimeMillis());
+        }
+        if (option == READ_TIMEOUT) {
+            return (T) Integer.valueOf(getReadTimeout());
+        }
 
         return super.getOption(option);
     }

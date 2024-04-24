@@ -45,19 +45,19 @@ import static org.fz.nettyx.util.EndianKit.LE;
 @Getter
 public class XmlSerializerContext {
 
-    private static final Map<String, Document> NAMESPACES_DOCS = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, Document>           NAMESPACES_DOCS = new SafeConcurrentHashMap<>(64);
     /**
      * key is enum name, the value is the enum-string
      */
-    private static final Map<String, String[]> ENUMS = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, String[]>           ENUMS           = new SafeConcurrentHashMap<>(64);
     /**
      * key is switch name, the value is the switch
      */
-    private static final Map<String, String[]> SWITCHES = new SafeConcurrentHashMap<>(64);
+    private static final Map<String, String[]>           SWITCHES        = new SafeConcurrentHashMap<>(64);
     /**
      * first key is namespace, second key is model name, the value is model
      */
-    private static final Map<String, Map<String, Model>> MODELS = new SafeConcurrentHashMap<>(256);
+    private static final Map<String, Map<String, Model>> MODELS          = new SafeConcurrentHashMap<>(256);
 
     private static final Map<String, PropTypeHandler> PROP_TYPE_CONVERTERS = new SafeConcurrentHashMap<>(64);
 
@@ -152,7 +152,7 @@ public class XmlSerializerContext {
     //************************************          public start            *****************************************//
 
     public static String[] findEnum(Prop prop) {
-        PropType type = prop.getType();
+        PropType type     = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "enum [" + type.getValue() + "] do not support 2 type args");
 
@@ -162,7 +162,7 @@ public class XmlSerializerContext {
     }
 
     public static String[] findSwitch(Prop prop) {
-        PropType type = prop.getType();
+        PropType type     = prop.getType();
         String[] typeArgs = type.getTypeArgs();
         Throws.ifTrue(typeArgs.length > 1, "switch [" + type.getValue() + "] do not support 2 type args");
 
@@ -194,14 +194,14 @@ public class XmlSerializerContext {
     @Data
     public static class Model {
 
-        private final String namespace;
-        private final String name;
+        private final String     namespace;
+        private final String     name;
         private final List<Prop> props;
 
         public Model(Element modelEl) {
             this.namespace = XmlUtils.attrValue(modelEl.getDocument().getRootElement(), NAMESPACE);
-            this.name = XmlUtils.name(modelEl);
-            this.props = XmlUtils.elements(modelEl).stream().map(Prop::new).collect(toList());
+            this.name      = XmlUtils.name(modelEl);
+            this.props     = XmlUtils.elements(modelEl).stream().map(Prop::new).collect(toList());
         }
 
         public static class Prop {
@@ -278,13 +278,13 @@ public class XmlSerializerContext {
             public static final Pattern MODEL_REF_PATTERN = Pattern.compile("^\\{\\{(\\S+)}}$");
             public static final Pattern TYPE_ARGS_PATTERN = Pattern.compile("^(.+)\\(.+\\)$");
 
-            private final String typeText;
-            private final String value;
+            private final String   typeText;
+            private final String   value;
             private final String[] typeArgs;
 
             public PropType(String typeText) {
                 this.typeText = typeText;
-                this.value = subBefore(typeText, "(", false);
+                this.value    = subBefore(typeText, "(", false);
                 this.typeArgs = splitToArray(subBetween(typeText, "(", ")"), ",");
             }
 

@@ -25,7 +25,7 @@ import static org.fz.nettyx.action.Actions.invokeAction;
 public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
 
     private final ChannelExceptionAction timeoutAction;
-    private final boolean fireNext;
+    private final boolean                fireNext;
 
     /**
      * Instantiates a new Actionable read timeout handler.
@@ -70,7 +70,7 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
     public ActionReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
-        this.fireNext = fireNext;
+        this.fireNext      = fireNext;
     }
 
     @Override
