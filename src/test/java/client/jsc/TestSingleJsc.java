@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.concurrent.Executors;
@@ -43,8 +41,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
         channelConfig
                 .setBaudRate(115200)
                 .setDataBits(JscChannelConfig.DataBits.DATABITS_8)
-                .setStopBits(StopBits.ONE_STOP_BIT)
-                .setParityBit(ParityBit.NO_PARITY)
+                .setStopBits(JscChannelConfig.StopBits.ONE_STOP_BIT)
+                .setParityBit(JscChannelConfig.ParityBit.NO_PARITY)
                 .setDtr(false)
                 .setRts(false);
     }

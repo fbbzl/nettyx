@@ -44,7 +44,7 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         // if(targetChannelKey=="MES") {br=19200}
         channelConfig
                .setBaudRate(115200)
-               .setDataBits(8)
+               .setDataBits(JscChannelConfig.DataBits.DATABITS_8)
                .setStopBits(JscChannelConfig.StopBits.ONE_STOP_BIT)
                .setParityBit(JscChannelConfig.ParityBit.NO_PARITY)
                .setDtr(false)
