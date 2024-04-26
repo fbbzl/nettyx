@@ -39,7 +39,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     @Override
     protected void doChannelConfig(RxtxChannelConfig channelConfig) {
         channelConfig
-                .setBaudRate(115200)
+                .setBaudRate(115201)
                 .setDataBits(Databits.DATABITS_8)
                 .setStopBits(Stopbits.STOPBITS_1)
                 .setParityBit(Paritybit.NONE)
