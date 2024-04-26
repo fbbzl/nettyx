@@ -60,7 +60,7 @@ public class TestSingleJsc extends SingleJscChannelClient {
                         testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
-                    JscChannelConfig config =(JscChannelConfig) cf.channel().config();
+                    JscChannelConfig config = (JscChannelConfig) cf.channel().config();
                     System.err.println(config.getBaudRate());
                 })
                 .whenCancel((l, cf) -> System.err.println("cancel"))
@@ -69,5 +69,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
         testSingleJsc.connect().addListener(listener);
 
+        // send msg
+        testSingleJsc.write("this is msg from 5 write");
+        testSingleJsc.writeAndFlush("this is msg from 6 writeAndFlush");
     }
 }
