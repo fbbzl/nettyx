@@ -2,7 +2,6 @@ package client.jsc;
 
 
 import client.TestChannelInitializer;
-import cn.hutool.core.lang.Console;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +53,8 @@ public class TestSingleJsc extends SingleJscChannelClient {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    System.err.println(cf.channel().config());
-
-                    Console.log(cf.channel().localAddress() + ": ok");
+                    JscChannelConfig config =(JscChannelConfig) cf.channel().config();
+                    System.err.println(config.getBaudRate());
                 })
                 .whenCancel((l, cf) -> System.err.println("cancel"))
                 .whenFailure(redo(testSingleJsc::connect, 2, SECONDS))
@@ -64,9 +62,5 @@ public class TestSingleJsc extends SingleJscChannelClient {
 
         testSingleJsc.connect().addListener(listener);
 
-
-        // send msg
-        testSingleJsc.write("this is msg from write");
-        testSingleJsc.writeAndFlush("this is msg writeAndFlush");
     }
 }
