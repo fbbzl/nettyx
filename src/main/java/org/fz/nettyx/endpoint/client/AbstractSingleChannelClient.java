@@ -18,7 +18,8 @@ import java.net.SocketAddress;
 
 @Slf4j
 @Getter
-public abstract class AbstractSingleChannelClient<C extends Channel> extends Client<C> {
+@SuppressWarnings({"unchecked", "unused"})
+public abstract class AbstractSingleChannelClient<C extends Channel, F extends ChannelConfig> extends Client<C> {
 
     private final SocketAddress remoteAddress;
     private final Bootstrap     bootstrap;
@@ -89,20 +90,20 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
         }
     }
 
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
+    Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
                     C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                    doChannelConfig(chl);
+                    doChannelConfig((F) chl.config());
                     return chl;
                 })
                 .handler(channelInitializer());
     }
 
-    protected void doChannelConfig(C channel) {
-        // default is nothing
+    protected void doChannelConfig(F channelConfig) {
+        // default is do nothing
     }
 
 }

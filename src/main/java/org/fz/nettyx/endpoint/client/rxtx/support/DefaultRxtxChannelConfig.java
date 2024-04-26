@@ -36,10 +36,10 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
 
     private volatile int       baudrate    = 115200;
     private volatile boolean   dtr;
-    private volatile boolean   rts;
-    private volatile Stopbits  stopbits    = Stopbits.STOPBITS_1;
-    private volatile Databits  databits    = Databits.DATABITS_8;
-    private volatile Paritybit paritybit   = Paritybit.NONE;
+    private volatile boolean  rts;
+    private volatile StopBits stopbits = StopBits.STOPBITS_1;
+    private volatile DataBits databits = DataBits.DATABITS_8;
+    private volatile ParityBit paritybit = ParityBit.NONE;
     private volatile int       waitTime;
     private volatile int       readTimeout = 1000;
 
@@ -57,7 +57,7 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     @Override
     public <T> T getOption(ChannelOption<T> option) {
         if (option == BAUD_RATE) {
-            return (T) Integer.valueOf(getBaudrate());
+            return (T) Integer.valueOf(getBaudRate());
         }
         if (option == DTR) {
             return (T) Boolean.valueOf(isDtr());
@@ -66,13 +66,13 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
             return (T) Boolean.valueOf(isRts());
         }
         if (option == STOP_BITS) {
-            return (T) getStopbits();
+            return (T) getStopBits();
         }
         if (option == DATA_BITS) {
-            return (T) getDatabits();
+            return (T) getDataBits();
         }
         if (option == PARITY_BIT) {
-            return (T) getParitybit();
+            return (T) getParityBit();
         }
         if (option == WAIT_TIME) {
             return (T) Integer.valueOf(getWaitTimeMillis());
@@ -88,17 +88,17 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
         validate(option, value);
 
         if (option == BAUD_RATE) {
-            setBaudrate((Integer) value);
+            setBaudRate((Integer) value);
         } else if (option == DTR) {
             setDtr((Boolean) value);
         } else if (option == RTS) {
             setRts((Boolean) value);
         } else if (option == STOP_BITS) {
-            setStopbits((Stopbits) value);
+            setStopBits((StopBits) value);
         } else if (option == DATA_BITS) {
-            setDatabits((Databits) value);
+            setDataBits((DataBits) value);
         } else if (option == PARITY_BIT) {
-            setParitybit((Paritybit) value);
+            setParityBit((ParityBit) value);
         } else if (option == WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
         } else if (option == READ_TIMEOUT) {
@@ -110,46 +110,46 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     }
 
     @Override
-    public RxtxChannelConfig setBaudrate(final int baudrate) {
+    public RxtxChannelConfig setBaudRate(final int baudrate) {
         this.baudrate = baudrate;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setStopbits(final Stopbits stopbits) {
+    public RxtxChannelConfig setStopBits(final StopBits stopbits) {
         this.stopbits = stopbits;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setDatabits(final Databits databits) {
+    public RxtxChannelConfig setDataBits(final DataBits databits) {
         this.databits = databits;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setParitybit(final Paritybit paritybit) {
+    public RxtxChannelConfig setParityBit(final ParityBit paritybit) {
         this.paritybit = paritybit;
         return this;
     }
 
     @Override
-    public int getBaudrate() {
+    public int getBaudRate() {
         return baudrate;
     }
 
     @Override
-    public Stopbits getStopbits() {
+    public StopBits getStopBits() {
         return stopbits;
     }
 
     @Override
-    public Databits getDatabits() {
+    public DataBits getDataBits() {
         return databits;
     }
 
     @Override
-    public Paritybit getParitybit() {
+    public ParityBit getParityBit() {
         return paritybit;
     }
 
