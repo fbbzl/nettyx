@@ -7,9 +7,9 @@ import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Databits;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Paritybit;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Stopbits;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.DataBits;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.ParityBit;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.StopBits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.concurrent.Executors;
@@ -40,9 +40,9 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     protected void doChannelConfig(RxtxChannelConfig channelConfig) {
         channelConfig
                 .setBaudRate(115200)
-                .setDataBits(Databits.DATABITS_8)
-                .setStopBits(Stopbits.STOPBITS_1)
-                .setParityBit(Paritybit.NONE)
+                .setDataBits(DataBits.DATABITS_8)
+                .setStopBits(StopBits.STOPBITS_1)
+                .setParityBit(ParityBit.NONE)
                 .setDtr(false)
                 .setRts(false);
     }
