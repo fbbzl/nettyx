@@ -9,6 +9,7 @@ import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
+import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -42,14 +43,14 @@ public class TestSingleJsc extends SingleJscChannelClient {
     }
 
     @Override
-    protected void doChannelConfig(JscChannel channel) {
-        channel.config()
-               .setBaudRate(115200)
-               .setDataBits(8)
-               .setStopBits(StopBits.ONE_STOP_BIT)
-               .setParityBit(ParityBit.NO_PARITY)
-               .setDtr(false)
-               .setRts(false);
+    protected void doChannelConfig(JscChannelConfig channelConfig) {
+        channelConfig
+                .setBaudRate(115200)
+                .setDataBits(8)
+                .setStopBits(StopBits.ONE_STOP_BIT)
+                .setParityBit(ParityBit.NO_PARITY)
+                .setDtr(false)
+                .setRts(false);
     }
 
     public static void main(String[] args) {
@@ -69,5 +70,9 @@ public class TestSingleJsc extends SingleJscChannelClient {
                 .whenDone((l, cf) -> System.err.println("done"));
 
         testSingleJsc.connect().addListener(listener);
+
+        // send msg
+        testSingleJsc.write("this is msg from write");
+        testSingleJsc.writeAndFlush("this is msg writeAndFlush");
     }
 }

@@ -7,6 +7,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Databits;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Paritybit;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Stopbits;
@@ -39,14 +40,14 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     @Override
-    protected void doChannelConfig(RxtxChannel channel) {
-        channel.config()
-               .setBaudRate(115200)
-               .setDataBits(Databits.DATABITS_8)
-               .setStopBits(Stopbits.STOPBITS_1)
-               .setParityBit(Paritybit.NONE)
-               .setDtr(false)
-               .setRts(false);
+    protected void doChannelConfig(RxtxChannelConfig channelConfig) {
+        channelConfig
+                .setBaudRate(115200)
+                .setDataBits(Databits.DATABITS_8)
+                .setStopBits(Stopbits.STOPBITS_1)
+                .setParityBit(Paritybit.NONE)
+                .setDtr(false)
+                .setRts(false);
     }
 
     public static void main(String[] args) {
