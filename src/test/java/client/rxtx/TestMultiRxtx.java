@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.endpoint.client.rxtx.MultiRxtxChannelClient;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
+import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
@@ -30,6 +31,18 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
 
     protected TestMultiRxtx(Map<String, SerialCommChannel.SerialCommAddress> stringRxtxDeviceAddressMap) {
         super(stringRxtxDeviceAddressMap);
+    }
+
+    @Override
+    protected void doChannelConfig(String targetChannelKey, RxtxChannelConfig channelConfig) {
+        // if(targetChannelKey=="MES") {br=19200}
+        channelConfig
+                .setBaudRate(115200)
+                .setDataBits(RxtxChannelConfig.Databits.DATABITS_8)
+                .setStopBits(RxtxChannelConfig.Stopbits.STOPBITS_1)
+                .setParityBit(RxtxChannelConfig.Paritybit.NONE)
+                .setDtr(false)
+                .setRts(false);
     }
 
     @Override

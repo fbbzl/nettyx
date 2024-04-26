@@ -41,6 +41,7 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
 
     @Override
     protected void doChannelConfig(String targetChannelKey, JscChannelConfig channelConfig) {
+        // if(targetChannelKey=="MES") {br=19200}
         channelConfig
                .setBaudRate(115200)
                .setDataBits(8)
