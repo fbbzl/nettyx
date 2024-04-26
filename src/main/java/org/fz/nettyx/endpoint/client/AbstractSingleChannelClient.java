@@ -18,6 +18,7 @@ import java.net.SocketAddress;
 
 @Slf4j
 @Getter
+@SuppressWarnings({"unchecked", "unused"})
 public abstract class AbstractSingleChannelClient<C extends Channel, F extends ChannelConfig> extends Client<C> {
 
     private final SocketAddress remoteAddress;
@@ -89,7 +90,6 @@ public abstract class AbstractSingleChannelClient<C extends Channel, F extends C
         }
     }
 
-    @SuppressWarnings("unchecked")
     Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
