@@ -52,7 +52,7 @@ public class JscChannel extends SerialCommChannel {
     protected void doInit() {
         serialPort.setComPortParameters(
                 config().getOption(BAUD_RATE),
-                config().getOption(DATA_BITS),
+                config().getOption(DATA_BITS).value(),
                 config().getOption(STOP_BITS).value(),
                 config().getOption(PARITY_BIT).value());
 
