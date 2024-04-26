@@ -2,7 +2,6 @@ package client.rxtx;
 
 
 import client.TestChannelInitializer;
-import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -13,14 +12,12 @@ import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Paritybit;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Stopbits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
-import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**
@@ -42,14 +39,14 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
     }
 
     @Override
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
-        return super.newBootstrap(remoteAddress)
-                    .option(BAUD_RATE, 115200)
-                    .option(DATA_BITS, Databits.DATABITS_8)
-                    .option(STOP_BITS, Stopbits.STOPBITS_1)
-                    .option(PARITY_BIT, Paritybit.NONE)
-                    .option(DTR, false)
-                    .option(RTS, false);
+    protected void doChannelConfig(RxtxChannel channel) {
+        channel.config()
+               .setBaudRate(115200)
+               .setDataBits(Databits.DATABITS_8)
+               .setStopBits(Stopbits.STOPBITS_1)
+               .setParityBit(Paritybit.NONE)
+               .setDtr(false)
+               .setRts(false);
     }
 
     public static void main(String[] args) {

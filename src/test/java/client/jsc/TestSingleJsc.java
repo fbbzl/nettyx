@@ -3,7 +3,6 @@ package client.jsc;
 
 import client.TestChannelInitializer;
 import cn.hutool.core.lang.Console;
-import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -14,14 +13,12 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.ParityBit;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig.StopBits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
-import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**
@@ -45,14 +42,14 @@ public class TestSingleJsc extends SingleJscChannelClient {
     }
 
     @Override
-    protected Bootstrap newBootstrap(SocketAddress jscDeviceAddress) {
-        return super.newBootstrap(jscDeviceAddress)
-                    .option(BAUD_RATE, 115200)
-                    .option(DATA_BITS, 8)
-                    .option(STOP_BITS, StopBits.ONE_STOP_BIT)
-                    .option(PARITY_BIT, ParityBit.NO_PARITY)
-                    .option(DTR, false)
-                    .option(RTS, false);
+    protected void doChannelConfig(JscChannel channel) {
+        channel.config()
+               .setBaudRate(115200)
+               .setDataBits(8)
+               .setStopBits(StopBits.ONE_STOP_BIT)
+               .setParityBit(ParityBit.NO_PARITY)
+               .setDtr(false)
+               .setRts(false);
     }
 
     public static void main(String[] args) {

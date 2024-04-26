@@ -34,17 +34,17 @@ import io.netty.channel.WriteBufferWaterMark;
  * <tr>
  * <th>Name</th><th>Associated setter method</th>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#BAUD_RATE}</td><td>{@link #setBaudrate(int)}</td>
+ * <td>{@link RxtxChannelOption#BAUD_RATE}</td><td>{@link #setBaudRate(int)}</td>
  * </tr><tr>
  * <td>{@link RxtxChannelOption#DTR}</td><td>{@link #setDtr(boolean)}</td>
  * </tr><tr>
  * <td>{@link RxtxChannelOption#RTS}</td><td>{@link #setRts(boolean)}</td>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#STOP_BITS}</td><td>{@link #setStopbits(Stopbits)}</td>
+ * <td>{@link RxtxChannelOption#STOP_BITS}</td><td>{@link #setStopBits(Stopbits)}</td>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#DATA_BITS}</td><td>{@link #setDatabits(Databits)}</td>
+ * <td>{@link RxtxChannelOption#DATA_BITS}</td><td>{@link #setDataBits(Databits)}</td>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#PARITY_BIT}</td><td>{@link #setParitybit(Paritybit)}</td>
+ * <td>{@link RxtxChannelOption#PARITY_BIT}</td><td>{@link #setParityBit(Paritybit)}</td>
  * </tr><tr>
  * <td>{@link RxtxChannelOption#WAIT_TIME}</td><td>{@link #setWaitTimeMillis(int)}</td>
  * </tr>
@@ -178,7 +178,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
      *
      * @param baudrate The baud rate (in bits per second)
      */
-    RxtxChannelConfig setBaudrate(int baudrate);
+    RxtxChannelConfig setBaudRate(int baudrate);
 
     /**
      * Sets the number of stop bits to include at the end of every character to aid the
@@ -186,7 +186,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
      *
      * @param stopbits The number of stop bits to use
      */
-    RxtxChannelConfig setStopbits(Stopbits stopbits);
+    RxtxChannelConfig setStopBits(Stopbits stopbits);
 
     /**
      * Sets the number of data bits to use to make up each character sent to the serial
@@ -194,34 +194,34 @@ public interface RxtxChannelConfig extends ChannelConfig {
      *
      * @param databits The number of data bits to use
      */
-    RxtxChannelConfig setDatabits(Databits databits);
+    RxtxChannelConfig setDataBits(Databits databits);
 
     /**
      * Sets the type of parity bit to be used when communicating with the serial device.
      *
      * @param paritybit The type of parity bit to be used
      */
-    RxtxChannelConfig setParitybit(Paritybit paritybit);
+    RxtxChannelConfig setParityBit(Paritybit paritybit);
 
     /**
      * @return The configured baud rate, defaulting to 115200 if unset
      */
-    int getBaudrate();
+    int getBaudRate();
 
     /**
      * @return The configured stop bits, defaulting to {@link Stopbits#STOPBITS_1} if unset
      */
-    Stopbits getStopbits();
+    Stopbits getStopBits();
 
     /**
      * @return The configured data bits, defaulting to {@link Databits#DATABITS_8} if unset
      */
-    Databits getDatabits();
+    Databits getDataBits();
 
     /**
      * @return The configured parity bit, defaulting to {@link Paritybit#NONE} if unset
      */
-    Paritybit getParitybit();
+    Paritybit getParityBit();
 
     /**
      * @return true if the serial device should support the Data Terminal Ready signal
