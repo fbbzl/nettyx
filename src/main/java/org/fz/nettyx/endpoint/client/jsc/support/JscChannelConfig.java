@@ -7,6 +7,7 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.MessageSizeEstimator;
 import io.netty.channel.RecvByteBufAllocator;
 import io.netty.channel.WriteBufferWaterMark;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
@@ -149,6 +150,42 @@ public interface JscChannelConfig extends ChannelConfig {
     @Override
     JscChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark);
 
+    @RequiredArgsConstructor
+    enum DataBits {
+        /**
+         * 5 data bits will be used for each character (ie. Baudot code)
+         */
+        DATABITS_5(5),
+        /**
+         * 6 data bits will be used for each character
+         */
+        DATABITS_6(6),
+        /**
+         * 7 data bits will be used for each character (ie. ASCII)
+         */
+        DATABITS_7(7),
+        /**
+         * 8 data bits will be used for each character (ie. binary data)
+         */
+        DATABITS_8(8);
+
+        private final int value;
+
+        public int value() {
+            return value;
+        }
+
+        public static DataBits valueOf(int value) {
+            for (DataBits databit : DataBits.values()) {
+                if (databit.value == value) {
+                    return databit;
+                }
+            }
+            throw new IllegalArgumentException("unknown " + DataBits.class.getSimpleName() + " value: " + value);
+        }
+    }
+
+    @RequiredArgsConstructor
     enum StopBits {
         /**
          * 1 stop bit will be sent at the end of every character
@@ -165,10 +202,6 @@ public interface JscChannelConfig extends ChannelConfig {
 
         private final int value;
 
-        StopBits(int value) {
-            this.value = value;
-        }
-
         public static StopBits valueOf(int value) {
             return Arrays.stream(StopBits.values())
                          .filter(stopBit -> stopBit.value == value)
@@ -182,6 +215,7 @@ public interface JscChannelConfig extends ChannelConfig {
         }
     }
 
+    @RequiredArgsConstructor
     enum ParityBit {
         /**
          * No parity bit will be sent with each data character at all
@@ -207,10 +241,6 @@ public interface JscChannelConfig extends ChannelConfig {
         SPACE_PARITY(SerialPort.SPACE_PARITY);
 
         private final int value;
-
-        ParityBit(int value) {
-            this.value = value;
-        }
 
         public static ParityBit valueOf(int value) {
             for (ParityBit paritybit : ParityBit.values()) {

@@ -38,9 +38,9 @@ public class TestMultiRxtx extends MultiRxtxChannelClient<String> {
         // if(targetChannelKey=="MES") {br=19200}
         channelConfig
                 .setBaudRate(115200)
-                .setDataBits(RxtxChannelConfig.Databits.DATABITS_8)
-                .setStopBits(RxtxChannelConfig.Stopbits.STOPBITS_1)
-                .setParityBit(RxtxChannelConfig.Paritybit.NONE)
+                .setDataBits(RxtxChannelConfig.DataBits.DATABITS_8)
+                .setStopBits(RxtxChannelConfig.StopBits.STOPBITS_1)
+                .setParityBit(RxtxChannelConfig.ParityBit.NONE)
                 .setDtr(false)
                 .setRts(false);
     }

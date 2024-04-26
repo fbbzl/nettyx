@@ -36,10 +36,10 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
 
     private volatile int       baudrate    = 115200;
     private volatile boolean   dtr;
-    private volatile boolean   rts;
-    private volatile Stopbits  stopbits    = Stopbits.STOPBITS_1;
-    private volatile Databits  databits    = Databits.DATABITS_8;
-    private volatile Paritybit paritybit   = Paritybit.NONE;
+    private volatile boolean  rts;
+    private volatile StopBits stopbits = StopBits.STOPBITS_1;
+    private volatile DataBits databits = DataBits.DATABITS_8;
+    private volatile ParityBit paritybit = ParityBit.NONE;
     private volatile int       waitTime;
     private volatile int       readTimeout = 1000;
 
@@ -94,11 +94,11 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
         } else if (option == RTS) {
             setRts((Boolean) value);
         } else if (option == STOP_BITS) {
-            setStopBits((Stopbits) value);
+            setStopBits((StopBits) value);
         } else if (option == DATA_BITS) {
-            setDataBits((Databits) value);
+            setDataBits((DataBits) value);
         } else if (option == PARITY_BIT) {
-            setParityBit((Paritybit) value);
+            setParityBit((ParityBit) value);
         } else if (option == WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
         } else if (option == READ_TIMEOUT) {
@@ -116,19 +116,19 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     }
 
     @Override
-    public RxtxChannelConfig setStopBits(final Stopbits stopbits) {
+    public RxtxChannelConfig setStopBits(final StopBits stopbits) {
         this.stopbits = stopbits;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setDataBits(final Databits databits) {
+    public RxtxChannelConfig setDataBits(final DataBits databits) {
         this.databits = databits;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setParityBit(final Paritybit paritybit) {
+    public RxtxChannelConfig setParityBit(final ParityBit paritybit) {
         this.paritybit = paritybit;
         return this;
     }
@@ -139,17 +139,17 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     }
 
     @Override
-    public Stopbits getStopBits() {
+    public StopBits getStopBits() {
         return stopbits;
     }
 
     @Override
-    public Databits getDataBits() {
+    public DataBits getDataBits() {
         return databits;
     }
 
     @Override
-    public Paritybit getParityBit() {
+    public ParityBit getParityBit() {
         return paritybit;
     }
 
