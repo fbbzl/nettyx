@@ -89,7 +89,7 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
         }
     }
 
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
+    Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
@@ -102,7 +102,7 @@ public abstract class AbstractSingleChannelClient<C extends Channel> extends Cli
     }
 
     protected void doChannelConfig(C channel) {
-        // default is nothing
+        // default is do nothing
     }
 
 }

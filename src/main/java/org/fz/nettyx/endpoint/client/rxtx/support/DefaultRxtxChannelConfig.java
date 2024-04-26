@@ -57,7 +57,7 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     @Override
     public <T> T getOption(ChannelOption<T> option) {
         if (option == BAUD_RATE) {
-            return (T) Integer.valueOf(getBaudrate());
+            return (T) Integer.valueOf(getBaudRate());
         }
         if (option == DTR) {
             return (T) Boolean.valueOf(isDtr());
@@ -66,13 +66,13 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
             return (T) Boolean.valueOf(isRts());
         }
         if (option == STOP_BITS) {
-            return (T) getStopbits();
+            return (T) getStopBits();
         }
         if (option == DATA_BITS) {
-            return (T) getDatabits();
+            return (T) getDataBits();
         }
         if (option == PARITY_BIT) {
-            return (T) getParitybit();
+            return (T) getParityBit();
         }
         if (option == WAIT_TIME) {
             return (T) Integer.valueOf(getWaitTimeMillis());
@@ -88,17 +88,17 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
         validate(option, value);
 
         if (option == BAUD_RATE) {
-            setBaudrate((Integer) value);
+            setBaudRate((Integer) value);
         } else if (option == DTR) {
             setDtr((Boolean) value);
         } else if (option == RTS) {
             setRts((Boolean) value);
         } else if (option == STOP_BITS) {
-            setStopbits((Stopbits) value);
+            setStopBits((Stopbits) value);
         } else if (option == DATA_BITS) {
-            setDatabits((Databits) value);
+            setDataBits((Databits) value);
         } else if (option == PARITY_BIT) {
-            setParitybit((Paritybit) value);
+            setParityBit((Paritybit) value);
         } else if (option == WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
         } else if (option == READ_TIMEOUT) {
@@ -110,46 +110,46 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     }
 
     @Override
-    public RxtxChannelConfig setBaudrate(final int baudrate) {
+    public RxtxChannelConfig setBaudRate(final int baudrate) {
         this.baudrate = baudrate;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setStopbits(final Stopbits stopbits) {
+    public RxtxChannelConfig setStopBits(final Stopbits stopbits) {
         this.stopbits = stopbits;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setDatabits(final Databits databits) {
+    public RxtxChannelConfig setDataBits(final Databits databits) {
         this.databits = databits;
         return this;
     }
 
     @Override
-    public RxtxChannelConfig setParitybit(final Paritybit paritybit) {
+    public RxtxChannelConfig setParityBit(final Paritybit paritybit) {
         this.paritybit = paritybit;
         return this;
     }
 
     @Override
-    public int getBaudrate() {
+    public int getBaudRate() {
         return baudrate;
     }
 
     @Override
-    public Stopbits getStopbits() {
+    public Stopbits getStopBits() {
         return stopbits;
     }
 
     @Override
-    public Databits getDatabits() {
+    public Databits getDataBits() {
         return databits;
     }
 
     @Override
-    public Paritybit getParitybit() {
+    public Paritybit getParityBit() {
         return paritybit;
     }
 
