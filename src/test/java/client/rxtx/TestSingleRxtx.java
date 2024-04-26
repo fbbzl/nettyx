@@ -51,9 +51,8 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    System.err.println(cf.channel().config());
-
-                    System.err.println(cf.channel().localAddress() + ": ok");
+                    RxtxChannelConfig config =(RxtxChannelConfig) cf.channel().config();
+                    System.err.println(config.getBaudRate());
                 })
                 .whenCancel((l, cf) -> System.err.println("cancel"))
                 .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
