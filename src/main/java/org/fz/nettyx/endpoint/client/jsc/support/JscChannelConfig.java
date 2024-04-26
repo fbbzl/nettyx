@@ -48,14 +48,14 @@ public interface JscChannelConfig extends ChannelConfig {
     /**
      * @return The configured data bits, defaulting to 8 if unset
      */
-    int getDataBits();
+    DataBits getDataBits();
 
     /**
      * Sets the number of data bits to use to make up each character sent to the serial device.
      *
      * @param dataBits The number of data bits to use
      */
-    JscChannelConfig setDataBits(int dataBits);
+    JscChannelConfig setDataBits(DataBits dataBits);
 
     /**
      * @return The configured parity bit, defaulting to {@link ParityBit#NO_PARITY} if unset
