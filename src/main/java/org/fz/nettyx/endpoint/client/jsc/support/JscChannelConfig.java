@@ -151,6 +151,36 @@ public interface JscChannelConfig extends ChannelConfig {
     JscChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark);
 
     @RequiredArgsConstructor
+    enum StopBits {
+        /**
+         * 1 stop bit will be sent at the end of every character
+         */
+        ONE_STOP_BIT(SerialPort.ONE_STOP_BIT),
+        /**
+         * 2 stop bits will be sent at the end of every character
+         */
+        TWO_STOP_BITS(SerialPort.TWO_STOP_BITS),
+        /**
+         * 1.5 stop bits will be sent at the end of every character
+         */
+        ONE_POINT_FIVE_STOP_BITS(SerialPort.ONE_POINT_FIVE_STOP_BITS);
+
+        private final int value;
+
+        public static StopBits valueOf(int value) {
+            return Arrays.stream(StopBits.values())
+                         .filter(stopBit -> stopBit.value == value)
+                         .findFirst()
+                         .orElseThrow(() -> new IllegalArgumentException(
+                                 "unknown " + StopBits.class.getSimpleName() + " value: " + value));
+        }
+
+        public int value() {
+            return value;
+        }
+    }
+
+    @RequiredArgsConstructor
     enum DataBits {
         /**
          * 5 data bits will be used for each character (ie. Baudot code)
@@ -182,36 +212,6 @@ public interface JscChannelConfig extends ChannelConfig {
                 }
             }
             throw new IllegalArgumentException("unknown " + DataBits.class.getSimpleName() + " value: " + value);
-        }
-    }
-
-    @RequiredArgsConstructor
-    enum StopBits {
-        /**
-         * 1 stop bit will be sent at the end of every character
-         */
-        ONE_STOP_BIT(SerialPort.ONE_STOP_BIT),
-        /**
-         * 2 stop bits will be sent at the end of every character
-         */
-        TWO_STOP_BITS(SerialPort.TWO_STOP_BITS),
-        /**
-         * 1.5 stop bits will be sent at the end of every character
-         */
-        ONE_POINT_FIVE_STOP_BITS(SerialPort.ONE_POINT_FIVE_STOP_BITS);
-
-        private final int value;
-
-        public static StopBits valueOf(int value) {
-            return Arrays.stream(StopBits.values())
-                         .filter(stopBit -> stopBit.value == value)
-                         .findFirst()
-                         .orElseThrow(() -> new IllegalArgumentException(
-                                 "unknown " + StopBits.class.getSimpleName() + " value: " + value));
-        }
-
-        public int value() {
-            return value;
         }
     }
 
