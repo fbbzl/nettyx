@@ -2,7 +2,6 @@ package client.rxtx;
 
 
 import client.TestChannelInitializer;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
@@ -13,10 +12,8 @@ import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Paritybit;
 import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig.Stopbits;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
-import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
@@ -54,11 +51,7 @@ public class TestSingleRxtx extends SingleRxtxChannelClient {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 1);
-                        testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
-                    }, 2, 30, TimeUnit.MILLISECONDS);
+                    System.err.println(cf.channel().config());
 
                     System.err.println(cf.channel().localAddress() + ": ok");
                 })
