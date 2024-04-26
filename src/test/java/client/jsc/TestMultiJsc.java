@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
 import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
+import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
@@ -37,6 +38,18 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
         return new TestChannelInitializer<>();
     }
 
+
+    @Override
+    protected void doChannelConfig(String targetChannelKey, JscChannelConfig channelConfig) {
+        channelConfig
+               .setBaudRate(115200)
+               .setDataBits(8)
+               .setStopBits(JscChannelConfig.StopBits.ONE_STOP_BIT)
+               .setParityBit(JscChannelConfig.ParityBit.NO_PARITY)
+               .setDtr(false)
+               .setRts(false);
+    }
+
     public static void main(String[] args) {
         Map<String, SerialCommChannel.SerialCommAddress> map = new HashMap<>();
 
@@ -59,6 +72,10 @@ public class TestMultiJsc extends MultiJscChannelClient<String> {
                 .whenDone((l, cf) -> System.err.println("done"));
 
         testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
+
+        // send msg
+        testMultiJsc.write("5", "this is msg from 5 write");
+        testMultiJsc.writeAndFlush("6", "this is msg from 6 writeAndFlush");
     }
 
 }
