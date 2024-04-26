@@ -18,7 +18,7 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscChannelConfig {
 
     private volatile int       baudRate    = 115200;
-    private volatile int       dataBits    = 8;
+    private volatile DataBits  dataBits    = DataBits.DATABITS_8;
     private volatile StopBits  stopbits    = StopBits.ONE_STOP_BIT;
     private volatile ParityBit paritybit   = ParityBit.NO_PARITY;
     private volatile boolean   dtr;
@@ -52,7 +52,7 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
             return (T) getStopBits();
         }
         if (option == DATA_BITS) {
-            return (T) Integer.valueOf(getDataBits());
+            return (T) getDataBits();
         }
         if (option == PARITY_BIT) {
             return (T) getParityBit();
@@ -80,7 +80,7 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
         } else if (option == STOP_BITS) {
             setStopBits((StopBits) value);
         } else if (option == DATA_BITS) {
-            setDataBits((Integer) value);
+            setDataBits((DataBits) value);
         } else if (option == PARITY_BIT) {
             setParityBit((ParityBit) value);
         } else if (option == WAIT_TIME) {
@@ -182,12 +182,12 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
     }
 
     @Override
-    public int getDataBits() {
+    public DataBits getDataBits() {
         return dataBits;
     }
 
     @Override
-    public JscChannelConfig setDataBits(final int dataBits) {
+    public JscChannelConfig setDataBits(final DataBits dataBits) {
         this.dataBits = dataBits;
         return this;
     }
