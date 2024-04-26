@@ -18,7 +18,7 @@ import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscChannelConfig {
 
     private volatile int       baudRate    = 115200;
-    private volatile int       dataBits    = 8;
+    private volatile DataBits  dataBits    = DataBits.DATABITS_8;
     private volatile StopBits  stopbits    = StopBits.ONE_STOP_BIT;
     private volatile ParityBit paritybit   = ParityBit.NO_PARITY;
     private volatile boolean   dtr;
@@ -182,12 +182,12 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
     }
 
     @Override
-    public int getDataBits() {
+    public DataBits getDataBits() {
         return dataBits;
     }
 
     @Override
-    public JscChannelConfig setDataBits(final int dataBits) {
+    public JscChannelConfig setDataBits(final DataBits dataBits) {
         this.dataBits = dataBits;
         return this;
     }
