@@ -52,7 +52,7 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
             return (T) getStopBits();
         }
         if (option == DATA_BITS) {
-            return (T) Integer.valueOf(getDataBits());
+            return (T) getDataBits();
         }
         if (option == PARITY_BIT) {
             return (T) getParityBit();
@@ -80,7 +80,7 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
         } else if (option == STOP_BITS) {
             setStopBits((StopBits) value);
         } else if (option == DATA_BITS) {
-            setDataBits((Integer) value);
+            setDataBits((DataBits) value);
         } else if (option == PARITY_BIT) {
             setParityBit((ParityBit) value);
         } else if (option == WAIT_TIME) {
