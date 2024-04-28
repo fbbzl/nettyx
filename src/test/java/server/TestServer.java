@@ -14,7 +14,6 @@ import org.fz.nettyx.endpoint.server.TcpServer;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 
-import java.net.SocketAddress;
 import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
@@ -25,11 +24,6 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
  * @since 2024/3/23 12:40
  */
 public class TestServer extends TcpServer {
-
-
-    public TestServer(SocketAddress bindAddress) {
-        super(bindAddress);
-    }
 
     public TestServer(int bindPort) {
         super(bindPort);
