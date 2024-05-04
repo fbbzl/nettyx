@@ -157,9 +157,7 @@ public final class StructSerializer implements Serializer {
             try {
                 Object fieldValue;
                 // some fields may ignore
-                if (isIgnore(field)) {
-                    continue;
-                }
+                if (isIgnore(field)) continue;
 
                 if (useReadHandler(field))     fieldValue = readHandled(field, this);
                 else
@@ -188,9 +186,7 @@ public final class StructSerializer implements Serializer {
                 Object fieldValue = StructUtils.readField(struct, field);
 
                 // some fields may ignore
-                if (isIgnore(field)) {
-                    continue;
-                }
+                if (isIgnore(field)) continue;
 
                 if (useWriteHandler(field)) writeHandled(field, fieldValue, this);
                 else
