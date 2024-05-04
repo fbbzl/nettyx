@@ -97,8 +97,9 @@ serializer                             序列化工具
         c                              内置的C基础类型
         cpp                            内置的Cpp基础类型
         ---Basic                       基础类型顶级父类
-     ---PropertyHandler                字段处理器
+     ---StructFieldHandler             字段处理器
      ---StructSerializer               核心结构体序列化器
+     ---StructSerializerContext        struct 序列化器的上下文，包含 handler-instance、type cache等等
      ---StructUtils                    序列化工具
      ---TypeRefer                      结构泛型类型应用
   xml
