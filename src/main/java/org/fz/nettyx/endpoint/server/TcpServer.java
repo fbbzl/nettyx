@@ -33,10 +33,7 @@ public abstract class TcpServer {
     private final ServerBootstrap serverBootstrap;
 
     protected TcpServer(int bindPort) {
-        this(new InetSocketAddress(bindPort));
-    }
-
-    protected TcpServer(SocketAddress bindAddress) {
+        InetSocketAddress bindAddress = new InetSocketAddress(bindPort);
         this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
         this.serverBootstrap      = newServerBootstrap(bindAddress);
