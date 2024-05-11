@@ -29,17 +29,6 @@ public class TestServer extends TcpServer {
         super(bindPort);
     }
 
-    public static void main(String[] args) {
-        TestServer    testServer = new TestServer(9888);
-        ChannelFuture bindFuture = testServer.bind();
-        bindFuture.addListener(cf -> System.err.println("binding state:" + cf.isSuccess()));
-        bindFuture.channel().closeFuture().addListener(cf -> {
-            System.err.println("关闭了");
-            testServer.shutdownGracefully();
-        });
-
-    }
-
     @Override
     protected ChannelInitializer<NioSocketChannel> childChannelInitializer() {
         return new ChannelInitializer<NioSocketChannel>() {
@@ -68,5 +57,16 @@ public class TestServer extends TcpServer {
                         , inboundAdvice);
             }
         };
+    }
+
+    public static void main(String[] args) {
+        TestServer    testServer = new TestServer(9888);
+        ChannelFuture bindFuture = testServer.bind();
+        bindFuture.addListener(cf -> System.err.println("binding state:" + cf.isSuccess()));
+        bindFuture.channel().closeFuture().addListener(cf -> {
+            System.err.println("关闭了");
+            testServer.shutdownGracefully();
+        });
+
     }
 }
