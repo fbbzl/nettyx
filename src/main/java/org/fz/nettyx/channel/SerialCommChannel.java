@@ -25,7 +25,7 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
 
     protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
-    protected SerialCommAddress deviceAddress;
+    protected SerialCommAddress remoteAddress;
 
     private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
 
@@ -58,7 +58,7 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
 
     @Override
     protected SerialCommAddress remoteAddress0() {
-        return deviceAddress;
+        return remoteAddress;
     }
 
     @Override

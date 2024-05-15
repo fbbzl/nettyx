@@ -43,8 +43,8 @@ public class JscChannel extends SerialCommChannel {
         }
         commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
 
-        deviceAddress = remote;
-        serialPort    = commPort;
+        this.remoteAddress = remote;
+        serialPort         = commPort;
     }
 
     protected void doInit() {

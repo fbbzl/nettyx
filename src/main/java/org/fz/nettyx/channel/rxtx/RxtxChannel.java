@@ -43,8 +43,8 @@ public class RxtxChannel extends SerialCommChannel {
         final CommPort           commPort = cpi.open(getClass().getName(), 1000);
         commPort.enableReceiveTimeout(config().getOption(RxtxChannelOption.READ_TIMEOUT));
 
-        deviceAddress = remote;
-        serialPort    = (SerialPort) commPort;
+        this.remoteAddress = remote;
+        serialPort         = (SerialPort) commPort;
     }
 
     @Override
