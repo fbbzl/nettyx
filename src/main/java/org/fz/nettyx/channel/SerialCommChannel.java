@@ -103,7 +103,7 @@ public abstract class SerialCommChannel extends NonBlockOioByteStreamChannel {
                             if (!wasActive && isActive()) {
                                 pipeline().fireChannelActive();
                             }
-                        } catch (Throwable t) {
+                        } catch (Exception t) {
                             safeSetFailure(promise, t);
                             closeIfClosed();
                         }
@@ -115,7 +115,7 @@ public abstract class SerialCommChannel extends NonBlockOioByteStreamChannel {
                         pipeline().fireChannelActive();
                     }
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 safeSetFailure(promise, t);
                 closeIfClosed();
             }
