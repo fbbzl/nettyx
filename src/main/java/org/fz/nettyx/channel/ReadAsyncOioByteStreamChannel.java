@@ -137,7 +137,7 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
                             if (!wasActive && isActive()) {
                                 pipeline().fireChannelActive();
                             }
-                        } catch (Throwable t) {
+                        } catch (Exception t) {
                             safeSetFailure(promise, t);
                             closeIfClosed();
                         }
@@ -149,7 +149,7 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
                         pipeline().fireChannelActive();
                     }
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 safeSetFailure(promise, t);
                 closeIfClosed();
             }
