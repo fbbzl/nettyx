@@ -2,7 +2,6 @@ package org.fz.nettyx.channel.bluetooth;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
@@ -73,16 +72,6 @@ public class BluetoothChannel extends AsyncReadOioByteStreamChannel {
     protected void doBind(SocketAddress localAddress) {
         throw new UnsupportedOperationException("doBind");
     }
-
-    @Override
-    protected int doReadBytes(ByteBuf buf) {
-        if (available() > 0) {
-            return super.doReadBytes(buf);
-        }
-
-        return 0;
-    }
-
 
     @Override
     protected void doInit() {
