@@ -100,7 +100,6 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
         return remoteAddress;
     }
 
-
     @Override
     protected void doDisconnect() throws Exception {
         doClose();
