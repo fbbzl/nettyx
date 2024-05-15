@@ -57,7 +57,7 @@ public class BluetoothChannel extends OioByteStreamChannel {
         try {
             inputStream.close();
             promise.setSuccess();
-        } catch (Throwable t) {
+        } catch (Exception t) {
             promise.setFailure(t);
         }
     }
@@ -67,9 +67,7 @@ public class BluetoothChannel extends OioByteStreamChannel {
      * */
     @Override
     protected int doReadBytes(ByteBuf buf) throws Exception {
-
         if (available() > 0) {
-
             return super.doReadBytes(buf);
         }
 
@@ -96,13 +94,11 @@ public class BluetoothChannel extends OioByteStreamChannel {
 
     @Override
     protected SocketAddress localAddress0() {
-
         return LOCAL_ADDRESS;
     }
 
     @Override
     protected SocketAddress remoteAddress0() {
-
         return remoteDeviceAddress;
     }
 
