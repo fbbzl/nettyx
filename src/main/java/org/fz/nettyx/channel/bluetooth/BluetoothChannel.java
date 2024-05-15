@@ -37,6 +37,11 @@ public class BluetoothChannel extends AsyncReadOioByteStreamChannel {
     }
 
     @Override
+    protected AbstractUnsafe newUnsafe() {
+        return new BluetoothUnsafe();
+    }
+
+    @Override
     protected boolean isInputShutdown() {
         return !opened;
     }
@@ -152,32 +157,29 @@ public class BluetoothChannel extends AsyncReadOioByteStreamChannel {
         return opened;
     }
 
-    @Override
-    protected AbstractUnsafe newUnsafe() {
-        return new AbstractUnsafe() {
-            @Override
-            public void connect(
-                    final SocketAddress remoteAddress,
-                    final SocketAddress localAddress, final ChannelPromise promise) {
-                if (!promise.setUncancellable() || !ensureOpen(promise)) {
-                    return;
-                }
-
-                try {
-                    final boolean wasActive = isActive();
-
-                    doConnect(remoteAddress, localAddress);
-                    promise.setSuccess();
-
-                    if (!wasActive && isActive()) {
-                        pipeline().fireChannelActive();
-                    }
-                } catch (Throwable t) {
-                    promise.setFailure(t);
-                    closeIfClosed();
-                }
+    protected final class BluetoothUnsafe extends AbstractUnsafe {
+        @Override
+        public void connect(
+                final SocketAddress remoteAddress,
+                final SocketAddress localAddress, final ChannelPromise promise) {
+            if (!promise.setUncancellable() || !ensureOpen(promise)) {
+                return;
             }
-        };
+
+            try {
+                final boolean wasActive = isActive();
+
+                doConnect(remoteAddress, localAddress);
+                promise.setSuccess();
+
+                if (!wasActive && isActive()) {
+                    pipeline().fireChannelActive();
+                }
+            } catch (Throwable t) {
+                promise.setFailure(t);
+                closeIfClosed();
+            }
+        }
     }
 
     public static class BluetoothDeviceAddress extends SocketAddress {

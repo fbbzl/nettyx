@@ -1,6 +1,5 @@
 package org.fz.nettyx.channel;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
@@ -66,36 +65,6 @@ public abstract class SerialCommChannel extends AsyncReadOioByteStreamChannel {
     @Override
     protected boolean isInputShutdown() {
         return !open;
-    }
-
-    @Override
-    protected int doReadBytes(ByteBuf buf) {
-        try {
-            return super.doReadBytes(buf);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    @Override
-    public void doRead() {
-        // do not use method reference!!!
-        Runnable runnable = () -> SerialCommChannel.super.doRead();
-        eventExecutors.execute(runnable);
-    }
-
-    @Override
-    protected void doClose() throws Exception {
-        try {
-            super.doClose();
-        } finally {
-            this.eventExecutors.shutdownGracefully();
-        }
-    }
-
-    @Override
-    protected void doDisconnect() throws Exception {
-        doClose();
     }
 
     @Override
