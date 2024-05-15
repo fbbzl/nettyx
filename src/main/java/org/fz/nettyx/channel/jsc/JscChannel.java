@@ -20,7 +20,7 @@ public class JscChannel extends SerialCommChannel {
     private       SerialPort       serialPort;
 
     public JscChannel() {
-        config = new DefaultJscChannelConfig(this);
+        config = new JscChannelConfig.DefaultJscChannelConfig(this);
     }
 
     @Override
