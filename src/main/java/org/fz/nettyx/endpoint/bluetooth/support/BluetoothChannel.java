@@ -25,19 +25,16 @@ public class BluetoothChannel extends OioByteStreamChannel {
 
     private final BluetoothChannelConfig config;
 
-    private InputStream inputStream;
+    private InputStream      inputStream;
     private StreamConnection streamConnection;
 
-
     public BluetoothChannel() {
-
         super(null);
         config = new DefaultBluetoothChannelConfig(this);
     }
 
     @Override
     protected boolean isInputShutdown() {
-
         return !opened;
     }
 
@@ -57,13 +54,10 @@ public class BluetoothChannel extends OioByteStreamChannel {
     }
 
     private void shutdownInput0(final ChannelPromise promise) {
-
         try {
-
             inputStream.close();
             promise.setSuccess();
         } catch (Throwable t) {
-
             promise.setFailure(t);
         }
     }
