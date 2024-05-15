@@ -4,6 +4,7 @@ package org.fz.nettyx.endpoint.serial.jsc.support;
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
+import org.fz.nettyx.endpoint.serial.SerialCommAddress;
 
 import java.net.SocketAddress;
 
