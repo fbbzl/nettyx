@@ -1,6 +1,7 @@
-package org.fz.nettyx.channel;
+package org.fz.nettyx.endpoint.bluetooth.support;
 
 import io.netty.channel.DefaultChannelConfig;
+import org.fz.nettyx.channel.BluetoothChannel;
 import org.fz.nettyx.endpoint.bluetooth.BluetoothChannelConfig;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
@@ -17,7 +18,7 @@ public class DefaultBluetoothChannelConfig extends DefaultChannelConfig implemen
     private boolean encrypt;
     private boolean master;
 
-    public DefaultBluetoothChannelConfig(OioBluetoothChannel channel) {
+    public DefaultBluetoothChannelConfig(BluetoothChannel channel) {
 
         super(channel);
     }
