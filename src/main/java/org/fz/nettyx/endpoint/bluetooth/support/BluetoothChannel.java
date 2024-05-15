@@ -7,7 +7,7 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
-import io.netty.channel.oio.OioByteStreamChannel;
+import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.net.SocketAddress;
 
 @SuppressWarnings("deprecation")
-public class BluetoothChannel extends OioByteStreamChannel {
+public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
 
     private static final BluetoothDeviceAddress LOCAL_ADDRESS = new BluetoothDeviceAddress("localhost");
 
@@ -29,7 +29,6 @@ public class BluetoothChannel extends OioByteStreamChannel {
     private StreamConnection streamConnection;
 
     public BluetoothChannel() {
-        super(null);
         config = new DefaultBluetoothChannelConfig(this);
     }
 
@@ -106,6 +105,16 @@ public class BluetoothChannel extends OioByteStreamChannel {
     protected void doBind(SocketAddress localAddress) throws Exception {
 
         throw new UnsupportedOperationException("doBind");
+    }
+
+    @Override
+    protected void doInit() {
+
+    }
+
+    @Override
+    protected int waitTime(ChannelConfig config) {
+        return 0;
     }
 
     @Override

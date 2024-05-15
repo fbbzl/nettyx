@@ -47,22 +47,22 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
     }
 
     @Override
-    public SerialCommAddress localAddress() {
-        return (SerialCommAddress) super.localAddress();
+    public SocketAddress localAddress() {
+        return super.localAddress();
     }
 
     @Override
-    public SerialCommAddress remoteAddress() {
-        return (SerialCommAddress) super.remoteAddress();
+    public SocketAddress remoteAddress() {
+        return super.remoteAddress();
     }
 
     @Override
-    protected SerialCommAddress localAddress0() {
+    protected SocketAddress localAddress0() {
         return LOCAL_ADDRESS;
     }
 
     @Override
-    protected SerialCommAddress remoteAddress0() {
+    protected SocketAddress remoteAddress0() {
         return deviceAddress;
     }
 
