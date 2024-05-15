@@ -47,16 +47,6 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
     }
 
     @Override
-    public SocketAddress localAddress() {
-        return super.localAddress();
-    }
-
-    @Override
-    public SocketAddress remoteAddress() {
-        return super.remoteAddress();
-    }
-
-    @Override
     protected SocketAddress localAddress0() {
         return LOCAL_ADDRESS;
     }
