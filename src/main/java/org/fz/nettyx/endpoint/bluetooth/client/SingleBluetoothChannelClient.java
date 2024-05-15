@@ -19,8 +19,8 @@ public abstract class SingleBluetoothChannelClient extends AbstractSingleChannel
         super(new SerialCommChannel.SerialCommAddress(commAddress));
     }
 
-    protected SingleBluetoothChannelClient(SerialCommChannel.SerialCommAddress commAddress) {
-        super(commAddress);
+    protected SingleBluetoothChannelClient(BluetoothChannel.BluetoothDeviceAddress address) {
+        super(address);
     }
 
     @Override
