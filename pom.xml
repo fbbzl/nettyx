@@ -56,7 +56,7 @@
         <jul-to-slf4j.version>2.0.12</jul-to-slf4j.version>
 
         <!--util-->
-        <netty-all.version>4.1.107.Final</netty-all.version>
+        <netty-all.version>4.1.109.Final</netty-all.version>
         <hutool-core.version>5.8.26</hutool-core.version>
         <jSerialComm.version>2.10.4</jSerialComm.version>
         <rxtx.version>2.1.7</rxtx.version>
