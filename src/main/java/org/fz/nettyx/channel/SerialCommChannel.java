@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * cause of {@link AbstractOioChannel sync read task}
+ * cause of {@link AbstractOioChannel sync blocking read task}
  *
  * @author fengbinbin
  * @version 1.0
