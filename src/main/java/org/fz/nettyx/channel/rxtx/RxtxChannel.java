@@ -23,7 +23,7 @@ public class RxtxChannel extends SerialCommChannel {
     private       SerialPort        serialPort;
 
     public RxtxChannel() {
-        config = new DefaultRxtxChannelConfig(this);
+        config = new RxtxChannelConfig.DefaultRxtxChannelConfig(this);
     }
 
     @Override

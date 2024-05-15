@@ -32,7 +32,7 @@ public class BluetoothChannel extends NonBlockOioByteStreamChannel {
     private StreamConnection streamConnection;
 
     public BluetoothChannel() {
-        config = new DefaultBluetoothChannelConfig(this);
+        config = new BluetoothChannelOption.DefaultBluetoothChannelConfig(this);
     }
 
     @Override
