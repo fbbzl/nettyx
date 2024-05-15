@@ -13,14 +13,14 @@ import io.netty.channel.ChannelOption;
  */
 public final class JscChannelOption<T> extends ChannelOption<T> {
 
-    public static final ChannelOption<Integer>   BAUD_RATE    = valueOf(JscChannelOption.class, "BAUD_RATE");
-    public static final ChannelOption<Boolean>   DTR          = valueOf(JscChannelOption.class, "DTR");
-    public static final ChannelOption<Boolean>                    RTS        = valueOf(JscChannelOption.class, "RTS");
-    public static final ChannelOption<JscChannelConfig.StopBits>  STOP_BITS  = valueOf(JscChannelOption.class, "STOP_BITS");
-    public static final ChannelOption<JscChannelConfig.DataBits>  DATA_BITS  = valueOf(JscChannelOption.class, "DATA_BITS");
-    public static final ChannelOption<JscChannelConfig.ParityBit> PARITY_BIT = valueOf(JscChannelOption.class, "PARITY_BIT");
-    public static final ChannelOption<Integer>                    WAIT_TIME  = valueOf(JscChannelOption.class, "WAIT_TIME");
-    public static final ChannelOption<Integer>   READ_TIMEOUT = valueOf(JscChannelOption.class, "READ_TIMEOUT");
+    public static final ChannelOption<Integer>                    BAUD_RATE    = valueOf(JscChannelOption.class, "BAUD_RATE");
+    public static final ChannelOption<Boolean>                    DTR          = valueOf(JscChannelOption.class, "DTR");
+    public static final ChannelOption<Boolean>                    RTS          = valueOf(JscChannelOption.class, "RTS");
+    public static final ChannelOption<JscChannelConfig.StopBits>  STOP_BITS    = valueOf(JscChannelOption.class, "STOP_BITS");
+    public static final ChannelOption<JscChannelConfig.DataBits>  DATA_BITS    = valueOf(JscChannelOption.class, "DATA_BITS");
+    public static final ChannelOption<JscChannelConfig.ParityBit> PARITY_BIT   = valueOf(JscChannelOption.class, "PARITY_BIT");
+    public static final ChannelOption<Integer>                    WAIT_TIME    = valueOf(JscChannelOption.class, "WAIT_TIME");
+    public static final ChannelOption<Integer>                    READ_TIMEOUT = valueOf(JscChannelOption.class, "READ_TIMEOUT");
 
     @SuppressWarnings("deprecation")
     private JscChannelOption() {

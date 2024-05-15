@@ -1,4 +1,4 @@
-package org.fz.nettyx.channel;
+package org.fz.nettyx.endpoint.bluetooth.support;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;
@@ -8,8 +8,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.channel.oio.OioByteStreamChannel;
-import org.fz.nettyx.endpoint.bluetooth.BluetoothChannelConfig;
-import org.fz.nettyx.endpoint.bluetooth.support.DefaultBluetoothChannelConfig;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;

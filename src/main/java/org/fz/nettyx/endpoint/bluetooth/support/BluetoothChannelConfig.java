@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.bluetooth;
+package org.fz.nettyx.endpoint.bluetooth.support;
 
 import io.netty.channel.ChannelConfig;
 
