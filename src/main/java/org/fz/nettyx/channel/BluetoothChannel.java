@@ -9,6 +9,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.channel.oio.OioByteStreamChannel;
 import org.fz.nettyx.endpoint.bluetooth.BluetoothChannelConfig;
+import org.fz.nettyx.endpoint.bluetooth.support.DefaultBluetoothChannelConfig;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
@@ -16,7 +17,7 @@ import java.io.InputStream;
 import java.net.SocketAddress;
 
 @SuppressWarnings("deprecation")
-public class OioBluetoothChannel extends OioByteStreamChannel {
+public class BluetoothChannel extends OioByteStreamChannel {
 
     private static final BluetoothDeviceAddress LOCAL_ADDRESS = new BluetoothDeviceAddress("localhost");
 
@@ -30,7 +31,7 @@ public class OioBluetoothChannel extends OioByteStreamChannel {
     private StreamConnection streamConnection;
 
 
-    public OioBluetoothChannel() {
+    public BluetoothChannel() {
 
         super(null);
         config = new DefaultBluetoothChannelConfig(this);
@@ -187,5 +188,25 @@ public class OioBluetoothChannel extends OioByteStreamChannel {
                 }
             }
         };
+    }
+
+    public static class BluetoothDeviceAddress extends SocketAddress {
+
+        private final String value;
+
+        public BluetoothDeviceAddress(String value) {
+
+            this.value = value;
+        }
+
+        public String value() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+
+            return value;
+        }
     }
 }
