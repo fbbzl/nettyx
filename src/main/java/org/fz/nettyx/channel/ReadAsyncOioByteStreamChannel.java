@@ -98,7 +98,7 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
 
     @Override
     protected void doBind(SocketAddress localAddress) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("doBind");
     }
 
     protected abstract void doInit();
