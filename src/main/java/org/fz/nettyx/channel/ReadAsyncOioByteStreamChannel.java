@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @SuppressWarnings("deprecation")
-public abstract class ReadAsyncOioChannel extends OioByteStreamChannel {
+public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel {
 
     protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
@@ -30,7 +30,7 @@ public abstract class ReadAsyncOioChannel extends OioByteStreamChannel {
 
     private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
 
-    protected ReadAsyncOioChannel() {
+    protected ReadAsyncOioByteStreamChannel() {
         super(null);
     }
 
@@ -83,7 +83,7 @@ public abstract class ReadAsyncOioChannel extends OioByteStreamChannel {
     @Override
     public void doRead() {
         // do not use method reference!!!
-        Runnable runnable = () -> ReadAsyncOioChannel.super.doRead();
+        Runnable runnable = () -> ReadAsyncOioByteStreamChannel.super.doRead();
         eventExecutors.execute(runnable);
     }
 
