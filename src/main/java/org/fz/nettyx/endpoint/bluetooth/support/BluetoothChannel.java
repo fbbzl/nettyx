@@ -61,11 +61,8 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
         }
     }
 
-    /*
-     * Fixed the blocking read in EventLoop(ThreadPerChannelEventLoop)
-     * */
     @Override
-    protected int doReadBytes(ByteBuf buf) throws Exception {
+    protected int doReadBytes(ByteBuf buf) {
         if (available() > 0) {
             return super.doReadBytes(buf);
         }
