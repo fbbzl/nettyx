@@ -15,7 +15,7 @@ import io.netty.channel.oio.OioByteStreamChannel;
  */
 
 @SuppressWarnings("deprecation")
-public abstract class NonBlockOioByteStreamChannel extends OioByteStreamChannel {
+public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel {
 
     protected boolean open = true;
 
@@ -34,7 +34,7 @@ public abstract class NonBlockOioByteStreamChannel extends OioByteStreamChannel 
         return newFailedFuture(new UnsupportedOperationException("shutdownInput"));
     }
 
-    protected NonBlockOioByteStreamChannel() {
+    protected EnhancedOioByteStreamChannel() {
         super(null);
     }
 
