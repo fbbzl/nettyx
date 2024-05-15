@@ -3,13 +3,11 @@ package org.fz.nettyx.channel;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
 
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -32,15 +30,9 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
     protected boolean open = true;
 
     @Override
-    protected AbstractUnsafe newUnsafe() {
-        return new SerialCommPortUnsafe();
-    }
-
-    @Override
     public boolean isOpen() {
         return open;
     }
-
 
     @Override
     protected boolean isInputShutdown() {
@@ -90,46 +82,5 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
     protected abstract void doInit();
 
     protected abstract int waitTime(ChannelConfig config);
-
-    protected final class SerialCommPortUnsafe extends AbstractUnsafe {
-        @Override
-        public void connect(
-                final SocketAddress remoteAddress,
-                final SocketAddress localAddress, final ChannelPromise promise) {
-            if (!promise.setUncancellable() || !ensureOpen(promise)) {
-                return;
-            }
-
-            try {
-                final boolean wasActive = isActive();
-                doConnect(remoteAddress, localAddress);
-
-                int waitTime = waitTime(config());
-                if (waitTime > 0) {
-                    eventLoop().schedule(() -> {
-                        try {
-                            doInit();
-                            safeSetSuccess(promise);
-                            if (!wasActive && isActive()) {
-                                pipeline().fireChannelActive();
-                            }
-                        } catch (Exception t) {
-                            safeSetFailure(promise, t);
-                            closeIfClosed();
-                        }
-                    }, waitTime, TimeUnit.MILLISECONDS);
-                } else {
-                    doInit();
-                    safeSetSuccess(promise);
-                    if (!wasActive && isActive()) {
-                        pipeline().fireChannelActive();
-                    }
-                }
-            } catch (Exception t) {
-                safeSetFailure(promise, t);
-                closeIfClosed();
-            }
-        }
-    }
 
 }
