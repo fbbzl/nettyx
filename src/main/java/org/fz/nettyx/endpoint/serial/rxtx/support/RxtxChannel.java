@@ -5,7 +5,7 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import io.netty.channel.ChannelConfig;
-import org.fz.nettyx.channel.SerialCommChannel;
+import org.fz.nettyx.channel.ReadAsyncOioChannel;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -17,7 +17,7 @@ import java.net.SocketAddress;
  * @since 2024/3/4 19:29
  */
 
-public class RxtxChannel extends SerialCommChannel {
+public class RxtxChannel extends ReadAsyncOioChannel {
 
     private final RxtxChannelConfig config;
     private       SerialPort        serialPort;
