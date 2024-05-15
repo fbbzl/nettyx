@@ -1,6 +1,5 @@
 package org.fz.nettyx.channel;
 
-import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
@@ -76,10 +75,6 @@ public abstract class SerialCommChannel extends AsyncReadOioByteStreamChannel {
     protected void doBind(SocketAddress localAddress) {
         throw new UnsupportedOperationException("doBind");
     }
-
-    protected abstract void doInit();
-
-    protected abstract int waitTime(ChannelConfig config);
 
     protected final class SerialCommPortUnsafe extends AbstractUnsafe {
         @Override
