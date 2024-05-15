@@ -4,9 +4,8 @@ package org.fz.nettyx.endpoint.bluetooth.client;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.channel.jsc.JscChannel;
-import org.fz.nettyx.channel.jsc.JscChannelConfig;
+import org.fz.nettyx.channel.bluetooth.BluetoothChannel;
+import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
 import org.fz.nettyx.endpoint.AbstractMultiChannelEndpoint;
 
 import java.util.Map;
@@ -19,9 +18,9 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiBluetoothChannelClient<K> extends AbstractMultiChannelEndpoint<K, JscChannel, JscChannelConfig> {
+public abstract class MultiBluetoothChannelClient<K> extends AbstractMultiChannelEndpoint<K, BluetoothChannel, BluetoothChannelConfig> {
 
-    protected MultiBluetoothChannelClient(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
+    protected MultiBluetoothChannelClient(Map<K, BluetoothChannel.BluetoothDeviceAddress> addressMap) {
         super(addressMap);
     }
 
