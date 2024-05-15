@@ -27,7 +27,8 @@ public abstract class AsyncReadOioByteStreamChannel extends OioByteStreamChannel
     @Override
     protected int doReadBytes(ByteBuf buf) {
         try {
-            return super.doReadBytes(buf);
+            if (available() > 0) return super.doReadBytes(buf);
+            return 0;
         } catch (Exception e) {
             return 0;
         }
