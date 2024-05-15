@@ -6,7 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.jsc.SingleJscChannelEndPoint;
+import org.fz.nettyx.endpoint.serial.jsc.SingleJscChannelEndpoint;
 import org.fz.nettyx.endpoint.serial.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.serial.jsc.support.JscChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -17,6 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**
  * @author fengbinbin
@@ -25,7 +26,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 
 @Slf4j
-public class TestSingleJsc extends SingleJscChannelEndPoint {
+public class TestSingleJsc extends SingleJscChannelEndpoint {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
