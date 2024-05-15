@@ -7,15 +7,19 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
-import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
+import org.fz.nettyx.channel.AsyncReadOioByteStreamChannel;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
 import java.net.SocketAddress;
 
-@SuppressWarnings("deprecation")
-public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
+/**
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/3/27 14:27
+ */
+public class BluetoothChannel extends AsyncReadOioByteStreamChannel {
 
     private static final BluetoothDeviceAddress LOCAL_ADDRESS = new BluetoothDeviceAddress("localhost");
 

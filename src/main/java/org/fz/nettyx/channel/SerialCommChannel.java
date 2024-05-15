@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @SuppressWarnings("deprecation")
-public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
+public abstract class SerialCommChannel extends AsyncReadOioByteStreamChannel {
 
     protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
