@@ -39,7 +39,6 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
 
     @Override
     protected ChannelFuture shutdownInput() {
-
         ChannelPromise promise = newPromise();
 
         EventLoop loop = eventLoop();
