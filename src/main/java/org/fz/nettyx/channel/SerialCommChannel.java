@@ -1,7 +1,6 @@
 package org.fz.nettyx.channel;
 
 import io.netty.channel.ChannelConfig;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +26,6 @@ public abstract class SerialCommChannel extends NonBlockOioByteStreamChannel {
 
     protected SerialCommAddress remoteAddress;
 
-    protected boolean open = true;
-
     protected abstract void doInit();
 
     /**
@@ -39,11 +36,6 @@ public abstract class SerialCommChannel extends NonBlockOioByteStreamChannel {
     @Override
     protected AbstractUnsafe newUnsafe() {
         return new SerialCommPortUnsafe();
-    }
-
-    @Override
-    public boolean isOpen() {
-        return open;
     }
 
     @Override
@@ -64,16 +56,6 @@ public abstract class SerialCommChannel extends NonBlockOioByteStreamChannel {
     @Override
     protected SerialCommAddress remoteAddress0() {
         return remoteAddress;
-    }
-
-    @Override
-    protected boolean isInputShutdown() {
-        return !open;
-    }
-
-    @Override
-    protected ChannelFuture shutdownInput() {
-        return newFailedFuture(new UnsupportedOperationException("shutdownInput"));
     }
 
     @Override

@@ -81,12 +81,12 @@ public class BluetoothChannel extends NonBlockOioByteStreamChannel {
 
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value());
         } else {
-
             BlueCoveImpl.setConfigProperty(BlueCoveConfigProperties.PROPERTY_CONNECT_TIMEOUT, String.valueOf(config.getConnectTimeoutMillis()));
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
 
         inputStream = streamConnection.openInputStream();
+
         activate(inputStream, streamConnection.openOutputStream());
     }
 
@@ -103,22 +103,17 @@ public class BluetoothChannel extends NonBlockOioByteStreamChannel {
 
     @Override
     protected void doDisconnect() throws Exception {
-
         doClose();
     }
 
     @Override
     protected void doClose() throws Exception {
-
         opened = false;
 
         try {
-
             super.doClose();
         } finally {
-
             if (streamConnection != null) {
-
                 streamConnection.close();
                 streamConnection = null;
             }
