@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.channel.oio.OioByteStreamChannel;
-import io.netty.util.concurrent.DefaultEventExecutor;
 
 
 /**
@@ -16,11 +15,9 @@ import io.netty.util.concurrent.DefaultEventExecutor;
  */
 
 @SuppressWarnings("deprecation")
-public abstract class AsyncReadOioByteStreamChannel extends OioByteStreamChannel {
+public abstract class NonBlockOioByteStreamChannel extends OioByteStreamChannel {
 
-    private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
-
-    protected AsyncReadOioByteStreamChannel() {
+    protected NonBlockOioByteStreamChannel() {
         super(null);
     }
 
@@ -31,22 +28,6 @@ public abstract class AsyncReadOioByteStreamChannel extends OioByteStreamChannel
             return 0;
         } catch (Exception e) {
             return 0;
-        }
-    }
-
-    @Override
-    public void doRead() {
-        // do not use method reference!!!
-        Runnable runnable = () -> AsyncReadOioByteStreamChannel.super.doRead();
-        eventExecutors.execute(runnable);
-    }
-
-    @Override
-    protected void doClose() throws Exception {
-        try {
-            super.doClose();
-        } finally {
-            this.eventExecutors.shutdownGracefully();
         }
     }
 
