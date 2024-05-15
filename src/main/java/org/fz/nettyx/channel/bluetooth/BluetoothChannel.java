@@ -19,7 +19,7 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
 
     private static final BluetoothDeviceAddress LOCAL_ADDRESS = new BluetoothDeviceAddress("localhost");
 
-    private BluetoothDeviceAddress remoteDeviceAddress;
+    private BluetoothDeviceAddress remoteAddress;
 
     private boolean opened = true;
 
@@ -75,17 +75,21 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
     }
 
     @Override
-    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+    protected void doInit() {
 
-        remoteDeviceAddress = (BluetoothDeviceAddress) remoteAddress;
+    }
+
+    @Override
+    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+        this.remoteAddress = (BluetoothDeviceAddress) remoteAddress;
 
         if (config.getConnectTimeoutMillis() <= 0) {
 
-            streamConnection = (StreamConnection) Connector.open(remoteDeviceAddress.value());
+            streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value());
         } else {
 
             BlueCoveImpl.setConfigProperty(BlueCoveConfigProperties.PROPERTY_CONNECT_TIMEOUT, String.valueOf(config.getConnectTimeoutMillis()));
-            streamConnection = (StreamConnection) Connector.open(remoteDeviceAddress.value(), Connector.READ_WRITE, true);
+            streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
 
         inputStream = streamConnection.openInputStream();
@@ -99,14 +103,9 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
 
     @Override
     protected SocketAddress remoteAddress0() {
-        return remoteDeviceAddress;
+        return remoteAddress;
     }
 
-
-    @Override
-    protected void doInit() {
-
-    }
 
     @Override
     protected int waitTime(ChannelConfig config) {
@@ -151,20 +150,16 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
 
     @Override
     protected AbstractUnsafe newUnsafe() {
-
         return new AbstractUnsafe() {
             @Override
             public void connect(
                     final SocketAddress remoteAddress,
                     final SocketAddress localAddress, final ChannelPromise promise) {
-
                 if (!promise.setUncancellable() || !ensureOpen(promise)) {
-
                     return;
                 }
 
                 try {
-
                     final boolean wasActive = isActive();
 
                     doConnect(remoteAddress, localAddress);
@@ -173,9 +168,7 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
                     if (!wasActive && isActive()) {
                         pipeline().fireChannelActive();
                     }
-
                 } catch (Throwable t) {
-
                     promise.setFailure(t);
                     closeIfClosed();
                 }
@@ -188,7 +181,6 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
         private final String value;
 
         public BluetoothDeviceAddress(String value) {
-
             this.value = value;
         }
 
@@ -198,7 +190,6 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
 
         @Override
         public String toString() {
-
             return value;
         }
     }

@@ -7,6 +7,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * cause of {@link AbstractOioChannel sync read task}
  * generic serial communication channel
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/27 14:27
@@ -157,6 +159,7 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
      * @version 1.0
      * @since 2024/5/15 12:44
      */
+    @ToString
     @RequiredArgsConstructor
     public static class SerialCommAddress extends SocketAddress {
 
@@ -170,12 +173,6 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
             return value;
         }
 
-        @Override
-        public String toString() {
-            return "SerialCommPortAddress{" +
-                   "value='" + value + '\'' +
-                   '}';
-        }
     }
 }
 
