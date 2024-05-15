@@ -3,7 +3,7 @@ package org.fz.nettyx.endpoint.serial.rxtx;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.channel.SerialCommChannel;
+import org.fz.nettyx.channel.ReadAsyncOioChannel;
 import org.fz.nettyx.endpoint.AbstractSingleChannellEndpoint;
 import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannel;
 import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig;
@@ -20,10 +20,10 @@ import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig;
 public abstract class SingleRxtxChannellEndpoint extends AbstractSingleChannellEndpoint<RxtxChannel, RxtxChannelConfig> {
 
     protected SingleRxtxChannellEndpoint(String commAddress) {
-        super(new SerialCommChannel.SerialCommAddress(commAddress));
+        super(new ReadAsyncOioChannel.SerialCommAddress(commAddress));
     }
 
-    protected SingleRxtxChannellEndpoint(SerialCommChannel.SerialCommAddress commAddress) {
+    protected SingleRxtxChannellEndpoint(ReadAsyncOioChannel.SerialCommAddress commAddress) {
         super(commAddress);
     }
 
