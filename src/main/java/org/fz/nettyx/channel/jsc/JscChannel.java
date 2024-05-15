@@ -1,10 +1,9 @@
-package org.fz.nettyx.endpoint.serial.jsc.support;
+package org.fz.nettyx.channel.jsc;
 
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.channel.ChannelConfig;
-import org.fz.nettyx.endpoint.serial.SerialCommAddress;
-import org.fz.nettyx.endpoint.serial.SerialCommChannel;
+import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;
 

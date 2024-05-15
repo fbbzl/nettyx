@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.bluetooth.support;
+package org.fz.nettyx.channel.bluetooth;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;

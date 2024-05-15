@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.serial;
+package org.fz.nettyx.channel;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
@@ -6,7 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
-import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
+import lombok.RequiredArgsConstructor;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -28,10 +28,6 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
     protected SerialCommAddress deviceAddress;
 
     private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
-
-    protected SerialCommChannel() {
-        super(null);
-    }
 
     protected boolean open = true;
 
@@ -107,7 +103,7 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
 
     @Override
     protected void doBind(SocketAddress localAddress) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("doBind");
     }
 
     protected abstract void doInit();
@@ -156,5 +152,30 @@ public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
     }
 
 
+    /**
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024/5/15 12:44
+     */
+    @RequiredArgsConstructor
+    public static class SerialCommAddress extends SocketAddress {
+
+        private static final long   serialVersionUID = -870353013039000250L;
+        private final        String value;
+
+        /**
+         * @return The serial port address of the device (e.g. COM1, /dev/ttyUSB0, ...)
+         */
+        public String value() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return "SerialCommPortAddress{" +
+                   "value='" + value + '\'' +
+                   '}';
+        }
+    }
 }
 

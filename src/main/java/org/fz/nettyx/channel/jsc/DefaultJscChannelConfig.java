@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.serial.jsc.support;
+package org.fz.nettyx.channel.jsc;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;

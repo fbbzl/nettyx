@@ -1,12 +1,11 @@
-package org.fz.nettyx.endpoint.serial.rxtx.support;
+package org.fz.nettyx.channel.rxtx;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import io.netty.channel.ChannelConfig;
-import org.fz.nettyx.endpoint.serial.SerialCommAddress;
-import org.fz.nettyx.endpoint.serial.SerialCommChannel;
+import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.io.IOException;
 import java.net.SocketAddress;
