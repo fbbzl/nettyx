@@ -24,6 +24,11 @@ public class JscChannel extends SerialCommChannel {
     }
 
     @Override
+    protected int available() {
+        return serialPort.bytesAvailable();
+    }
+
+    @Override
     protected int waitTime(ChannelConfig config) {
         return config().getOption(JscChannelOption.WAIT_TIME);
     }
