@@ -3,7 +3,6 @@ package org.fz.nettyx.channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
-import io.netty.util.concurrent.DefaultEventExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
@@ -26,8 +25,6 @@ public abstract class SerialCommChannel extends AsyncReadOioByteStreamChannel {
     protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
     protected SerialCommAddress remoteAddress;
-
-    private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
 
     protected boolean open = true;
 
