@@ -1,5 +1,6 @@
 package org.fz.nettyx.channel;
 
+import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
@@ -27,6 +28,13 @@ public abstract class SerialCommChannel extends NonBlockOioByteStreamChannel {
     protected SerialCommAddress remoteAddress;
 
     protected boolean open = true;
+
+    protected abstract void doInit();
+
+    /**
+     * wait for the effective time
+     */
+    protected abstract int waitTime(ChannelConfig config);
 
     @Override
     protected AbstractUnsafe newUnsafe() {

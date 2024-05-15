@@ -74,11 +74,6 @@ public class BluetoothChannel extends NonBlockOioByteStreamChannel {
     }
 
     @Override
-    protected void doInit() {
-
-    }
-
-    @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         this.remoteAddress = (BluetoothDeviceAddress) remoteAddress;
 
@@ -105,11 +100,6 @@ public class BluetoothChannel extends NonBlockOioByteStreamChannel {
         return remoteAddress;
     }
 
-
-    @Override
-    protected int waitTime(ChannelConfig config) {
-        return 0;
-    }
 
     @Override
     protected void doDisconnect() throws Exception {
