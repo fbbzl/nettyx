@@ -4,7 +4,7 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import org.fz.nettyx.channel.ReadAsyncOioChannel;
+import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
 import org.fz.nettyx.endpoint.serial.jsc.MultiJscChannelEndpoint;
 import org.fz.nettyx.endpoint.serial.jsc.support.JscChannel;
 import org.fz.nettyx.endpoint.serial.jsc.support.JscChannelConfig;
@@ -29,7 +29,7 @@ public class TestMultiJsc extends MultiJscChannelEndpoint<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    public TestMultiJsc(Map<String, ReadAsyncOioChannel.SerialCommAddress> stringJscDeviceAddressMap) {
+    public TestMultiJsc(Map<String, ReadAsyncOioByteStreamChannel.SerialCommAddress> stringJscDeviceAddressMap) {
         super(stringJscDeviceAddressMap);
     }
 
@@ -52,10 +52,10 @@ public class TestMultiJsc extends MultiJscChannelEndpoint<String> {
     }
 
     public static void main(String[] args) {
-        Map<String, ReadAsyncOioChannel.SerialCommAddress> map = new HashMap<>();
+        Map<String, ReadAsyncOioByteStreamChannel.SerialCommAddress> map = new HashMap<>();
 
-        map.put("5", new ReadAsyncOioChannel.SerialCommAddress("COM5"));
-        map.put("6", new ReadAsyncOioChannel.SerialCommAddress("COM6"));
+        map.put("5", new ReadAsyncOioByteStreamChannel.SerialCommAddress("COM5"));
+        map.put("6", new ReadAsyncOioByteStreamChannel.SerialCommAddress("COM6"));
 
         TestMultiJsc testMultiJsc = new TestMultiJsc(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()

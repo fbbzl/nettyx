@@ -4,7 +4,7 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import org.fz.nettyx.channel.ReadAsyncOioChannel;
+import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
 import org.fz.nettyx.endpoint.serial.rxtx.MultiRxtxChannelEndpoint;
 import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannel;
 import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig;
@@ -29,7 +29,7 @@ public class TestMultiRxtx extends MultiRxtxChannelEndpoint<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    protected TestMultiRxtx(Map<String, ReadAsyncOioChannel.SerialCommAddress> stringRxtxDeviceAddressMap) {
+    protected TestMultiRxtx(Map<String, ReadAsyncOioByteStreamChannel.SerialCommAddress> stringRxtxDeviceAddressMap) {
         super(stringRxtxDeviceAddressMap);
     }
 
@@ -51,10 +51,10 @@ public class TestMultiRxtx extends MultiRxtxChannelEndpoint<String> {
     }
 
     public static void main(String[] args) {
-        Map<String, ReadAsyncOioChannel.SerialCommAddress> map = new HashMap<>();
+        Map<String, ReadAsyncOioByteStreamChannel.SerialCommAddress> map = new HashMap<>();
 
-        map.put("5", new ReadAsyncOioChannel.SerialCommAddress("COM5"));
-        map.put("6", new ReadAsyncOioChannel.SerialCommAddress("COM6"));
+        map.put("5", new ReadAsyncOioByteStreamChannel.SerialCommAddress("COM5"));
+        map.put("6", new ReadAsyncOioByteStreamChannel.SerialCommAddress("COM6"));
 
         TestMultiRxtx testMultiTcp = new TestMultiRxtx(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
