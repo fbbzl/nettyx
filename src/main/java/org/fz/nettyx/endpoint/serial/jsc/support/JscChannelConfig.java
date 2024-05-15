@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client.jsc.support;
+package org.fz.nettyx.endpoint.serial.jsc.support;
 
 
 import com.fazecast.jSerialComm.SerialPort;

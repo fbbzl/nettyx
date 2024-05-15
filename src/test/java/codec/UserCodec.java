@@ -14,7 +14,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.fz.nettyx.endpoint.client.AbstractMultiChannelClient.channelKey;
+import static org.fz.nettyx.endpoint.AbstractMultiChannelEndpoint.channelKey;
 
 
 @Slf4j

@@ -5,9 +5,9 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import org.fz.nettyx.endpoint.client.rxtx.SingleRxtxChannelClient;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
+import org.fz.nettyx.endpoint.serial.rxtx.SingleRxtxChannellEndpoint;
+import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannel;
+import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
  * @version 1.0
  * @since 2024/2/29 10:31
  */
-public class TestSingleRxtx extends SingleRxtxChannelClient {
+public class TestSingleRxtx extends SingleRxtxChannellEndpoint {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 

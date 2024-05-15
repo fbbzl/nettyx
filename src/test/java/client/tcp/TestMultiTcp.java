@@ -6,7 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.endpoint.client.tcp.MultiTcpChannelClient;
+import org.fz.nettyx.endpoint.tcp.client.MultiTcpChannelClient;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.InetSocketAddress;

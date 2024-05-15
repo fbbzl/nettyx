@@ -5,9 +5,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.endpoint.client.jsc.MultiJscChannelClient;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
+import org.fz.nettyx.endpoint.serial.jsc.MultiJscChannelEndpoint;
+import org.fz.nettyx.endpoint.serial.jsc.support.JscChannel;
+import org.fz.nettyx.endpoint.serial.jsc.support.JscChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;
@@ -25,7 +25,7 @@ import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
  * @version 1.0
  * @since 2024/3/1 22:58
  */
-public class TestMultiJsc extends MultiJscChannelClient<String> {
+public class TestMultiJsc extends MultiJscChannelEndpoint<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 

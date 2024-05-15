@@ -1,13 +1,13 @@
-package org.fz.nettyx.endpoint.client.jsc;
+package org.fz.nettyx.endpoint.serial.jsc;
 
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.endpoint.client.AbstractMultiChannelClient;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
+import org.fz.nettyx.endpoint.AbstractMultiChannelEndpoint;
+import org.fz.nettyx.endpoint.serial.jsc.support.JscChannel;
+import org.fz.nettyx.endpoint.serial.jsc.support.JscChannelConfig;
 
 import java.util.Map;
 
@@ -19,9 +19,9 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiJscChannelClient<K> extends AbstractMultiChannelClient<K, JscChannel, JscChannelConfig> {
+public abstract class MultiJscChannelEndpoint<K> extends AbstractMultiChannelEndpoint<K, JscChannel, JscChannelConfig> {
 
-    protected MultiJscChannelClient(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
+    protected MultiJscChannelEndpoint(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
         super(addressMap);
     }
 
