@@ -3,8 +3,8 @@ package org.fz.nettyx.endpoint.serial.jsc.support;
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.channel.ChannelConfig;
-import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
 import org.fz.nettyx.endpoint.serial.SerialCommAddress;
+import org.fz.nettyx.endpoint.serial.SerialCommChannel;
 
 import java.net.SocketAddress;
 
@@ -15,7 +15,7 @@ import java.net.SocketAddress;
  * @since 2024/3/2 13:29
  */
 
-public class JscChannel extends ReadAsyncOioByteStreamChannel {
+public class JscChannel extends SerialCommChannel {
 
     private final JscChannelConfig config;
     private       SerialPort       serialPort;
