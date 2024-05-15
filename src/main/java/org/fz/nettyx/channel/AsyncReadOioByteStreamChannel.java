@@ -16,11 +16,11 @@ import io.netty.util.concurrent.DefaultEventExecutor;
  */
 
 @SuppressWarnings("deprecation")
-public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel {
+public abstract class AsyncReadOioByteStreamChannel extends OioByteStreamChannel {
 
     private final DefaultEventExecutor eventExecutors = new DefaultEventExecutor();
 
-    protected ReadAsyncOioByteStreamChannel() {
+    protected AsyncReadOioByteStreamChannel() {
         super(null);
     }
 
@@ -36,7 +36,7 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
     @Override
     public void doRead() {
         // do not use method reference!!!
-        Runnable runnable = () -> ReadAsyncOioByteStreamChannel.super.doRead();
+        Runnable runnable = () -> AsyncReadOioByteStreamChannel.super.doRead();
         eventExecutors.execute(runnable);
     }
 
