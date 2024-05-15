@@ -66,7 +66,7 @@ public class JscChannel extends SerialCommChannel {
             serialPort.setRTS();
         }
 
-        activate(serialPort.getInputStream(), serialPort.getOutputStream());
+        super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
     }
 
     @Override
