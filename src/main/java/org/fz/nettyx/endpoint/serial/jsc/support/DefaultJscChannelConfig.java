@@ -1,11 +1,9 @@
-package org.fz.nettyx.endpoint.client.jsc.support;
+package org.fz.nettyx.endpoint.serial.jsc.support;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
 
 import java.util.Map;
-
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 
 /**
@@ -33,34 +31,34 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
 
     @Override
     public Map<ChannelOption<?>, Object> getOptions() {
-        return getOptions(super.getOptions(), BAUD_RATE, DTR, RTS, STOP_BITS, DATA_BITS, PARITY_BIT, WAIT_TIME);
+        return getOptions(super.getOptions(), JscChannelOption.BAUD_RATE, JscChannelOption.DTR, JscChannelOption.RTS, JscChannelOption.STOP_BITS, JscChannelOption.DATA_BITS, JscChannelOption.PARITY_BIT, JscChannelOption.WAIT_TIME);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T getOption(ChannelOption<T> option) {
-        if (option == BAUD_RATE) {
+        if (option == JscChannelOption.BAUD_RATE) {
             return (T) Integer.valueOf(getBaudRate());
         }
-        if (option == DTR) {
+        if (option == JscChannelOption.DTR) {
             return (T) Boolean.valueOf(isDtr());
         }
-        if (option == RTS) {
+        if (option == JscChannelOption.RTS) {
             return (T) Boolean.valueOf(isRts());
         }
-        if (option == STOP_BITS) {
+        if (option == JscChannelOption.STOP_BITS) {
             return (T) getStopBits();
         }
-        if (option == DATA_BITS) {
+        if (option == JscChannelOption.DATA_BITS) {
             return (T) getDataBits();
         }
-        if (option == PARITY_BIT) {
+        if (option == JscChannelOption.PARITY_BIT) {
             return (T) getParityBit();
         }
-        if (option == WAIT_TIME) {
+        if (option == JscChannelOption.WAIT_TIME) {
             return (T) Integer.valueOf(getWaitTimeMillis());
         }
-        if (option == READ_TIMEOUT) {
+        if (option == JscChannelOption.READ_TIMEOUT) {
             return (T) Integer.valueOf(getReadTimeout());
         }
 
@@ -71,21 +69,21 @@ final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscC
     public <T> boolean setOption(ChannelOption<T> option, T value) {
         validate(option, value);
 
-        if (option == BAUD_RATE) {
+        if (option == JscChannelOption.BAUD_RATE) {
             setBaudRate((Integer) value);
-        } else if (option == DTR) {
+        } else if (option == JscChannelOption.DTR) {
             setDtr((Boolean) value);
-        } else if (option == RTS) {
+        } else if (option == JscChannelOption.RTS) {
             setRts((Boolean) value);
-        } else if (option == STOP_BITS) {
+        } else if (option == JscChannelOption.STOP_BITS) {
             setStopBits((StopBits) value);
-        } else if (option == DATA_BITS) {
+        } else if (option == JscChannelOption.DATA_BITS) {
             setDataBits((DataBits) value);
-        } else if (option == PARITY_BIT) {
+        } else if (option == JscChannelOption.PARITY_BIT) {
             setParityBit((ParityBit) value);
-        } else if (option == WAIT_TIME) {
+        } else if (option == JscChannelOption.WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
-        } else if (option == READ_TIMEOUT) {
+        } else if (option == JscChannelOption.READ_TIMEOUT) {
             setReadTimeout((Integer) value);
         } else {
             return super.setOption(option, value);

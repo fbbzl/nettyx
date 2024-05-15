@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client.rxtx.support;
+package org.fz.nettyx.endpoint.serial.rxtx.support;
 
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
@@ -9,8 +9,6 @@ import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-
-import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 
 
 /**
@@ -30,7 +28,7 @@ public class RxtxChannel extends SerialCommChannel {
 
     @Override
     protected int waitTime(ChannelConfig config) {
-        return config.getOption(WAIT_TIME);
+        return config.getOption(RxtxChannelOption.WAIT_TIME);
     }
 
     @Override
@@ -43,7 +41,7 @@ public class RxtxChannel extends SerialCommChannel {
         SerialCommAddress        remote   = (SerialCommAddress) remoteAddress;
         final CommPortIdentifier cpi      = CommPortIdentifier.getPortIdentifier(remote.value());
         final CommPort           commPort = cpi.open(getClass().getName(), 1000);
-        commPort.enableReceiveTimeout(config().getOption(READ_TIMEOUT));
+        commPort.enableReceiveTimeout(config().getOption(RxtxChannelOption.READ_TIMEOUT));
 
         deviceAddress = remote;
         serialPort    = (SerialPort) commPort;
@@ -53,13 +51,13 @@ public class RxtxChannel extends SerialCommChannel {
     protected void doInit() {
         try {
             serialPort.setSerialPortParams(
-                    config().getOption(BAUD_RATE),
-                    config().getOption(DATA_BITS).value(),
-                    config().getOption(STOP_BITS).value(),
-                    config().getOption(PARITY_BIT).value()
+                    config().getOption(RxtxChannelOption.BAUD_RATE),
+                    config().getOption(RxtxChannelOption.DATA_BITS).value(),
+                    config().getOption(RxtxChannelOption.STOP_BITS).value(),
+                    config().getOption(RxtxChannelOption.PARITY_BIT).value()
                                           );
-            serialPort.setDTR(config().getOption(DTR));
-            serialPort.setRTS(config().getOption(RTS));
+            serialPort.setDTR(config().getOption(RxtxChannelOption.DTR));
+            serialPort.setRTS(config().getOption(RxtxChannelOption.RTS));
 
             activate(serialPort.getInputStream(), serialPort.getOutputStream());
         } catch (UnsupportedCommOperationException commPortError) {

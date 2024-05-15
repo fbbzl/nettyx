@@ -10,7 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
-import org.fz.nettyx.endpoint.server.TcpServer;
+import org.fz.nettyx.endpoint.tcp.server.TcpServer;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 

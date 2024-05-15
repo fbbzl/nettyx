@@ -1,13 +1,13 @@
-package org.fz.nettyx.endpoint.client.jsc;
+package org.fz.nettyx.endpoint.serial.jsc;
 
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannel;
-import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
+import org.fz.nettyx.endpoint.AbstractSingleChannellEndpoint;
+import org.fz.nettyx.endpoint.serial.jsc.support.JscChannel;
+import org.fz.nettyx.endpoint.serial.jsc.support.JscChannelConfig;
 
 /**
  * @author fengbinbin
@@ -17,13 +17,13 @@ import org.fz.nettyx.endpoint.client.jsc.support.JscChannelConfig;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleJscChannelClient extends AbstractSingleChannelClient<JscChannel, JscChannelConfig> {
+public abstract class SingleJscChannelEndpoint extends AbstractSingleChannellEndpoint<JscChannel, JscChannelConfig> {
 
-    protected SingleJscChannelClient(String commAddress) {
+    protected SingleJscChannelEndpoint(String commAddress) {
         super(new SerialCommChannel.SerialCommAddress(commAddress));
     }
 
-    protected SingleJscChannelClient(SerialCommChannel.SerialCommAddress commAddress) {
+    protected SingleJscChannelEndpoint(SerialCommChannel.SerialCommAddress commAddress) {
         super(commAddress);
     }
 

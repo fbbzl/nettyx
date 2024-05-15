@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client.jsc.support;
+package org.fz.nettyx.endpoint.serial.jsc.support;
 
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -6,8 +6,6 @@ import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.net.SocketAddress;
-
-import static org.fz.nettyx.endpoint.client.jsc.support.JscChannelOption.*;
 
 
 /**
@@ -27,7 +25,7 @@ public class JscChannel extends SerialCommChannel {
 
     @Override
     protected int waitTime(ChannelConfig config) {
-        return config().getOption(WAIT_TIME);
+        return config().getOption(JscChannelOption.WAIT_TIME);
     }
 
     @Override
@@ -43,7 +41,7 @@ public class JscChannel extends SerialCommChannel {
         if (!commPort.openPort()) {
             throw new IllegalArgumentException("Unable to open [" + remote.value() + "] port");
         }
-        commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(READ_TIMEOUT), 0);
+        commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
 
         deviceAddress = remote;
         serialPort    = commPort;
@@ -51,15 +49,15 @@ public class JscChannel extends SerialCommChannel {
 
     protected void doInit() {
         serialPort.setComPortParameters(
-                config().getOption(BAUD_RATE),
-                config().getOption(DATA_BITS).value(),
-                config().getOption(STOP_BITS).value(),
-                config().getOption(PARITY_BIT).value());
+                config().getOption(JscChannelOption.BAUD_RATE),
+                config().getOption(JscChannelOption.DATA_BITS).value(),
+                config().getOption(JscChannelOption.STOP_BITS).value(),
+                config().getOption(JscChannelOption.PARITY_BIT).value());
 
-        if (Boolean.TRUE.equals(config().getOption(DTR))) {
+        if (Boolean.TRUE.equals(config().getOption(JscChannelOption.DTR))) {
             serialPort.setDTR();
         }
-        if (Boolean.TRUE.equals(config().getOption(RTS))) {
+        if (Boolean.TRUE.equals(config().getOption(JscChannelOption.RTS))) {
             serialPort.setRTS();
         }
 

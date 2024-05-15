@@ -8,9 +8,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.channel.oio.OioByteStreamChannel;
-import io.unifycom.netty.channel.bluetooth.BluetoothChannelConfig;
-import io.unifycom.netty.channel.bluetooth.BluetoothDeviceAddress;
-import io.unifycom.netty.channel.bluetooth.DefaultBluetoothChannelConfig;
+import org.fz.nettyx.endpoint.bluetooth.BluetoothChannelConfig;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;

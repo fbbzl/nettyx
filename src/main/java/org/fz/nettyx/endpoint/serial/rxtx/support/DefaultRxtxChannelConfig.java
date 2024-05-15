@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.fz.nettyx.endpoint.client.rxtx.support;
+package org.fz.nettyx.endpoint.serial.rxtx.support;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
@@ -21,7 +21,6 @@ import io.netty.channel.*;
 import java.util.Map;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
-import static org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelOption.*;
 
 /**
  * Default configuration class for RXTX device connections.
@@ -50,34 +49,34 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
 
     @Override
     public Map<ChannelOption<?>, Object> getOptions() {
-        return getOptions(super.getOptions(), BAUD_RATE, DTR, RTS, STOP_BITS, DATA_BITS, PARITY_BIT, WAIT_TIME);
+        return getOptions(super.getOptions(), RxtxChannelOption.BAUD_RATE, RxtxChannelOption.DTR, RxtxChannelOption.RTS, RxtxChannelOption.STOP_BITS, RxtxChannelOption.DATA_BITS, RxtxChannelOption.PARITY_BIT, RxtxChannelOption.WAIT_TIME);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getOption(ChannelOption<T> option) {
-        if (option == BAUD_RATE) {
+        if (option == RxtxChannelOption.BAUD_RATE) {
             return (T) Integer.valueOf(getBaudRate());
         }
-        if (option == DTR) {
+        if (option == RxtxChannelOption.DTR) {
             return (T) Boolean.valueOf(isDtr());
         }
-        if (option == RTS) {
+        if (option == RxtxChannelOption.RTS) {
             return (T) Boolean.valueOf(isRts());
         }
-        if (option == STOP_BITS) {
+        if (option == RxtxChannelOption.STOP_BITS) {
             return (T) getStopBits();
         }
-        if (option == DATA_BITS) {
+        if (option == RxtxChannelOption.DATA_BITS) {
             return (T) getDataBits();
         }
-        if (option == PARITY_BIT) {
+        if (option == RxtxChannelOption.PARITY_BIT) {
             return (T) getParityBit();
         }
-        if (option == WAIT_TIME) {
+        if (option == RxtxChannelOption.WAIT_TIME) {
             return (T) Integer.valueOf(getWaitTimeMillis());
         }
-        if (option == READ_TIMEOUT) {
+        if (option == RxtxChannelOption.READ_TIMEOUT) {
             return (T) Integer.valueOf(getReadTimeout());
         }
         return super.getOption(option);
@@ -87,21 +86,21 @@ final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements Rxt
     public <T> boolean setOption(ChannelOption<T> option, T value) {
         validate(option, value);
 
-        if (option == BAUD_RATE) {
+        if (option == RxtxChannelOption.BAUD_RATE) {
             setBaudRate((Integer) value);
-        } else if (option == DTR) {
+        } else if (option == RxtxChannelOption.DTR) {
             setDtr((Boolean) value);
-        } else if (option == RTS) {
+        } else if (option == RxtxChannelOption.RTS) {
             setRts((Boolean) value);
-        } else if (option == STOP_BITS) {
+        } else if (option == RxtxChannelOption.STOP_BITS) {
             setStopBits((StopBits) value);
-        } else if (option == DATA_BITS) {
+        } else if (option == RxtxChannelOption.DATA_BITS) {
             setDataBits((DataBits) value);
-        } else if (option == PARITY_BIT) {
+        } else if (option == RxtxChannelOption.PARITY_BIT) {
             setParityBit((ParityBit) value);
-        } else if (option == WAIT_TIME) {
+        } else if (option == RxtxChannelOption.WAIT_TIME) {
             setWaitTimeMillis((Integer) value);
-        } else if (option == READ_TIMEOUT) {
+        } else if (option == RxtxChannelOption.READ_TIMEOUT) {
             setReadTimeout((Integer) value);
         } else {
             return super.setOption(option, value);
