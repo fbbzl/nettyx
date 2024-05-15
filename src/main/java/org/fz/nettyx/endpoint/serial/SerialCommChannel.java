@@ -5,8 +5,8 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
-import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
+import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
 
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @SuppressWarnings("deprecation")
-public abstract class SerialCommChannel extends OioByteStreamChannel {
+public abstract class SerialCommChannel extends ReadAsyncOioByteStreamChannel {
 
     protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
