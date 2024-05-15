@@ -5,9 +5,9 @@ import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import org.fz.nettyx.channel.rxtx.RxtxChannel;
+import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
 import org.fz.nettyx.endpoint.serial.rxtx.SingleRxtxChannellEndpoint;
-import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannel;
-import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;

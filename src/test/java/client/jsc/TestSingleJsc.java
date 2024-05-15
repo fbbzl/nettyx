@@ -6,9 +6,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.jsc.JscChannel;
+import org.fz.nettyx.channel.jsc.JscChannelConfig;
 import org.fz.nettyx.endpoint.serial.jsc.SingleJscChannelEndpoint;
-import org.fz.nettyx.endpoint.serial.jsc.support.JscChannel;
-import org.fz.nettyx.endpoint.serial.jsc.support.JscChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.Arrays;

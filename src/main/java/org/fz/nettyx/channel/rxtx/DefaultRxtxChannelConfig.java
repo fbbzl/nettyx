@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.fz.nettyx.endpoint.serial.rxtx.support;
+package org.fz.nettyx.channel.rxtx;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;

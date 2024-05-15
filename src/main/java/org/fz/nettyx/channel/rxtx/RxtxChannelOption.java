@@ -13,12 +13,12 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.fz.nettyx.endpoint.serial.rxtx.support;
+package org.fz.nettyx.channel.rxtx;
 
 import io.netty.channel.ChannelOption;
-import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig.DataBits;
-import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig.ParityBit;
-import org.fz.nettyx.endpoint.serial.rxtx.support.RxtxChannelConfig.StopBits;
+import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.DataBits;
+import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.ParityBit;
+import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.StopBits;
 
 /**
  * Option for configuring a serial port connection

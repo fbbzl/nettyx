@@ -2,12 +2,9 @@ package org.fz.nettyx.channel;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelConfig;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.concurrent.DefaultEventExecutor;
-
-import java.net.SocketAddress;
 
 
 /**
@@ -55,16 +52,6 @@ public abstract class ReadAsyncOioByteStreamChannel extends OioByteStreamChannel
     @Override
     protected void doDisconnect() throws Exception {
         doClose();
-    }
-
-    @Override
-    protected ChannelFuture shutdownInput() {
-        return newFailedFuture(new UnsupportedOperationException("shutdownInput"));
-    }
-
-    @Override
-    protected void doBind(SocketAddress localAddress) {
-        throw new UnsupportedOperationException("doBind");
     }
 
     protected abstract void doInit();
