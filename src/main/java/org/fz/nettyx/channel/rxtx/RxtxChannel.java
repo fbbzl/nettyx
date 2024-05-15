@@ -59,7 +59,7 @@ public class RxtxChannel extends SerialCommChannel {
             serialPort.setDTR(config().getOption(RxtxChannelOption.DTR));
             serialPort.setRTS(config().getOption(RxtxChannelOption.RTS));
 
-            activate(serialPort.getInputStream(), serialPort.getOutputStream());
+            super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
         } catch (UnsupportedCommOperationException commPortError) {
             throw new IllegalArgumentException("can not open comm port", commPortError);
         } catch (IOException steamError) {
