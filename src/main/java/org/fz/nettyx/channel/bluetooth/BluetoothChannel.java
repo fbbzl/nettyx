@@ -2,6 +2,8 @@ package org.fz.nettyx.channel.bluetooth;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;
+import com.intel.bluetooth.BluetoothConnectionAccess;
+import com.intel.bluetooth.BluetoothConnectionAccessAdapter;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
@@ -14,6 +16,7 @@ import java.io.InputStream;
 import java.net.SocketAddress;
 
 /**
+ * TODO not completed
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/27 14:27
