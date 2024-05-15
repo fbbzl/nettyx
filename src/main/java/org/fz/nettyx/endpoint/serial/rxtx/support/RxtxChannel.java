@@ -6,6 +6,7 @@ import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.ReadAsyncOioByteStreamChannel;
+import org.fz.nettyx.endpoint.serial.SerialCommAddress;
 
 import java.io.IOException;
 import java.net.SocketAddress;
@@ -38,8 +39,8 @@ public class RxtxChannel extends ReadAsyncOioByteStreamChannel {
 
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
-        SerialCommAddress        remote   = (SerialCommAddress) remoteAddress;
-        final CommPortIdentifier cpi      = CommPortIdentifier.getPortIdentifier(remote.value());
+        SerialCommAddress        remote = (SerialCommAddress) remoteAddress;
+        final CommPortIdentifier cpi    = CommPortIdentifier.getPortIdentifier(remote.value());
         final CommPort           commPort = cpi.open(getClass().getName(), 1000);
         commPort.enableReceiveTimeout(config().getOption(RxtxChannelOption.READ_TIMEOUT));
 
