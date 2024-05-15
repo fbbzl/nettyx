@@ -101,11 +101,6 @@ public class BluetoothChannel extends ReadAsyncOioByteStreamChannel {
         return remoteDeviceAddress;
     }
 
-    @Override
-    protected void doBind(SocketAddress localAddress) throws Exception {
-
-        throw new UnsupportedOperationException("doBind");
-    }
 
     @Override
     protected void doInit() {
