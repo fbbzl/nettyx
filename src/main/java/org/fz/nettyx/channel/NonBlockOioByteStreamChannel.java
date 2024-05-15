@@ -24,6 +24,7 @@ public abstract class NonBlockOioByteStreamChannel extends OioByteStreamChannel 
     @Override
     protected int doReadBytes(ByteBuf buf) {
         try {
+            // check before use, it will avoid blocking
             if (available() > 0) return super.doReadBytes(buf);
             return 0;
         } catch (Exception e) {
