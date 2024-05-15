@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.bluetooth;
+package org.fz.nettyx.endpoint.bluetooth.client;
 
 
 import io.netty.channel.EventLoopGroup;
@@ -19,9 +19,9 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiBluetoothChannelEndpoint<K> extends AbstractMultiChannelEndpoint<K, JscChannel, JscChannelConfig> {
+public abstract class MultiBluetoothChannelClient<K> extends AbstractMultiChannelEndpoint<K, JscChannel, JscChannelConfig> {
 
-    protected MultiBluetoothChannelEndpoint(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
+    protected MultiBluetoothChannelClient(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
         super(addressMap);
     }
 
