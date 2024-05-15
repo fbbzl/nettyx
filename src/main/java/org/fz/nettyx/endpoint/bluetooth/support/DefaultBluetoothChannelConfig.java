@@ -1,8 +1,6 @@
 package org.fz.nettyx.endpoint.bluetooth.support;
 
 import io.netty.channel.DefaultChannelConfig;
-import org.fz.nettyx.channel.BluetoothChannel;
-import org.fz.nettyx.endpoint.bluetooth.BluetoothChannelConfig;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 
