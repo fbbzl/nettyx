@@ -85,12 +85,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.github.unifycom</groupId>
-            <artifactId>netty-transport-bluetooth</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>io.ultreia</groupId>
             <artifactId>bluecove</artifactId>
             <version>${bluecove.version}</version>
