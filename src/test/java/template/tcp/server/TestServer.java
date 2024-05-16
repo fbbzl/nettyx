@@ -10,9 +10,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
-import org.fz.nettyx.endpoint.tcp.server.TcpServer;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
+import org.fz.nettyx.template.tcp.server.TcpServerTemplate;
 
 import java.util.Arrays;
 
@@ -23,7 +23,7 @@ import static io.netty.buffer.Unpooled.wrappedBuffer;
  * @version 1.0
  * @since 2024/3/23 12:40
  */
-public class TestServer extends TcpServer {
+public class TestServer extends TcpServerTemplate {
 
     public TestServer(int bindPort) {
         super(bindPort);
