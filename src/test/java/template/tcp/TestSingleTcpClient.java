@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 @Slf4j
-public class TestSingleTcp extends SingleTcpChannellClient {
+public class TestSingleTcpClient extends SingleTcpChannellClient {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    public TestSingleTcp(InetSocketAddress address) {
+    public TestSingleTcpClient(InetSocketAddress address) {
         super(address);
     }
 
@@ -33,7 +33,7 @@ public class TestSingleTcp extends SingleTcpChannellClient {
     }
 
     public static void main(String[] args) {
-        TestSingleTcp testClient = new TestSingleTcp(new InetSocketAddress(9888));
+        TestSingleTcpClient testClient = new TestSingleTcpClient(new InetSocketAddress(9888));
 
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((ls, cf) -> {
