@@ -109,7 +109,7 @@ public abstract class Detector extends SingleTcpChannellClient {
     /**
      * protocol channel handlers
      */
-    public abstract ChannelHandler[] getChannelHandlers();
+    public abstract void initChannel(NioSocketChannel channel);
 
     /**
      * the message use to detect the device, please choose the message that device response immediately
