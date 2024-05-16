@@ -40,6 +40,7 @@ public abstract class Detector extends SingleTcpChannellClient {
             @Override
             protected void initChannel(NioSocketChannel channel) {
                 initDetectorChannel(channel);
+                
                 channel.pipeline()
                        .addLast(new SimpleChannelInboundHandler<Object>() {
                            @Override
