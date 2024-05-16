@@ -1,8 +1,6 @@
 package template.tcp;
 
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.tcp.client.Detector;
 
 import java.net.InetSocketAddress;
@@ -32,20 +30,9 @@ public class TestDetector extends Detector<String> {
         return "this is detect string type msg";
     }
 
-    public static void main(String[] args) {
-        TestDetector testClient = new TestDetector(new InetSocketAddress(9888));
-
-        ChannelFutureListener listener = new ActionChannelFutureListener()
-                .whenSuccess((ls, cf) -> {
-
-
-                    System.err.println(cf.channel().localAddress() + ": ok");
-                })
-
-
-                .whenDone((ls, cf) -> System.err.println("done"));
-
-        testClient.connect().addListener(listener);
+    public static void main(String[] args) throws Exception {
+        TestDetector testDetector = new TestDetector(new InetSocketAddress(9888));
+        System.err.println(testDetector.doDetect());
     }
 
 }
