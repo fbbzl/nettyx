@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BooleanSupplier;
 
 /**
  * @author fengbinbin
@@ -33,14 +32,6 @@ public abstract class Detector extends SingleTcpChannellClient {
         super(address);
         this.detectRetryTimes   = detectRetryTimes;
         this.waitResponseMillis = waitResponseMillis;
-    }
-
-    protected boolean getResponseState() {
-        return responseState.get();
-    }
-
-    protected boolean noneResponse() {
-        return !responseState.get();
     }
 
     @Override
@@ -79,12 +70,12 @@ public abstract class Detector extends SingleTcpChannellClient {
         super.storeChannel(detectChannel);
 
         // 2.3 try-send detect req-message
-        this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis, this::noneResponse);
+        this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
 
         // 3. close channel after detect
         this.closeChannelGracefully();
 
-        return this.getResponseState();
+        return this.responseState.get();
     }
 
     /**
@@ -95,7 +86,7 @@ public abstract class Detector extends SingleTcpChannellClient {
      * @param waitResponseMillis wait the device response
      * @param retryCondition     the re-try condition
      */
-    public void trySend(Object detectMsg, int retryTimes, int waitResponseMillis, BooleanSupplier retryCondition) throws InterruptedException {
+    public void trySend(Object detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
         do {
             try {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).sync();
@@ -108,7 +99,7 @@ public abstract class Detector extends SingleTcpChannellClient {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
             }
-        } while (retryTimes > 0 && retryCondition.getAsBoolean());
+        } while (retryTimes > 0 && !responseState.get());
     }
 
     /**
