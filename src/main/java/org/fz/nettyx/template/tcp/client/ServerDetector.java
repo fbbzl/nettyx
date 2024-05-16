@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -62,11 +63,15 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
      * @return if is the correct device
      * @throws InterruptedException
      */
-    public boolean doDetect() throws InterruptedException {
+    public boolean doDetect() throws InterruptedException, ConnectException {
         this.responseState.set(false);
         // 1. do connect sync
-        ChannelFuture connectFuture = this.connect().await();
+        ChannelFuture connectFuture = this.connect().sync();
 
+        // 1.1 check if connect success
+        if (!connectFuture.isSuccess()) {
+            throw new ConnectException();
+        }
         // 2. send detect-message when connect success
         // 2.1 get the channel
         Channel detectChannel = connectFuture.channel();
