@@ -10,8 +10,8 @@ import java.net.InetSocketAddress;
  * @version 1.0
  * @since 2024/5/16 18:39
  */
-public class TestDetector extends ServerDetector<String> {
-    protected TestDetector(InetSocketAddress address) {
+public class TestServerDetector extends ServerDetector<String> {
+    protected TestServerDetector(InetSocketAddress address) {
         super(address);
     }
 
@@ -31,7 +31,7 @@ public class TestDetector extends ServerDetector<String> {
     }
 
     public static void main(String[] args) throws Exception {
-        TestDetector testDetector = new TestDetector(new InetSocketAddress(9888));
+        TestServerDetector testDetector = new TestServerDetector(new InetSocketAddress(9888));
         System.err.println(testDetector.doDetect());
     }
 
