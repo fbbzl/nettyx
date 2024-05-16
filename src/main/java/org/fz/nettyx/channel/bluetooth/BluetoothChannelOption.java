@@ -7,4 +7,6 @@ package org.fz.nettyx.channel.bluetooth;
  */
 public class BluetoothChannelOption {
 
+
+
 }
