@@ -39,14 +39,12 @@ public abstract class Detector extends SingleTcpChannellClient {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
-                channel.pipeline()
-                       .addLast(getChannelHandlers())
-                       .addLast(new SimpleChannelInboundHandler<Object>() {
-                           @Override
-                           protected void channelRead0(ChannelHandlerContext ctx, Object res) throws Exception {
-                               responseState.set(checkResponse(res));
-                           }
-                       });
+                channel.pipeline().addLast(getChannelHandlers()).addLast(new SimpleChannelInboundHandler<Object>() {
+                    @Override
+                    protected void channelRead0(ChannelHandlerContext ctx, Object res) throws Exception {
+                        responseState.set(checkResponse(res));
+                    }
+                });
             }
         };
     }
