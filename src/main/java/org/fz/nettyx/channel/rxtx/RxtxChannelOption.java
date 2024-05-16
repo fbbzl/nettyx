@@ -29,14 +29,18 @@ import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.StopBits;
  */
 public final class RxtxChannelOption<T> extends ChannelOption<T> {
 
-    public static final ChannelOption<Integer>   BAUD_RATE    = valueOf(RxtxChannelOption.class, "BAUD_RATE");
-    public static final ChannelOption<Boolean>   DTR          = valueOf(RxtxChannelOption.class, "DTR");
-    public static final ChannelOption<Boolean>   RTS          = valueOf(RxtxChannelOption.class, "RTS");
-    public static final ChannelOption<StopBits>  STOP_BITS    = valueOf(RxtxChannelOption.class, "STOP_BITS");
-    public static final ChannelOption<DataBits>  DATA_BITS    = valueOf(RxtxChannelOption.class, "DATA_BITS");
-    public static final ChannelOption<ParityBit> PARITY_BIT   = valueOf(RxtxChannelOption.class, "PARITY_BIT");
-    public static final ChannelOption<Integer>   WAIT_TIME    = valueOf(RxtxChannelOption.class, "WAIT_TIME");
-    public static final ChannelOption<Integer>   READ_TIMEOUT = valueOf(RxtxChannelOption.class, "READ_TIMEOUT");
+    public static final ChannelOption<Integer>   BAUD_RATE    = option("BAUD_RATE");
+    public static final ChannelOption<Boolean>   DTR          = option("DTR");
+    public static final ChannelOption<Boolean>   RTS          = option("RTS");
+    public static final ChannelOption<StopBits>  STOP_BITS    = option("STOP_BITS");
+    public static final ChannelOption<DataBits>  DATA_BITS    = option("DATA_BITS");
+    public static final ChannelOption<ParityBit> PARITY_BIT   = option("PARITY_BIT");
+    public static final ChannelOption<Integer>   WAIT_TIME    = option("WAIT_TIME");
+    public static final ChannelOption<Integer>   READ_TIMEOUT = option("READ_TIMEOUT");
+
+    private static <O> ChannelOption<O> option(String secondNameComponent) {
+        return valueOf(RxtxChannelOption.class, secondNameComponent);
+    }
 
     @SuppressWarnings("deprecation")
     private RxtxChannelOption() {
