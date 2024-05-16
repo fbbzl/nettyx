@@ -20,9 +20,9 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiRxtxChannelEndpoint<K> extends AbstractMultiChannelEndpoint<K, RxtxChannel, RxtxChannelConfig> {
+public abstract class MultiRxtxChannelTemplate<K> extends AbstractMultiChannelEndpoint<K, RxtxChannel, RxtxChannelConfig> {
 
-    protected MultiRxtxChannelEndpoint(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
+    protected MultiRxtxChannelTemplate(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
         super(addressMap);
     }
 
