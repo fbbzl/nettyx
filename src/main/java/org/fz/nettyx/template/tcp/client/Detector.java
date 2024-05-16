@@ -39,12 +39,12 @@ public abstract class Detector extends SingleTcpChannellClient {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
+                initDetectorChannel(channel);
                 channel.pipeline()
-                       .addLast(getChannelHandlers())
                        .addLast(new SimpleChannelInboundHandler<Object>() {
                            @Override
-                           protected void channelRead0(ChannelHandlerContext ctx, Object res) {
-                               responseState.set(checkResponse(res));
+                           protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+                               responseState.set(checkResponse(msg));
                            }
                        });
             }
@@ -109,7 +109,7 @@ public abstract class Detector extends SingleTcpChannellClient {
     /**
      * protocol channel handlers
      */
-    public abstract void initChannel(NioSocketChannel channel);
+    public abstract void initDetectorChannel(NioSocketChannel channel);
 
     /**
      * the message use to detect the device, please choose the message that device response immediately
