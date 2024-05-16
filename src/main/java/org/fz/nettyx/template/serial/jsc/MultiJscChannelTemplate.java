@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
-import org.fz.nettyx.template.AbstractMultiChannelEndpoint;
+import org.fz.nettyx.template.AbstractMultiChannelTemplate;
 
 import java.util.Map;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiJscChannelTemplate<K> extends AbstractMultiChannelEndpoint<K, JscChannel, JscChannelConfig> {
+public abstract class MultiJscChannelTemplate<K> extends AbstractMultiChannelTemplate<K, JscChannel, JscChannelConfig> {
 
     protected MultiJscChannelTemplate(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
         super(addressMap);
