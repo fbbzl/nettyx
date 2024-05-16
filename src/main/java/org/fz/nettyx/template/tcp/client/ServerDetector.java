@@ -12,6 +12,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * It is used to detect whether it is the target server
  * @author fengbinbin
  * @version 1.0
  * @since 2/17/2023
@@ -30,7 +31,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     private int waitResponseMillis = DEFAULT_WAIT_RESPONSE_MILLIS;
 
     /**
-     * this is the state that if we got the response from device
+     * this is the state that if we got the response from server
      */
     private final AtomicBoolean responseState = new AtomicBoolean(false);
 
@@ -57,33 +58,31 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     }
 
     /**
-     * the core mothod to detect if the comm port
+     * the core mothod to detect server
      *
      * @param address
-     * @return if is the correct device
+     * @return if is the correct server
      * @throws InterruptedException
      */
     public boolean doDetect() throws InterruptedException, ConnectException {
-        this.responseState.set(false);
-        // 1. do connect sync
-        ChannelFuture connectFuture = this.connect().sync();
+        try {
+            this.responseState.set(false);
+            // 1. do connect sync
+            ChannelFuture connectFuture = this.connect().sync();
 
-        // 1.1 check if connect success
-        if (!connectFuture.isSuccess()) throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
+            // 2. check if connect success
+            if (!connectFuture.isSuccess()) throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
 
-        // 2. send detect-message when connect success
-        // 2.1 get the channel
-        Channel detectChannel = connectFuture.channel();
-        // 2.2 store channel
-        super.storeChannel(detectChannel);
+            // 3. store channel
+            super.storeChannel(connectFuture.channel());
 
-        // 2.3 try-send detect req-message
-        this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
+            // 4. try-send detect req-message
+            this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
 
-        // 3. close channel after detect
-        this.closeChannelGracefully();
-
-        return this.responseState.get();
+            return this.responseState.get();
+        } finally {
+            this.closeChannelGracefully();
+        }
     }
 
     /**
@@ -91,8 +90,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
      *
      * @param detectMsg          detect message
      * @param retryTimes         re-try times
-     * @param waitResponseMillis wait the device response
-     * @param retryCondition     the re-try condition
+     * @param waitResponseMillis wait the server response
      */
     public void trySend(M detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
         do {
@@ -120,7 +118,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     public abstract void initDetectChannel(NioSocketChannel channel);
 
     /**
-     * the message use to detect the device, please choose the message that device response immediately
+     * the message use to detect the server, please choose the message that server response immediately
      */
     public abstract M getDetectMessage();
 }
