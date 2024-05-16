@@ -5,7 +5,6 @@ import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.channel.jsc.JscChannel;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,17 +43,16 @@ public abstract class Detector extends SingleTcpChannellClient {
         return !responseState.get();
     }
 
-    protected final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<NioSocketChannel>() {
-        @Override
-        protected void initChannel(NioSocketChannel channel) {
-            channel.pipeline()
-                   .addLast(getProtocolHandlers())
-                   .addLast(newResponseValidator());
-        }
-    };
-
-    protected ChannelInitializer<JscChannel> detectorChannelInitializer() {
-
+    @Override
+    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new ChannelInitializer<NioSocketChannel>() {
+            @Override
+            protected void initChannel(NioSocketChannel channel) {
+                channel.pipeline()
+                       .addLast(getProtocolHandlers())
+                       .addLast(newResponseValidator());
+            }
+        };
     }
 
     /**
