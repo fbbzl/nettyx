@@ -69,9 +69,8 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
         ChannelFuture connectFuture = this.connect().sync();
 
         // 1.1 check if connect success
-        if (!connectFuture.isSuccess()) {
-            throw new ConnectException();
-        }
+        if (!connectFuture.isSuccess()) throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
+
         // 2. send detect-message when connect success
         // 2.1 get the channel
         Channel detectChannel = connectFuture.channel();
