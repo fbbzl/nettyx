@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.handler.ChannelAdvice;
 
 import java.net.InetSocketAddress;
@@ -55,7 +56,12 @@ public abstract class Detector extends SingleTcpChannellClient {
         }
     };
 
+    @Override
+    protected final ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return null;
+    }
 
+    protected abstract ChannelInitializer<JscChannel> detectorChannelInitializer();
 
     /**
      * the simple channel handler to check response from the device
