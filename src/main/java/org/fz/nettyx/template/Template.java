@@ -15,12 +15,12 @@ import java.lang.reflect.Type;
 @Slf4j
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class Endpoint<C extends Channel> {
+public abstract class Template<C extends Channel> {
 
     private final Class<C>       channelClass;
     private final EventLoopGroup eventLoopGroup;
 
-    protected Endpoint() {
+    protected Template() {
         this.eventLoopGroup = newEventLoopGroup();
         this.channelClass   = this.findChannelClass();
     }
@@ -42,7 +42,7 @@ public abstract class Endpoint<C extends Channel> {
         do {
             supperType  = supperClass.getGenericSuperclass();
             supperClass = supperClass.getSuperclass();
-        } while (supperClass != Endpoint.class);
+        } while (supperClass != Template.class);
 
         Type typeArgument = TypeUtil.getTypeArgument(supperType);
 

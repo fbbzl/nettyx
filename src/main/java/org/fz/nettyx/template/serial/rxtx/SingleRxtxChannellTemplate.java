@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.rxtx.RxtxChannel;
 import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
-import org.fz.nettyx.template.AbstractSingleChannellEndpoint;
+import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
  * single channel rxtx client
@@ -17,7 +17,7 @@ import org.fz.nettyx.template.AbstractSingleChannellEndpoint;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleRxtxChannellTemplate extends AbstractSingleChannellEndpoint<RxtxChannel, RxtxChannelConfig> {
+public abstract class SingleRxtxChannellTemplate extends AbstractSingleChannelTemplate<RxtxChannel, RxtxChannelConfig> {
 
     protected SingleRxtxChannellTemplate(String commAddress) {
         super(new SerialCommChannel.SerialCommAddress(commAddress));

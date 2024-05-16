@@ -19,13 +19,13 @@ import java.net.SocketAddress;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class AbstractSingleChannellEndpoint<C extends Channel, F extends ChannelConfig> extends Endpoint<C> {
+public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     private final SocketAddress remoteAddress;
     private final Bootstrap     bootstrap;
     private       Channel       channel;
 
-    protected AbstractSingleChannellEndpoint(SocketAddress remoteAddress) {
+    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
         this.bootstrap     = newBootstrap(remoteAddress);
     }

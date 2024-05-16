@@ -27,8 +27,8 @@ import java.util.Map;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class AbstractMultiChannelEndpoint<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                                  Endpoint<C> {
+public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
+                                                                                                  Template<C> {
 
     protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("$multi_channel_key$");
 
@@ -36,7 +36,7 @@ public abstract class AbstractMultiChannelEndpoint<K, C extends Channel, F exten
     private final Map<K, SocketAddress> addressMap;
     private final Map<K, Bootstrap>     bootstrapMap;
 
-    protected <S extends SocketAddress> AbstractMultiChannelEndpoint(Map<K, S> addressMap) {
+    protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap) {
         this.addressMap   = (Map<K, SocketAddress>) addressMap;
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
@@ -76,13 +76,13 @@ public abstract class AbstractMultiChannelEndpoint<K, C extends Channel, F exten
     }
 
     public void closeChannelGracefully(K key) {
-        if (Endpoint.gracefullyCloseable(getChannel(key))) {
+        if (Template.gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close();
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Endpoint.gracefullyCloseable(getChannel(key))) {
+        if (Template.gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close(promise);
         }
     }

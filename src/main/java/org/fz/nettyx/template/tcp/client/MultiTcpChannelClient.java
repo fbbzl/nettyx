@@ -5,7 +5,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.template.AbstractMultiChannelEndpoint;
+import org.fz.nettyx.template.AbstractMultiChannelTemplate;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -20,7 +20,7 @@ import java.util.Map;
  */
 @Slf4j
 public abstract class MultiTcpChannelClient<K> extends
-                                               AbstractMultiChannelEndpoint<K, NioSocketChannel, SocketChannelConfig> {
+                                               AbstractMultiChannelTemplate<K, NioSocketChannel, SocketChannelConfig> {
 
     protected MultiTcpChannelClient(Map<K, InetSocketAddress> addressMap) {
         super(addressMap);

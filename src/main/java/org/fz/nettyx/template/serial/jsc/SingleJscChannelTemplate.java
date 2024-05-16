@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
-import org.fz.nettyx.template.AbstractSingleChannellEndpoint;
+import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
  * @author fengbinbin
@@ -17,7 +17,7 @@ import org.fz.nettyx.template.AbstractSingleChannellEndpoint;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleJscChannelTemplate extends AbstractSingleChannellEndpoint<JscChannel, JscChannelConfig> {
+public abstract class SingleJscChannelTemplate extends AbstractSingleChannelTemplate<JscChannel, JscChannelConfig> {
 
     protected SingleJscChannelTemplate(String commAddress) {
         super(new SerialCommChannel.SerialCommAddress(commAddress));
