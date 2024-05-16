@@ -1,4 +1,4 @@
-package template.tcp;
+package template.tcp.client;
 
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.template.tcp.client.Detector;

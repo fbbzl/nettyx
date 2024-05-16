@@ -1,4 +1,4 @@
-package template.tcp;
+package template.tcp.client;
 
 
 import io.netty.buffer.Unpooled;
