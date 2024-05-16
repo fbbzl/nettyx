@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint;
+package org.fz.nettyx.template;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;

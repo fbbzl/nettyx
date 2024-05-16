@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint;
+package org.fz.nettyx.template;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.map.SafeConcurrentHashMap;

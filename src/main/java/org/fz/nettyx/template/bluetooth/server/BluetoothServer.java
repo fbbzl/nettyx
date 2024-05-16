@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.bluetooth.server;
+package org.fz.nettyx.template.bluetooth.server;
 
 /**
  * @author fengbinbin

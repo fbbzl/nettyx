@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.tcp.server;
+package org.fz.nettyx.template.tcp.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
