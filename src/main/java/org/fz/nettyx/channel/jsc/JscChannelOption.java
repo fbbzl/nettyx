@@ -13,14 +13,18 @@ import io.netty.channel.ChannelOption;
  */
 public final class JscChannelOption<T> extends ChannelOption<T> {
 
-    public static final ChannelOption<Integer>                    BAUD_RATE    = valueOf(JscChannelOption.class, "BAUD_RATE");
-    public static final ChannelOption<Boolean>                    DTR          = valueOf(JscChannelOption.class, "DTR");
-    public static final ChannelOption<Boolean>                    RTS          = valueOf(JscChannelOption.class, "RTS");
-    public static final ChannelOption<JscChannelConfig.StopBits>  STOP_BITS    = valueOf(JscChannelOption.class, "STOP_BITS");
-    public static final ChannelOption<JscChannelConfig.DataBits>  DATA_BITS    = valueOf(JscChannelOption.class, "DATA_BITS");
-    public static final ChannelOption<JscChannelConfig.ParityBit> PARITY_BIT   = valueOf(JscChannelOption.class, "PARITY_BIT");
-    public static final ChannelOption<Integer>                    WAIT_TIME    = valueOf(JscChannelOption.class, "WAIT_TIME");
-    public static final ChannelOption<Integer>                    READ_TIMEOUT = valueOf(JscChannelOption.class, "READ_TIMEOUT");
+    public static final ChannelOption<Integer>                    BAUD_RATE    = option("BAUD_RATE");
+    public static final ChannelOption<Boolean>                    DTR          = option("DTR");
+    public static final ChannelOption<Boolean>                    RTS          = option("RTS");
+    public static final ChannelOption<JscChannelConfig.StopBits>  STOP_BITS    = option("STOP_BITS");
+    public static final ChannelOption<JscChannelConfig.DataBits>  DATA_BITS    = option("DATA_BITS");
+    public static final ChannelOption<JscChannelConfig.ParityBit> PARITY_BIT   = option("PARITY_BIT");
+    public static final ChannelOption<Integer>                    WAIT_TIME    = option("WAIT_TIME");
+    public static final ChannelOption<Integer>                    READ_TIMEOUT = option("READ_TIMEOUT");
+
+    private static <O> ChannelOption<O> option(String secondNameComponent) {
+        return valueOf(JscChannelOption.class, secondNameComponent);
+    }
 
     @SuppressWarnings("deprecation")
     private JscChannelOption() {
