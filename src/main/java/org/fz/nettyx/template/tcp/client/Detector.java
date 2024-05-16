@@ -43,7 +43,7 @@ public abstract class Detector extends SingleTcpChannellClient {
                        .addLast(getChannelHandlers())
                        .addLast(new SimpleChannelInboundHandler<Object>() {
                            @Override
-                           protected void channelRead0(ChannelHandlerContext ctx, Object res) throws Exception {
+                           protected void channelRead0(ChannelHandlerContext ctx, Object res) {
                                responseState.set(checkResponse(res));
                            }
                        });
