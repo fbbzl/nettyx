@@ -7,24 +7,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
-import org.fz.nettyx.template.AbstractSingleChannellEndpoint;
+import org.fz.nettyx.template.AbstractMultiChannelEndpoint;
+
+import java.util.Map;
 
 /**
  * @author fengbinbin
  * @version 1.0
- * @since 2024/2/29 10:09
+ * @since 2024/2/29 10:12
  */
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleJscChannelEndpoint extends AbstractSingleChannellEndpoint<JscChannel, JscChannelConfig> {
+public abstract class MultiJscChannelTemplate<K> extends AbstractMultiChannelEndpoint<K, JscChannel, JscChannelConfig> {
 
-    protected SingleJscChannelEndpoint(String commAddress) {
-        super(new SerialCommChannel.SerialCommAddress(commAddress));
-    }
-
-    protected SingleJscChannelEndpoint(SerialCommChannel.SerialCommAddress commAddress) {
-        super(commAddress);
+    protected MultiJscChannelTemplate(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
+        super(addressMap);
     }
 
     @Override
