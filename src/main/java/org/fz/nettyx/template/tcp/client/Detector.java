@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 @Setter
 @SuppressWarnings("all")
-public abstract class Detector<M> extends SingleTcpChannellClient {
+public abstract class Detector<M> extends SingleTcpChannellClientTemplate {
 
     private static final int DEFAULT_DETECT_RETRY_TIMES   = 3;
     private static final int DEFAULT_WAIT_RESPONSE_MILLIS = 1000;

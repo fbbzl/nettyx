@@ -18,13 +18,13 @@ import java.net.InetSocketAddress;
  * @since 2021 /5/6 15:22
  */
 @Slf4j
-public abstract class SingleTcpChannellClient extends AbstractSingleChannelTemplate<NioSocketChannel, SocketChannelConfig> {
+public abstract class SingleTcpChannellClientTemplate extends AbstractSingleChannelTemplate<NioSocketChannel, SocketChannelConfig> {
 
-    protected SingleTcpChannellClient(InetSocketAddress address) {
+    protected SingleTcpChannellClientTemplate(InetSocketAddress address) {
         super(address);
     }
 
-    protected SingleTcpChannellClient(String hostname, int port) {
+    protected SingleTcpChannellClientTemplate(String hostname, int port) {
         super(new InetSocketAddress(hostname, port));
     }
 
