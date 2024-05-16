@@ -10,13 +10,13 @@ import java.net.InetSocketAddress;
  * @version 1.0
  * @since 2024/5/16 18:39
  */
-public class TestDetector extends Detector {
+public class TestDetector extends Detector<String> {
     protected TestDetector(InetSocketAddress address, int detectRetryTimes, int waitResponseMillis) {
         super(address, detectRetryTimes, waitResponseMillis);
     }
 
     @Override
-    public boolean checkResponse(Object response) {
+    public boolean checkResponse(String response) {
         return false;
     }
 
@@ -26,7 +26,7 @@ public class TestDetector extends Detector {
     }
 
     @Override
-    public Object getDetectMessage() {
-        return null;
+    public String getDetectMessage() {
+        return "this is detect string type msg";
     }
 }
