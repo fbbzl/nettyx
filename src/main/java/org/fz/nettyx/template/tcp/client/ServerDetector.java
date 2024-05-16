@@ -65,7 +65,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     public boolean doDetect() throws InterruptedException {
         this.responseState.set(false);
         // 1. do connect sync
-        ChannelFuture connectFuture = this.connect().sync();
+        ChannelFuture connectFuture = this.connect().await();
 
         // 2. send detect-message when connect success
         // 2.1 get the channel
@@ -93,7 +93,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     public void trySend(M detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
         do {
             try {
-                ChannelPromise promise = super.writeAndFlush(detectMsg).sync();
+                ChannelPromise promise = super.writeAndFlush(detectMsg).await();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
                 else log.info("failed send detect message [{}]", detectMsg);
