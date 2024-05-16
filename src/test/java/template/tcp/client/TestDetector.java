@@ -1,7 +1,7 @@
 package template.tcp.client;
 
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.template.tcp.client.Detector;
+import org.fz.nettyx.template.tcp.client.ServerDetector;
 
 import java.net.InetSocketAddress;
 
@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
  * @version 1.0
  * @since 2024/5/16 18:39
  */
-public class TestDetector extends Detector<String> {
+public class TestDetector extends ServerDetector<String> {
     protected TestDetector(InetSocketAddress address) {
         super(address);
     }
