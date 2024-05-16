@@ -93,12 +93,11 @@ public abstract class Detector extends SingleTcpChannellClient {
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
                 else log.info("failed send detect message [{}]", detectMsg);
-
-                Thread.sleep(waitResponseMillis);
             } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
             }
+            Thread.sleep(waitResponseMillis);
         } while (retryTimes > 0 && !responseState.get());
     }
 
