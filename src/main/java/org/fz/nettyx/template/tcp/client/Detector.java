@@ -9,7 +9,6 @@ import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.handler.ChannelAdvice;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 
@@ -58,6 +57,7 @@ public abstract class Detector extends SingleTcpChannellClient {
 
     @Override
     protected final ChannelInitializer<NioSocketChannel> channelInitializer() {
+
         return null;
     }
 
@@ -87,21 +87,19 @@ public abstract class Detector extends SingleTcpChannellClient {
      * @return if is the correct device
      * @throws InterruptedException
      */
-    public boolean doDetect(SocketAddress address) throws InterruptedException {
+    public boolean doDetect() throws InterruptedException {
         this.responseState.set(false);
         // 1. do connect sync
-        ChannelFuture connectFuture = this.connect(address).sync();
+        ChannelFuture connectFuture = this.connect().sync();
 
         // 2. send detect-message when connect success
-        if (connectFuture.isSuccess()) {
-            // 2.1 get the channel
-            Channel detectChannel = connectFuture.channel();
-            // 2.2 store channel
-            super.storeChannel(detectChannel);
+        // 2.1 get the channel
+        Channel detectChannel = connectFuture.channel();
+        // 2.2 store channel
+        super.storeChannel(detectChannel);
 
-            // 2.3 try-send detect req-message
-            this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis, this::noneResponse);
-        } else log.info("detector connect failed, inet-address: {}", address);
+        // 2.3 try-send detect req-message
+        this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis, this::noneResponse);
 
         // 3. close channel after detect
         this.closeChannelGracefully();
