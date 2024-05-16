@@ -49,11 +49,11 @@ public abstract class Detector extends SingleTcpChannellClient {
             @Override
             protected void initChannel(NioSocketChannel channel) {
                 channel.pipeline()
-                       .addLast(getProtocolHandlers())
+                       .addLast(getChannelHandlers())
                        .addLast(new SimpleChannelInboundHandler<Object>() {
                            @Override
                            protected void channelRead0(ChannelHandlerContext ctx, Object res) throws Exception {
-                               responseState.set(validResponse(res));
+                               responseState.set(checkResponse(res));
                            }
                        });
             }
@@ -100,7 +100,6 @@ public abstract class Detector extends SingleTcpChannellClient {
             try {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).sync();
 
-                // TODO
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
                 else log.info("failed send detect message [{}]", detectMsg);
 
@@ -115,12 +114,12 @@ public abstract class Detector extends SingleTcpChannellClient {
     /**
      * check if the response is valid
      */
-    public abstract boolean validResponse(Object response);
+    public abstract boolean checkResponse(Object response);
 
     /**
      * protocol channel handlers
      */
-    public abstract ChannelHandler[] getProtocolHandlers();
+    public abstract ChannelHandler[] getChannelHandlers();
 
     /**
      * the message use to detect the device, please choose the message that device response immediately
