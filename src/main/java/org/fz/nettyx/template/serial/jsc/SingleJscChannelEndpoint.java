@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.serial.jsc;
+package org.fz.nettyx.template.serial.jsc;
 
 
 import io.netty.channel.EventLoopGroup;
@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
-import org.fz.nettyx.endpoint.AbstractSingleChannellEndpoint;
+import org.fz.nettyx.template.AbstractSingleChannellEndpoint;
 
 /**
  * @author fengbinbin

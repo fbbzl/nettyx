@@ -1,11 +1,11 @@
-package org.fz.nettyx.endpoint.tcp.client;
+package org.fz.nettyx.template.tcp.client;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.AbstractMultiChannelEndpoint;
+import org.fz.nettyx.template.AbstractMultiChannelEndpoint;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
