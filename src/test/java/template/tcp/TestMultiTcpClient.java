@@ -6,7 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
-import org.fz.nettyx.template.tcp.client.MultiTcpChannelClient;
+import org.fz.nettyx.template.tcp.client.MultiTcpChannelClientTemplate;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
@@ -25,7 +25,7 @@ import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
  * @version 1.0
  * @since 2024/2/29 14:58
  */
-public class TestMultiTcpClient extends MultiTcpChannelClient<String> {
+public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 

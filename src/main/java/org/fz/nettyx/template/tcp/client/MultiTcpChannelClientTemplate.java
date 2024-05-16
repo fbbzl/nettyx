@@ -19,10 +19,10 @@ import java.util.Map;
  * @since 2021 /5/6 16:58
  */
 @Slf4j
-public abstract class MultiTcpChannelClient<K> extends
+public abstract class MultiTcpChannelClientTemplate<K> extends
                                                AbstractMultiChannelTemplate<K, NioSocketChannel, SocketChannelConfig> {
 
-    protected MultiTcpChannelClient(Map<K, InetSocketAddress> addressMap) {
+    protected MultiTcpChannelClientTemplate(Map<K, InetSocketAddress> addressMap) {
         super(addressMap);
     }
 
