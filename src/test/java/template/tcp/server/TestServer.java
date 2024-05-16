@@ -1,4 +1,4 @@
-package server;
+package template.tcp.server;
 
 import codec.UserCodec;
 import io.netty.buffer.Unpooled;

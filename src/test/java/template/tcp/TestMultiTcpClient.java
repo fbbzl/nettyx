@@ -25,11 +25,11 @@ import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
  * @version 1.0
  * @since 2024/2/29 14:58
  */
-public class TestMultiTcp extends MultiTcpChannelClient<String> {
+public class TestMultiTcpClient extends MultiTcpChannelClient<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-    protected TestMultiTcp(Map<String, InetSocketAddress> inetSocketAddressMap) {
+    protected TestMultiTcpClient(Map<String, InetSocketAddress> inetSocketAddressMap) {
         super(inetSocketAddressMap);
     }
 
@@ -44,7 +44,7 @@ public class TestMultiTcp extends MultiTcpChannelClient<String> {
         map.put("a", new InetSocketAddress(9888));
         map.put("b", new InetSocketAddress(9888));
 
-        TestMultiTcp testMultiTcp = new TestMultiTcp(map);
+        TestMultiTcpClient testMultiTcp = new TestMultiTcpClient(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
