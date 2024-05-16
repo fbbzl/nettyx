@@ -1,7 +1,6 @@
-package client.rxtx;
+package template.rxtx;
 
 
-import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -9,6 +8,7 @@ import org.fz.nettyx.channel.rxtx.RxtxChannel;
 import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
 import org.fz.nettyx.endpoint.serial.rxtx.SingleRxtxChannellEndpoint;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import template.TestChannelInitializer;
 
 import java.util.Arrays;
 import java.util.concurrent.Executors;
@@ -16,7 +16,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
 
 /**
  * @author fengbinbin

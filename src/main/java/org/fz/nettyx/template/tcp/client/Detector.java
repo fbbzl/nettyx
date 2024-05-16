@@ -45,14 +45,6 @@ public abstract class Detector extends SingleTcpChannellClient {
         return !responseState.get();
     }
 
-    @Override
-    public final ChannelFuture connect(SocketAddress address) {
-        return super.newBootstrap()
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3_000)
-                    .handler(channelInitializer)
-                    .connect(address);
-    }
-
     protected final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<NioSocketChannel>() {
         @Override
         protected void initChannel(NioSocketChannel channel) {
@@ -62,6 +54,8 @@ public abstract class Detector extends SingleTcpChannellClient {
                    .addLast(new ChannelAdvice());
         }
     };
+
+
 
     /**
      * the simple channel handler to check response from the device
