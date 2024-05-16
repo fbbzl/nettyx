@@ -98,7 +98,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
                 ChannelPromise promise = super.writeAndFlush(detectMsg).await();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
-                else log.info("failed send detect message [{}]", detectMsg);
+                else                     log.info("failed send detect message [{}]", detectMsg);
             } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
