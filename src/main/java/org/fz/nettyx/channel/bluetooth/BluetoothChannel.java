@@ -25,8 +25,6 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
 
     private BluetoothDeviceAddress remoteAddress;
 
-    private boolean opened = true;
-
     private final BluetoothChannelConfig config;
 
     private InputStream      inputStream;
@@ -39,11 +37,6 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
     @Override
     protected AbstractUnsafe newUnsafe() {
         return new BluetoothUnsafe();
-    }
-
-    @Override
-    protected boolean isInputShutdown() {
-        return !opened;
     }
 
     @Override
@@ -107,7 +100,7 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
 
     @Override
     protected void doClose() throws Exception {
-        opened = false;
+        open = false;
 
         try {
             super.doClose();
@@ -121,14 +114,7 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
 
     @Override
     public ChannelConfig config() {
-
         return config;
-    }
-
-    @Override
-    public boolean isOpen() {
-
-        return opened;
     }
 
     protected final class BluetoothUnsafe extends AbstractUnsafe {
@@ -149,7 +135,7 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
                 if (!wasActive && isActive()) {
                     pipeline().fireChannelActive();
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 promise.setFailure(t);
                 closeIfClosed();
             }

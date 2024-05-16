@@ -48,6 +48,7 @@ public class TestBluetooth {
         UUID         uuid         = new UUID(NOAUTHENTICATE_NOENCRYPT);
 
         String           url              = agent.selectService(uuid, NOAUTHENTICATE_NOENCRYPT, false);
+        System.err.println(ur);
         StreamConnection streamConnection = (StreamConnection) Connector.open(url);
 
         // 发送数据
