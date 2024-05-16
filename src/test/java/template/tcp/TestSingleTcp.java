@@ -6,8 +6,8 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.tcp.client.SingleTcpChannellClient;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.template.tcp.client.SingleTcpChannellClient;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;

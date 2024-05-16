@@ -6,8 +6,8 @@ import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.rxtx.RxtxChannel;
 import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
-import org.fz.nettyx.endpoint.serial.rxtx.MultiRxtxChannelEndpoint;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.template.serial.rxtx.MultiRxtxChannelTemplate;
 import template.TestChannelInitializer;
 
 import java.util.Arrays;
@@ -25,7 +25,7 @@ import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
  * @version 1.0
  * @since 2024/3/1 22:58
  */
-public class TestMultiRxtx extends MultiRxtxChannelEndpoint<String> {
+public class TestMultiRxtx extends MultiRxtxChannelTemplate<String> {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
