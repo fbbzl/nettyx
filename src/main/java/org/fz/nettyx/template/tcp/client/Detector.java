@@ -21,7 +21,7 @@ import java.util.function.BooleanSupplier;
 @Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings("all")
-public abstract class Detector extends SingleTcpChannellClient  {
+public abstract class Detector extends SingleTcpChannellClient {
 
     private final int detectRetryTimes;
     private final int waitResponseMillis;
@@ -31,8 +31,10 @@ public abstract class Detector extends SingleTcpChannellClient  {
      */
     private final AtomicBoolean responseState = new AtomicBoolean(false);
 
-    protected Detector(InetSocketAddress address) {
+    protected Detector(InetSocketAddress address, int detectRetryTimes, final int waitResponseMillis) {
         super(address);
+        this.detectRetryTimes   = detectRetryTimes;
+        this.waitResponseMillis = waitResponseMillis;
     }
 
     protected boolean getResponseState() {
@@ -46,18 +48,18 @@ public abstract class Detector extends SingleTcpChannellClient  {
     @Override
     public final ChannelFuture connect(SocketAddress address) {
         return super.newBootstrap()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3_000)
-                .handler(channelInitializer)
-                .connect(address);
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3_000)
+                    .handler(channelInitializer)
+                    .connect(address);
     }
 
     protected final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<NioSocketChannel>() {
         @Override
         protected void initChannel(NioSocketChannel channel) {
             channel.pipeline()
-                    .addLast(getProtocolHandlers())
-                    .addLast(newResponseValidator())
-                    .addLast(new ChannelAdvice());
+                   .addLast(getProtocolHandlers())
+                   .addLast(newResponseValidator())
+                   .addLast(new ChannelAdvice());
         }
     };
 
@@ -99,8 +101,7 @@ public abstract class Detector extends SingleTcpChannellClient  {
 
             // 2.3 try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis, this::noneResponse);
-        }
-        else log.info("detector connect failed, inet-address: {}", address);
+        } else log.info("detector connect failed, inet-address: {}", address);
 
         // 3. close channel after detect
         this.closeChannelGracefully();
@@ -110,10 +111,11 @@ public abstract class Detector extends SingleTcpChannellClient  {
 
     /**
      * send detect message in re-try mode
-     * @param detectMsg detect message
-     * @param retryTimes re-try times
+     *
+     * @param detectMsg          detect message
+     * @param retryTimes         re-try times
      * @param waitResponseMillis wait the device response
-     * @param retryCondition the re-try condition
+     * @param retryCondition     the re-try condition
      */
     public void trySend(Object detectMsg, int retryTimes, int waitResponseMillis, BooleanSupplier retryCondition) throws InterruptedException {
         do {
@@ -121,11 +123,10 @@ public abstract class Detector extends SingleTcpChannellClient  {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).sync();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}] to device: [{}]", detectMsg, getDeviceTag());
-                else                     log.info("failed send detect message [{}] to device: [{}]",  detectMsg, getDeviceTag());
+                else log.info("failed send detect message [{}] to device: [{}]", detectMsg, getDeviceTag());
 
                 Thread.sleep(waitResponseMillis);
-            }
-            finally {
+            } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
             }
