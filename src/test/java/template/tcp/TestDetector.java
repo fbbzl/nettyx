@@ -1,6 +1,6 @@
 package template.tcp;
 
-import io.netty.channel.ChannelHandler;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.template.tcp.client.Detector;
 
 import java.net.InetSocketAddress;
@@ -21,8 +21,8 @@ public class TestDetector extends Detector {
     }
 
     @Override
-    public ChannelHandler[] getChannelHandlers() {
-        return new ChannelHandler[0];
+    public void initChannel(NioSocketChannel ch) {
+        ch.pipeline().addLast();
     }
 
     @Override
