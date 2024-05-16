@@ -3,7 +3,8 @@ package org.fz.nettyx.template.tcp.client;
 
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -16,22 +17,24 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 
 @Slf4j
-@RequiredArgsConstructor
+@Getter
+@Setter
 @SuppressWarnings("all")
 public abstract class Detector<M> extends SingleTcpChannellClient {
 
-    private final int detectRetryTimes;
-    private final int waitResponseMillis;
+    private static final int DEFAULT_DETECT_RETRY_TIMES   = 3;
+    private static final int DEFAULT_WAIT_RESPONSE_MILLIS = 1000;
+
+    private int detectRetryTimes   = DEFAULT_DETECT_RETRY_TIMES;
+    private int waitResponseMillis = DEFAULT_WAIT_RESPONSE_MILLIS;
 
     /**
      * this is the state that if we got the response from device
      */
     private final AtomicBoolean responseState = new AtomicBoolean(false);
 
-    protected Detector(InetSocketAddress address, int detectRetryTimes, final int waitResponseMillis) {
+    protected Detector(InetSocketAddress address) {
         super(address);
-        this.detectRetryTimes   = detectRetryTimes;
-        this.waitResponseMillis = waitResponseMillis;
     }
 
     @Override
