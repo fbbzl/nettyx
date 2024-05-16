@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings("all")
-public abstract class Detector extends SingleTcpChannellClient {
+public abstract class Detector<M> extends SingleTcpChannellClient {
 
     private final int detectRetryTimes;
     private final int waitResponseMillis;
@@ -40,11 +40,11 @@ public abstract class Detector extends SingleTcpChannellClient {
             @Override
             protected void initChannel(NioSocketChannel channel) {
                 initDetectorChannel(channel);
-                
+
                 channel.pipeline()
-                       .addLast(new SimpleChannelInboundHandler<Object>() {
+                       .addLast(new SimpleChannelInboundHandler<M>() {
                            @Override
-                           protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+                           protected void channelRead0(ChannelHandlerContext ctx, M msg) {
                                responseState.set(checkResponse(msg));
                            }
                        });
@@ -87,7 +87,7 @@ public abstract class Detector extends SingleTcpChannellClient {
      * @param waitResponseMillis wait the device response
      * @param retryCondition     the re-try condition
      */
-    public void trySend(Object detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
+    public void trySend(M detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
         do {
             try {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).sync();
@@ -105,7 +105,7 @@ public abstract class Detector extends SingleTcpChannellClient {
     /**
      * check if the response is valid
      */
-    public abstract boolean checkResponse(Object response);
+    public abstract boolean checkResponse(M response);
 
     /**
      * protocol channel handlers
@@ -115,5 +115,5 @@ public abstract class Detector extends SingleTcpChannellClient {
     /**
      * the message use to detect the device, please choose the message that device response immediately
      */
-    public abstract Object getDetectMessage();
+    public abstract M getDetectMessage();
 }
