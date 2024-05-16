@@ -6,7 +6,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.jsc.JscChannel;
-import org.fz.nettyx.handler.ChannelAdvice;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,18 +49,13 @@ public abstract class Detector extends SingleTcpChannellClient {
         protected void initChannel(NioSocketChannel channel) {
             channel.pipeline()
                    .addLast(getProtocolHandlers())
-                   .addLast(newResponseValidator())
-                   .addLast(new ChannelAdvice());
+                   .addLast(newResponseValidator());
         }
     };
 
-    @Override
-    protected final ChannelInitializer<NioSocketChannel> channelInitializer() {
+    protected ChannelInitializer<JscChannel> detectorChannelInitializer() {
 
-        return null;
     }
-
-    protected abstract ChannelInitializer<JscChannel> detectorChannelInitializer();
 
     /**
      * the simple channel handler to check response from the device
@@ -120,8 +114,9 @@ public abstract class Detector extends SingleTcpChannellClient {
             try {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).sync();
 
-                if (promise.isSuccess()) log.info("success send detect message [{}] to device: [{}]", detectMsg, getDeviceTag());
-                else log.info("failed send detect message [{}] to device: [{}]", detectMsg, getDeviceTag());
+                // TODO
+                if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
+                else log.info("failed send detect message [{}]", detectMsg);
 
                 Thread.sleep(waitResponseMillis);
             } finally {
