@@ -21,7 +21,7 @@ public class TestDetector extends Detector {
     }
 
     @Override
-    public void initDetectorChannel(NioSocketChannel ch) {
+    public void initDetectChannel(NioSocketChannel ch) {
         ch.pipeline().addLast();
     }
 
