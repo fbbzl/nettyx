@@ -1,4 +1,4 @@
-package client;
+package template;
 
 import codec.UserCodec;
 import io.netty.channel.Channel;

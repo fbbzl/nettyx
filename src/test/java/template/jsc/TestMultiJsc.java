@@ -1,6 +1,5 @@
-package client.jsc;
+package template.jsc;
 
-import client.TestChannelInitializer;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -9,6 +8,7 @@ import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
 import org.fz.nettyx.endpoint.serial.jsc.MultiJscChannelEndpoint;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import template.TestChannelInitializer;
 
 import java.util.Arrays;
 import java.util.HashMap;

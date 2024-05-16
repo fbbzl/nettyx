@@ -1,4 +1,4 @@
-package client.bluetooth;
+package template.bluetooth;
 
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
