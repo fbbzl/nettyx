@@ -7,7 +7,7 @@ import io.netty.channel.ChannelOption;
  * @version 1.0
  * @since 2024/5/15 15:18
  */
-public class BluetoothChannelOption<T> extends ChannelOption<T> {
+public class BluetoothChannelOption extends ChannelOption<String> {
 
     public static final String PROPERTY_DEBUG = "bluecove.debug";
 
@@ -158,12 +158,11 @@ public class BluetoothChannelOption<T> extends ChannelOption<T> {
      * This one will force it to be encoded as ASCII (charsetName "US-ASCII").
      * May be useful for connections with some OEM devices.
      *
-     * Used on MS stack and BlueZ GPL module for now. TODO other stacks.
+     * Used on MS stack and BlueZ GPL module for now.
      *
      * Defaults to false.
      */
     public static final String PROPERTY_SDP_STRING_ENCODING_ASCII = "bluecove.sdp.string_encoding_ascii";
-
 
 
     private static <O> ChannelOption<O> option(String secondNameComponent) {
