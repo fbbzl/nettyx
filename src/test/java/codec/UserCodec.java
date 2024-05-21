@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 
 import java.util.concurrent.TimeUnit;
@@ -30,8 +31,8 @@ public class UserCodec extends SimpleChannelInboundHandler<ByteBuf> {
         s.start("read:" + channelKey(ctx));
         User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> read = StructSerializer.read(typeRefer, msg);
         s.stop();
-
+        Cuchar bid = read.getBill().getBid();
+        Console.print(bid.getValue());
         Console.print(s.prettyPrint(TimeUnit.MILLISECONDS));
-
     }
 }
