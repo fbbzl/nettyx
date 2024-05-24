@@ -2,6 +2,7 @@ package org.fz.nettyx.channel.bluetooth;
 
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.DefaultChannelConfig;
+import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 

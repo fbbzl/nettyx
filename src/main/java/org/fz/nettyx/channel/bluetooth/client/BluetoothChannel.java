@@ -1,4 +1,4 @@
-package org.fz.nettyx.channel.bluetooth;
+package org.fz.nettyx.channel.bluetooth.client;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;
@@ -7,14 +7,20 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import org.fz.nettyx.channel.EnhancedOioByteStreamChannel;
+import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
+import org.fz.nettyx.channel.bluetooth.BluetoothDeviceAddress;
+import org.fz.nettyx.util.Try;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.SocketAddress;
+import java.util.function.Consumer;
 
 /**
  * TODO not completed
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/27 14:27
@@ -28,6 +34,7 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
     private final BluetoothChannelConfig config;
 
     private InputStream      inputStream;
+    private OutputStream     outputStream;
     private StreamConnection streamConnection;
 
     public BluetoothChannel() {
@@ -44,22 +51,24 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
         ChannelPromise promise = newPromise();
 
         EventLoop loop = eventLoop();
+
+        Consumer<ChannelPromise> doShutdown = Try.accept(pro -> {
+            try {
+                inputStream.close();
+                outputStream.close();
+                pro.setSuccess();
+            } catch (Exception t) {
+                pro.setFailure(t);
+            }
+        });
+
         if (loop.inEventLoop()) {
-            shutdownInput0(promise);
+            doShutdown.accept(promise);
         } else {
-            loop.execute(() -> shutdownInput0(promise));
+            loop.execute(() -> doShutdown.accept(promise));
         }
 
         return promise;
-    }
-
-    private void shutdownInput0(final ChannelPromise promise) {
-        try {
-            inputStream.close();
-            promise.setSuccess();
-        } catch (Exception t) {
-            promise.setFailure(t);
-        }
     }
 
     @Override
@@ -78,9 +87,7 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
 
-        inputStream = streamConnection.openInputStream();
-
-        activate(inputStream, streamConnection.openOutputStream());
+        activate((inputStream = streamConnection.openInputStream()), (outputStream = streamConnection.openOutputStream()));
     }
 
     @Override
@@ -142,21 +149,4 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
         }
     }
 
-    public static class BluetoothDeviceAddress extends SocketAddress {
-
-        private final String value;
-
-        public BluetoothDeviceAddress(String value) {
-            this.value = value;
-        }
-
-        public String value() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
 }

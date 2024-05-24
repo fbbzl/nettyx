@@ -30,7 +30,7 @@ import java.util.Map;
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                   Template<C> {
 
-    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("$multi_channel_key$");
+    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;

@@ -1,4 +1,4 @@
-package org.fz.nettyx.channel.bluetooth;
+package org.fz.nettyx.channel.bluetooth.server;
 
 /**
  * @author fengbinbin
