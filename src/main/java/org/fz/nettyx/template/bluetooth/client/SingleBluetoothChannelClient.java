@@ -2,8 +2,9 @@ package org.fz.nettyx.template.bluetooth.client;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import org.fz.nettyx.channel.bluetooth.BluetoothChannel;
 import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
+import org.fz.nettyx.channel.bluetooth.BluetoothDeviceAddress;
+import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
@@ -15,10 +16,10 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 public abstract class SingleBluetoothChannelClient extends AbstractSingleChannelTemplate<BluetoothChannel, BluetoothChannelConfig> {
 
     protected SingleBluetoothChannelClient(String commAddress) {
-        super(new BluetoothChannel.BluetoothDeviceAddress(commAddress));
+        super(new BluetoothDeviceAddress(commAddress));
     }
 
-    protected SingleBluetoothChannelClient(BluetoothChannel.BluetoothDeviceAddress address) {
+    protected SingleBluetoothChannelClient(BluetoothDeviceAddress address) {
         super(address);
     }
 
