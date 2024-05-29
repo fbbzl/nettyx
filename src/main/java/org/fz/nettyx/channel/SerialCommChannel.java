@@ -5,6 +5,9 @@ import io.netty.channel.oio.AbstractOioChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.SocketAddress;
 
 
@@ -23,6 +26,10 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
     protected static final SerialCommAddress LOCAL_ADDRESS = new SerialCommAddress("localhost");
 
     protected SerialCommAddress remoteAddress;
+
+    protected abstract InputStream getInputStream() throws IOException;
+
+    protected abstract OutputStream getOutputStream() throws IOException;
 
     @Override
     protected AbstractUnsafe newUnsafe() {
@@ -64,7 +71,8 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
             }
 
             try {
-                doConnect(remoteAddress, localAddress);
+                SerialCommChannel.this.doConnect(remoteAddress, localAddress);
+                SerialCommChannel.super.activate(getInputStream(), getOutputStream());
                 safeSetSuccess(promise);
                 if (isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {

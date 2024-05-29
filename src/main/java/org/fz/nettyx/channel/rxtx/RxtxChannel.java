@@ -4,6 +4,9 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import org.fz.nettyx.channel.SerialCommChannel;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.SocketAddress;
 
 
@@ -44,8 +47,16 @@ public class RxtxChannel extends SerialCommChannel {
                                       );
         serialPort.setDTR(config().getOption(RxtxChannelOption.DTR));
         serialPort.setRTS(config().getOption(RxtxChannelOption.RTS));
+    }
 
-        super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
+    @Override
+    protected InputStream getInputStream() throws IOException {
+        return serialPort.getInputStream();
+    }
+
+    @Override
+    protected OutputStream getOutputStream() throws IOException {
+        return serialPort.getOutputStream();
     }
 
     @Override
