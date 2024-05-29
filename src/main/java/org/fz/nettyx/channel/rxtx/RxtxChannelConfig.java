@@ -137,23 +137,6 @@ public interface RxtxChannelConfig extends ChannelConfig {
     RxtxChannelConfig setRts(boolean rts);
 
     /**
-     * @return The number of milliseconds to wait between opening the serial port and
-     * initialising.
-     */
-    int getWaitTimeMillis();
-
-    /**
-     * Sets the time to wait after opening the serial port and before sending it any
-     * configuration information or data. A value of 0 indicates that no waiting should
-     * occur.
-     *
-     * @param waitTimeMillis The number of milliseconds to wait, defaulting to 0 (no
-     *                       wait) if unset
-     * @throws IllegalArgumentException if the supplied value is &lt; 0
-     */
-    RxtxChannelConfig setWaitTimeMillis(int waitTimeMillis);
-
-    /**
      * Sets the maximal time (in ms) to block while try to read from the serial port. Default is 1000ms
      */
     RxtxChannelConfig setReadTimeout(int readTimeout);
@@ -316,11 +299,10 @@ public interface RxtxChannelConfig extends ChannelConfig {
 
         private volatile int       baudrate    = 115200;
         private volatile boolean   dtr;
-        private volatile boolean  rts;
-        private volatile StopBits stopbits = StopBits.STOPBITS_1;
-        private volatile DataBits databits = DataBits.DATABITS_8;
-        private volatile ParityBit paritybit = ParityBit.NONE;
-        private volatile int       waitTime;
+        private volatile boolean   rts;
+        private volatile StopBits  stopbits    = StopBits.STOPBITS_1;
+        private volatile DataBits  databits    = DataBits.DATABITS_8;
+        private volatile ParityBit paritybit   = ParityBit.NONE;
         private volatile int       readTimeout = 1000;
 
         DefaultRxtxChannelConfig(RxtxChannel channel) {
@@ -330,7 +312,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
 
         @Override
         public Map<ChannelOption<?>, Object> getOptions() {
-            return getOptions(super.getOptions(), RxtxChannelOption.BAUD_RATE, RxtxChannelOption.DTR, RxtxChannelOption.RTS, RxtxChannelOption.STOP_BITS, RxtxChannelOption.DATA_BITS, RxtxChannelOption.PARITY_BIT, RxtxChannelOption.WAIT_TIME);
+            return getOptions(super.getOptions(), RxtxChannelOption.BAUD_RATE, RxtxChannelOption.DTR, RxtxChannelOption.RTS, RxtxChannelOption.STOP_BITS, RxtxChannelOption.DATA_BITS, RxtxChannelOption.PARITY_BIT);
         }
 
         @SuppressWarnings("unchecked")
@@ -354,9 +336,6 @@ public interface RxtxChannelConfig extends ChannelConfig {
             if (option == RxtxChannelOption.PARITY_BIT) {
                 return (T) getParityBit();
             }
-            if (option == RxtxChannelOption.WAIT_TIME) {
-                return (T) Integer.valueOf(getWaitTimeMillis());
-            }
             if (option == RxtxChannelOption.READ_TIMEOUT) {
                 return (T) Integer.valueOf(getReadTimeout());
             }
@@ -379,8 +358,6 @@ public interface RxtxChannelConfig extends ChannelConfig {
                 setDataBits((DataBits) value);
             } else if (option == RxtxChannelOption.PARITY_BIT) {
                 setParityBit((ParityBit) value);
-            } else if (option == RxtxChannelOption.WAIT_TIME) {
-                setWaitTimeMillis((Integer) value);
             } else if (option == RxtxChannelOption.READ_TIMEOUT) {
                 setReadTimeout((Integer) value);
             } else {
@@ -452,17 +429,6 @@ public interface RxtxChannelConfig extends ChannelConfig {
         @Override
         public RxtxChannelConfig setRts(final boolean rts) {
             this.rts = rts;
-            return this;
-        }
-
-        @Override
-        public int getWaitTimeMillis() {
-            return waitTime;
-        }
-
-        @Override
-        public RxtxChannelConfig setWaitTimeMillis(final int waitTimeMillis) {
-            this.waitTime = checkPositiveOrZero(waitTimeMillis, "waitTimeMillis");
             return this;
         }
 

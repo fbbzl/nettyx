@@ -35,7 +35,6 @@ public final class RxtxChannelOption<T> extends ChannelOption<T> {
     public static final ChannelOption<StopBits>  STOP_BITS    = option("STOP_BITS");
     public static final ChannelOption<DataBits>  DATA_BITS    = option("DATA_BITS");
     public static final ChannelOption<ParityBit> PARITY_BIT   = option("PARITY_BIT");
-    public static final ChannelOption<Integer>   WAIT_TIME    = option("WAIT_TIME");
     public static final ChannelOption<Integer>   READ_TIMEOUT = option("READ_TIMEOUT");
 
     private static <O> ChannelOption<O> option(String secondNameComponent) {

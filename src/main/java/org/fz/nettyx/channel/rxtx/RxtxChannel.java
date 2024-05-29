@@ -4,7 +4,6 @@ import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
-import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.SerialCommChannel;
 
 import java.io.IOException;
@@ -24,11 +23,6 @@ public class RxtxChannel extends SerialCommChannel {
 
     public RxtxChannel() {
         config = new RxtxChannelConfig.DefaultRxtxChannelConfig(this);
-    }
-
-    @Override
-    protected int waitTime(ChannelConfig config) {
-        return config.getOption(RxtxChannelOption.WAIT_TIME);
     }
 
     @Override
