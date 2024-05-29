@@ -40,16 +40,19 @@ public class JscChannel extends SerialCommChannel {
     }
 
     @Override
-    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) {
-        SerialCommAddress remote   = (SerialCommAddress) remoteAddress;
-        SerialPort        commPort = SerialPort.getCommPort(remote.value());
+    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+        // always check before do connect
+        if (serialPort != null && serialPort.isOpen()) this.doClose();
+
+        this.remoteAddress = (SerialCommAddress) remoteAddress;
+
+        SerialPort commPort = SerialPort.getCommPort(this.remoteAddress.value());
 
         // check comm-port
-        Throws.ifFalse(commPort.openPort(), new IllegalArgumentException("Unable to open [" + remote.value() + "] port"));
+        Throws.ifFalse(commPort.openPort(), new IllegalArgumentException("Unable to open [" + this.remoteAddress.value() + "] port"));
         commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
 
-        this.remoteAddress = remote;
-        serialPort         = commPort;
+        serialPort = commPort;
     }
 
     protected void doInit() {
