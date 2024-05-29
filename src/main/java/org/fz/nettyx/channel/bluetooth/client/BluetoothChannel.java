@@ -76,21 +76,14 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
         throw new UnsupportedOperationException("doBind");
     }
 
-    protected void doInit() {
-        Map<ChannelOption<?>, Object> options = config().getOptions();
-
-        for (Map.Entry<ChannelOption<?>, Object> channelOptionEntry : options.entrySet()) {
-            BluetoothChannelOption channelOption = (BluetoothChannelOption) channelOptionEntry.getKey();
-            BlueCoveImpl.setConfigProperty(channelOption.name(), String.valueOf(channelOptionEntry.getValue()));
-        }
-
-        super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
-    }
-
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         this.remoteAddress = (BluetoothDeviceAddress) remoteAddress;
 
+        for (Map.Entry<ChannelOption<?>, Object> channelOptionEntry : config().getOptions().entrySet()) {
+            BluetoothChannelOption channelOption = (BluetoothChannelOption) channelOptionEntry.getKey();
+            BlueCoveImpl.setConfigProperty(channelOption.name(), String.valueOf(channelOptionEntry.getValue()));
+        }
         if (config.getConnectTimeoutMillis() <= 0) {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value());
         } else {
