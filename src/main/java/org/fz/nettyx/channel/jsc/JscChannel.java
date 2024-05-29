@@ -46,13 +46,11 @@ public class JscChannel extends SerialCommChannel {
 
         this.remoteAddress = (SerialCommAddress) remoteAddress;
 
-        SerialPort commPort = SerialPort.getCommPort(this.remoteAddress.value());
+        this.serialPort = SerialPort.getCommPort(this.remoteAddress.value());
 
         // check comm-port
-        Throws.ifFalse(commPort.openPort(), new IllegalArgumentException("Unable to open [" + this.remoteAddress.value() + "] port"));
-        commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
-
-        serialPort = commPort;
+        Throws.ifFalse(this.serialPort.openPort(), new IllegalArgumentException("Unable to open [" + this.remoteAddress.value() + "] port"));
+        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
     }
 
     protected void doInit() {
