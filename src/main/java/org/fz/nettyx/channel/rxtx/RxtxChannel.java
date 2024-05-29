@@ -43,7 +43,6 @@ public class RxtxChannel extends SerialCommChannel {
         serialPort.setRTS(config().getOption(RxtxChannelOption.RTS));
 
         super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
-
     }
 
     @Override
