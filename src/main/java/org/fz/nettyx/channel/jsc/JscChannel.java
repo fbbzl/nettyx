@@ -42,7 +42,7 @@ public class JscChannel extends SerialCommChannel {
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         // always check before do connect
-        if (serialPort != null && serialPort.isOpen()) this.doClose();
+        if (this.serialPort != null && this.serialPort.isOpen()) this.doClose();
 
         this.remoteAddress = (SerialCommAddress) remoteAddress;
         this.serialPort    = SerialPort.getCommPort(this.remoteAddress.value());
