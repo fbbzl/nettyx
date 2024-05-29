@@ -81,7 +81,7 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         this.remoteAddress = (BluetoothDeviceAddress) remoteAddress;
 
-        config().getOptions().forEach((co, v) -> BlueCoveImpl.setConfigProperty(co.name(), String.valueOf(v)));
+        config().getOptions().forEach((co, val) -> BlueCoveImpl.setConfigProperty(co.name(), String.valueOf(val)));
 
         if (config.getConnectTimeoutMillis() <= 0) {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value());
