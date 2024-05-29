@@ -1,13 +1,11 @@
 package org.fz.nettyx.channel;
 
-import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.net.SocketAddress;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -27,11 +25,6 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
     protected SerialCommAddress remoteAddress;
 
     protected abstract void doInit();
-
-    /**
-     * wait for the effective time
-     */
-    protected abstract int waitTime(ChannelConfig config);
 
     @Override
     protected AbstractUnsafe newUnsafe() {
@@ -73,30 +66,10 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
             }
 
             try {
-                final boolean wasActive = isActive();
                 doConnect(remoteAddress, localAddress);
-
-                int waitTime = waitTime(config());
-                if (waitTime > 0) {
-                    eventLoop().schedule(() -> {
-                        try {
-                            doInit();
-                            safeSetSuccess(promise);
-                            if (!wasActive && isActive()) {
-                                pipeline().fireChannelActive();
-                            }
-                        } catch (Exception t) {
-                            safeSetFailure(promise, t);
-                            closeIfClosed();
-                        }
-                    }, waitTime, TimeUnit.MILLISECONDS);
-                } else {
-                    doInit();
-                    safeSetSuccess(promise);
-                    if (!wasActive && isActive()) {
-                        pipeline().fireChannelActive();
-                    }
-                }
+                doInit();
+                safeSetSuccess(promise);
+                if (isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {
                 safeSetFailure(promise, t);
                 closeIfClosed();
