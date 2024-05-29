@@ -92,20 +92,6 @@ public interface JscChannelConfig extends ChannelConfig {
     JscChannelConfig setRts(boolean rts);
 
     /**
-     * @return The number of milliseconds to wait between opening the serial port and initialising.
-     */
-    int getWaitTimeMillis();
-
-    /**
-     * Sets the time to wait after opening the serial port and before sending it any configuration information or data.
-     * A value of 0 indicates that no waiting should occur.
-     *
-     * @param waitTimeMillis The number of milliseconds to wait, defaulting to 0 (no wait) if unset
-     * @throws IllegalArgumentException if the supplied value is &lt; 0
-     */
-    JscChannelConfig setWaitTimeMillis(int waitTimeMillis);
-
-    /**
      * Return the maximal time (in ms) to block and wait for something to be ready to read.
      */
     int getReadTimeout();
@@ -269,7 +255,6 @@ public interface JscChannelConfig extends ChannelConfig {
         private volatile ParityBit paritybit   = ParityBit.NO_PARITY;
         private volatile boolean   dtr;
         private volatile boolean   rts;
-        private volatile int       waitTime;
         private volatile int       readTimeout = 1000;
 
         DefaultJscChannelConfig(JscChannel channel) {
@@ -279,7 +264,7 @@ public interface JscChannelConfig extends ChannelConfig {
 
         @Override
         public Map<ChannelOption<?>, Object> getOptions() {
-            return getOptions(super.getOptions(), JscChannelOption.BAUD_RATE, JscChannelOption.DTR, JscChannelOption.RTS, JscChannelOption.STOP_BITS, JscChannelOption.DATA_BITS, JscChannelOption.PARITY_BIT, JscChannelOption.WAIT_TIME);
+            return getOptions(super.getOptions(), JscChannelOption.BAUD_RATE, JscChannelOption.DTR, JscChannelOption.RTS, JscChannelOption.STOP_BITS, JscChannelOption.DATA_BITS, JscChannelOption.PARITY_BIT);
         }
 
         @Override
@@ -302,9 +287,6 @@ public interface JscChannelConfig extends ChannelConfig {
             }
             if (option == JscChannelOption.PARITY_BIT) {
                 return (T) getParityBit();
-            }
-            if (option == JscChannelOption.WAIT_TIME) {
-                return (T) Integer.valueOf(getWaitTimeMillis());
             }
             if (option == JscChannelOption.READ_TIMEOUT) {
                 return (T) Integer.valueOf(getReadTimeout());
@@ -329,8 +311,6 @@ public interface JscChannelConfig extends ChannelConfig {
                 setDataBits((DataBits) value);
             } else if (option == JscChannelOption.PARITY_BIT) {
                 setParityBit((ParityBit) value);
-            } else if (option == JscChannelOption.WAIT_TIME) {
-                setWaitTimeMillis((Integer) value);
             } else if (option == JscChannelOption.READ_TIMEOUT) {
                 setReadTimeout((Integer) value);
             } else {
@@ -468,20 +448,6 @@ public interface JscChannelConfig extends ChannelConfig {
         @Override
         public JscChannelConfig setRts(final boolean rts) {
             this.rts = rts;
-            return this;
-        }
-
-        @Override
-        public int getWaitTimeMillis() {
-            return waitTime;
-        }
-
-        @Override
-        public JscChannelConfig setWaitTimeMillis(final int waitTimeMillis) {
-            if (waitTimeMillis < 0) {
-                throw new IllegalArgumentException("Wait time must be >= 0");
-            }
-            waitTime = waitTimeMillis;
             return this;
         }
 
