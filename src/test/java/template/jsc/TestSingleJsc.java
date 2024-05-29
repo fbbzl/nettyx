@@ -1,6 +1,7 @@
 package template.jsc;
 
 
+import cn.hutool.core.lang.Console;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -61,11 +62,11 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
                     JscChannelConfig config = (JscChannelConfig) cf.channel().config();
-                    System.err.println(config.getBaudRate());
+                    Console.log(config.getBaudRate());
                 })
-                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenCancel((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testSingleJsc::connect, 2, SECONDS))
-                .whenDone((l, cf) -> System.err.println("done"));
+                .whenDone((l, cf) -> Console.log("done"));
 
         testSingleJsc.connect().addListener(listener);
 

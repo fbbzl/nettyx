@@ -1,5 +1,6 @@
 package template.jsc;
 
+import cn.hutool.core.lang.Console;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -66,11 +67,11 @@ public class TestMultiJsc extends MultiJscChannelTemplate<String> {
                         cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
-                    System.err.println(cf.channel().localAddress() + ": ok");
+                    Console.log(cf.channel().localAddress() + ": ok");
                 })
-                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenCancel((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
-                .whenDone((l, cf) -> System.err.println("done"));
+                .whenDone((l, cf) -> Console.log("done"));
 
         testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
 

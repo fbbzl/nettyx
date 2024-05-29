@@ -1,5 +1,6 @@
 package template.tcp.client;
 
+import cn.hutool.core.lang.Console;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.template.tcp.client.ServerDetector;
 
@@ -32,7 +33,7 @@ public class TestServerDetector extends ServerDetector<String> {
 
     public static void main(String[] args) throws Exception {
         TestServerDetector testDetector = new TestServerDetector(new InetSocketAddress(9888));
-        System.err.println(testDetector.doDetect());
+        Console.log(testDetector.doDetect());
     }
 
 }

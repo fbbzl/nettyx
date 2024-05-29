@@ -1,5 +1,6 @@
 package template.tcp.server;
 
+import cn.hutool.core.lang.Console;
 import codec.UserCodec;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -35,9 +36,9 @@ public class TestServer extends TcpServerTemplate {
             @Override
             protected void initChannel(NioSocketChannel channel) {
                 InboundAdvice inboundAdvice = new InboundAdvice(channel)
-                        .whenExceptionCaught((c, t) -> System.err.println("in error: [" + t + "]"));
+                        .whenExceptionCaught((c, t) -> Console.log("in error: [" + t + "]"));
                 OutboundAdvice outboundAdvice = new OutboundAdvice(channel)
-                        .whenExceptionCaught((c, t) -> System.err.println("out error: [" + t + "]"));
+                        .whenExceptionCaught((c, t) -> Console.log("out error: [" + t + "]"));
 
                 channel.pipeline().addLast(
                         outboundAdvice
@@ -62,9 +63,9 @@ public class TestServer extends TcpServerTemplate {
     public static void main(String[] args) {
         TestServer    testServer = new TestServer(9888);
         ChannelFuture bindFuture = testServer.bind();
-        bindFuture.addListener(cf -> System.err.println("binding state:" + cf.isSuccess()));
+        bindFuture.addListener(cf -> Console.log("binding state:" + cf.isSuccess()));
         bindFuture.channel().closeFuture().addListener(cf -> {
-            System.err.println("关闭了");
+            Console.log("关闭了");
             testServer.shutdownGracefully();
         });
 

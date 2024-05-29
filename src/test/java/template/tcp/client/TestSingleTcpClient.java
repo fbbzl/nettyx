@@ -1,6 +1,7 @@
 package template.tcp.client;
 
 
+import cn.hutool.core.lang.Console;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -43,14 +44,14 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
                         testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
-                    System.err.println(cf.channel().localAddress() + ": ok");
+                    Console.log(cf.channel().localAddress() + ": ok");
                 })
-                .whenCancel((ls, cf) -> System.err.println("cancel"))
+                .whenCancel((ls, cf) -> Console.log("cancel"))
                 .whenFailure(redo(() -> {
                     log.error("redo");
                     return testClient.connect();
                 }, 2, TimeUnit.MILLISECONDS))
-                .whenDone((ls, cf) -> System.err.println("done"));
+                .whenDone((ls, cf) -> Console.log("done"));
 
         testClient.connect().addListener(listener);
     }

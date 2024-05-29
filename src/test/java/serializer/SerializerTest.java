@@ -15,7 +15,6 @@ import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -29,7 +28,7 @@ import java.util.Arrays;
 @Slf4j
 public class SerializerTest {
 
-    @BeforeClass
+   // @BeforeClass
     public static void initContext() {
         String u = "pc";
         File file = new File("C:\\Users\\" + u + "\\Desktop");
@@ -60,7 +59,7 @@ public class SerializerTest {
         User<Son<Cchar, Wife<Cint, Bill>>, Clong4, GirlFriend> user = StructSerializer.read(typeRefer,
                 Unpooled.wrappedBuffer(bytes));
 
-        System.err.println("read :" + user);
+        Console.log("read :" + user);
 //        user.setAddress(null);
 //        user.setQqNames(null);
 //        user.setQqNames(null);
@@ -71,13 +70,13 @@ public class SerializerTest {
 //        user.setWwife(null);
 
         final byte[] userWriteBytes = StructSerializer.writeBytes(typeRefer, user);
-        System.err.println("userWriteBytes: " + userWriteBytes.length);
+        Console.log("userWriteBytes: " + userWriteBytes.length);
         User turn = StructSerializer.read(typeRefer, userWriteBytes);
 
         byte[] bytes1 = StructSerializer.writeBytes(typeRefer, turn);
-        System.err.println("bytes1: " + bytes1.length);
-        System.err.println(Arrays.toString(bytes1));
-        System.err.println("turn :" + turn);
+        Console.log("bytes1: " + bytes1.length);
+        Console.log(Arrays.toString(bytes1));
+        Console.log("turn :" + turn);
 
         Assert.assertNotNull(turn);
     }
