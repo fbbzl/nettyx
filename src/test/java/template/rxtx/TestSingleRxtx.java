@@ -1,6 +1,7 @@
 package template.rxtx;
 
 
+import cn.hutool.core.lang.Console;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -58,11 +59,11 @@ public class TestSingleRxtx extends SingleRxtxChannellTemplate {
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
                     RxtxChannelConfig config =(RxtxChannelConfig) cf.channel().config();
-                    System.err.println(config.getBaudRate());
+                    Console.log(config.getBaudRate());
                 })
-                .whenCancel((l, cf) -> System.err.println("cancel"))
+                .whenCancel((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
-                .whenDone((l, cf) -> System.err.println("done"));
+                .whenDone((l, cf) -> Console.log("done"));
 
         testSingleRxtx.connect().addListener(listener);
     }

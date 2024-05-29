@@ -1,5 +1,7 @@
 package template.bluetooth;
 
+import cn.hutool.core.lang.Console;
+
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
@@ -48,7 +50,7 @@ public class TestBluetooth {
         UUID         uuid         = new UUID(NOAUTHENTICATE_NOENCRYPT);
 
         String           url              = agent.selectService(uuid, NOAUTHENTICATE_NOENCRYPT, false);
-        System.err.println(url);
+        Console.log(url);
         StreamConnection streamConnection = (StreamConnection) Connector.open(url);
 
         // 发送数据
