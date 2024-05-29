@@ -45,8 +45,7 @@ public class JscChannel extends SerialCommChannel {
         if (serialPort != null && serialPort.isOpen()) this.doClose();
 
         this.remoteAddress = (SerialCommAddress) remoteAddress;
-
-        this.serialPort = SerialPort.getCommPort(this.remoteAddress.value());
+        this.serialPort    = SerialPort.getCommPort(this.remoteAddress.value());
 
         // check comm-port
         Throws.ifFalse(this.serialPort.openPort(), new IllegalArgumentException("Unable to open [" + this.remoteAddress.value() + "] port"));
