@@ -1,13 +1,7 @@
 package template.bluetooth;
 
-import cn.hutool.core.lang.Console;
-
 import javax.bluetooth.*;
-import javax.microedition.io.Connector;
-import javax.microedition.io.StreamConnection;
 import java.io.IOException;
-
-import static javax.bluetooth.ServiceRecord.NOAUTHENTICATE_NOENCRYPT;
 
 /**
  * @author fengbinbin
@@ -73,16 +67,15 @@ public class TestBluetooth {
     }
 
     public static void main(String[] args) throws Exception {
-        DiscoveryAgent agent = LocalDevice.getLocalDevice().getDiscoveryAgent();
-        agent.startInquiry(DiscoveryAgent.GIAC, listener);
 
-
-        RemoteDevice remoteDevice = agent.retrieveDevices(DiscoveryAgent.PREKNOWN)[0];
-        UUID         uuid         = new UUID(NOAUTHENTICATE_NOENCRYPT);
-
-        String url = agent.selectService(uuid, NOAUTHENTICATE_NOENCRYPT, false);
-        Console.log(url);
-        StreamConnection streamConnection = (StreamConnection) Connector.open(url);
+        findDevices();
+//
+//        RemoteDevice remoteDevice = agent.retrieveDevices(DiscoveryAgent.PREKNOWN)[0];
+//        UUID         uuid         = new UUID(NOAUTHENTICATE_NOENCRYPT);
+//
+//        String url = agent.selectService(uuid, NOAUTHENTICATE_NOENCRYPT, false);
+//        Console.log(url);
+//        StreamConnection streamConnection = (StreamConnection) Connector.open(url);
 
 
     }
