@@ -52,12 +52,8 @@ public class JscChannel extends SerialCommChannel {
                 config().getOption(JscChannelOption.STOP_BITS).value(),
                 config().getOption(JscChannelOption.PARITY_BIT).value());
 
-        if (Boolean.TRUE.equals(config().getOption(JscChannelOption.DTR))) {
-            serialPort.setDTR();
-        }
-        if (Boolean.TRUE.equals(config().getOption(JscChannelOption.RTS))) {
-            serialPort.setRTS();
-        }
+        if (Boolean.TRUE.equals(config().getOption(JscChannelOption.DTR))) serialPort.setDTR();
+        if (Boolean.TRUE.equals(config().getOption(JscChannelOption.RTS))) serialPort.setRTS();
 
         super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
     }
