@@ -44,6 +44,7 @@ public class JscChannel extends SerialCommChannel {
         SerialCommAddress remote   = (SerialCommAddress) remoteAddress;
         SerialPort        commPort = SerialPort.getCommPort(remote.value());
 
+        // check comm-port
         Throws.ifFalse(commPort.openPort(), new IllegalArgumentException("Unable to open [" + remote.value() + "] port"));
         commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
 
