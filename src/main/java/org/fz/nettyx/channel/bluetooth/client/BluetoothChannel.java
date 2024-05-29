@@ -2,10 +2,12 @@ package org.fz.nettyx.channel.bluetooth.client;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;
-import io.netty.channel.*;
+import io.netty.channel.ChannelConfig;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelPromise;
+import io.netty.channel.EventLoop;
 import org.fz.nettyx.channel.EnhancedOioByteStreamChannel;
 import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
-import org.fz.nettyx.channel.bluetooth.BluetoothChannelOption;
 import org.fz.nettyx.channel.bluetooth.BluetoothDeviceAddress;
 import org.fz.nettyx.util.Try;
 
@@ -14,7 +16,6 @@ import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketAddress;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -80,10 +81,8 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
         this.remoteAddress = (BluetoothDeviceAddress) remoteAddress;
 
-        for (Map.Entry<ChannelOption<?>, Object> channelOptionEntry : config().getOptions().entrySet()) {
-            BluetoothChannelOption channelOption = (BluetoothChannelOption) channelOptionEntry.getKey();
-            BlueCoveImpl.setConfigProperty(channelOption.name(), String.valueOf(channelOptionEntry.getValue()));
-        }
+        config().getOptions().forEach((co, v) -> BlueCoveImpl.setConfigProperty(co.name(), String.valueOf(v)));
+
         if (config.getConnectTimeoutMillis() <= 0) {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value());
         } else {
