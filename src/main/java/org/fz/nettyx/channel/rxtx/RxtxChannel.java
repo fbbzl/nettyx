@@ -57,6 +57,5 @@ public class RxtxChannel extends SerialCommChannel {
                 serialPort = null;
             }
         }
-
     }
 }
