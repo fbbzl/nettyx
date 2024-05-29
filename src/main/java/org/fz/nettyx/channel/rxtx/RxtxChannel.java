@@ -29,6 +29,9 @@ public class RxtxChannel extends SerialCommChannel {
 
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+        // always check before do connect
+        if (this.serialPort != null) this.doClose();
+
         this.remoteAddress = (SerialCommAddress) remoteAddress;
         this.serialPort    = (SerialPort) CommPortIdentifier.getPortIdentifier(this.remoteAddress.value()).open(getClass().getName(), 1000);
         this.serialPort.enableReceiveTimeout(config().getOption(RxtxChannelOption.READ_TIMEOUT));
