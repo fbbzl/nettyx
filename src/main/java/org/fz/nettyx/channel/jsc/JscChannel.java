@@ -43,11 +43,10 @@ public class JscChannel extends SerialCommChannel {
 
         // check comm-port
         Throws.ifFalse(this.serialPort.openPort(), new IllegalArgumentException("Unable to open [" + this.remoteAddress.value() + "] port"));
-        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
-    }
 
-    protected void doInit() {
-        serialPort.setComPortParameters(
+        // set config
+        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
+        this.serialPort.setComPortParameters(
                 config().getOption(JscChannelOption.BAUD_RATE),
                 config().getOption(JscChannelOption.DATA_BITS).value(),
                 config().getOption(JscChannelOption.STOP_BITS).value(),

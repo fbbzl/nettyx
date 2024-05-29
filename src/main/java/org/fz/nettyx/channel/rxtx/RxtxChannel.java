@@ -1,6 +1,5 @@
 package org.fz.nettyx.channel.rxtx;
 
-import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
@@ -32,17 +31,12 @@ public class RxtxChannel extends SerialCommChannel {
 
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
-        SerialCommAddress  remote   = (SerialCommAddress) remoteAddress;
-        CommPortIdentifier cpi      = CommPortIdentifier.getPortIdentifier(remote.value());
-        CommPort           commPort = cpi.open(getClass().getName(), 1000);
-        commPort.enableReceiveTimeout(config().getOption(RxtxChannelOption.READ_TIMEOUT));
+        this.remoteAddress = (SerialCommAddress) remoteAddress;
+        CommPortIdentifier cpi = CommPortIdentifier.getPortIdentifier(this.remoteAddress.value());
 
-        this.remoteAddress = remote;
-        serialPort         = (SerialPort) commPort;
-    }
+        this.serialPort = (SerialPort) cpi.open(getClass().getName(), 1000);
+        this.serialPort.enableReceiveTimeout(config().getOption(RxtxChannelOption.READ_TIMEOUT));
 
-    @Override
-    protected void doInit() {
         try {
             serialPort.setSerialPortParams(
                     config().getOption(RxtxChannelOption.BAUD_RATE),
@@ -59,6 +53,7 @@ public class RxtxChannel extends SerialCommChannel {
         } catch (IOException steamError) {
             throw new UnsupportedOperationException("can get input/output stream, please check", steamError);
         }
+
     }
 
     @Override

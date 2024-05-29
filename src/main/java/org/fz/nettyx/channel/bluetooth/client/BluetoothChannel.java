@@ -78,13 +78,11 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
 
     protected void doInit() {
         Map<ChannelOption<?>, Object> options = config().getOptions();
+
         for (Map.Entry<ChannelOption<?>, Object> channelOptionEntry : options.entrySet()) {
             BluetoothChannelOption channelOption = (BluetoothChannelOption) channelOptionEntry.getKey();
             BlueCoveImpl.setConfigProperty(channelOption.name(), String.valueOf(channelOptionEntry.getValue()));
         }
-
-
-        BlueCoveImpl.setConfigProperty(BlueCoveConfigProperties.PROPERTY_CONNECT_TIMEOUT, String.valueOf(config.getConnectTimeoutMillis()));
 
         super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
     }

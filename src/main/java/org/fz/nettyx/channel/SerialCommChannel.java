@@ -24,8 +24,6 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
 
     protected SerialCommAddress remoteAddress;
 
-    protected abstract void doInit();
-
     @Override
     protected AbstractUnsafe newUnsafe() {
         return new SerialCommPortUnsafe();
@@ -67,7 +65,6 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
 
             try {
                 doConnect(remoteAddress, localAddress);
-                doInit();
                 safeSetSuccess(promise);
                 if (isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {
