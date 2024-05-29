@@ -4,6 +4,7 @@ package org.fz.nettyx.channel.jsc;
 import com.fazecast.jSerialComm.SerialPort;
 import io.netty.channel.ChannelConfig;
 import org.fz.nettyx.channel.SerialCommChannel;
+import org.fz.nettyx.util.Throws;
 
 import java.net.SocketAddress;
 
@@ -43,9 +44,7 @@ public class JscChannel extends SerialCommChannel {
         SerialCommAddress remote   = (SerialCommAddress) remoteAddress;
         SerialPort        commPort = SerialPort.getCommPort(remote.value());
 
-        if (!commPort.openPort()) {
-            throw new IllegalArgumentException("Unable to open [" + remote.value() + "] port");
-        }
+        Throws.ifFalse(commPort.openPort(), new IllegalArgumentException("Unable to open [" + remote.value() + "] port"));
         commPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
 
         this.remoteAddress = remote;
