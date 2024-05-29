@@ -5,8 +5,6 @@ import cn.hutool.core.lang.Console;
 import javax.bluetooth.*;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import static javax.bluetooth.ServiceRecord.NOAUTHENTICATE_NOENCRYPT;
 
@@ -26,22 +24,24 @@ public class TestBluetooth {
         agent.startInquiry(DiscoveryAgent.GIAC, new DiscoveryListener() {
             @Override
             public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass) {
-
+                System.err.println(remoteDevice);
+                System.err.println(deviceClass);
             }
 
             @Override
             public void servicesDiscovered(int i, ServiceRecord[] serviceRecords) {
-
+                System.err.println(serviceRecords.length);
             }
 
             @Override
             public void serviceSearchCompleted(int i, int i1) {
-
+                System.err.println(i);
+                System.err.println(i1);
             }
 
             @Override
             public void inquiryCompleted(int i) {
-
+                System.err.println(i);
             }
         });
 
@@ -53,18 +53,8 @@ public class TestBluetooth {
         Console.log(url);
         StreamConnection streamConnection = (StreamConnection) Connector.open(url);
 
-        // 发送数据
-        OutputStream os = streamConnection.openOutputStream();
-        os.write("Hello, Bluetooth!".getBytes());
 
-        // 接收数据
-        InputStream is     = streamConnection.openInputStream();
-        byte[]      buffer = new byte[1024];
-        int         bytes;
-        while ((bytes = is.read(buffer)) != -1) {
-            String receivedData = new String(buffer, 0, bytes);
-            System.out.println("接收到数据：" + receivedData);
-        }
+
 
     }
 }
