@@ -2,12 +2,10 @@ package org.fz.nettyx.channel.bluetooth.client;
 
 import com.intel.bluetooth.BlueCoveConfigProperties;
 import com.intel.bluetooth.BlueCoveImpl;
-import io.netty.channel.ChannelConfig;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.EventLoop;
+import io.netty.channel.*;
 import org.fz.nettyx.channel.EnhancedOioByteStreamChannel;
 import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
+import org.fz.nettyx.channel.bluetooth.BluetoothChannelOption;
 import org.fz.nettyx.channel.bluetooth.BluetoothDeviceAddress;
 import org.fz.nettyx.util.Try;
 
@@ -16,6 +14,7 @@ import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketAddress;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -25,6 +24,7 @@ import java.util.function.Consumer;
  * @version 1.0
  * @since 2024/3/27 14:27
  */
+
 public class BluetoothChannel extends EnhancedOioByteStreamChannel {
 
     private static final BluetoothDeviceAddress LOCAL_ADDRESS = new BluetoothDeviceAddress("localhost");
@@ -74,6 +74,19 @@ public class BluetoothChannel extends EnhancedOioByteStreamChannel {
     @Override
     protected void doBind(SocketAddress localAddress) {
         throw new UnsupportedOperationException("doBind");
+    }
+
+    protected void doInit() {
+        Map<ChannelOption<?>, Object> options = config().getOptions();
+        for (Map.Entry<ChannelOption<?>, Object> channelOptionEntry : options.entrySet()) {
+            BluetoothChannelOption channelOption = (BluetoothChannelOption) channelOptionEntry.getKey();
+            BlueCoveImpl.setConfigProperty(channelOption.name(), String.valueOf(channelOptionEntry.getValue()));
+        }
+
+
+        BlueCoveImpl.setConfigProperty(BlueCoveConfigProperties.PROPERTY_CONNECT_TIMEOUT, String.valueOf(config.getConnectTimeoutMillis()));
+
+        super.activate(serialPort.getInputStream(), serialPort.getOutputStream());
     }
 
     @Override

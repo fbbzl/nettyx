@@ -100,7 +100,7 @@ public class BluetoothChannelOption extends ChannelOption<String> {
      * Some properties can't be changed at runtime once the Stack was
      * initialized.
      */
-    public static final ChannelOption<?>[] INITIALIZATION_PROPERTIES = new ChannelOption[]{PROPERTY_STACK, PROPERTY_STACK_FIRST, PROPERTY_NATIVE_RESOURCE,
+    public static final ChannelOption<?>[] INITIALIZATION_PROPERTIES = new ChannelOption[]{PROPERTY_STACK, PROPERTY_STACK_FIRST,
                                                                                            PROPERTY_NATIVE_RESOURCE, PROPERTY_BLUEZ_CLASS, PROPERTY_LOCAL_DEVICE_ID, PROPERTY_LOCAL_DEVICE_ADDRESS, PROPERTY_EMULATOR_CLASS, PROPERTY_EMULATOR_HOST, PROPERTY_EMULATOR_PORT};
 
     /**
