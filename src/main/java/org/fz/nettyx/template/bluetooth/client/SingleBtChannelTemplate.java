@@ -15,8 +15,8 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 @SuppressWarnings("deprecation")
 public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTemplate<BluetoothChannel, BluetoothChannelConfig> {
 
-    protected SingleBtChannelTemplate(String commAddress) {
-        super(new BluetoothDeviceAddress(commAddress));
+    protected SingleBtChannelTemplate(String address) {
+        super(new BluetoothDeviceAddress(address));
     }
 
     protected SingleBtChannelTemplate(BluetoothDeviceAddress address) {
