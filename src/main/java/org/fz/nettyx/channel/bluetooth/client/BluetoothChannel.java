@@ -6,8 +6,8 @@ import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
 import org.fz.nettyx.channel.EnhancedOioByteStreamChannel;
-import org.fz.nettyx.channel.bluetooth.BtChannelConfig;
-import org.fz.nettyx.channel.bluetooth.BtDeviceAddress;
+import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
+import org.fz.nettyx.channel.bluetooth.BluetoothDeviceAddress;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
@@ -21,21 +21,21 @@ import java.net.SocketAddress;
  * @since 2024/3/27 14:27
  */
 
-public class BtChannel extends EnhancedOioByteStreamChannel {
+public class BluetoothChannel extends EnhancedOioByteStreamChannel {
 
-    private static final BtDeviceAddress LOCAL_ADDRESS = new BtDeviceAddress("localhost");
+    private static final BluetoothDeviceAddress LOCAL_ADDRESS = new BluetoothDeviceAddress("localhost");
 
-    private BtDeviceAddress remoteAddress;
+    private BluetoothDeviceAddress remoteAddress;
 
-    private final BtChannelConfig config;
+    private final BluetoothChannelConfig config;
 
     private boolean open;
 
     private InputStream      inputStream;
     private StreamConnection streamConnection;
 
-    public BtChannel() {
-        config = new BtChannelConfig.DefaultBluetoothChannelConfig(this);
+    public BluetoothChannel() {
+        config = new BluetoothChannelConfig.DefaultBluetoothChannelConfig(this);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
 
     @Override
     protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
-        this.remoteAddress = (BtDeviceAddress) remoteAddress;
+        this.remoteAddress = (BluetoothDeviceAddress) remoteAddress;
 
         config().getOptions().forEach((co, val) -> BlueCoveImpl.setConfigProperty(co.name(), String.valueOf(val)));
 

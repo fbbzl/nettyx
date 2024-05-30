@@ -11,18 +11,18 @@ import java.net.SocketAddress;
  * @version 1.0
  * @since 2024/5/26 10:32
  */
-public class BtDeviceAddress extends SocketAddress {
+public class BluetoothDeviceAddress extends SocketAddress {
 
     private final String value;
     private final String friendlyName;
 
     @SneakyThrows(IOException.class)
-    public BtDeviceAddress(RemoteDevice device) {
+    public BluetoothDeviceAddress(RemoteDevice device) {
         this.value        = device.getBluetoothAddress();
         this.friendlyName = device.getFriendlyName(false);
     }
 
-    public BtDeviceAddress(String value) {
+    public BluetoothDeviceAddress(String value) {
         this.value = this.friendlyName = value;
     }
 

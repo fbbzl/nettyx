@@ -20,30 +20,26 @@ public class BluetoothServerTest extends Thread {
     // 流连接
     private StreamConnection         streamConnection = null;
     // 接受数据的字节流
-    private byte[]           acceptdByteArray = new byte[1024];
+    private byte[]                   acceptdByteArray = new byte[1024];
     // 输入流
     private InputStream              inputStream;
     private OutputStream             outputStream;
     //接入通知
     private StreamConnectionNotifier notifier;
 
-    private boolean stopFlag = false;
-    public final static String serverName = "Bluetooth Test";
-    public final static String serverUUID = "1000110100001000800000805F9B34FB";
+    private             boolean stopFlag   = false;
+    public final static String  serverName = "Bluetooth Test";
+    public final static String  serverUUID = "1000110100001000800000805F9B34FB";
 
     public BluetoothServerTest() {
         try {
             local = LocalDevice.getLocalDevice();
-            if (!local.setDiscoverable(DiscoveryAgent.GIAC))
-                System.out.println("请将蓝牙设置为可被发现");
-            /**
-             * 作为服务端，被请求
-             */
-            String url = "btspp://localhost:" +  serverUUID + ";name="+serverName;
+            if (!local.setDiscoverable(DiscoveryAgent.GIAC)) System.out.println("请将蓝牙设置为可被发现");
+            String url = "btspp://localhost:" + serverUUID + ";name=" + serverName;
             notifier = (StreamConnectionNotifier) Connector.open(url);
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());;
+            System.out.println(e.getMessage());
         }
     }
 
@@ -52,8 +48,8 @@ public class BluetoothServerTest extends Thread {
         try {
             String inStr = null;
             streamConnection = notifier.acceptAndOpen();                //阻塞的，等待设备连接
-            inputStream = streamConnection.openInputStream();
-            outputStream = streamConnection.openOutputStream();
+            inputStream      = streamConnection.openInputStream();
+            outputStream     = streamConnection.openOutputStream();
 
             System.out.printf("Connected");
 

@@ -6,4 +6,10 @@ package template.bluetooth;
  * @since 2024/5/30 19:57
  */
 public class BluetoothClientTest {
+
+    public static void main(String[] args) {
+
+
+    }
+
 }
