@@ -19,9 +19,9 @@ import java.util.Map;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class MultiBluetoothChannelClient<K> extends AbstractMultiChannelTemplate<K, BluetoothChannel, BluetoothChannelConfig> {
+public abstract class MultiBtChannelTemplate<K> extends AbstractMultiChannelTemplate<K, BluetoothChannel, BluetoothChannelConfig> {
 
-    protected MultiBluetoothChannelClient(Map<K, BluetoothDeviceAddress> addressMap) {
+    protected MultiBtChannelTemplate(Map<K, BluetoothDeviceAddress> addressMap) {
         super(addressMap);
     }
 
