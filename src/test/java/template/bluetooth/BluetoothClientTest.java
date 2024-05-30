@@ -27,7 +27,11 @@ public class BluetoothClientTest extends SingleBtChannelTemplate {
 
     public static void main(String[] args) throws Exception {
         List<RemoteDevice> devices = new BluetoothFinder.DeviceFinder().getDevices();
-        System.err.println(devices);
+        for (RemoteDevice device : devices) {
+            System.err.println(device.getFriendlyName(false));
+            System.err.println(device.getBluetoothAddress());
+        }
+
 
     }
 
