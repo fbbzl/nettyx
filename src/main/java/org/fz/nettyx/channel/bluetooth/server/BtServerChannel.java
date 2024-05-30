@@ -6,4 +6,6 @@ package org.fz.nettyx.channel.bluetooth.server;
  * @since 2024/5/15 17:29
  */
 public class BtServerChannel {
+
+
 }

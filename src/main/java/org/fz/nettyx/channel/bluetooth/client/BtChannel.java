@@ -19,7 +19,6 @@ import java.net.SocketAddress;
 import java.util.function.Consumer;
 
 /**
- * TODO not completed
  *
  * @author fengbinbin
  * @version 1.0
