@@ -20,6 +20,7 @@ public class RxtxChannel extends SerialCommChannel {
 
     private final RxtxChannelConfig config;
     private       SerialPort        serialPort;
+    private boolean open;
 
     public RxtxChannel() {
         config = new RxtxChannelConfig.DefaultRxtxChannelConfig(this);
@@ -28,6 +29,16 @@ public class RxtxChannel extends SerialCommChannel {
     @Override
     public RxtxChannelConfig config() {
         return config;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return open;
+    }
+
+    @Override
+    protected boolean isInputShutdown() {
+        return !isOpen();
     }
 
     @Override
@@ -47,6 +58,8 @@ public class RxtxChannel extends SerialCommChannel {
                                       );
         serialPort.setDTR(config().getOption(RxtxChannelOption.DTR));
         serialPort.setRTS(config().getOption(RxtxChannelOption.RTS));
+
+        open = true;
     }
 
     @Override
