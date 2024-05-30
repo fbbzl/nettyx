@@ -5,17 +5,14 @@ import com.intel.bluetooth.BlueCoveImpl;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import io.netty.channel.EventLoop;
 import org.fz.nettyx.channel.EnhancedOioByteStreamChannel;
 import org.fz.nettyx.channel.bluetooth.BtChannelConfig;
 import org.fz.nettyx.channel.bluetooth.BtDeviceAddress;
-import org.fz.nettyx.util.Try;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
 import java.net.SocketAddress;
-import java.util.function.Consumer;
 
 /**
  *
@@ -58,26 +55,16 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
 
     @Override
     protected ChannelFuture shutdownInput() {
-        ChannelPromise promise = newPromise();
+        ChannelPromise pro = newPromise();
 
-        EventLoop loop = eventLoop();
-
-        Consumer<ChannelPromise> doShutdown = Try.accept(pro -> {
-            try {
-                inputStream.close();
-                pro.setSuccess();
-            } catch (Exception t) {
-                pro.setFailure(t);
-            }
-        });
-
-        if (loop.inEventLoop()) {
-            doShutdown.accept(promise);
-        } else {
-            loop.execute(() -> doShutdown.accept(promise));
+        try {
+            inputStream.close();
+            pro.setSuccess();
+        } catch (Exception t) {
+            pro.setFailure(t);
         }
 
-        return promise;
+        return pro;
     }
 
     @Override
