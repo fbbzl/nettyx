@@ -9,7 +9,7 @@ import io.netty.channel.ChannelOption;
  * @version 1.0
  * @since 2024/5/15 15:18
  */
-public class BluetoothChannelOption extends ChannelOption<String> {
+public class BtChannelOption extends ChannelOption<String> {
 
     public static final ChannelOption<String> PROPERTY_DEBUG = option(BlueCoveConfigProperties.PROPERTY_DEBUG);
 
@@ -167,11 +167,11 @@ public class BluetoothChannelOption extends ChannelOption<String> {
     public static final ChannelOption<String> PROPERTY_SDP_STRING_ENCODING_ASCII = option(BlueCoveConfigProperties.PROPERTY_SDP_STRING_ENCODING_ASCII);
 
     private static ChannelOption<String> option(String secondNameComponent) {
-        return valueOf(BluetoothChannelOption.class, secondNameComponent);
+        return valueOf(BtChannelOption.class, secondNameComponent);
     }
 
     @SuppressWarnings("deprecation")
-    private BluetoothChannelOption() {
+    private BtChannelOption() {
         super("bluetooth-config");
     }
 }
