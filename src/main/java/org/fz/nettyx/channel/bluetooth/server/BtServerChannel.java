@@ -1,5 +1,8 @@
 package org.fz.nettyx.channel.bluetooth.server;
 
+import io.netty.channel.socket.oio.OioServerSocketChannel;
+import io.netty.channel.socket.oio.OioSocketChannel;
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -7,5 +10,7 @@ package org.fz.nettyx.channel.bluetooth.server;
  */
 public class BtServerChannel {
 
+    OioServerSocketChannel x;
+    OioSocketChannel l;
 
 }
