@@ -28,6 +28,7 @@ public class BluetoothClient {
         List<RemoteDevice> device = new BtFinder.DeviceFinder().getDevices();
         System.err.println(device);
     }
+
     /**
      * 客户端监听
      */
