@@ -31,14 +31,15 @@ public class BluetoothChannelTest {
 
         List<RemoteDevice> devices = new BtFinder.DeviceFinder().getDevices();
         RemoteDevice       remoteDevice = devices.get(0);
+        System.err.println(remoteDevice);
         Console.log(remoteDevice.getFriendlyName(false));
 
         String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", remoteDevice.getBluetoothAddress());
         bootstrap.group(workerGroup).channel(BtChannel.class).remoteAddress(new BtDeviceAddress(url))
-                 .handler(new ChannelInitializer<OioBluetoothChannel>() {
+                 .handler(new ChannelInitializer<BtChannel>() {
 
                      @Override
-                     public void initChannel(OioBluetoothChannel ch) {
+                     public void initChannel(BtChannel ch) {
                          ch.pipeline().addLast(new StringDecoder()).addLast(new StringEncoder());
                      }
                  });
