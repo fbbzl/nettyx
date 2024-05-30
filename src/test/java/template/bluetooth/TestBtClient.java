@@ -29,13 +29,14 @@ public class TestBtClient extends SingleBtChannelTemplate {
 
     public static void main(String[] args) throws Exception {
         List<RemoteDevice> devices = new BtFinder.DeviceFinder().getDevices();
-        for (RemoteDevice device : devices) {
-            String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", device.getBluetoothAddress());
 
-            TestBtClient client = new TestBtClient(url);
+        RemoteDevice device = devices.get(0);
 
-            client.connect().addListener(new DebugChannelListener());
-        }
+        String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", device.getBluetoothAddress());
+
+        TestBtClient client = new TestBtClient(url);
+
+        client.connect().addListener(new DebugChannelListener());
 
     }
 
