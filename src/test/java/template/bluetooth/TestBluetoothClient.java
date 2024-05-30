@@ -14,9 +14,9 @@ import java.util.List;
  * @version 1.0
  * @since 2024/5/30 19:57
  */
-public class BluetoothClientTest extends SingleBtChannelTemplate {
+public class TestBluetoothClient extends SingleBtChannelTemplate {
 
-    public BluetoothClientTest(String commAddress) {
+    public TestBluetoothClient(String commAddress) {
         super(commAddress);
     }
 
@@ -32,7 +32,10 @@ public class BluetoothClientTest extends SingleBtChannelTemplate {
             System.err.println(device.getBluetoothAddress());
         }
 
+        RemoteDevice iphone = devices.get(0);
+        TestBluetoothClient client = new TestBluetoothClient(iphone.getBluetoothAddress());
 
+        client.connect();
     }
 
 }
