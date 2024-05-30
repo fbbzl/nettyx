@@ -99,11 +99,6 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected void doDisconnect() throws Exception {
-        doClose();
-    }
-
-    @Override
     protected void doClose() throws Exception {
         open = false;
 
