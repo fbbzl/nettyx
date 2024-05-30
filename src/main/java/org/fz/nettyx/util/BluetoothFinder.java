@@ -18,7 +18,7 @@ import java.util.function.Predicate;
  * @since 2024/5/30 11:04
  */
 @UtilityClass
-public final class BtFinder {
+public final class BluetoothFinder {
 
     @NoArgsConstructor
     public static class DeviceFinder {
