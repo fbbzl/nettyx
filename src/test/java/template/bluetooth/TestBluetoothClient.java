@@ -1,5 +1,6 @@
 package template.bluetooth;
 
+import cn.hutool.core.util.StrUtil;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
 import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
@@ -34,6 +35,8 @@ public class TestBluetoothClient extends SingleBtChannelTemplate {
         }
 
         RemoteDevice iphone = devices.get(0);
+        String       e0897EA7179B = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", "E0897EA7179B");
+
         TestBluetoothClient client = new TestBluetoothClient(iphone.getBluetoothAddress());
 
         client.connect().addListener(new DebugChannelListener());
