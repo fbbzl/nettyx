@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 public final class BtFinder {
 
     @NoArgsConstructor
-    public static class BtDeviceFinder {
+    public static class DeviceFinder {
 
         private final Object             completedTag = new Object();
         private final List<RemoteDevice> devices      = new ArrayList<>(64);
@@ -39,7 +39,7 @@ public final class BtFinder {
             }
         };
 
-        public BtDeviceFinder(DiscoveryListener listener) {
+        public DeviceFinder(DiscoveryListener listener) {
             this.listener = listener;
         }
 
@@ -66,7 +66,7 @@ public final class BtFinder {
     }
 
     @RequiredArgsConstructor
-    public static class BtServiceFinder {
+    public static class ServiceFinder {
 
         private static final int               DEFAULT_ATTR_ID = 0x0100;
         private static final Object            completedTag    = new Object();
@@ -91,7 +91,7 @@ public final class BtFinder {
             }
         };
 
-        public BtServiceFinder(DiscoveryListener listener) {
+        public ServiceFinder(DiscoveryListener listener) {
             this.listener = listener;
         }
 
@@ -108,7 +108,6 @@ public final class BtFinder {
             return services;
         }
     }
-
 
     private abstract static class DiscoveryListenerAdapter implements DiscoveryListener {
         @Override
