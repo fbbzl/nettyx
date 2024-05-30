@@ -2,11 +2,11 @@ package org.fz.nettyx.channel.bluetooth;
 
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.DefaultChannelConfig;
-import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
+import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 
-public interface BluetoothChannelConfig extends ChannelConfig {
+public interface BtChannelConfig extends ChannelConfig {
 
     String getAddress();
 
@@ -33,7 +33,7 @@ public interface BluetoothChannelConfig extends ChannelConfig {
      * @version 1.0
      * @since 2024/5/16 23:06
      */
-    class DefaultBluetoothChannelConfig extends DefaultChannelConfig implements BluetoothChannelConfig {
+    class DefaultBluetoothChannelConfig extends DefaultChannelConfig implements BtChannelConfig {
 
         private static final int DEFAULT_CONNECT_TIMEOUT = 5 * 1000;
 
@@ -45,7 +45,7 @@ public interface BluetoothChannelConfig extends ChannelConfig {
         private boolean encrypt;
         private boolean master;
 
-        public DefaultBluetoothChannelConfig(BluetoothChannel channel) {
+        public DefaultBluetoothChannelConfig(BtChannel channel) {
             super(channel);
         }
 

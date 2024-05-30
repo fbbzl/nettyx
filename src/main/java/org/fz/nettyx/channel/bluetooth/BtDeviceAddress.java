@@ -7,11 +7,12 @@ import java.net.SocketAddress;
  * @version 1.0
  * @since 2024/5/26 10:32
  */
-public class BluetoothDeviceAddress extends SocketAddress {
+@Deprecated
+public class BtDeviceAddress extends SocketAddress {
 
     private final String value;
 
-    public BluetoothDeviceAddress(String value) {
+    public BtDeviceAddress(String value) {
         this.value = value;
     }
 
@@ -23,4 +24,5 @@ public class BluetoothDeviceAddress extends SocketAddress {
     public String toString() {
         return value;
     }
+
 }
