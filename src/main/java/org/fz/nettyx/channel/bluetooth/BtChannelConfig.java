@@ -6,6 +6,12 @@ import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 
+/**
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/5/15 17:29
+ */
+
 public interface BtChannelConfig extends ChannelConfig {
 
     String getAddress();
