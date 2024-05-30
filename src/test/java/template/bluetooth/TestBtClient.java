@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
-import org.fz.nettyx.util.BluetoothFinder;
+import org.fz.nettyx.util.BtFinder;
 import template.DebugChannelListener;
 import template.TestChannelInitializer;
 
@@ -28,7 +28,7 @@ public class TestBtClient extends SingleBtChannelTemplate {
     }
 
     public static void main(String[] args) throws Exception {
-        List<RemoteDevice> devices = new BluetoothFinder.DeviceFinder().getDevices();
+        List<RemoteDevice> devices = new BtFinder.DeviceFinder().getDevices();
         for (RemoteDevice device : devices) {
             String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", device.getBluetoothAddress());
 

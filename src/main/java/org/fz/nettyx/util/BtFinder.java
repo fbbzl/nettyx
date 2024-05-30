@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 @Slf4j
 @UtilityClass
-public final class BluetoothFinder {
+public final class BtFinder {
 
     @NoArgsConstructor
     public static class DeviceFinder {
