@@ -27,22 +27,17 @@ public class BluetoothChannelTest {
         EventLoopGroup workerGroup = new OioEventLoopGroup();
 
         List<RemoteDevice> devices = new BtFinder.DeviceFinder().getDevices();
-        for (RemoteDevice device : devices) {
-            String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", device.getBluetoothAddress());
-            bootstrap.group(workerGroup).channel(OioBluetoothChannel.class).remoteAddress(new BluetoothDeviceAddress(url))
-                     .handler(new ChannelInitializer<OioBluetoothChannel>() {
+        String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", devices.get(0).getBluetoothAddress());
+        bootstrap.group(workerGroup).channel(OioBluetoothChannel.class).remoteAddress(new BluetoothDeviceAddress(url))
+                 .handler(new ChannelInitializer<OioBluetoothChannel>() {
 
-                         @Override
-                         public void initChannel(OioBluetoothChannel ch) {
-                             ch.pipeline().addLast(new StringDecoder()).addLast(new StringEncoder());
-                         }
-                     });
+                     @Override
+                     public void initChannel(OioBluetoothChannel ch) {
+                         ch.pipeline().addLast(new StringDecoder()).addLast(new StringEncoder());
+                     }
+                 });
 
-            bootstrap.connect().syncUninterruptibly();
-
-
-
-        }
+        bootstrap.connect().syncUninterruptibly();
 
     }
 }
