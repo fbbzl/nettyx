@@ -7,7 +7,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 import org.fz.nettyx.channel.bluetooth.finder.BtFinder;
-import org.fz.nettyx.channel.jsc.JscChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
 import template.TestChannelInitializer;
@@ -54,9 +53,6 @@ public class TestBtClient extends SingleBtChannelTemplate {
                         Arrays.fill(msg, (byte) 1);
                         client.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
-
-                    JscChannelConfig config = (JscChannelConfig) cf.channel().config();
-                    Console.log(config.getBaudRate());
                 })
                 .whenCancel((l, cf) -> Console.log("cancel"))
                 .whenDone((l, cf) -> Console.log("done"));
