@@ -14,15 +14,14 @@ import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.fz.nettyx.util.BtFinder;
-import org.junit.Test;
+import template.DebugChannelListener;
 
 import javax.bluetooth.RemoteDevice;
 import java.util.List;
 
 public class BluetoothChannelTest {
 
-    @Test
-    public void testConnect() {
+    public static void main(String[] args) {
         Bootstrap      bootstrap   = new Bootstrap();
         EventLoopGroup workerGroup = new OioEventLoopGroup();
 
@@ -37,7 +36,7 @@ public class BluetoothChannelTest {
                      }
                  });
 
-        bootstrap.connect().syncUninterruptibly();
-
+        bootstrap.connect().addListener(new DebugChannelListener());
     }
+
 }
