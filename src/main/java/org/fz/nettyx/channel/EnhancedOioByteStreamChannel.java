@@ -17,18 +17,6 @@ import io.netty.channel.oio.OioByteStreamChannel;
 @SuppressWarnings("deprecation")
 public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel {
 
-    protected boolean open = true;
-
-    @Override
-    public boolean isOpen() {
-        return open;
-    }
-
-    @Override
-    protected boolean isInputShutdown() {
-        return !open;
-    }
-
     @Override
     protected ChannelFuture shutdownInput() {
         return newFailedFuture(new UnsupportedOperationException("shutdownInput"));

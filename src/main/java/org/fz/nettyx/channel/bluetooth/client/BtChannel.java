@@ -47,6 +47,11 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
+    protected boolean isInputShutdown() {
+        return false;
+    }
+
+    @Override
     protected ChannelFuture shutdownInput() {
         ChannelPromise promise = newPromise();
 
@@ -124,6 +129,11 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     @Override
     public ChannelConfig config() {
         return config;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return false;
     }
 
     protected final class BluetoothUnsafe extends AbstractUnsafe {
