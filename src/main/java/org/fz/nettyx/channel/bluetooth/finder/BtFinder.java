@@ -1,4 +1,4 @@
-package org.fz.nettyx.util;
+package org.fz.nettyx.channel.bluetooth.finder;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import lombok.NoArgsConstructor;
