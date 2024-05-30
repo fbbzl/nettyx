@@ -1,5 +1,9 @@
 package org.fz.nettyx.channel.bluetooth;
 
+import lombok.SneakyThrows;
+
+import javax.bluetooth.RemoteDevice;
+import java.io.IOException;
 import java.net.SocketAddress;
 
 /**
@@ -7,12 +11,19 @@ import java.net.SocketAddress;
  * @version 1.0
  * @since 2024/5/26 10:32
  */
-@Deprecated
 public class BtDeviceAddress extends SocketAddress {
+
     private final String value;
+    private final String friendlyName;
+
+    @SneakyThrows(IOException.class)
+    public BtDeviceAddress(RemoteDevice device) {
+        this.value        = device.getBluetoothAddress();
+        this.friendlyName = device.getFriendlyName(false);
+    }
 
     public BtDeviceAddress(String value) {
-        this.value = value;
+        this.value = this.friendlyName = value;
     }
 
     public String value() {
@@ -21,7 +32,7 @@ public class BtDeviceAddress extends SocketAddress {
 
     @Override
     public String toString() {
-        return value;
+        return friendlyName;
     }
 
 }
