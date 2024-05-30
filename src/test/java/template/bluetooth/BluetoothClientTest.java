@@ -2,7 +2,7 @@ package template.bluetooth;
 
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
-import org.fz.nettyx.template.bluetooth.client.SingleBluetoothChannelClient;
+import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
 import org.fz.nettyx.util.BluetoothFinder;
 import template.TestChannelInitializer;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * @version 1.0
  * @since 2024/5/30 19:57
  */
-public class BluetoothClientTest extends SingleBluetoothChannelClient {
+public class BluetoothClientTest extends SingleBtChannelTemplate {
 
     public BluetoothClientTest(String commAddress) {
         super(commAddress);
