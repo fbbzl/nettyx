@@ -43,12 +43,12 @@ public final class BtFinder {
             this.listener = listener;
         }
 
-        public List<RemoteDevice> getDevice() throws BluetoothStateException {
-            return getDevice(device -> true);
+        public List<RemoteDevice> getDevices() throws BluetoothStateException {
+            return getDevices(device -> true);
         }
 
         @SneakyThrows({ InterruptedException.class })
-        public List<RemoteDevice> getDevice(Predicate<RemoteDevice> condition) throws BluetoothStateException {
+        public List<RemoteDevice> getDevices(Predicate<RemoteDevice> condition) throws BluetoothStateException {
             devices.clear();
 
             synchronized (completedTag) {
@@ -95,7 +95,11 @@ public final class BtFinder {
             this.listener = listener;
         }
 
-        public List<String> getService(RemoteDevice btDevice, String serviceUUID, Predicate<String> condition) throws IOException, InterruptedException {
+        public List<String> getServices(RemoteDevice btDevice, String serviceUUID) throws IOException, InterruptedException {
+            return getServices(btDevice, serviceUUID, s -> true);
+        }
+
+        public List<String> getServices(RemoteDevice btDevice, String serviceUUID, Predicate<String> condition) throws IOException, InterruptedException {
             UUID[] searchUuidSet = new UUID[]{ new UUID(serviceUUID, false) };
 
             synchronized (completedTag) {
