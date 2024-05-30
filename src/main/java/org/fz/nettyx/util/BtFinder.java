@@ -4,6 +4,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 
 import javax.bluetooth.*;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
  * @version 1.0
  * @since 2024/5/30 11:04
  */
+@UtilityClass
 public final class BtFinder {
 
     @NoArgsConstructor
