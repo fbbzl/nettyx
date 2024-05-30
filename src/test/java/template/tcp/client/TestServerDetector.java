@@ -1,6 +1,7 @@
 package template.tcp.client;
 
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.StrUtil;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.template.tcp.client.ServerDetector;
 
@@ -18,7 +19,7 @@ public class TestServerDetector extends ServerDetector<String> {
 
     @Override
     public boolean checkResponse(String response) {
-        return false;
+        return StrUtil.equals(response, "ack");
     }
 
     @Override
