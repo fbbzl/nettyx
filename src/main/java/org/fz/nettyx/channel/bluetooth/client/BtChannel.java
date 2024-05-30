@@ -33,6 +33,8 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
 
     private final BtChannelConfig config;
 
+    private boolean open;
+
     private InputStream      inputStream;
     private OutputStream     outputStream;
     private StreamConnection streamConnection;
@@ -47,8 +49,13 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
+    public boolean isOpen() {
+        return open;
+    }
+
+    @Override
     protected boolean isInputShutdown() {
-        return false;
+        return !isOpen();
     }
 
     @Override
@@ -93,7 +100,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
             BlueCoveImpl.setConfigProperty(BlueCoveConfigProperties.PROPERTY_CONNECT_TIMEOUT, String.valueOf(config.getConnectTimeoutMillis()));
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
-
+        open = true;
         activate((inputStream = streamConnection.openInputStream()), (outputStream = streamConnection.openOutputStream()));
     }
 
@@ -129,11 +136,6 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     @Override
     public ChannelConfig config() {
         return config;
-    }
-
-    @Override
-    public boolean isOpen() {
-        return false;
     }
 
     protected final class BluetoothUnsafe extends AbstractUnsafe {
