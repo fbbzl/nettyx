@@ -19,7 +19,7 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
 
     @Override
     protected ChannelFuture shutdownInput() {
-        return newFailedFuture(new UnsupportedOperationException("shutdownInput"));
+        return newSucceededFuture();
     }
 
     protected EnhancedOioByteStreamChannel() {

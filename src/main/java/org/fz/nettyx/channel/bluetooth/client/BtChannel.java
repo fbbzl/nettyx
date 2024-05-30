@@ -14,7 +14,6 @@ import org.fz.nettyx.util.Try;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.SocketAddress;
 import java.util.function.Consumer;
 
@@ -36,7 +35,6 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     private boolean open;
 
     private InputStream      inputStream;
-    private OutputStream     outputStream;
     private StreamConnection streamConnection;
 
     public BtChannel() {
@@ -67,7 +65,6 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
         Consumer<ChannelPromise> doShutdown = Try.accept(pro -> {
             try {
                 inputStream.close();
-                outputStream.close();
                 pro.setSuccess();
             } catch (Exception t) {
                 pro.setFailure(t);
@@ -101,7 +98,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
         open = true;
-        activate((inputStream = streamConnection.openInputStream()), (outputStream = streamConnection.openOutputStream()));
+        activate((inputStream = streamConnection.openInputStream()), streamConnection.openOutputStream());
     }
 
     @Override
