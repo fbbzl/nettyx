@@ -4,6 +4,7 @@ import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
 import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
 import org.fz.nettyx.util.BluetoothFinder;
+import template.DebugChannelListener;
 import template.TestChannelInitializer;
 
 import javax.bluetooth.RemoteDevice;
@@ -35,7 +36,7 @@ public class TestBluetoothClient extends SingleBtChannelTemplate {
         RemoteDevice iphone = devices.get(0);
         TestBluetoothClient client = new TestBluetoothClient(iphone.getBluetoothAddress());
 
-        client.connect();
+        client.connect().addListener(new DebugChannelListener());
     }
 
 }
