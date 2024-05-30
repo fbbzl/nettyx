@@ -9,7 +9,6 @@ import java.net.SocketAddress;
  */
 @Deprecated
 public class BtDeviceAddress extends SocketAddress {
-
     private final String value;
 
     public BtDeviceAddress(String value) {

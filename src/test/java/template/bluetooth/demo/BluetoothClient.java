@@ -58,7 +58,7 @@ public class BluetoothClient {
      */
     public void find() throws IOException, InterruptedException {
         //附近所有的蓝牙设备，必须先执行 runDiscovery
-        List<RemoteDevice>     devicesDiscovered = new BtFinder.BtDeviceFinder().getDevice();
+        List<RemoteDevice>     devicesDiscovered = new BtFinder.DeviceFinder().getDevice();
         Iterator<RemoteDevice> itr               = devicesDiscovered.iterator();
         //连接
         while (itr.hasNext()) {
