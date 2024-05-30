@@ -7,17 +7,17 @@ import java.net.SocketAddress;
  * @version 1.0
  * @since 2024/5/26 10:32
  */
-public class BluetoothDeviceAddress extends SocketAddress {
+public class BtDeviceAddress extends SocketAddress {
 
     private final String value;
     private final String friendlyName;
 
-    public BluetoothDeviceAddress(String value, String friendlyName) {
+    public BtDeviceAddress(String value, String friendlyName) {
         this.value        = value;
         this.friendlyName = friendlyName;
     }
 
-    public BluetoothDeviceAddress(String value) {
+    public BtDeviceAddress(String value) {
         this.value = this.friendlyName = value;
     }
 

@@ -2,9 +2,9 @@ package org.fz.nettyx.template.bluetooth.client;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import org.fz.nettyx.channel.bluetooth.BluetoothChannelConfig;
-import org.fz.nettyx.channel.bluetooth.BluetoothDeviceAddress;
-import org.fz.nettyx.channel.bluetooth.client.BluetoothChannel;
+import org.fz.nettyx.channel.bluetooth.BtChannelConfig;
+import org.fz.nettyx.channel.bluetooth.BtDeviceAddress;
+import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
@@ -13,13 +13,13 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
  * @since 2024/5/15 12:21
  */
 @SuppressWarnings("deprecation")
-public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTemplate<BluetoothChannel, BluetoothChannelConfig> {
+public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTemplate<BtChannel, BtChannelConfig> {
 
     protected SingleBtChannelTemplate(String address) {
-        super(new BluetoothDeviceAddress(address));
+        super(new BtDeviceAddress(address));
     }
 
-    protected SingleBtChannelTemplate(BluetoothDeviceAddress address) {
+    protected SingleBtChannelTemplate(BtDeviceAddress address) {
         super(address);
     }
 
