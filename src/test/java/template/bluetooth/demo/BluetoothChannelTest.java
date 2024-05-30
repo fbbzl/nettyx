@@ -14,6 +14,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.fz.nettyx.channel.bluetooth.BtDeviceAddress;
+import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 import org.fz.nettyx.channel.bluetooth.finder.BtFinder;
 import template.DebugChannelListener;
 
@@ -30,8 +32,9 @@ public class BluetoothChannelTest {
         List<RemoteDevice> devices = new BtFinder.DeviceFinder().getDevices();
         RemoteDevice       remoteDevice = devices.get(0);
         Console.log(remoteDevice.getFriendlyName(false));
+
         String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", remoteDevice.getBluetoothAddress());
-        bootstrap.group(workerGroup).channel(OioBluetoothChannel.class).remoteAddress(new BluetoothDeviceAddress(url))
+        bootstrap.group(workerGroup).channel(BtChannel.class).remoteAddress(new BtDeviceAddress(url))
                  .handler(new ChannelInitializer<OioBluetoothChannel>() {
 
                      @Override

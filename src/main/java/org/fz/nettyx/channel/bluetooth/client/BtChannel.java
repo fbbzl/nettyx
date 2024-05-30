@@ -84,8 +84,8 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
             BlueCoveImpl.setConfigProperty(BlueCoveConfigProperties.PROPERTY_CONNECT_TIMEOUT, String.valueOf(config.getConnectTimeoutMillis()));
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
-
-        activate((inputStream = streamConnection.openInputStream()), streamConnection.openOutputStream());
+        inputStream = streamConnection.openInputStream();
+        activate(inputStream, streamConnection.openOutputStream());
     }
 
     @Override
