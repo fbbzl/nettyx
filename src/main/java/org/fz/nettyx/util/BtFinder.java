@@ -69,7 +69,7 @@ public final class BtFinder {
     public static class ServiceFinder {
 
         private static final int               DEFAULT_ATTR_ID = 0x0100;
-        private static final Object            completedTag    = new Object();
+        private final        Object            completedTag    = new Object();
         private final        List<String>      services        = new ArrayList<>(32);
         private              DiscoveryListener listener        = new DiscoveryListenerAdapter() {
             @Override
@@ -113,7 +113,7 @@ public final class BtFinder {
         }
     }
 
-    private abstract static class DiscoveryListenerAdapter implements DiscoveryListener {
+    abstract static class DiscoveryListenerAdapter implements DiscoveryListener {
         @Override
         public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
         }
