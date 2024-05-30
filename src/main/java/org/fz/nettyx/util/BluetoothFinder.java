@@ -5,10 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.bluetooth.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -17,6 +19,8 @@ import java.util.function.Predicate;
  * @version 1.0
  * @since 2024/5/30 11:04
  */
+
+@Slf4j
 @UtilityClass
 public final class BluetoothFinder {
 
@@ -43,24 +47,30 @@ public final class BluetoothFinder {
             this.listener = listener;
         }
 
-        public List<RemoteDevice> getDevices() throws BluetoothStateException {
+        public List<RemoteDevice> getDevices() {
             return getDevices(device -> true);
         }
 
         @SneakyThrows({ InterruptedException.class })
-        public List<RemoteDevice> getDevices(Predicate<RemoteDevice> condition) throws BluetoothStateException {
-            devices.clear();
+        public List<RemoteDevice> getDevices(Predicate<RemoteDevice> condition) {
+            try {
+                devices.clear();
 
-            synchronized (completedTag) {
-                DiscoveryAgent discoveryAgent = LocalDevice.getLocalDevice().getDiscoveryAgent();
-                boolean        started        = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, listener);
+                synchronized (completedTag) {
+                    DiscoveryAgent discoveryAgent = LocalDevice.getLocalDevice().getDiscoveryAgent();
+                    boolean        started        = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, listener);
 
-                if (started) {
-                    completedTag.wait();
-                    discoveryAgent.cancelInquiry(listener);
+                    if (started) {
+                        completedTag.wait();
+                        discoveryAgent.cancelInquiry(listener);
+                    }
                 }
+                devices.removeIf(condition.negate());
+            } catch (BluetoothStateException stateException) {
+                log.error("bluetooth state is illegal, please check");
+                return Collections.emptyList();
             }
-            devices.removeIf(condition.negate());
+
             return devices;
         }
     }
