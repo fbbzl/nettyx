@@ -37,9 +37,6 @@ action                              Contains sufficient functional interfaces to
   ---ChannelReadAction
   ---ChannelWriteAction
 channel                               channel extention
-  ---bluetooth                        bluetooth channel
-    ---client
-      ---BtChannel                     
   ---jsc                              java serial comm channel
     ---JscChannel
     ---JscChannelConfig
@@ -116,9 +113,6 @@ ssl
   ---OpenSslContextFactory           OpenSSL context factory
   ---SslContextFactory               SSL context factory
 template
-  ---bluetooth
-    ---MultiBtChannelTemplate
-    ---SingleBtChannelTemplate
   ---serial
     ---jsc
       ---MultiJscChannelTemplate       Client with multiple channels, using key to retrieve corresponding channels    
