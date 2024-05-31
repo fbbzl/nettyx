@@ -135,6 +135,7 @@ ssl
   ---SslContextFactory               SSL context factory
 util                              nettyx tool class
   ---Bins                            binary util
+  ---BtFinder                        bluetooth util
   ---ChannelStorage                  Storage channel, internally using KV pairs for storage
   ---CommPorts                       commport util
   ---EndianKit                       bytes tool
