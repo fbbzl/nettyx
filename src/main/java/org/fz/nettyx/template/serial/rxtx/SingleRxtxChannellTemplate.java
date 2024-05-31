@@ -1,12 +1,12 @@
-package org.fz.nettyx.endpoint.client.rxtx;
+package org.fz.nettyx.template.serial.rxtx;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannel;
-import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
+import org.fz.nettyx.channel.rxtx.RxtxChannel;
+import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
+import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
  * single channel rxtx client
@@ -17,13 +17,13 @@ import org.fz.nettyx.endpoint.client.rxtx.support.RxtxChannelConfig;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleRxtxChannelClient extends AbstractSingleChannelClient<RxtxChannel, RxtxChannelConfig> {
+public abstract class SingleRxtxChannellTemplate extends AbstractSingleChannelTemplate<RxtxChannel, RxtxChannelConfig> {
 
-    protected SingleRxtxChannelClient(String commAddress) {
+    protected SingleRxtxChannellTemplate(String commAddress) {
         super(new SerialCommChannel.SerialCommAddress(commAddress));
     }
 
-    protected SingleRxtxChannelClient(SerialCommChannel.SerialCommAddress commAddress) {
+    protected SingleRxtxChannellTemplate(SerialCommChannel.SerialCommAddress commAddress) {
         super(commAddress);
     }
 
