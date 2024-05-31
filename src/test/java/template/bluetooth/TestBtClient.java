@@ -57,7 +57,6 @@ public class TestBtClient extends SingleBtChannelTemplate {
                 .whenCancel((l, cf) -> Console.log("cancel"))
                 .whenDone((l, cf) -> Console.log("done"));
 
-
         client.connect().addListener(listener);
 
     }
