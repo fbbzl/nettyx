@@ -37,29 +37,20 @@ action                              包含足够的功能接口来支持nettyx�
   ---ChannelPromiseAction
   ---ChannelReadAction
   ---ChannelWriteAction
+channel                               channel扩展
+  ---jsc                              jsc
+    ---JscChannel                     jsc通道 
+    ---JscChannelConfig               jsc通道配置
+    ---JscChannelOption               jsc通道配置项
+  ---rxtx                             rxtx
+    ---RxtxChannel                    rxtx通道
+    ---RxtxChannelConfig              rxtx通道配置
+    ---RxtxChannelOption              rxtx通道项
 codec                              提供了一些基本的编解码器
   ---DelimiterBasedFrameCodec          基于分隔符编解码器
   ---EscapeCodec                       协议敏感字替换，例如转义
   ---StartEndFlagFrameCodec            Start End Flag 编解码器，用于根据开始和结束标志对消息进行解码
   ---StringMessageCodec                字符串编解码器
-endpoint
-  client
-     jsc
-       support                         jsc对netty的支持实现
-       ---MultiJscChannelClient        多jsc通道客户端 
-       ---SingleJscChannelClient       单jsc通道客户端
-     rxtx
-       support                        重写了RxtxChannel, 提供了异步读取的方法, 读取将不会在阻塞发送
-       ---MultiRxtxChannelClient        多rxtx通道客户端 
-       ---SingleRxtxChannelClient       单rxtx通道客户端
-     tcp
-       ---MultiTcpChannelClient         多tcp通道客户端 
-       ---SingleTcpChannelClient        单tcp通道客户端
-     ---AbstractMultiChannelClient      多通道客户端的抽象父类    
-     ---AbstractSingleChannelClient     单通道客户端的抽象父类
-     ---Client                          客户端顶级抽象父类
-  server
-     ---TcpServer
 envet                                为网络事件提供支持
   ---ChannelEvent                     Channel 事件对象，建议与 Spring 容器事件结合使用
   ---ChannelEvents                    通道事件对象工具
