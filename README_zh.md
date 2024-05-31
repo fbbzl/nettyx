@@ -119,6 +119,22 @@ serializer                             序列化工具
 ssl
   ---OpenSslContextFactory           OpenSSL 上下文工厂
   ---SslContextFactory               SSL 上下文工厂
+template
+  ---serial
+    ---jsc
+      ---MultiJscChannelTemplate        多通道java serial comm客户端模板
+      ---SingleJscChannelTemplate       单通道java serial comm客户端模板
+    ---rxtx
+      ---MultiRxtxChannelTemplate       多通道rxtx客户端模板
+      ---SingleRxtxChannelCTemplate     单通道rxtx客户端模板
+  ---tcp
+    ---client
+      ---MultiTcpChannelTemplate        多通道tcp客户端模板
+      ---SingleTcpChannelCTemplate      单通道tcp客户端模板
+    ---server
+      ---TcpServer                      服务单模板
+  ---AbstractMultiChannelTemplate      抽象多通道模板       
+  ---AbstractSingleChannelTemplate     抽象单通道模板
 util                                 基础工具
   ---Bins                            二进制工具
   ---ChannelStorage                  存储通道，内部使用 KV 对进行存储
