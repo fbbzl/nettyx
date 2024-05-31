@@ -116,14 +116,15 @@ template
   ---serial
     ---jsc
       ---MultiJscChannelTemplate       Client with multiple channels, using key to retrieve corresponding channels    
-      ---SingleJscChannelTemplate       Single Channel Client
+      ---SingleJscChannelTemplate      Single Channel Client
     ---rxtx
-      ---MultiRxtxChannelTemplate        Client with multiple channels, using key to retrieve corresponding channels
-      ---SingleRxtxChannelCTemplate       Single Channel Client
+      ---MultiRxtxChannelTemplate       Client with multiple channels, using key to retrieve corresponding channels
+      ---SingleRxtxChannelCTemplate     Single Channel Client
   ---tcp
     ---client
       ---MultiTcpChannelTemplate        Client with multiple channels, using key to retrieve corresponding channels
-      ---SingleTcpChannelCTemplate        Single Channel Client
+      ---ServerDetector                 remote server detector     
+      ---SingleTcpChannelCTemplate      Single Channel Client
     ---server
       ---TcpServer
   ---AbstractMultiChannelTemplate      Abstract parent class for multi-channel client       

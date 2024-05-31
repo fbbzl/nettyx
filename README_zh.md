@@ -121,6 +121,7 @@ template
   ---tcp
     ---client
       ---MultiTcpChannelTemplate        多通道tcp客户端模板
+      ---ServerDetector                 远程服务探测器
       ---SingleTcpChannelCTemplate      单通道tcp客户端模板
     ---server
       ---TcpServer                      服务单模板
