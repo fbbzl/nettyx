@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client;
+package org.fz.nettyx.template;
 
 import cn.hutool.core.util.TypeUtil;
 import io.netty.channel.*;
@@ -15,12 +15,12 @@ import java.lang.reflect.Type;
 @Slf4j
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class Client<C extends Channel> {
+abstract class Template<C extends Channel> {
 
     private final Class<C>       channelClass;
     private final EventLoopGroup eventLoopGroup;
 
-    protected Client() {
+    protected Template() {
         this.eventLoopGroup = newEventLoopGroup();
         this.channelClass   = this.findChannelClass();
     }
@@ -42,7 +42,7 @@ public abstract class Client<C extends Channel> {
         do {
             supperType  = supperClass.getGenericSuperclass();
             supperClass = supperClass.getSuperclass();
-        } while (supperClass != Client.class);
+        } while (supperClass != Template.class);
 
         Type typeArgument = TypeUtil.getTypeArgument(supperType);
 

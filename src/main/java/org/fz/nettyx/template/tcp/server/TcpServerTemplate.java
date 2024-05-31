@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.server;
+package org.fz.nettyx.template.tcp.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -24,7 +24,7 @@ import java.net.SocketAddress;
 
 @Slf4j
 @Getter
-public abstract class TcpServer {
+public abstract class TcpServerTemplate {
 
     private final EventLoopGroup
             parentEventLoopGroup,
@@ -32,7 +32,7 @@ public abstract class TcpServer {
 
     private final ServerBootstrap serverBootstrap;
 
-    protected TcpServer(int bindPort) {
+    protected TcpServerTemplate(int bindPort) {
         InetSocketAddress bindAddress = new InetSocketAddress(bindPort);
         this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
