@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client.tcp;
+package org.fz.nettyx.template.tcp.client;
 
 
 import io.netty.channel.EventLoopGroup;
@@ -6,7 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.endpoint.client.AbstractSingleChannelClient;
+import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 import java.net.InetSocketAddress;
 
@@ -18,13 +18,13 @@ import java.net.InetSocketAddress;
  * @since 2021 /5/6 15:22
  */
 @Slf4j
-public abstract class SingleTcpChannelClient extends AbstractSingleChannelClient<NioSocketChannel, SocketChannelConfig> {
+public abstract class SingleTcpChannellClientTemplate extends AbstractSingleChannelTemplate<NioSocketChannel, SocketChannelConfig> {
 
-    protected SingleTcpChannelClient(InetSocketAddress address) {
+    protected SingleTcpChannellClientTemplate(InetSocketAddress address) {
         super(address);
     }
 
-    protected SingleTcpChannelClient(String hostname, int port) {
+    protected SingleTcpChannellClientTemplate(String hostname, int port) {
         super(new InetSocketAddress(hostname, port));
     }
 

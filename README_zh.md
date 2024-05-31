@@ -37,29 +37,20 @@ action                              包含足够的功能接口来支持nettyx�
   ---ChannelPromiseAction
   ---ChannelReadAction
   ---ChannelWriteAction
+channel                               channel扩展
+  ---jsc                              jsc
+    ---JscChannel                     jsc通道 
+    ---JscChannelConfig               jsc通道配置
+    ---JscChannelOption               jsc通道配置项
+  ---rxtx                             rxtx
+    ---RxtxChannel                    rxtx通道
+    ---RxtxChannelConfig              rxtx通道配置
+    ---RxtxChannelOption              rxtx通道项
 codec                              提供了一些基本的编解码器
   ---DelimiterBasedFrameCodec          基于分隔符编解码器
   ---EscapeCodec                       协议敏感字替换，例如转义
   ---StartEndFlagFrameCodec            Start End Flag 编解码器，用于根据开始和结束标志对消息进行解码
   ---StringMessageCodec                字符串编解码器
-endpoint
-  client
-     jsc
-       support                         jsc对netty的支持实现
-       ---MultiJscChannelClient        多jsc通道客户端 
-       ---SingleJscChannelClient       单jsc通道客户端
-     rxtx
-       support                        重写了RxtxChannel, 提供了异步读取的方法, 读取将不会在阻塞发送
-       ---MultiRxtxChannelClient        多rxtx通道客户端 
-       ---SingleRxtxChannelClient       单rxtx通道客户端
-     tcp
-       ---MultiTcpChannelClient         多tcp通道客户端 
-       ---SingleTcpChannelClient        单tcp通道客户端
-     ---AbstractMultiChannelClient      多通道客户端的抽象父类    
-     ---AbstractSingleChannelClient     单通道客户端的抽象父类
-     ---Client                          客户端顶级抽象父类
-  server
-     ---TcpServer
 envet                                为网络事件提供支持
   ---ChannelEvent                     Channel 事件对象，建议与 Spring 容器事件结合使用
   ---ChannelEvents                    通道事件对象工具
@@ -119,6 +110,23 @@ serializer                             序列化工具
 ssl
   ---OpenSslContextFactory           OpenSSL 上下文工厂
   ---SslContextFactory               SSL 上下文工厂
+template
+  ---serial
+    ---jsc
+      ---MultiJscChannelTemplate        多通道java serial comm客户端模板
+      ---SingleJscChannelTemplate       单通道java serial comm客户端模板
+    ---rxtx
+      ---MultiRxtxChannelTemplate       多通道rxtx客户端模板
+      ---SingleRxtxChannelCTemplate     单通道rxtx客户端模板
+  ---tcp
+    ---client
+      ---MultiTcpChannelTemplate        多通道tcp客户端模板
+      ---ServerDetector                 远程服务探测器
+      ---SingleTcpChannelCTemplate      单通道tcp客户端模板
+    ---server
+      ---TcpServer                      服务单模板
+  ---AbstractMultiChannelTemplate      抽象多通道模板       
+  ---AbstractSingleChannelTemplate     抽象单通道模板
 util                                 基础工具
   ---Bins                            二进制工具
   ---ChannelStorage                  存储通道，内部使用 KV 对进行存储

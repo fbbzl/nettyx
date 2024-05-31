@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client;
+package org.fz.nettyx.template;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.map.SafeConcurrentHashMap;
@@ -27,16 +27,16 @@ import java.util.Map;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                                Client<C> {
+public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
+                                                                                                  Template<C> {
 
-    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("$multi_channel_key$");
+    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
     private final Map<K, Bootstrap>     bootstrapMap;
 
-    protected <S extends SocketAddress> AbstractMultiChannelClient(Map<K, S> addressMap) {
+    protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap) {
         this.addressMap   = (Map<K, SocketAddress>) addressMap;
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
@@ -76,13 +76,13 @@ public abstract class AbstractMultiChannelClient<K, C extends Channel, F extends
     }
 
     public void closeChannelGracefully(K key) {
-        if (Client.gracefullyCloseable(getChannel(key))) {
+        if (Template.gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close();
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Client.gracefullyCloseable(getChannel(key))) {
+        if (Template.gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close(promise);
         }
     }
