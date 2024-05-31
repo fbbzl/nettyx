@@ -3,7 +3,7 @@ package template.tcp.client;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.template.RemoteDetector;
+import org.fz.nettyx.template.tcp.client.RemoteDetector;
 
 import java.net.InetSocketAddress;
 
