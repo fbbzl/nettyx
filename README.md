@@ -126,8 +126,8 @@ template
       ---SingleTcpChannelCTemplate        Single Channel Client
     ---server
       ---TcpServer
-  ---AbstractMultiChannelTemplate      Abstract parent class for multi-channel clients       
-  ---AbstractSingleChannelTemplate     Abstract parent class for single channel clients
+  ---AbstractMultiChannelTemplate      Abstract parent class for multi-channel client       
+  ---AbstractSingleChannelTemplate     Abstract parent class for single channel client
 util                              nettyx tool class
   ---Bins                            binary util
   ---BtFinder                        bluetooth device search util. Sorry, im not your Lou, Sam
