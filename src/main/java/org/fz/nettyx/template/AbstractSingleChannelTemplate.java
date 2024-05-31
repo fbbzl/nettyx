@@ -1,4 +1,4 @@
-package org.fz.nettyx.endpoint.client;
+package org.fz.nettyx.template;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -19,13 +19,13 @@ import java.net.SocketAddress;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class AbstractSingleChannelClient<C extends Channel, F extends ChannelConfig> extends Client<C> {
+public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     private final SocketAddress remoteAddress;
     private final Bootstrap     bootstrap;
     private       Channel       channel;
 
-    protected AbstractSingleChannelClient(SocketAddress remoteAddress) {
+    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
         this.bootstrap     = newBootstrap(remoteAddress);
     }
