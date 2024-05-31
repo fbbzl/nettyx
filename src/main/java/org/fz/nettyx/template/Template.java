@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 @Slf4j
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class Template<C extends Channel> {
+abstract class Template<C extends Channel> {
 
     private final Class<C>       channelClass;
     private final EventLoopGroup eventLoopGroup;
