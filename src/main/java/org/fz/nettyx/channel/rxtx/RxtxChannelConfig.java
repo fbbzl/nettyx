@@ -47,8 +47,6 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
  * <td>{@link RxtxChannelOption#DATA_BITS}</td><td>{@link #setDataBits(DataBits)}</td>
  * </tr><tr>
  * <td>{@link RxtxChannelOption#PARITY_BIT}</td><td>{@link #setParityBit(ParityBit)}</td>
- * </tr><tr>
- * <td>{@link RxtxChannelOption#WAIT_TIME}</td><td>{@link #setWaitTimeMillis(int)}</td>
  * </tr>
  * </table>
  *
