@@ -131,7 +131,7 @@ template
   ---AbstractSingleChannelTemplate     Abstract parent class for single channel client
 util                              nettyx tool class
   ---Bins                            binary util
-  ---BtFinder                        bluetooth device search util. Sorry, im not your Lou, Sam
+  ---BtFinder                        bluetooth device search util. [Sorry, im not your Lou, Sam]
   ---ChannelStorage                  Storage channel, internally using KV pairs for storage
   ---CommPorts                       commport util
   ---EndianKit                       bytes tool
