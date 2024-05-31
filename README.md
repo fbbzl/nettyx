@@ -36,6 +36,20 @@ action                              Contains sufficient functional interfaces to
   ---ChannelPromiseAction
   ---ChannelReadAction
   ---ChannelWriteAction
+channel                               channel extention
+  ---bluetooth                        bluetooth channel
+    ---client
+      ---BtChannel                     
+  ---jsc                              java serial comm channel
+    ---JscChannel
+    ---JscChannelConfig
+    ---JscChannelOption                       
+  ---rxtx                             java rxtx channel
+    ---RxtxChannel
+    ---RxtxChannelConfig
+    ---RxtxChannelOption
+  EnhancedOioByteStreamChannel         non blocking read Oio
+  SerialCommChannel                    abstract serial comm channel
 codec                               Provided some basic codecs
   ---DelimiterBasedFrameCodec          Based on the delimiter codec
   ---EscapeCodec                       Protocol sensitive word replacement, such as escape
