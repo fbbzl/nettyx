@@ -3,7 +3,7 @@ package template.tcp.client;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.fz.nettyx.template.tcp.client.ServerDetector;
+import org.fz.nettyx.template.RemoteDetector;
 
 import java.net.InetSocketAddress;
 
@@ -12,7 +12,7 @@ import java.net.InetSocketAddress;
  * @version 1.0
  * @since 2024/5/16 18:39
  */
-public class TestServerDetector extends ServerDetector<String> {
+public class TestServerDetector extends RemoteDetector<String> {
     protected TestServerDetector(InetSocketAddress address) {
         super(address);
     }
