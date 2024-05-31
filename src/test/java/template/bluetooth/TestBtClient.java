@@ -6,9 +6,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BtChannel;
-import org.fz.nettyx.channel.bluetooth.finder.BtFinder;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
+import org.fz.nettyx.util.BtFinder;
 import template.TestChannelInitializer;
 
 import javax.bluetooth.RemoteDevice;
