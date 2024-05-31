@@ -55,16 +55,16 @@
         <log4j-slf4j-series.version>2.23.0</log4j-slf4j-series.version>
         <jul-to-slf4j.version>2.0.12</jul-to-slf4j.version>
 
-        <!--util-->
-        <netty-all.version>4.1.107.Final</netty-all.version>
-        <hutool-core.version>5.8.26</hutool-core.version>
+        <!--transport-->
         <jSerialComm.version>2.10.4</jSerialComm.version>
+        <bluecove.version>2.1.1</bluecove.version>
+
+        <!--util-->
+        <netty-all.version>4.1.109.Final</netty-all.version>
+        <hutool-core.version>5.8.26</hutool-core.version>
         <rxtx.version>2.1.7</rxtx.version>
         <dom4j.version>2.1.4</dom4j.version>
         <mvel2.version>2.5.2.Final</mvel2.version>
-
-        <!--test-->
-        <junit.version>4.13.2</junit.version>
     </properties>
 
     <dependencies>
@@ -79,6 +79,12 @@
                     <artifactId>netty-transport-rxtx</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.ultreia</groupId>
+            <artifactId>bluecove</artifactId>
+            <version>${bluecove.version}</version>
         </dependency>
 
         <dependency>
@@ -140,7 +146,6 @@
             <artifactId>mvel2</artifactId>
             <version>${mvel2.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>
