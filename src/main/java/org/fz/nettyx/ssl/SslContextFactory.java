@@ -58,10 +58,8 @@ public class SslContextFactory {
     public static final TwoWay TWOWAY;
 
     static {
-        synchronized (SslContextFactory.class) {
-            ONEWAY = new OneWay("TLS");
-            TWOWAY = new TwoWay("TLS");
-        }
+        ONEWAY = new OneWay("TLS");
+        TWOWAY = new TwoWay("TLS");
     }
 
     /**
