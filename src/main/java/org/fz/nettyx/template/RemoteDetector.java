@@ -1,4 +1,4 @@
-package org.fz.nettyx.template.tcp.client;
+package org.fz.nettyx.template;
 
 
 import io.netty.channel.*;
@@ -6,13 +6,14 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.template.tcp.client.SingleTcpChannellClientTemplate;
 
 import java.net.ConnectException;
-import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * It is used to detect whether it is the target server
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2/17/2023
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 @Setter
 @SuppressWarnings("all")
-public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate {
+public abstract class RemoteDetector<M> {
 
     private static final int DEFAULT_DETECT_RETRY_TIMES   = 3;
     private static final int DEFAULT_WAIT_RESPONSE_MILLIS = 1000;
@@ -30,16 +31,17 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     private int detectRetryTimes   = DEFAULT_DETECT_RETRY_TIMES;
     private int waitResponseMillis = DEFAULT_WAIT_RESPONSE_MILLIS;
 
+    private SingleTcpChannellClientTemplate template;
+
     /**
      * this is the state that if we got the response from server
      */
     private final AtomicBoolean responseState = new AtomicBoolean(false);
 
-    protected ServerDetector(InetSocketAddress address) {
-        super(address);
+    protected RemoteDetector(SingleTcpChannellClientTemplate template) {
+        this.template = template;
     }
 
-    @Override
     protected ChannelInitializer<NioSocketChannel> channelInitializer() {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
@@ -68,20 +70,21 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
         try {
             this.responseState.set(false);
             // 1. do connect sync
-            ChannelFuture connectFuture = this.connect().sync();
+            ChannelFuture connectFuture = template.connect().sync();
 
             // 2. check if connect success
-            if (!connectFuture.isSuccess()) throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
+            if (!connectFuture.isSuccess())
+                throw new ConnectException("can not connect to address [" + template.getRemoteAddress() + "]");
 
             // 3. store channel
-            super.storeChannel(connectFuture.channel());
+            template.storeChannel(connectFuture.channel());
 
             // 4. try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
 
             return this.responseState.get();
         } finally {
-            this.closeChannelGracefully();
+            template.closeChannelGracefully();
         }
     }
 
@@ -95,10 +98,10 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
     public void trySend(M detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
         do {
             try {
-                ChannelPromise promise = super.writeAndFlush(detectMsg).await();
+                ChannelPromise promise = template.writeAndFlush(detectMsg).await();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
-                else                     log.info("failed send detect message [{}]",  detectMsg);
+                else log.info("failed send detect message [{}]", detectMsg);
             } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
