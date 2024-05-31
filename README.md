@@ -55,24 +55,6 @@ codec                               Provided some basic codecs
   ---EscapeCodec                       Protocol sensitive word replacement, such as escape
   ---StartEndFlagFrameCodec            Start End Flag Codec, use to decoe message based on start and end flag
   ---StringMessageCodec                String Codec
-endpoint
-  client
-     jsc
-       support                         rewrite jsc-netty support
-       ---MultiJscChannelClient        Client with multiple channels, using key to retrieve corresponding channels    
-       ---SingleJscChannelClient       Single Channel Client
-     rxtx
-       support                          rewrite rxtx-netty support, using async comm-read
-       ---MultiRxtxChannelClient        Client with multiple channels, using key to retrieve corresponding channels
-       ---SingleRxtxChannelClient       Single Channel Client
-     tcp
-       ---MultiTcpChannelClient         Client with multiple channels, using key to retrieve corresponding channels
-       ---SingleTcpChannelClient        Single Channel Client
-     ---AbstractMultiChannelClient      Abstract parent class for multi-channel clients       
-     ---AbstractSingleChannelClient     Abstract parent class for single channel clients
-     ---Client                          Client top-level abstract parent class
-  server
-     ---TcpServer
 envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
@@ -133,9 +115,28 @@ serializer                             Serialization tool
 ssl
   ---OpenSslContextFactory           OpenSSL context factory
   ---SslContextFactory               SSL context factory
+template
+  ---bluetooth
+    ---MultiBtChannelTemplate
+    ---SingleBtChannelTemplate
+  ---serial
+    ---jsc
+      ---MultiJscChannelTemplate       Client with multiple channels, using key to retrieve corresponding channels    
+      ---SingleJscChannelTemplate       Single Channel Client
+    ---rxtx
+      ---MultiRxtxChannelTemplate        Client with multiple channels, using key to retrieve corresponding channels
+      ---SingleRxtxChannelCTemplate       Single Channel Client
+  ---tcp
+    ---client
+      ---MultiTcpChannelTemplate        Client with multiple channels, using key to retrieve corresponding channels
+      ---SingleTcpChannelCTemplate        Single Channel Client
+    ---server
+      ---TcpServer
+  ---AbstractMultiChannelTemplate      Abstract parent class for multi-channel clients       
+  ---AbstractSingleChannelTemplate     Abstract parent class for single channel clients
 util                              nettyx tool class
   ---Bins                            binary util
-  ---BtFinder                        bluetooth util, certainly not a tool for finding perverts
+  ---BtFinder                        bluetooth device search util. Sorry, im not your Lou, Sam
   ---ChannelStorage                  Storage channel, internally using KV pairs for storage
   ---CommPorts                       commport util
   ---EndianKit                       bytes tool
