@@ -9,6 +9,8 @@ package org.fz.nettyx.ssl;
 
 public class OpenSslManagement {
 
+    // 生成根证书
+
     // 生成客户端证书
 
 
