@@ -3,7 +3,6 @@ package org.fz.nettyx.template;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
-import io.netty.util.concurrent.Future;
 import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -35,9 +34,9 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
-        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
-        // add channel state listener
-        channelFuture.addListener(ChannelState::doIncrease);
+        channelFuture.addListeners(
+                new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)),
+                (ChannelFutureListener) ChannelState::doIncrease);
         return channelFuture;
     }
 
@@ -141,9 +140,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
          */
         private int connectCancelTimes;
 
-        static <F extends Future<? super Void>> void doIncrease(F future) {
+        static void doIncrease(ChannelFuture cf) {
             ChannelState state = channelState.get();
-            ChannelFuture cf = (ChannelFuture) future;
 
             if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
             else                  state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
