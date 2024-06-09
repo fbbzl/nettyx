@@ -6,6 +6,7 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.SocketAddress;
@@ -18,12 +19,13 @@ import java.net.SocketAddress;
 
 @Slf4j
 @Getter
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    private final SocketAddress remoteAddress;
-    private final Bootstrap     bootstrap;
-    private       Channel       channel;
+    protected static final ThreadLocal<ChannelState> channelState = ThreadLocal.withInitial(() -> true);
+    private final          SocketAddress             remoteAddress;
+    private final          Bootstrap                 bootstrap;
+    private                Channel                   channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
@@ -40,7 +42,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         storeChannel(cf.channel());
     }
 
-    @SneakyThrows({InterruptedException.class})
+    @SneakyThrows({ InterruptedException.class })
     protected void storeChannel(Channel channel) {
         if (isActive(this.channel)) {
             this.channel.close().sync();
