@@ -6,8 +6,8 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
+import org.fz.nettyx.exception.Throws;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.util.Throws;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
