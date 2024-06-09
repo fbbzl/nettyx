@@ -1,4 +1,4 @@
-package org.fz.nettyx.util;
+package org.fz.nettyx.channel;
 
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.channel.Channel;

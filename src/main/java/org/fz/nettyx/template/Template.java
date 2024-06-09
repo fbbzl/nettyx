@@ -98,15 +98,4 @@ abstract class Template<C extends Channel> {
         getEventLoopGroup().shutdownGracefully();
     }
 
-    /**
-     * to save connect state history
-     */
-    protected static class ConnectState {
-        private int connectTimes;
-        private int connectSuccessTimes;
-        private int connectFailureTimes;
-        private int connectDoneTimes;
-        private int connectCancelTimes;
-    }
-
 }

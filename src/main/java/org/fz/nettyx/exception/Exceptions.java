@@ -1,4 +1,4 @@
-package org.fz.nettyx.util;
+package org.fz.nettyx.exception;
 
 import java.util.Optional;
 import java.util.function.Supplier;

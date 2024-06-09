@@ -1,4 +1,4 @@
-package org.fz.nettyx.util;
+package org.fz.nettyx.exception;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
