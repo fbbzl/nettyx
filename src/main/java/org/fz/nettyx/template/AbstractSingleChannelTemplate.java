@@ -22,7 +22,7 @@ import java.net.SocketAddress;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    protected static final ThreadLocal<ConnectionState> channelState = ThreadLocal.withInitial(ConnectionState::new);
+    protected static final ThreadLocal<ConnectionState> connectState = ThreadLocal.withInitial(ConnectionState::new);
     private final          SocketAddress                remoteAddress;
     private final          Bootstrap                    bootstrap;
     private                Channel                      channel;
@@ -36,7 +36,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListeners(
                 new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)),
-                (ChannelFutureListener) ConnectionState::doIncrease
+                (ChannelFutureListener) (cf -> ConnectionState.doIncrease(connectState.get(), cf))
                                   );
 
         return channelFuture;
@@ -142,8 +142,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
          */
         private long connectCancelTimes;
 
-       public static void doIncrease(ChannelFuture cf) {
-            ConnectionState state = channelState.get();
+       public static void doIncrease(ConnectionState state, ChannelFuture cf) {
             state.setConnectTimes(state.getConnectTimes() + 1);
 
             if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
@@ -152,8 +151,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
             if (cf.isCancelled()) state.setConnectCancelTimes(state.getConnectCancelTimes() + 1);
         }
 
-        public static void reset() {
-            ConnectionState state = channelState.get();
+        public static void reset(ConnectionState state) {
             state.setConnectTimes(0);
             state.setConnectSuccessTimes(0);
             state.setConnectFailureTimes(0);
