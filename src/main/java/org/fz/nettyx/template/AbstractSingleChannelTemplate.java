@@ -144,6 +144,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
         static void doIncrease(ChannelFuture cf) {
             ConnectionState state = channelState.get();
+            state.setConnectTimes(state.getConnectTimes() + 1);
 
             if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
             if(!cf.isSuccess())   state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
