@@ -22,8 +22,8 @@ import java.net.SocketAddress;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    protected static final ThreadLocal<ChannelState> channelState = ThreadLocal.withInitial(ChannelState::new);
-    private final          SocketAddress             remoteAddress;
+    protected static final ThreadLocal<ConnectionState> channelState = ThreadLocal.withInitial(ConnectionState::new);
+    private final          SocketAddress                remoteAddress;
     private final          Bootstrap                 bootstrap;
     private                Channel                   channel;
 
@@ -36,7 +36,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListeners(
                 new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)),
-                (ChannelFutureListener) ChannelState::doIncrease
+                (ChannelFutureListener) ConnectionState::doIncrease
                                   );
 
         return channelFuture;
@@ -119,22 +119,22 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
      * @since 2021 -12-29 18:46
      */
     @Data
-    public static class ChannelState {
+    public static class ConnectionState {
 
         /**
-         * total number of connections
+         * total number of connection times
          */
         private int connectTimes;
         /**
-         * the number of successful connections
+         * the number of successful connection times
          */
         private int connectSuccessTimes;
         /**
-         * the number of connection failures
+         * the number of connection failure times
          */
         private int connectFailureTimes;
         /**
-         * the number of times the connection was completed
+         * the number of times the connection was done
          */
         private int connectDoneTimes;
         /**
@@ -143,12 +143,21 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         private int connectCancelTimes;
 
         static void doIncrease(ChannelFuture cf) {
-            ChannelState state = channelState.get();
+            ConnectionState state = channelState.get();
 
             if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
             if(!cf.isSuccess())   state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
             if (cf.isDone())      state.setConnectDoneTimes(state.getConnectDoneTimes() + 1);
             if (cf.isCancelled()) state.setConnectCancelTimes(state.getConnectCancelTimes() + 1);
+        }
+
+        static void reset() {
+            ConnectionState state = channelState.get();
+            state.setConnectTimes(0);
+            state.setConnectSuccessTimes(0);
+            state.setConnectFailureTimes(0);
+            state.setConnectDoneTimes(0);
+            state.setConnectCancelTimes(0);
         }
 
     }
