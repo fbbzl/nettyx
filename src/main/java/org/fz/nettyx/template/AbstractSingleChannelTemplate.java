@@ -145,7 +145,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
             ChannelState state = channelState.get();
 
             if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
-            else                  state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
+            else
+            if(!cf.isSuccess())   state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
 
             if (cf.isDone())      state.setConnectDoneTimes(state.getConnectDoneTimes() + 1);
             if (cf.isCancelled()) state.setConnectCancelTimes(state.getConnectCancelTimes() + 1);
