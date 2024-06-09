@@ -32,7 +32,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
             whenDone;
 
     @Override
-    public void operationComplete(ChannelFuture channelFuture) throws Exception {
+    public final void operationComplete(ChannelFuture channelFuture) throws Exception {
         if (channelFuture.isSuccess()) invokeAction(whenSuccess, this, channelFuture);
         else if (!channelFuture.isSuccess()) invokeAction(whenFailure, this, channelFuture);
 
