@@ -36,7 +36,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListeners(
                 new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)),
-                (ChannelFutureListener) ChannelState::doIncrease);
+                (ChannelFutureListener) ChannelState::doIncrease
+                                  );
 
         return channelFuture;
     }
