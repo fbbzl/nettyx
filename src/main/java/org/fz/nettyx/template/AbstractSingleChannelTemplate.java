@@ -109,11 +109,12 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
     private void addStateListener(ChannelFuture channelFuture) {
         ActionChannelFutureListener stateListener = new ActionChannelFutureListener();
         stateListener
-                .whenSuccess((l, cf) -> this.storeChannel(cf))
+                .whenSuccess((l, cf) -> channelState.get().)
                 .whenFailure((l, cf) -> {})
                 .whenDone((l, cf) -> {})
                 .whenCancel((l, cf) -> {});
 
+        // TODO close release
         channelFuture.addListener(stateListener);
     }
 
@@ -127,7 +128,6 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
      * @author fengbinbin
      * @since 2021 -12-29 18:46
      */
-
     @Data
     public static class ChannelState {
 
@@ -151,5 +151,16 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
          * the number of times the connection was canceled
          */
         private int connectCancelTimes;
+
+        static void increase(ChannelFuture channelFuture) {
+            ChannelState currentState = channelState.get();
+
+            if (channelFuture.isSuccess())   currentState.setConnectSuccessTimes(currentState.getConnectSuccessTimes() + 1);
+            else                             currentState.setConnectFailureTimes(currentState.getConnectFailureTimes() + 1);
+
+            if (channelFuture.isDone())      currentState.setConnectDoneTimes(currentState.getConnectDoneTimes() + 1);
+            if (channelFuture.isCancelled()) currentState.setConnectCancelTimes(currentState.getConnectCancelTimes() + 1);
+        }
+
     }
 }
