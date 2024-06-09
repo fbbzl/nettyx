@@ -2,9 +2,9 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
-import org.fz.nettyx.exception.Throws;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.util.Throws;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

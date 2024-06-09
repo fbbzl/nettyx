@@ -3,12 +3,12 @@ package org.fz.nettyx.serializer.struct.annotation;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.exception.Throws;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructUtils;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

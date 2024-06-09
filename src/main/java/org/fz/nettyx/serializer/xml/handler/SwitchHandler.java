@@ -2,9 +2,9 @@ package org.fz.nettyx.serializer.xml.handler;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.exception.Throws;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model.Prop;
+import org.fz.nettyx.util.Throws;
 
 import java.util.ArrayList;
 import java.util.BitSet;

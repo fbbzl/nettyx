@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
-import org.fz.nettyx.exception.Throws;
 import org.fz.nettyx.util.HexKit;
+import org.fz.nettyx.util.Throws;
 
 import java.util.Arrays;
 import java.util.Collection;

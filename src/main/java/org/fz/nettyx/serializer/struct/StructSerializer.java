@@ -10,7 +10,6 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.SerializeHandlerException;
-import org.fz.nettyx.exception.Throws;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
@@ -18,6 +17,7 @@ import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.util.Throws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
