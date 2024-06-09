@@ -3,6 +3,7 @@ package org.fz.nettyx.template;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.Future;
 import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -36,7 +37,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
         // add channel state listener
-        addStateListener(channelFuture);
+        channelFuture.addListener(ChannelState::doIncrease);
         return channelFuture;
     }
 
@@ -106,18 +107,6 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
                 .handler(channelInitializer());
     }
 
-    private void addStateListener(ChannelFuture channelFuture) {
-        ActionChannelFutureListener stateListener = new ActionChannelFutureListener();
-        stateListener
-                .whenSuccess((l, cf) -> channelState.get().)
-                .whenFailure((l, cf) -> {})
-                .whenDone((l, cf) -> {})
-                .whenCancel((l, cf) -> {});
-
-        // TODO close release
-        channelFuture.addListener(stateListener);
-    }
-
     protected void doChannelConfig(F channelConfig) {
         // default is do nothing
     }
@@ -152,14 +141,15 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
          */
         private int connectCancelTimes;
 
-        static void increase(ChannelFuture channelFuture) {
-            ChannelState currentState = channelState.get();
+        static <F extends Future<? super Void>> void doIncrease(F future) {
+            ChannelState state = channelState.get();
+            ChannelFuture cf = (ChannelFuture) future;
 
-            if (channelFuture.isSuccess())   currentState.setConnectSuccessTimes(currentState.getConnectSuccessTimes() + 1);
-            else                             currentState.setConnectFailureTimes(currentState.getConnectFailureTimes() + 1);
+            if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
+            else                  state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
 
-            if (channelFuture.isDone())      currentState.setConnectDoneTimes(currentState.getConnectDoneTimes() + 1);
-            if (channelFuture.isCancelled()) currentState.setConnectCancelTimes(currentState.getConnectCancelTimes() + 1);
+            if (cf.isDone())      state.setConnectDoneTimes(state.getConnectDoneTimes() + 1);
+            if (cf.isCancelled()) state.setConnectCancelTimes(state.getConnectCancelTimes() + 1);
         }
 
     }
