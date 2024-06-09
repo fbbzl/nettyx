@@ -3,10 +3,10 @@ package org.fz.nettyx.template;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.SocketAddress;
@@ -22,7 +22,7 @@ import java.net.SocketAddress;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    protected static final ThreadLocal<ChannelState> channelState = ThreadLocal.withInitial(() -> true);
+    protected static final ThreadLocal<ChannelState> channelState = ThreadLocal.withInitial(ChannelState::new);
     private final          SocketAddress             remoteAddress;
     private final          Bootstrap                 bootstrap;
     private                Channel                   channel;
@@ -35,6 +35,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
+        // add channel state listener
+        addStateListener(channelFuture);
         return channelFuture;
     }
 
@@ -42,7 +44,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         storeChannel(cf.channel());
     }
 
-    @SneakyThrows({ InterruptedException.class })
+    @SneakyThrows(InterruptedException.class)
     protected void storeChannel(Channel channel) {
         if (isActive(this.channel)) {
             this.channel.close().sync();
@@ -104,8 +106,50 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
                 .handler(channelInitializer());
     }
 
+    private void addStateListener(ChannelFuture channelFuture) {
+        ActionChannelFutureListener stateListener = new ActionChannelFutureListener();
+        stateListener
+                .whenSuccess((l, cf) -> this.storeChannel(cf))
+                .whenFailure((l, cf) -> {})
+                .whenDone((l, cf) -> {})
+                .whenCancel((l, cf) -> {});
+
+        channelFuture.addListener(stateListener);
+    }
+
     protected void doChannelConfig(F channelConfig) {
         // default is do nothing
     }
 
+    /**
+     * to save connect state history
+     *
+     * @author fengbinbin
+     * @since 2021 -12-29 18:46
+     */
+
+    @Data
+    public static class ChannelState {
+
+        /**
+         * total number of connections
+         */
+        private int connectTimes;
+        /**
+         * the number of successful connections
+         */
+        private int connectSuccessTimes;
+        /**
+         * the number of connection failures
+         */
+        private int connectFailureTimes;
+        /**
+         * the number of times the connection was completed
+         */
+        private int connectDoneTimes;
+        /**
+         * the number of times the connection was canceled
+         */
+        private int connectCancelTimes;
+    }
 }
