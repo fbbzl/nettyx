@@ -124,23 +124,23 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         /**
          * total number of connection times
          */
-        private int connectTimes;
+        private long connectTimes;
         /**
          * the number of successful connection times
          */
-        private int connectSuccessTimes;
+        private long connectSuccessTimes;
         /**
          * the number of connection failure times
          */
-        private int connectFailureTimes;
+        private long connectFailureTimes;
         /**
          * the number of times the connection was done
          */
-        private int connectDoneTimes;
+        private long connectDoneTimes;
         /**
          * the number of times the connection was canceled
          */
-        private int connectCancelTimes;
+        private long connectCancelTimes;
 
         static void doIncrease(ChannelFuture cf) {
             ConnectionState state = channelState.get();
