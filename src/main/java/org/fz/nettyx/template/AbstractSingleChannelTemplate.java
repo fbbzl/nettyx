@@ -24,8 +24,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     protected static final ThreadLocal<ConnectionState> channelState = ThreadLocal.withInitial(ConnectionState::new);
     private final          SocketAddress                remoteAddress;
-    private final          Bootstrap                 bootstrap;
-    private                Channel                   channel;
+    private final          Bootstrap                    bootstrap;
+    private                Channel                      channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
@@ -142,7 +142,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
          */
         private long connectCancelTimes;
 
-        static void doIncrease(ChannelFuture cf) {
+       public static void doIncrease(ChannelFuture cf) {
             ConnectionState state = channelState.get();
             state.setConnectTimes(state.getConnectTimes() + 1);
 
@@ -152,7 +152,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
             if (cf.isCancelled()) state.setConnectCancelTimes(state.getConnectCancelTimes() + 1);
         }
 
-        static void reset() {
+        public static void reset() {
             ConnectionState state = channelState.get();
             state.setConnectTimes(0);
             state.setConnectSuccessTimes(0);
