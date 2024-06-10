@@ -65,7 +65,7 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
                     JscChannelConfig config = (JscChannelConfig) cf.channel().config();
                     Console.log(config.getBaudRate());
                 })
-                .whenCancel((l, cf) -> Console.log("cancel"))
+                .whenCancelled((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testSingleJsc::connect, 2, SECONDS))
                 .whenDone((l, cf) -> Console.log("done"));
 

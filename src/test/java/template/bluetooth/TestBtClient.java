@@ -54,7 +54,7 @@ public class TestBtClient extends SingleBtChannelTemplate {
                         client.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
                 })
-                .whenCancel((l, cf) -> Console.log("cancel"))
+                .whenCancelled((l, cf) -> Console.log("cancel"))
                 .whenDone((l, cf) -> Console.log("done"));
 
         client.connect().addListener(listener);
