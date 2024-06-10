@@ -136,6 +136,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
                 .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
+                .attr(MULTI_CHANNEL_STATE_KEY, new ChannelState())
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
