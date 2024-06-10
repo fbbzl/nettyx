@@ -17,7 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
 
@@ -66,7 +65,7 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
                     Console.log(config.getBaudRate());
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))
-                .whenFailure(redo(testSingleJsc::connect, 2, SECONDS))
+                .whenFailure(redo(testSingleJsc::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> System.err.println("最后次失败后执行")))
                 .whenDone((l, cf) -> Console.log("done"));
 
         testSingleJsc.connect().addListener(listener);
