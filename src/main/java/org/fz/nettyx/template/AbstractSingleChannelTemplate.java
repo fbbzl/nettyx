@@ -98,7 +98,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         }
     }
 
-    Bootstrap newBootstrap(SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
