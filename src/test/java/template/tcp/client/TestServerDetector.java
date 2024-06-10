@@ -34,6 +34,8 @@ public class TestServerDetector extends RemoteDetector<String> {
 
     public static void main(String[] args) throws Exception {
         TestServerDetector testDetector = new TestServerDetector(new InetSocketAddress(9888));
+        testDetector.setDetectRetryTimes(2);
+        testDetector.setWaitResponseMillis(5000);
         Console.log(testDetector.doDetect());
     }
 
