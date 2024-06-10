@@ -58,7 +58,10 @@ public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
                     Console.log(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))
-                .whenFailure(redo(cf -> testMultiTcp.connect(channelKey(cf)), 2, SECONDS, 2))
+                .whenFailure(redo(cf -> testMultiTcp.connect(channelKey(cf)), 2, SECONDS, 2, (l, cf) -> {
+                    String string = channelKey(cf).toString();
+                    System.err.println(string);
+                }))
                 .whenDone((l, cf) -> Console.log("done"));
 
         testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));
