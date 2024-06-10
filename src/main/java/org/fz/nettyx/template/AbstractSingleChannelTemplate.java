@@ -34,9 +34,13 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
+        ConnectionState connectionState = connectState.get();
+        System.err.println("connect: "+Thread.currentThread().getId());
         channelFuture.addListeners(
                 new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)),
-                (ChannelFutureListener) (cf -> ConnectionState.doIncrease(connectState.get(), cf))
+                (ChannelFutureListener) (cf -> {
+                    ConnectionState.doIncrease(connectionState, cf);
+                })
                                   );
 
         return channelFuture;

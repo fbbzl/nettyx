@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.fz.nettyx.listener.ActionChannelFutureListener.redo;
+
 
 @Slf4j
 public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
@@ -52,7 +52,6 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
                     return testClient.connect();
                 }, 2, TimeUnit.MILLISECONDS))
                 .whenDone((ls, cf) -> {
-                    System.err.println(testClient.getConnectState());
                     Console.log("done");
                 });
 
