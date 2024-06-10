@@ -36,10 +36,10 @@ public class ChannelState {
     public void increase(ChannelFuture cf) {
         this.connectTimes++;
 
-        if (cf.isSuccess())   connectSuccessTimes++;
-        if (!cf.isSuccess())  connectFailureTimes++;
-        if (cf.isDone())      connectDoneTimes++;
-        if (cf.isCancelled()) connectCancelledTimes++;
+        if (cf.isSuccess())     connectSuccessTimes++;
+        if (cf.cause() != null) connectFailureTimes++;
+        if (cf.isDone())        connectDoneTimes++;
+        if (cf.isCancelled())   connectCancelledTimes++;
     }
 
     public void reset() {
