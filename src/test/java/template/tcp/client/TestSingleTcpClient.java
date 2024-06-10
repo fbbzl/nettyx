@@ -43,7 +43,7 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
                         Arrays.fill(msg, (byte) 1);
                         testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
-
+                    System.err.println(testClient);
                     Console.log(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancel((ls, cf) -> Console.log("cancel"))
@@ -51,7 +51,10 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
                     log.error("redo");
                     return testClient.connect();
                 }, 2, TimeUnit.MILLISECONDS))
-                .whenDone((ls, cf) -> Console.log("done"));
+                .whenDone((ls, cf) -> {
+                    System.err.println(testClient.getConnectState());
+                    Console.log("done");
+                });
 
         testClient.connect().addListener(listener);
     }
