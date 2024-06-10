@@ -99,7 +99,7 @@ public abstract class RemoteDetector<M> extends SingleTcpChannellClientTemplate 
                 ChannelPromise promise = super.writeAndFlush(detectMsg).await();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
-                else                     log.info("failed send detect message [{}]",  detectMsg);
+                else                     log.info("something wrong when sending detect message [{}]",  detectMsg);
             } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
