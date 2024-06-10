@@ -29,15 +29,11 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
             whenDone;
 
     @Override
-    public final void operationComplete(ChannelFuture channelFuture) throws Exception {
-        if (channelFuture.isSuccess())     invokeAction(whenSuccess, this, channelFuture);
-        if (channelFuture.cause() != null) {
-            // TODO
-            System.err.println("失败后执行");
-            invokeAction(whenFailure, this, channelFuture);
-        }
-        if (channelFuture.isDone())        invokeAction(whenDone, this, channelFuture);
-        if (channelFuture.isCancelled())   invokeAction(whenCancel, this, channelFuture);
+    public final void operationComplete(ChannelFuture cf) throws Exception {
+        if (cf.isSuccess())     invokeAction(whenSuccess, this, cf);
+        if (cf.cause() != null) invokeAction(whenFailure, this, cf);
+        if (cf.isDone())        invokeAction(whenDone,    this, cf);
+        if (cf.isCancelled())   invokeAction(whenCancel,  this, cf);
     }
 
     public static void invokeAction(ListenerAction action, ActionChannelFutureListener listener, ChannelFuture cf) throws Exception {
