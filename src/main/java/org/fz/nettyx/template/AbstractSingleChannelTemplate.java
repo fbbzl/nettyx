@@ -2,10 +2,12 @@ package org.fz.nettyx.template;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.SocketAddress;
@@ -21,9 +23,10 @@ import java.net.SocketAddress;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    private final          SocketAddress                            remoteAddress;
-    private final          Bootstrap                    bootstrap;
-    private                Channel                      channel;
+    public static final AttributeKey<ChannelState> CHANNEL_STATE_KEY = AttributeKey.valueOf("__$channel_state_key$");
+    private final       SocketAddress              remoteAddress;
+    private final       Bootstrap                  bootstrap;
+    private             Channel                    channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
@@ -100,6 +103,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
                     doChannelConfig((F) chl.config());
                     return chl;
                 })
+                .attr(CHANNEL_STATE_KEY, new ChannelState())
                 .handler(channelInitializer());
     }
 

@@ -48,10 +48,7 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
                     Console.log(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancel((ls, cf) -> Console.log("cancel"))
-                .whenFailure(redo(() -> {
-                    log.error("redo");
-                    return testClient.connect();
-                }, 2, TimeUnit.MILLISECONDS))
+                .whenFailure(redo(testClient::connect, 2, TimeUnit.MILLISECONDS, 2))
                 .whenDone((ls, cf) -> {
                     Console.log("done");
                 });
