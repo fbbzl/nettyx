@@ -44,6 +44,7 @@ public class ChannelState {
 
     public void reset() {
         this.connectTimes          = 0;
+
         this.connectSuccessTimes   = 0;
         this.connectFailureTimes   = 0;
         this.connectDoneTimes      = 0;
