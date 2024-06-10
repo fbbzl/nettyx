@@ -19,14 +19,14 @@ public interface ListenerAction {
     /**
      * will re-execute the action after assigned delay and timeUnit
      */
-    public static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
+    static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
         return (ls, cf) -> {
             ThreadUtil.safeSleep(unit.toMillis(delay));
             did.get().addListener(ls);
         };
     }
 
-    public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
+    static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
         return (ls, cf) -> {
             ThreadUtil.safeSleep(unit.toMillis(delay));
             did.apply(cf).addListener(ls);
