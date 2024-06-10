@@ -32,9 +32,8 @@ public interface ListenerAction {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                if (state.getConnectTimes() > maxRedoTimes) {
-                    return;
-                } else state.increase(cf);
+                if (state.getConnectTimes() > maxRedoTimes) return;
+                else state.increase(cf);
             }
             channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
         };
@@ -43,11 +42,10 @@ public interface ListenerAction {
     static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
-            if (channel.hasAttr(counter)) {
-                Counter counter1 = channel.attr(counter).get();
-                if (counter1.getCount() > maxRedoTimes) {
-                    return;
-                }
+            if (channel.hasAttr(CHANNEL_STATE_KEY)) {
+                ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
+                if (state.getConnectTimes() > maxRedoTimes) return;
+                else state.increase(cf);
             }
             channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
         };
