@@ -1,6 +1,5 @@
 package org.fz.nettyx.action;
 
-import cn.hutool.core.thread.ThreadUtil;
 import io.netty.channel.ChannelFuture;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
@@ -16,20 +15,11 @@ import java.util.function.UnaryOperator;
 public interface ListenerAction {
     void act(ActionChannelFutureListener listener, ChannelFuture channelFuture) throws Exception;
 
-    /**
-     * will re-execute the action after assigned delay and timeUnit
-     */
     static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> {
-            ThreadUtil.safeSleep(unit.toMillis(delay));
-            did.get().addListener(ls);
-        };
+        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
     }
 
     static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> {
-            ThreadUtil.safeSleep(unit.toMillis(delay));
-            did.apply(cf).addListener(ls);
-        };
+        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
     }
 }
