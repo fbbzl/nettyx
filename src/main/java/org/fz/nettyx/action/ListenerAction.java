@@ -6,6 +6,7 @@ import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -29,12 +30,18 @@ public interface ListenerAction {
     }
 
     static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes) {
+        return redo(did, delay, unit, maxRedoTimes, null);
+    }
+
+    static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes, BiConsumer<ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                if (state.getConnectTimes() > maxRedoTimes) return;
-                else state.increase(cf);
+                if (state.getConnectTimes() > maxRedoTimes) {
+                    if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
+                    else return;
+                } else state.increase(cf);
             }
             channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
         };
