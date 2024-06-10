@@ -76,13 +76,13 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     }
 
     public void closeChannelGracefully(K key) {
-        if (Template.gracefullyCloseable(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close();
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Template.gracefullyCloseable(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close(promise);
         }
     }
