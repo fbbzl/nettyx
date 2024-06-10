@@ -45,9 +45,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
     }
 
     protected void storeChannel(Channel channel) {
-        if (isActive(this.channel)) {
-            closeChannelDirectly(true);
-        }
+        if (isActive(this.channel)) closeChannelDirectly(true);
+
         this.channel = channel;
     }
 
