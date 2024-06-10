@@ -44,7 +44,7 @@ public interface ListenerAction {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
                 if (state.getConnectTimes() > maxRedoTimes) {
                     if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
-                    else return;
+                    return;
                 } else state.increase(cf);
             }
             channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
@@ -67,7 +67,7 @@ public interface ListenerAction {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
                 if (state.getConnectTimes() > maxRedoTimes) {
                     if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
-                    else return;
+                    return;
                 } else state.increase(cf);
             }
             channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
