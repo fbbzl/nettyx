@@ -33,7 +33,11 @@ public interface ListenerAction {
         return redo(did, delay, unit, maxRedoTimes, null);
     }
 
-    static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes, BiConsumer<ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
+    static ListenerAction redo(
+            Supplier<ChannelFuture> did,
+            long delay, TimeUnit unit,
+            int maxRedoTimes,
+            BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
@@ -48,12 +52,23 @@ public interface ListenerAction {
     }
 
     static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes) {
+        return redo(did, delay, unit, maxRedoTimes, null);
+    }
+
+    static ListenerAction redo(
+            UnaryOperator<ChannelFuture> did,
+            long delay,
+            TimeUnit unit,
+            int maxRedoTimes,
+            BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                if (state.getConnectTimes() > maxRedoTimes) return;
-                else state.increase(cf);
+                if (state.getConnectTimes() > maxRedoTimes) {
+                    if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
+                    else return;
+                } else state.increase(cf);
             }
             channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
         };
