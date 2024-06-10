@@ -17,6 +17,7 @@ import static org.fz.nettyx.template.AbstractSingleChannelTemplate.CHANNEL_STATE
  * @since 2024/6/10 12:43
  */
 public interface ListenerAction {
+
     void act(ActionChannelFutureListener listener, ChannelFuture channelFuture) throws Exception;
 
     static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
