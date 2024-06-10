@@ -31,7 +31,7 @@ import java.util.Map;
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                   Template<C> {
 
-    public static final AttributeKey<ChannelState> MULTI_CHANNEL_STATE_KEY = AttributeKey.valueOf("__$single_channel_state_key$");
+    public static final AttributeKey<ChannelState> MULTI_CHANNEL_STATE_KEY = AttributeKey.valueOf("__$multi_channel_state_key$");
     protected static final AttributeKey<?>         MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
