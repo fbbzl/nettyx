@@ -2,6 +2,7 @@ package org.fz.nettyx.action;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.exception.StopRedoException;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -38,14 +39,13 @@ public interface ListenerAction {
             Supplier<ChannelFuture> did,
             long delay, TimeUnit unit,
             int maxRedoTimes,
-            BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
+            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
             try {
-                checkState(cf, maxRedoTimes, afterMaxRedoTimes);
+                checkState(ls, cf, maxRedoTimes, afterMaxRedoTimes);
             } catch (StopRedoException stopRedo) {
                 return;
             }
-
             cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
         };
     }
@@ -59,20 +59,22 @@ public interface ListenerAction {
             long delay,
             TimeUnit unit,
             int maxRedoTimes,
-            BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
+            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
             try {
-                checkState(cf, maxRedoTimes, afterMaxRedoTimes);
+                checkState(ls, cf, maxRedoTimes, afterMaxRedoTimes);
             } catch (StopRedoException stopRedo) {
                 return;
             }
-
             cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
         };
     }
 
-    static void checkState(ChannelFuture cf, int maxRedoTimes,
-                           BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
+    static void checkState(
+            ChannelFutureListener ls,
+            ChannelFuture cf,
+            int maxRedoTimes,
+            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
             throws StopRedoException {
         Channel chl = cf.channel();
         if (chl.hasAttr(CHANNEL_STATE_KEY)) {
