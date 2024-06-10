@@ -54,6 +54,10 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         this.channel = channel;
     }
 
+    public ConnectionState getConnectState() {
+        return connectState.get();
+    }
+
     public void closeChannelGracefully() {
         if (gracefullyCloseable(channel)) {
             this.getChannel().close();
