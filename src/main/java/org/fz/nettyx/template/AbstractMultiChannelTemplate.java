@@ -148,8 +148,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         return channelKey(ctx.channel());
     }
 
-    public static <T> T channelKey(ChannelFuture channelFuture) {
-        return channelKey(channelFuture.channel());
+    public static <T> T channelKey(ChannelFuture cf) {
+        return channelKey(cf.channel());
     }
 
     public static <T> T channelKey(Channel channel) {

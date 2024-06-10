@@ -19,7 +19,7 @@ import static org.fz.nettyx.template.AbstractSingleChannelTemplate.CHANNEL_STATE
  */
 public interface ListenerAction {
 
-    void act(ActionChannelFutureListener listener, ChannelFuture channelFuture) throws Exception;
+    void act(ActionChannelFutureListener listener, ChannelFuture cf) throws Exception;
 
     static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
         return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
