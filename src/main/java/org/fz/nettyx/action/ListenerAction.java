@@ -3,6 +3,7 @@ package org.fz.nettyx.action;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.fz.nettyx.channel.ChannelState;
+import org.fz.nettyx.exception.StopRedoException;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.util.concurrent.TimeUnit;
@@ -39,16 +40,13 @@ public interface ListenerAction {
             int maxRedoTimes,
             BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
-            Channel channel = cf.channel();
-            if (channel.hasAttr(CHANNEL_STATE_KEY)) {
-                ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                // the first connect-action is also the redo type
-                if (state.getConnectTimes() + 1 > maxRedoTimes - 1) {
-                    if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
-                    return;
-                } else state.increase(cf);
+            try {
+                checkState(cf, maxRedoTimes, afterMaxRedoTimes);
+            } catch (StopRedoException stopRedo) {
+                return;
             }
-            channel.eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
+
+            cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
         };
     }
 
@@ -63,16 +61,28 @@ public interface ListenerAction {
             int maxRedoTimes,
             BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
         return (ls, cf) -> {
-            Channel channel = cf.channel();
-            if (channel.hasAttr(CHANNEL_STATE_KEY)) {
-                ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                // the first connect-action is also the redo type
-                if (state.getConnectTimes() + 1 > maxRedoTimes - 1) {
-                    if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
-                    return;
-                } else state.increase(cf);
+            try {
+                checkState(cf, maxRedoTimes, afterMaxRedoTimes);
+            } catch (StopRedoException stopRedo) {
+                return;
             }
-            channel.eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
+
+            cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
         };
     }
+
+    static void checkState(ChannelFuture cf, int maxRedoTimes,
+                           BiConsumer<? super ActionChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
+            throws StopRedoException {
+        Channel chl = cf.channel();
+        if (chl.hasAttr(CHANNEL_STATE_KEY)) {
+            ChannelState state = chl.attr(CHANNEL_STATE_KEY).get();
+            // the first connect-action is also the redo type
+            if (state.getConnectTimes() + 1 > maxRedoTimes - 1) {
+                if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
+                throw new StopRedoException();
+            } else state.increase(cf);
+        }
+    }
+
 }
