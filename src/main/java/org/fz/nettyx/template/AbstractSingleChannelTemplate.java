@@ -44,12 +44,18 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         storeChannel(cf.channel());
     }
 
-    @SneakyThrows(InterruptedException.class)
+
     protected void storeChannel(Channel channel) {
         if (isActive(this.channel)) {
-            this.channel.close().sync();
+            closeChannelDirectly(true);
         }
         this.channel = channel;
+    }
+
+    @SneakyThrows(InterruptedException.class)
+    public void closeChannelDirectly(boolean sync) {
+        if (sync) this.channel.close().sync();
+        else      this.channel.close();
     }
 
     public void closeChannelGracefully() {
