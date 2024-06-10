@@ -42,7 +42,7 @@ public interface ListenerAction {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                if (state.getConnectTimes() > maxRedoTimes) {
+                if (state.getConnectTimes() > maxRedoTimes - 1) {
                     if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
                     return;
                 } else state.increase(cf);
@@ -65,7 +65,7 @@ public interface ListenerAction {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
-                if (state.getConnectTimes() > maxRedoTimes) {
+                if (state.getConnectTimes() > maxRedoTimes - 1) {
                     if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
                     return;
                 } else state.increase(cf);
