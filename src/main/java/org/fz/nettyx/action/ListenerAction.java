@@ -22,4 +22,8 @@ public interface ListenerAction {
     static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
         return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
     }
+
+    static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes) {
+        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
+    }
 }
