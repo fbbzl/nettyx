@@ -8,6 +8,7 @@ import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.channel.ChannelStorage;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.util.Throws;
@@ -30,7 +31,8 @@ import java.util.Map;
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                   Template<C> {
 
-    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
+    public static final AttributeKey<ChannelState> CHANNEL_STATE_KEY = AttributeKey.valueOf("__$single_channel_state_key$");
+    protected static final AttributeKey<?>         MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_id_key$");
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
