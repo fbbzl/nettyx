@@ -1,5 +1,6 @@
 package org.fz.nettyx.listener;
 
+import cn.hutool.core.thread.ThreadUtil;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Setter;
@@ -43,11 +44,17 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
      * will re-execute the action after assigned delay and timeUnit
      */
     public static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
+        return (ls, cf) -> {
+            ThreadUtil.safeSleep(unit.toMillis(delay));
+            did.get().addListener(ls);
+        };
     }
 
     public static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
-        return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
+        return (ls, cf) -> {
+            ThreadUtil.safeSleep(unit.toMillis(delay));
+            did.apply(cf).addListener(ls);
+        };
     }
 
     public interface ListenerAction {
