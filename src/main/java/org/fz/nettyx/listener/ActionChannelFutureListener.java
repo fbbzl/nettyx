@@ -31,7 +31,10 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     @Override
     public final void operationComplete(ChannelFuture channelFuture) throws Exception {
         if (channelFuture.isSuccess())     invokeAction(whenSuccess, this, channelFuture);
-        if (channelFuture.cause() != null) invokeAction(whenFailure, this, channelFuture);
+        if (channelFuture.cause() != null) {
+            System.err.println("失败后执行");
+            invokeAction(whenFailure, this, channelFuture);
+        }
         if (channelFuture.isDone())        invokeAction(whenDone, this, channelFuture);
         if (channelFuture.isCancelled())   invokeAction(whenCancel, this, channelFuture);
     }
