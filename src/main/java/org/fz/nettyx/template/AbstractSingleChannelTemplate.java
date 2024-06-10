@@ -3,7 +3,6 @@ package org.fz.nettyx.template;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
-import lombok.Data;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,7 @@ import java.net.SocketAddress;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    protected static final ThreadLocal<ConnectionState> connectState = ThreadLocal.withInitial(ConnectionState::new);
-    private final          SocketAddress                remoteAddress;
+    private final          SocketAddress                            remoteAddress;
     private final          Bootstrap                    bootstrap;
     private                Channel                      channel;
 
@@ -34,14 +32,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
-        ConnectionState connectionState = connectState.get();
-        System.err.println("connect: "+Thread.currentThread().getId());
-        channelFuture.addListeners(
-                new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)),
-                (ChannelFutureListener) (cf -> {
-                    ConnectionState.doIncrease(connectionState, cf);
-                })
-                                  );
+        channelFuture.addListeners(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
 
         return channelFuture;
     }
@@ -56,10 +47,6 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
             this.channel.close().sync();
         }
         this.channel = channel;
-    }
-
-    public ConnectionState getConnectState() {
-        return connectState.get();
     }
 
     public void closeChannelGracefully() {
@@ -120,52 +107,4 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         // default is do nothing
     }
 
-    /**
-     * to save connect state history
-     *
-     * @author fengbinbin
-     * @since 2021 -12-29 18:46
-     */
-    @Data
-    public static class ConnectionState {
-
-        /**
-         * total number of connection times
-         */
-        private long connectTimes;
-        /**
-         * the number of successful connection times
-         */
-        private long connectSuccessTimes;
-        /**
-         * the number of connection failure times
-         */
-        private long connectFailureTimes;
-        /**
-         * the number of times the connection was done
-         */
-        private long connectDoneTimes;
-        /**
-         * the number of times the connection was canceled
-         */
-        private long connectCancelTimes;
-
-       public static void doIncrease(ConnectionState state, ChannelFuture cf) {
-            state.setConnectTimes(state.getConnectTimes() + 1);
-
-            if (cf.isSuccess())   state.setConnectSuccessTimes(state.getConnectSuccessTimes() + 1);
-            if(!cf.isSuccess())   state.setConnectFailureTimes(state.getConnectFailureTimes() + 1);
-            if (cf.isDone())      state.setConnectDoneTimes(state.getConnectDoneTimes() + 1);
-            if (cf.isCancelled()) state.setConnectCancelTimes(state.getConnectCancelTimes() + 1);
-        }
-
-        public static void reset(ConnectionState state) {
-            state.setConnectTimes(0);
-            state.setConnectSuccessTimes(0);
-            state.setConnectFailureTimes(0);
-            state.setConnectDoneTimes(0);
-            state.setConnectCancelTimes(0);
-        }
-
-    }
 }
