@@ -131,7 +131,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         // default is nothing
     }
 
-    Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
                 .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
                 .remoteAddress(remoteAddress)
