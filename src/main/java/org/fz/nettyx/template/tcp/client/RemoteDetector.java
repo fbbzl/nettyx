@@ -68,14 +68,14 @@ public abstract class RemoteDetector<M> extends SingleTcpChannellClientTemplate 
         try {
             this.responseState.set(false);
             // 1. do connect sync
-            ChannelFuture connectFuture = this.connect().sync();
+            ChannelFuture cf = this.connect().sync();
 
             // 2. check if connect success
-            if (connectFuture.cause() != null)
+            if (cf.cause() != null)
                 throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
 
             // 3. store channel
-            super.storeChannel(connectFuture.channel());
+            super.storeChannel(cf.channel());
 
             // 4. try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
