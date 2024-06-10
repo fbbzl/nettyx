@@ -42,6 +42,7 @@ public interface ListenerAction {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
+                // the first connect-action was not the redo type
                 if (state.getConnectTimes() > maxRedoTimes - 1) {
                     if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
                     return;
@@ -65,6 +66,7 @@ public interface ListenerAction {
             Channel channel = cf.channel();
             if (channel.hasAttr(CHANNEL_STATE_KEY)) {
                 ChannelState state = channel.attr(CHANNEL_STATE_KEY).get();
+                // the first connect-action was not the redo type
                 if (state.getConnectTimes() > maxRedoTimes - 1) {
                     if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
                     return;
