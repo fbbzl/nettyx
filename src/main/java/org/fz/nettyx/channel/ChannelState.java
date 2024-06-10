@@ -1,6 +1,8 @@
 package org.fz.nettyx.channel;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.util.AttributeKey;
 import lombok.Data;
 
 /**
@@ -11,6 +13,8 @@ import lombok.Data;
  */
 @Data
 public class ChannelState {
+
+    public static final AttributeKey<ChannelState> CHANNEL_STATE_KEY = AttributeKey.valueOf("__$channel_state_key$");
 
     /**
      * total number of connection times
@@ -32,6 +36,14 @@ public class ChannelState {
      * the number of times the connection was canceled
      */
     private long connectCancelledTimes;
+
+    public static ChannelState getChannelState(ChannelFuture cf) {
+        return getChannelState(cf.channel());
+    }
+
+    public static ChannelState getChannelState(Channel chl) {
+        return chl.hasAttr(CHANNEL_STATE_KEY) ? chl.attr(CHANNEL_STATE_KEY).get() : null;
+    }
 
     public void increase(ChannelFuture cf) {
         this.connectTimes++;

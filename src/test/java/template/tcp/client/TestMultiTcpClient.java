@@ -44,7 +44,7 @@ public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
         Map<String, InetSocketAddress> map = new HashMap<>();
 
         map.put("a", new InetSocketAddress(9888));
-        map.put("b", new InetSocketAddress(9888));
+       // map.put("b", new InetSocketAddress(9888));
 
         TestMultiTcpClient testMultiTcp = new TestMultiTcpClient(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()

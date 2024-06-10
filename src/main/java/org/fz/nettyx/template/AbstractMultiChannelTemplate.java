@@ -17,6 +17,8 @@ import org.fz.nettyx.util.Try;
 import java.net.SocketAddress;
 import java.util.Map;
 
+import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
+
 /**
  * multichannel client
  *
@@ -31,8 +33,7 @@ import java.util.Map;
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                   Template<C> {
 
-    public static final AttributeKey<ChannelState> MULTI_CHANNEL_STATE_KEY = AttributeKey.valueOf("__$multi_channel_state_key$");
-    protected static final AttributeKey<?>         MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
+    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
@@ -50,7 +51,6 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     public ChannelFuture connect(K key) {
         Bootstrap bootstrap = getBootstrapMap().get(key);
         Throws.ifNull(bootstrap, "can not find config by key [" + key + "]");
-
         ChannelFuture channelFuture = bootstrap.clone().connect();
         channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
         return channelFuture;
@@ -137,7 +137,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
                 .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
-                .attr(MULTI_CHANNEL_STATE_KEY, new ChannelState())
+                .attr(CHANNEL_STATE_KEY, new ChannelState())
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
