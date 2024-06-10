@@ -62,7 +62,7 @@ public class TestSingleRxtx extends SingleRxtxChannellTemplate {
                     RxtxChannelConfig config =(RxtxChannelConfig) cf.channel().config();
                     Console.log(config.getBaudRate());
                 })
-                .whenCancel((l, cf) -> Console.log("cancel"))
+                .whenCancelled((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
                 .whenDone((l, cf) -> Console.log("done"));
 

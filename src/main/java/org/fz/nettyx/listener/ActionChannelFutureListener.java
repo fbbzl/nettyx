@@ -25,19 +25,15 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     private ListenerAction
             whenSuccess,
             whenFailure,
-            whenCancel,
+            whenCancelled,
             whenDone;
 
     @Override
     public final void operationComplete(ChannelFuture cf) throws Exception {
-        if (cf.isSuccess())     invokeAction(whenSuccess, this, cf);
-        if (cf.cause() != null) invokeAction(whenFailure, this, cf);
-        if (cf.isDone())        invokeAction(whenDone,    this, cf);
-        if (cf.isCancelled())   invokeAction(whenCancel,  this, cf);
-    }
-
-    public static void invokeAction(ListenerAction action, ActionChannelFutureListener listener, ChannelFuture cf) throws Exception {
-        if (action != null) action.act(listener, cf);
+        if (whenSuccess   != null && cf.isSuccess())     whenSuccess.act(this, cf);
+        if (whenFailure   != null && cf.cause() != null) whenFailure.act(this, cf);
+        if (whenDone      != null && cf.isDone())        whenDone.act(this, cf);
+        if (whenCancelled != null && cf.isCancelled())   whenCancelled.act(this, cf);
     }
 
 }

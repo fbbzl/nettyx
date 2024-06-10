@@ -69,7 +69,7 @@ public class TestMultiJsc extends MultiJscChannelTemplate<String> {
 
                     Console.log(cf.channel().localAddress() + ": ok");
                 })
-                .whenCancel((l, cf) -> Console.log("cancel"))
+                .whenCancelled((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
                 .whenDone((l, cf) -> Console.log("done"));
 
