@@ -1,6 +1,5 @@
 package org.fz.nettyx.action;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import org.fz.nettyx.channel.ChannelState;
@@ -12,7 +11,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import static org.fz.nettyx.template.AbstractSingleChannelTemplate.CHANNEL_STATE_KEY;
+import static org.fz.nettyx.channel.ChannelState.getChannelState;
 
 /**
  * @author fengbinbin
@@ -76,15 +75,15 @@ public interface ListenerAction {
             int maxRedoTimes,
             BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
             throws StopRedoException {
-        Channel chl = cf.channel();
-        if (chl.hasAttr(CHANNEL_STATE_KEY)) {
-            ChannelState state = chl.attr(CHANNEL_STATE_KEY).get();
+        ChannelState state = getChannelState(cf);
+        if (state != null) {
             // the first connect-action is also the redo type
             if (state.getConnectTimes() + 1 > maxRedoTimes - 1) {
                 if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
                 throw new StopRedoException();
             } else state.increase(cf);
         }
+
     }
 
 }
