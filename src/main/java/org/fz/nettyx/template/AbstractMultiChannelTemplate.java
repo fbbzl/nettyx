@@ -31,8 +31,8 @@ import java.util.Map;
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
                                                                                                   Template<C> {
 
-    public static final AttributeKey<ChannelState> CHANNEL_STATE_KEY    = AttributeKey.valueOf("__$single_channel_state_key$");
-    protected static final AttributeKey<?>         MULTI_CHANNEL_ID_KEY = AttributeKey.valueOf("__$multi_channel_id_key$");
+    public static final AttributeKey<ChannelState> CHANNEL_STATE_KEY = AttributeKey.valueOf("__$single_channel_state_key$");
+    protected static final AttributeKey<?>         MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 
     private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress> addressMap;
@@ -135,7 +135,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
 
     protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
-                .attr((AttributeKey<? super K>) MULTI_CHANNEL_ID_KEY, key)
+                .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
@@ -155,7 +155,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     }
 
     public static <T> T channelKey(Channel channel) {
-        return (T) channel.attr(MULTI_CHANNEL_ID_KEY).get();
+        return (T) channel.attr(MULTI_CHANNEL_KEY).get();
     }
 
 }
