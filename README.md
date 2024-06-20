@@ -63,9 +63,7 @@ exception                           Abnormal extension
   ---TooLessBytesException
   ---TypeJudgmentException
 handler                             Provided some basic channel handler implementations
-  interceptor
-     ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
-     ---ChannelInterceptors               Channel interceptor utils
+  ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication   
   ---ActionIdleStateHandler            Actionable Idle State Handler
   ---ActionReadTimeoutHandler          Actionable ReadTimeout Handler
   ---ActionWriteTimeoutHandler         Actionable WriteTimeout Handler
