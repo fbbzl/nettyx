@@ -1,14 +1,14 @@
 package org.fz.nettyx.ssl;
 
 /**
- * TODO
+ *
  *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/6/1 10:11
  */
 
-public class OpenSslManagement {
+  class OpenSslManagement {
 
     // 生成根证书
     public static void createRootCertificate() {
