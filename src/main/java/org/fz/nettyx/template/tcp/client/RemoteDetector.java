@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 @Setter
 @SuppressWarnings("all")
-public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate {
+public abstract class RemoteDetector<M> extends SingleTcpChannellClientTemplate {
 
     private static final int DEFAULT_DETECT_RETRY_TIMES   = 3;
     private static final int DEFAULT_WAIT_RESPONSE_MILLIS = 1000;
@@ -35,7 +35,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
      */
     private final AtomicBoolean responseState = new AtomicBoolean(false);
 
-    protected ServerDetector(InetSocketAddress address) {
+    protected RemoteDetector(InetSocketAddress address) {
         super(address);
     }
 
@@ -68,13 +68,14 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
         try {
             this.responseState.set(false);
             // 1. do connect sync
-            ChannelFuture connectFuture = this.connect().sync();
+            ChannelFuture cf = this.connect().sync();
 
             // 2. check if connect success
-            if (!connectFuture.isSuccess()) throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
+            if (cf.cause() != null)
+                throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
 
             // 3. store channel
-            super.storeChannel(connectFuture.channel());
+            super.storeChannel(cf.channel());
 
             // 4. try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
@@ -98,7 +99,7 @@ public abstract class ServerDetector<M> extends SingleTcpChannellClientTemplate 
                 ChannelPromise promise = super.writeAndFlush(detectMsg).await();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
-                else                     log.info("failed send detect message [{}]",  detectMsg);
+                else                     log.info("something wrong when sending detect message [{}]",  detectMsg);
             } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);
