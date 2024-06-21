@@ -10,7 +10,6 @@ import java.util.Map;
 
 /**
  * channel interceptor
- *
  * Not Thread Safe!!!
  *
  * @author fengbinbin
