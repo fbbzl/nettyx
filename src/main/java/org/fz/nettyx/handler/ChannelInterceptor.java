@@ -17,9 +17,9 @@ import java.util.Map;
  * @version 1.0
  * @since 2021 /4/25 15:46
  */
-public class ChannelInterceptor extends ChannelHandlerAdapter {
+public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
-    private final boolean defaultInterceptAll;
+    protected final boolean defaultInterceptAll;
 
     /**
      * interceptor state
@@ -54,44 +54,44 @@ public class ChannelInterceptor extends ChannelHandlerAdapter {
         this.state = false;
     }
 
-    public ChannelInterceptor() {
+    protected ChannelInterceptor() {
         // All methods will NOT be intercepted by default, which method should be overridden for which event you want to intercept
         this(false);
     }
 
-    public ChannelInterceptor(boolean defaultInterceptAll) {
+    protected ChannelInterceptor(boolean defaultInterceptAll) {
         this.defaultInterceptAll = defaultInterceptAll;
     }
+
+    /**
+     * Subclass [InboundInterceptor, OutboundInterceptor] implementation start
+     */
 
     @SuppressWarnings("unchecked")
     public static class InboundInterceptor<M> extends ChannelInterceptor implements ChannelInboundHandler {
 
         @Override
         public final void channelRegistered(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.fireChannelRegistered();
-            } else this.preChannelRegistered(ctx);
+            if (isFreed()) ctx.fireChannelRegistered();
+            else           this.preChannelRegistered(ctx);
         }
 
         @Override
         public final void channelUnregistered(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.fireChannelUnregistered();
-            } else this.preChannelUnregistered(ctx);
+            if (isFreed()) ctx.fireChannelUnregistered();
+            else           this.preChannelUnregistered(ctx);
         }
 
         @Override
         public final void channelActive(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.fireChannelActive();
-            } else this.preChannelActive(ctx);
+            if (isFreed()) ctx.fireChannelActive();
+            else           this.preChannelActive(ctx);
         }
 
         @Override
         public final void channelInactive(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.fireChannelInactive();
-            } else this.preChannelInactive(ctx);
+            if (isFreed()) ctx.fireChannelInactive();
+            else           this.preChannelInactive(ctx);
         }
 
         @Override
@@ -111,31 +111,27 @@ public class ChannelInterceptor extends ChannelHandlerAdapter {
 
         @Override
         public final void channelReadComplete(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.fireChannelReadComplete();
-            } else this.preChannelReadComplete(ctx);
+            if (isFreed()) ctx.fireChannelReadComplete();
+            else           this.preChannelReadComplete(ctx);
         }
 
         @Override
         public final void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
-            if (isFreed()) {
-                ctx.fireUserEventTriggered(evt);
-            } else this.preUserEventTriggered(ctx, evt);
+            if (isFreed()) ctx.fireUserEventTriggered(evt);
+            else           this.preUserEventTriggered(ctx, evt);
         }
 
         @Override
         public final void channelWritabilityChanged(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.fireChannelWritabilityChanged();
-            } else this.preChannelWritabilityChanged(ctx);
+            if (isFreed()) ctx.fireChannelWritabilityChanged();
+            else           this.preChannelWritabilityChanged(ctx);
         }
 
         @Override
         @SuppressWarnings("deprecation")
         public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            if (isFreed()) {
-                ctx.fireExceptionCaught(cause);
-            } else this.preExceptionCaught(ctx, cause);
+            if (isFreed()) ctx.fireExceptionCaught(cause);
+            else           this.preExceptionCaught(ctx, cause);
         }
 
         protected void preChannelRegistered(ChannelHandlerContext ctx) {
@@ -269,58 +265,50 @@ public class ChannelInterceptor extends ChannelHandlerAdapter {
 
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
-            if (isFreed()) {
-                ctx.bind(localAddress, promise);
-            } else this.preBind(ctx, localAddress, promise);
+            if (isFreed()) ctx.bind(localAddress, promise);
+            else           this.preBind(ctx, localAddress, promise);
         }
 
         @Override
         public final void connect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
-            if (isFreed()) {
-                ctx.connect(remoteAddress, localAddress, promise);
-            } else this.preConnect(ctx, remoteAddress, localAddress, promise);
+            if (isFreed()) ctx.connect(remoteAddress, localAddress, promise);
+            else           this.preConnect(ctx, remoteAddress, localAddress, promise);
         }
 
         @Override
         public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
-            if (isFreed()) {
-                ctx.disconnect(promise);
-            } else this.preDisconnect(ctx, promise);
+            if (isFreed()) ctx.disconnect(promise);
+            else           this.preDisconnect(ctx, promise);
         }
 
         @Override
         public final void close(ChannelHandlerContext ctx, ChannelPromise promise) {
-            if (isFreed()) {
-                ctx.close(promise);
-            } else this.preClose(ctx, promise);
+            if (isFreed()) ctx.close(promise);
+            else           this.preClose(ctx, promise);
         }
 
         @Override
         public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) {
-            if (isFreed()) {
-                ctx.deregister(promise);
-            } else this.preDeregister(ctx, promise);
+            if (isFreed()) ctx.deregister(promise);
+            else           this.preDeregister(ctx, promise);
         }
 
         @Override
         public final void read(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.read();
-            } else this.preRead(ctx);
+            if (isFreed()) ctx.read();
+            else           this.preRead(ctx);
         }
 
         @Override
         public final void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-            if (isFreed()) {
-                ctx.write(msg, promise);
-            } else this.preWrite(ctx, msg, promise);
+            if (isFreed()) ctx.write(msg, promise);
+            else           this.preWrite(ctx, msg, promise);
         }
 
         @Override
         public final void flush(ChannelHandlerContext ctx) {
-            if (isFreed()) {
-                ctx.flush();
-            } else this.preFlush(ctx);
+            if (isFreed()) ctx.flush();
+            else           this.preFlush(ctx);
         }
 
         public final void preBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
