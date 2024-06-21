@@ -10,14 +10,16 @@ import java.util.Map;
 
 /**
  * channel interceptor
- * All methods will NOT be intercepted by default, which method should be overridden for which event you want to intercept
+ *
  * Not Thread Safe!!!
  *
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /4/25 15:46
  */
-public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
+public class ChannelInterceptor extends ChannelHandlerAdapter {
+
+    private final boolean defaultInterceptAll;
 
     /**
      * interceptor state
@@ -52,6 +54,14 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         this.state = false;
     }
 
+    public ChannelInterceptor() {
+        // All methods will NOT be intercepted by default, which method should be overridden for which event you want to intercept
+        this(false);
+    }
+
+    public ChannelInterceptor(boolean defaultInterceptAll) {
+        this.defaultInterceptAll = defaultInterceptAll;
+    }
 
     @SuppressWarnings("unchecked")
     public static class InboundInterceptor<M> extends ChannelInterceptor implements ChannelInboundHandler {
