@@ -134,39 +134,39 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         protected void preChannelRegistered(ChannelHandlerContext ctx) {
-            ctx.fireChannelRegistered();
+            if (!defaultInterceptAll) ctx.fireChannelRegistered();
         }
 
         protected void preChannelUnregistered(ChannelHandlerContext ctx) {
-            ctx.fireChannelUnregistered();
+            if (!defaultInterceptAll) ctx.fireChannelUnregistered();
         }
 
         protected void preChannelActive(ChannelHandlerContext ctx) {
-            ctx.fireChannelActive();
+            if (!defaultInterceptAll) ctx.fireChannelActive();
         }
 
         protected void preChannelInactive(ChannelHandlerContext ctx) {
-            ctx.fireChannelInactive();
+            if (!defaultInterceptAll) ctx.fireChannelInactive();
         }
 
         protected void preChannelRead(ChannelHandlerContext ctx, M msg) {
-            ctx.fireChannelRead(msg);
+            if (!defaultInterceptAll) ctx.fireChannelRead(msg);
         }
 
         protected void preChannelReadComplete(ChannelHandlerContext ctx) {
-            ctx.fireChannelReadComplete();
+            if (!defaultInterceptAll) ctx.fireChannelReadComplete();
         }
 
         protected void preUserEventTriggered(ChannelHandlerContext ctx, Object evt) {
-            ctx.fireUserEventTriggered(evt);
+            if (!defaultInterceptAll) ctx.fireUserEventTriggered(evt);
         }
 
         protected void preChannelWritabilityChanged(ChannelHandlerContext ctx) {
-            ctx.fireChannelWritabilityChanged();
+            if (!defaultInterceptAll) ctx.fireChannelWritabilityChanged();
         }
 
         protected void preExceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-            ctx.fireExceptionCaught(cause);
+            if (!defaultInterceptAll) ctx.fireExceptionCaught(cause);
         }
 
         protected void freeAndFireRegistered(ChannelHandlerContext ctx) {
@@ -311,35 +311,35 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         public final void preBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
-            ctx.bind(localAddress, promise);
+            if (!defaultInterceptAll) ctx.bind(localAddress, promise);
         }
 
         public final void preConnect(ChannelHandlerContext ctx, SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
-            ctx.connect(remoteAddress, localAddress, promise);
+            if (!defaultInterceptAll) ctx.connect(remoteAddress, localAddress, promise);
         }
 
         public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise) {
-            ctx.disconnect(promise);
+            if (!defaultInterceptAll) ctx.disconnect(promise);
         }
 
         public final void preClose(ChannelHandlerContext ctx, ChannelPromise promise) {
-            ctx.close(promise);
+            if (!defaultInterceptAll) ctx.close(promise);
         }
 
         public final void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise) {
-            ctx.deregister(promise);
+            if (!defaultInterceptAll) ctx.deregister(promise);
         }
 
         public final void preRead(ChannelHandlerContext ctx) {
-            ctx.read();
+            if (!defaultInterceptAll) ctx.read();
         }
 
         public final void preWrite(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
-            ctx.write(msg, promise);
+            if (!defaultInterceptAll) ctx.write(msg, promise);
         }
 
         public final void preFlush(ChannelHandlerContext ctx) {
-            ctx.flush();
+            if (!defaultInterceptAll) ctx.flush();
         }
 
         protected void freeAndBind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) {
