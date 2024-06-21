@@ -19,7 +19,7 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.1-RELEASE</version>
+    <version>2.3.2-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -63,9 +63,7 @@ exception                           Abnormal extension
   ---TooLessBytesException
   ---TypeJudgmentException
 handler                             Provided some basic channel handler implementations
-  interceptor
-     ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication
-     ---ChannelInterceptors               Channel interceptor utils
+  ---ChannelInterceptor                Channel interceptor, suitable for pre operation such as handshake before communication   
   ---ActionIdleStateHandler            Actionable Idle State Handler
   ---ActionReadTimeoutHandler          Actionable ReadTimeout Handler
   ---ActionWriteTimeoutHandler         Actionable WriteTimeout Handler

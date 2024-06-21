@@ -8,13 +8,16 @@ import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.ChannelState;
+import org.fz.nettyx.channel.ChannelStorage;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
-import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
 
 import java.net.SocketAddress;
 import java.util.Map;
+
+import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
 
 /**
  * multichannel client
@@ -76,13 +79,13 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     }
 
     public void closeChannelGracefully(K key) {
-        if (Template.gracefullyCloseable(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close();
         }
     }
 
     public void closeChannelGracefully(K key, ChannelPromise promise) {
-        if (Template.gracefullyCloseable(getChannel(key))) {
+        if (gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close(promise);
         }
     }
@@ -131,9 +134,10 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         // default is nothing
     }
 
-    Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
         return new Bootstrap()
                 .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
+                .attr(CHANNEL_STATE_KEY, new ChannelState())
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
@@ -148,8 +152,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         return channelKey(ctx.channel());
     }
 
-    public static <T> T channelKey(ChannelFuture channelFuture) {
-        return channelKey(channelFuture.channel());
+    public static <T> T channelKey(ChannelFuture cf) {
+        return channelKey(cf.channel());
     }
 
     public static <T> T channelKey(Channel channel) {

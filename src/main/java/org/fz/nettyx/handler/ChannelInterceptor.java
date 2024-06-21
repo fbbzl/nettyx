@@ -1,9 +1,12 @@
-package org.fz.nettyx.handler.interceptor;
+package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * channel interceptor
@@ -423,4 +426,52 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
     }
+
+    //***************************************    public static start   ***********************************************//
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(Channel channel) {
+        return getInterceptors(channel.pipeline());
+    }
+
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelHandlerContext ctx) {
+        return getInterceptors(ctx.pipeline());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelPipeline pipeline) {
+        List<T> result = new ArrayList<>(10);
+
+        for (Map.Entry<String, ChannelHandler> entry : pipeline) {
+            if (ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass())) {
+                result.add((T) entry.getValue());
+            }
+        }
+
+        return result;
+    }
+
+    public static void freeAll(Channel channel) {
+        freeAll(channel.pipeline());
+    }
+
+    public static void freeAll(ChannelHandlerContext ctx) {
+        freeAll(ctx.pipeline());
+    }
+
+    public static void freeAll(ChannelPipeline pipeline) {
+        getInterceptors(pipeline).stream().filter(ChannelInterceptor::isNotFreed).forEach(ChannelInterceptor::free);
+    }
+
+    public static void resetAll(Channel channel) {
+        resetAll(channel.pipeline());
+    }
+
+    public static void resetAll(ChannelHandlerContext ctx) {
+        resetAll(ctx.pipeline());
+    }
+
+    public static void resetAll(ChannelPipeline pipeline) {
+        getInterceptors(pipeline).stream().filter(ChannelInterceptor::isFreed).forEach(ChannelInterceptor::reset);
+    }
+
+    //***************************************    public static end     ***********************************************//
 }

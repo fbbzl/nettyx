@@ -286,7 +286,7 @@ public class ChannelAdvice {
             @Override
             public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
                 promise.addListener(cf -> {
-                    if (!cf.isSuccess()) {
+                    if (cf.cause() != null) {
                         log.error("exception occur while writing, message is [" + msg + "]", cf.cause());
                         invokeAction(whenExceptionCaught, ctx, cf.cause());
                     }
@@ -297,7 +297,7 @@ public class ChannelAdvice {
             static ChannelFutureListener failureListener(ChannelHandlerContext ctx,
                                                          ChannelExceptionAction whenExceptionCaught) {
                 return cf -> {
-                    if (!cf.isSuccess()) {
+                    if (cf.cause() != null) {
                         log.error(cf.cause().getMessage());
                         invokeAction(whenExceptionCaught, ctx, cf.cause());
                     }
