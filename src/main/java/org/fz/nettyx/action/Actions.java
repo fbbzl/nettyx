@@ -71,8 +71,8 @@ public interface Actions {
         if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
     }
 
-    static void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture channelFuture) {
-        if (channelFutureAction != null) channelFutureAction.act(channelFuture);
+    static void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture cf) {
+        if (channelFutureAction != null) channelFutureAction.act(cf);
     }
 
     /**

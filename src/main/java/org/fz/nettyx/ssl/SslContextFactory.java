@@ -29,7 +29,7 @@ import static lombok.AccessLevel.PACKAGE;
  * GenericFutureListener<Promise<Channel>> handshakeListener =
  * future -> {
  * if (future.isSuccess())  log.info("ssl handshake success, remote address is [{}]", remoteAddress);
- * if (!future.isSuccess()) log.error("ssl handshake failure, remote address is [{}]", remoteAddress, future.cause());
+ * if (future.cause() != null) log.error("ssl handshake failure, remote address is [{}]", remoteAddress, future.cause());
  * };
  * <p>
  * sslHandler.handshakeFuture().addListener(handshakeListener);

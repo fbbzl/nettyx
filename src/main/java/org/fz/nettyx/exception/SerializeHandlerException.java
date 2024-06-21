@@ -10,13 +10,13 @@ import java.lang.reflect.Field;
  * @since 2024/1/11 16:02
  */
 @Getter
-public class HandlerException extends RuntimeException {
+public class SerializeHandlerException extends RuntimeException {
 
     private final transient Field field;
 
     private final Class<?> handlerClass;
 
-    public HandlerException(Field field, Class<?> handlerClass, Throwable throwable) {
+    public SerializeHandlerException(Field field, Class<?> handlerClass, Throwable throwable) {
         super("handler cause exception please check [" + handlerClass + "], this handler is on field [" + field + "]", throwable);
         this.field        = field;
         this.handlerClass = handlerClass;
