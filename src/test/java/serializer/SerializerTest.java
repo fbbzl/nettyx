@@ -78,6 +78,7 @@ public class SerializerTest {
         Console.log(Arrays.toString(bytes1));
         Console.log("turn :" + turn);
 
+        System.err.println(turn.equals(user));
         Assert.assertNotNull(turn);
     }
 
