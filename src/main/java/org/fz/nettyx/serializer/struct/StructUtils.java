@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -15,9 +14,13 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.*;
 
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
+import static cn.hutool.core.lang.reflect.MethodHandleUtil.findMethod;
+import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
+import static java.lang.invoke.MethodType.methodType;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
@@ -118,9 +121,7 @@ public class StructUtils {
     public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass) {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try {
-            return ((Basic<?>) CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> findConstructor(ByteBuf.class)).invokeWithArguments(fillingBuf)).getSize();
-        } catch (Throwable e) {
-            throw new SerializeException("can not read basic bytes size", e);
+            return newBasic(basicClass, fillingBuf).getSize();
         } finally {
             fillingBuf.skipBytes(fillingBuf.readableBytes());
             fillingBuf.release();
@@ -149,15 +150,15 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
-            return (B) CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> findConstructor(ByteBuf.class)).invokeWithArguments(buf);
+            return (B) CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> findConstructor(basicClass, ByteBuf.class)).invoke(buf);
         } catch (Throwable instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException) {
-                throw new SerializeException(cause.getMessage());
+                throw new SerializeException(instanceError);
             } else {
                 throw new SerializeException(
                         "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf)
-                        + "]", cause);
+                        + "]", instanceError);
             }
         }
     }
@@ -193,22 +194,22 @@ public class StructUtils {
         }
     }
 
-    public static void writeField(Object object, Field field, Object value) {
-        Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> getWriterHandle(object.getClass(), f));
-        MethodHandleUtil.invoke(object, writeMethod, value);
+    public static void writeField(Object object, Field field, Object value) throws Throwable {
+        MethodHandle writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> getWriterHandle(object.getClass(), f));
+        writeMethod.invoke(object, value);
     }
 
-    public static <T> T readField(Object object, Field field) {
-        Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> getReaderHandle(object.getClass(), f));
-        return MethodHandleUtil.invoke(object, readMethod);
+    public static <T> T readField(Object object, Field field) throws Throwable {
+        MethodHandle readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> getReaderHandle(object.getClass(), f));
+        return (T) readMethod.invoke(object);
     }
 
-    public static Method getReaderHandle(Class<?> clazz, Field field) {
-        return BeanUtil.getPropertyDescriptor(clazz, field.getName()).getReadMethod();
+    public static MethodHandle getReaderHandle(Class<?> clazz, Field field) {
+        return findMethod(clazz, upperFirstAndAddPre(field.getName(), "get"), methodType(field.getType()));
     }
 
-    public static Method getWriterHandle(Class<?> clazz, Field field) {
-        return BeanUtil.getPropertyDescriptor(clazz, field.getName()).getReadMethod();
+    public static MethodHandle getWriterHandle(Class<?> clazz, Field field) {
+        return findMethod(clazz, upperFirstAndAddPre(field.getName(), "set"), methodType(void.class, field.getType()));
     }
 
     /**

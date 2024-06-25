@@ -12,12 +12,10 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+import static org.fz.nettyx.serializer.struct.StructUtils.getReaderHandle;
+import static org.fz.nettyx.serializer.struct.StructUtils.getWriterHandle;
 
 /**
  * The type Struct cache.
@@ -41,8 +41,8 @@ public final class StructSerializerContext {
     /**
      * reflection cache
      */
-    static final Map<Field, Method> FIELD_READER_CACHE = new ConcurrentHashMap<>(256);
-    static final Map<Field, Method> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(256);
+    static final Map<Field, MethodHandle> FIELD_READER_CACHE = new ConcurrentHashMap<>(256);
+    static final Map<Field, MethodHandle> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(256);
     static final Map<Class<?>, MethodHandle> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
 
     static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new WeakConcurrentMap<>();
@@ -72,7 +72,7 @@ public final class StructSerializerContext {
                 scanStructs(classes);
             }
         } catch (Exception e) {
-            throw new NotInitedException("init serializer context failed please check", e);
+            throw new NotInitedException("init struct-serializer context failed please check", e);
         }
     }
 
@@ -97,7 +97,7 @@ public final class StructSerializerContext {
             boolean isBasic = Basic.class.isAssignableFrom(clazz);
 
             if (isBasic) {
-                CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, findConstructor((Class<? extends Basic<?>>) clazz, ByteBuf.class));
+                CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, findConstructor(clazz, ByteBuf.class));
                 BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
             }
         }
@@ -110,9 +110,9 @@ public final class StructSerializerContext {
 
                 Field[] structFields = StructUtils.getStructFields(clazz);
                 for (Field field : structFields) {
-                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), clazz);
-                    FIELD_READER_CACHE.putIfAbsent(field, propertyDescriptor.getReadMethod());
-                    FIELD_WRITER_CACHE.putIfAbsent(field, propertyDescriptor.getWriteMethod());
+
+                    FIELD_READER_CACHE.putIfAbsent(field, getReaderHandle(clazz, field));
+                    FIELD_WRITER_CACHE.putIfAbsent(field, getWriterHandle(clazz, field));
 
                     AnnotationUtil.getAnnotations(field, false);
                 }

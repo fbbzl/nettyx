@@ -167,7 +167,7 @@ public final class StructSerializer implements Serializer {
                 else                           throw new TypeJudgmentException(field);
 
                 StructUtils.writeField(struct, field, fieldValue);
-            } catch (Exception exception) {
+            } catch (Throwable exception) {
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
@@ -200,7 +200,7 @@ public final class StructSerializer implements Serializer {
                     writeStruct(structType, defaultIfNull(fieldValue, () -> newStruct(structType)), writing);
                 }
                 else throw new TypeJudgmentException(field);
-            } catch (Exception exception) {
+            } catch (Throwable exception) {
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);
             }
         }
