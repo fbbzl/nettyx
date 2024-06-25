@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructPropHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Documented;
@@ -43,7 +43,7 @@ public @interface ToString {
      */
     int bufferLength();
 
-    class ToStringHandler implements StructFieldHandler.ReadWriteHandler<ToString> {
+    class ToStringHandler implements StructPropHandler.ReadWriteHandler<ToString> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToString toString) {
