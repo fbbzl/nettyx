@@ -12,8 +12,8 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.SerializeHandlerException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
-import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
+import org.fz.nettyx.serializer.struct.StructPropHandler.ReadHandler;
+import org.fz.nettyx.serializer.struct.StructPropHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -167,7 +167,7 @@ public final class StructSerializer implements Serializer {
                 else                           throw new TypeJudgmentException(field);
 
                 StructUtils.writeField(struct, field, fieldValue);
-            } catch (Exception exception) {
+            } catch (Throwable exception) {
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
@@ -200,7 +200,7 @@ public final class StructSerializer implements Serializer {
                     writeStruct(structType, defaultIfNull(fieldValue, () -> newStruct(structType)), writing);
                 }
                 else throw new TypeJudgmentException(field);
-            } catch (Exception exception) {
+            } catch (Throwable exception) {
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);
             }
         }

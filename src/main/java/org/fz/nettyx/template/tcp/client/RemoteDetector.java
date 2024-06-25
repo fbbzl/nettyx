@@ -60,6 +60,7 @@ public abstract class RemoteDetector<M> extends SingleTcpChannellClientTemplate 
     /**
      * the core mothod to detect server
      *
+     * @param address
      * @return if is the correct server
      * @throws InterruptedException
      */
