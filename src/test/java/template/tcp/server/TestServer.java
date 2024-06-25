@@ -42,7 +42,7 @@ public class TestServer extends TcpServerTemplate {
 
                 channel.pipeline().addLast(
                         outboundAdvice
-                        , new StartEndFlagFrameCodec(320, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
+                        , new StartEndFlagFrameCodec(3000, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
                         , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
                         , new ChannelInboundHandlerAdapter() {
                             @Override
