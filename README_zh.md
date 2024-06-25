@@ -20,7 +20,7 @@ Gitee地址: https://gitee.com/fbbzl/nettyx<br>
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.1-RELEASE</version>
+    <version>2.3.3-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -62,16 +62,14 @@ exception                           异常扩展
   ---TooLessBytesException
   ---TypeJudgmentException
 handler                             提供了一些基本的通道处理程序实现
-  interceptor
-     ---ChannelInterceptor                信道拦截器，适用于通信前握手等预操作
-     ---ChannelInterceptors               通道拦截器实用程序
-  ---ActionIdleStateHandler            可操作的空闲状态处理程序
+  ---ChannelInterceptor                channel拦截器，适用于通信前握手等预操作
+  ---ActionIdleStateHandler            空闲状态处理程序,lambda增强
   ---ActioneReadTimeoutHandler         可操作的 读取超时 处理程序
   ---ActionWriteTimeoutHandler         可操作的 写超时 处理程序
   ---ChannelAdvice                     包含入站建言和出站建言
   ---IdledHeartBeater                  闲置后的心跳器
-  ---LoggerHandler                     进入和退出消息日志
-  ---MessageFilter                     用于过滤消息
+  ---LoggerHandler                     简单的日志处理器, 可以打印简单的日志
+  ---MessageFilter                     消息过滤器
 listener
   ---ActionableChannelFutureListener   可操作的频道未来侦听器
 serializer                             序列化工具
@@ -88,7 +86,7 @@ serializer                             序列化工具
         c                              内置的C基础类型
         cpp                            内置的Cpp基础类型
         ---Basic                       基础类型顶级父类
-     ---StructFieldHandler             字段处理器
+     ---StructPropHandler              字段处理器
      ---StructSerializer               核心结构体序列化器
      ---StructSerializerContext        struct 序列化器的上下文，包含 handler-instance、type cache等等
      ---StructUtils                    序列化工具
