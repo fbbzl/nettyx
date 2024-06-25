@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import cn.hutool.core.util.EnumUtil;
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructPropHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Retention;
@@ -49,7 +49,7 @@ public @interface ToNamedEnum {
     /**
      * The type To named enum handler.
      */
-    class ToNamedEnumHandler implements StructFieldHandler.ReadWriteHandler<ToNamedEnum> {
+    class ToNamedEnumHandler implements StructPropHandler.ReadWriteHandler<ToNamedEnum> {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToNamedEnum toNamedEnum) {
