@@ -6,9 +6,12 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
 import java.net.SocketAddress;
+
+import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
 
 /**
  * @author fengbinbin
@@ -18,12 +21,12 @@ import java.net.SocketAddress;
 
 @Slf4j
 @Getter
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    private final SocketAddress remoteAddress;
-    private final Bootstrap     bootstrap;
-    private       Channel       channel;
+    private final       SocketAddress              remoteAddress;
+    private final       Bootstrap                  bootstrap;
+    private             Channel                    channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
@@ -32,7 +35,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     public ChannelFuture connect() {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
-        channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
+        channelFuture.addListeners(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
+
         return channelFuture;
     }
 
@@ -40,12 +44,16 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         storeChannel(cf.channel());
     }
 
-    @SneakyThrows({InterruptedException.class})
     protected void storeChannel(Channel channel) {
-        if (isActive(this.channel)) {
-            this.channel.close().sync();
-        }
+        if (isActive(this.channel)) closeChannelDirectly(true);
+
         this.channel = channel;
+    }
+
+    @SneakyThrows(InterruptedException.class)
+    public void closeChannelDirectly(boolean sync) {
+        if (sync) this.channel.close().sync();
+        else      this.channel.close();
     }
 
     public void closeChannelGracefully() {
@@ -90,7 +98,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         }
     }
 
-    Bootstrap newBootstrap(SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())
@@ -99,6 +107,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
                     doChannelConfig((F) chl.config());
                     return chl;
                 })
+                .attr(CHANNEL_STATE_KEY, new ChannelState())
                 .handler(channelInitializer());
     }
 

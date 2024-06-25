@@ -15,7 +15,7 @@ public interface ChannelFutureAction {
     ChannelFutureAction DO_NOTHING = cf -> {
     };
 
-    void act(ChannelFuture channelFuture);
+    void act(ChannelFuture cf);
 
 
 }

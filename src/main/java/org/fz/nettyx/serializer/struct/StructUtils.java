@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -15,12 +14,15 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.function.Predicate;
 
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
+import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
+import static cn.hutool.core.lang.reflect.MethodHandleUtil.findMethod;
+import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
+import static java.lang.invoke.MethodType.methodType;
+import static org.fz.nettyx.serializer.struct.StructPropHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.StructPropHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -42,7 +44,7 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((StructFieldHandler<?>) StructUtils.getHandler(field));
+        return isReadHandler((StructPropHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
@@ -52,7 +54,7 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((StructFieldHandler<?>) StructUtils.getHandler(field));
+        return isWriteHandler((StructPropHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
@@ -79,10 +81,10 @@ public class StructUtils {
      * @param element the element
      * @return the serializer handler
      */
-    public <H extends StructFieldHandler<?>> H getHandler(AnnotatedElement element) {
+    public <H extends StructPropHandler<?>> H getHandler(AnnotatedElement element) {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
         if (handlerAnnotation != null) {
-            Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
+            Class<? extends StructPropHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
                     handlerAnnotation.annotationType());
             return (H) newHandler(handlerClass);
         }
@@ -96,10 +98,10 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    public static <H extends StructFieldHandler<?>> H newHandler(Class<H> clazz) {
+    public static <H extends StructPropHandler<?>> H newHandler(Class<H> clazz) {
         try {
-            return ReflectUtil.getConstructor(clazz).newInstance();
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
+            return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
+        } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
     }
@@ -113,7 +115,17 @@ public class StructUtils {
     }
 
     public static int findBasicSize(Class<?> basicClass) {
-        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(Basic::reflectForSize));
+        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(StructUtils::reflectForSize));
+    }
+
+    public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass) {
+        ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
+        try {
+            return newBasic(basicClass, fillingBuf).getSize();
+        } finally {
+            fillingBuf.skipBytes(fillingBuf.readableBytes());
+            fillingBuf.release();
+        }
     }
 
     /**
@@ -138,23 +150,17 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
-            return (B) ReflectUtil.getConstructor(basicClass, ByteBuf.class).newInstance(buf);
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException invocationException) {
-            Throwable cause = invocationException.getCause();
+            return (B) CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> findConstructor(basicClass, ByteBuf.class)).invoke(buf);
+        } catch (Throwable instanceError) {
+            Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException) {
-                throw new SerializeException(cause.getMessage());
+                throw new SerializeException(instanceError);
             } else {
                 throw new SerializeException(
                         "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf)
-                        + "]", cause);
+                        + "]", instanceError);
             }
         }
-    }
-
-    public static <B extends Basic<?>> Constructor<B> filterConstructor(Class<?> basicClass,
-                                                                        Predicate<Constructor<B>> filter) {
-        Constructor<B>[] constructors = (Constructor<B>[]) ReflectUtil.getConstructors(basicClass);
-        return Arrays.stream(constructors).filter(filter).findFirst().orElse(null);
     }
 
     /**
@@ -177,30 +183,33 @@ public class StructUtils {
      */
     public static <S> S newStruct(Type structClass) {
         try {
-            if (structClass instanceof Class) {
-                return ReflectUtil.getConstructor((Class<S>) structClass).newInstance();
-            }
-
-            if (structClass instanceof ParameterizedType) {
-                return ReflectUtil.getConstructor((Class<S>) ((ParameterizedType) structClass).getRawType()).newInstance();
-            }
+            if (structClass instanceof Class)
+                return (S) CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) structClass, MethodHandleUtil::findConstructor).invoke();
+            if (structClass instanceof ParameterizedType)
+                return (S) CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), MethodHandleUtil::findConstructor).invoke();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
-        } catch (IllegalAccessException | InvocationTargetException | InstantiationException exception) {
-            throw new SerializeException("struct [" + structClass + "] instantiate failed...", exception);
+        } catch (Throwable instanceError) {
+            throw new SerializeException("struct [" + structClass + "] instantiate failed...", instanceError);
         }
     }
 
-    public static void writeField(Object object, Field field, Object value) {
-        Method writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field,
-                                                                f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getWriteMethod());
-        MethodHandleUtil.invoke(object, writeMethod, value);
+    public static void writeField(Object object, Field field, Object value) throws Throwable {
+        MethodHandle writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> getWriterHandle(object.getClass(), f));
+        writeMethod.invoke(object, value);
     }
 
-    public static <T> T readField(Object object, Field field) {
-        Method readMethod = FIELD_READER_CACHE.computeIfAbsent(field,
-                                                               f -> BeanUtil.getPropertyDescriptor(object.getClass(), f.getName()).getReadMethod());
-        return MethodHandleUtil.invoke(object, readMethod);
+    public static <T> T readField(Object object, Field field) throws Throwable {
+        MethodHandle readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> getReaderHandle(object.getClass(), f));
+        return (T) readMethod.invoke(object);
+    }
+
+    public static MethodHandle getReaderHandle(Class<?> clazz, Field field) {
+        return findMethod(clazz, upperFirstAndAddPre(field.getName(), "get"), methodType(field.getType()));
+    }
+
+    public static MethodHandle getWriterHandle(Class<?> clazz, Field field) {
+        return findMethod(clazz, upperFirstAndAddPre(field.getName(), "set"), methodType(void.class, field.getType()));
     }
 
     /**
