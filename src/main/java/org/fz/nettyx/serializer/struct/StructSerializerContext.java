@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
+import static org.fz.nettyx.serializer.struct.StructPropHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructUtils.getReaderHandle;
 import static org.fz.nettyx.serializer.struct.StructUtils.getWriterHandle;
 
@@ -50,7 +50,7 @@ public final class StructSerializerContext {
     /**
      * mapping handler and annotation
      */
-    static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
+    static final Map<Class<? extends Annotation>, Class<? extends StructPropHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>();
 
     static {
         doScan(EMPTY);
@@ -67,7 +67,7 @@ public final class StructSerializerContext {
             for (String packageName : packageNames) {
                 Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
-                scanFieldHandlers(classes);
+                scanPropHandlers(classes);
                 scanBasics(classes);
                 scanStructs(classes);
             }
@@ -76,16 +76,16 @@ public final class StructSerializerContext {
         }
     }
 
-    private synchronized static void scanFieldHandlers(Set<Class<?>> classes) {
+    private synchronized static void scanPropHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
-            boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
+            boolean isPropertyHandler = StructPropHandler.class.isAssignableFrom(clazz);
 
             if (isPropertyHandler) {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                 if (targetAnnotationType != null) {
                     CONSTRUCTOR_CACHE.putIfAbsent(clazz, findConstructor(clazz));
                     ANNOTATION_HANDLER_MAPPING.putIfAbsent(targetAnnotationType,
-                                                           (Class<? extends StructFieldHandler<? extends Annotation>>) clazz);
+                                                           (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
                 }
             }
         }

@@ -88,7 +88,7 @@ serializer                             Serialization tool
         c                              internal c basic types
         cpp                            internal cpp basic types
         ---Basic                       basic type
-     ---StructFieldHandler             top struct field handler interface
+     ---StructPropHandler             top struct field handler interface
      ---StructSerializer               core struct serializer tool
      ---StructSerializerContext        the context of struct serializer, contains handler-instance, type cache, etc
      ---StructUtils                    struct serializer tool
