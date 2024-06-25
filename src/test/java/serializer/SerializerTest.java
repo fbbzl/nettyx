@@ -46,7 +46,7 @@ public class SerializerTest {
     }
 
 
-   static final TypeRefer<User<Clong4, Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>> typeRefer = new TypeRefer<User<Clong4,
+   static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>> typeRefer = new TypeRefer<User<Bill,
             Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>>() {
     };
     @Test
@@ -72,12 +72,12 @@ public class SerializerTest {
         Console.log("userWriteBytes: " + userWriteBytes.length);
         User turn = StructSerializer.read(typeRefer, userWriteBytes);
 
+        System.err.println(turn.equals(user));
         byte[] bytes1 = StructSerializer.writeBytes(typeRefer, turn);
         Console.log("bytes1: " + bytes1.length);
         Console.log(Arrays.toString(bytes1));
         Console.log("turn :" + turn);
 
-        System.err.println(turn.equals(user));
         Assert.assertNotNull(turn);
     }
 
