@@ -21,8 +21,8 @@ import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findMethod;
 import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
 import static java.lang.invoke.MethodType.methodType;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructPropHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.StructPropHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -44,7 +44,7 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((StructFieldHandler<?>) StructUtils.getHandler(field));
+        return isReadHandler((StructPropHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
@@ -54,7 +54,7 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((StructFieldHandler<?>) StructUtils.getHandler(field));
+        return isWriteHandler((StructPropHandler<?>) StructUtils.getHandler(field));
     }
 
     /**
@@ -81,10 +81,10 @@ public class StructUtils {
      * @param element the element
      * @return the serializer handler
      */
-    public <H extends StructFieldHandler<?>> H getHandler(AnnotatedElement element) {
+    public <H extends StructPropHandler<?>> H getHandler(AnnotatedElement element) {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
         if (handlerAnnotation != null) {
-            Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
+            Class<? extends StructPropHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
                     handlerAnnotation.annotationType());
             return (H) newHandler(handlerClass);
         }
@@ -98,7 +98,7 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    public static <H extends StructFieldHandler<?>> H newHandler(Class<H> clazz) {
+    public static <H extends StructPropHandler<?>> H newHandler(Class<H> clazz) {
         try {
             return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
         } catch (Throwable exception) {
