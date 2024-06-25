@@ -40,7 +40,7 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((ls, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
+                        byte[] msg = new byte[2048];
                         Arrays.fill(msg, (byte) 1);
                         testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
