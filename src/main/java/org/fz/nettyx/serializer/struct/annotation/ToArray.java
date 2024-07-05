@@ -173,14 +173,10 @@ public @interface ToArray {
             for (int i = 0; i < length; i++) {
                 if (i < basicArray.length) {
                     Basic<?> basic = basicArray[i];
-                    if (basic == null) {
-                        writing.writeBytes(new byte[elementBytesSize]);
-                    } else {
-                        writing.writeBytes(basicArray[i].getBytes());
-                    }
-                } else {
-                    writing.writeBytes(new byte[elementBytesSize]);
+                    if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
+                    else               writing.writeBytes(basicArray[i].getBytes());
                 }
+                else writing.writeBytes(new byte[elementBytesSize]);
             }
         }
 
