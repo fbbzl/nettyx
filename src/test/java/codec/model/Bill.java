@@ -15,16 +15,14 @@ public class Bill {
     @ToString(bufferLength = 4)
     private String orgName;
 
-    @ToNamedEnum(enumType = BillType.class,bufferLength = 4)
+    @ToNamedEnum(enumType = BillType.class, bufferLength = 4)
     private BillType billType;
 
-    @Override
-    public String toString() {
-        return "Bill{" + "bid='" + bid + '\'' + '}';
-    }
-
     public enum BillType {
-        NORMAL, VIP,CCCC,
+        C,
+        CC,
+        CCC,
+        CCCC, CCCCC,
         ;
     }
 }
