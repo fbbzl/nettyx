@@ -58,10 +58,7 @@ public abstract class TypeRefer<T> implements Type {
             return getActualType(root, actualTypeArguments[index]);
         }
 
-        if (type instanceof GenericArrayType) {
-            GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);
-            return getActualType(root, TypeUtil.getActualType(root, genericArrayType.getGenericComponentType()));
-        }
+        if (type instanceof GenericArrayType) return getActualType(root, TypeUtil.getActualType(root, ((GenericArrayType) TypeUtil.getActualType(root, type)).getGenericComponentType()));
 
         return (Class<T>) Object.class;
     }
