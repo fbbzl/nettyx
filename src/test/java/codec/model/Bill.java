@@ -15,7 +15,7 @@ public class Bill {
     @ToString(bufferLength = 4)
     private String orgName;
 
-    @ToNamedEnum(enumType = BillType.class, bufferLength = 4)
+    @ToNamedEnum(enumType = BillType.class, bufferLength = 3)
     private BillType billType;
 
     public enum BillType {
