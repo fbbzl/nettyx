@@ -142,9 +142,7 @@ public @interface ToArray {
                                                                ByteBuf arrayBuf) {
             B[] basics = newArray(elementType, length);
 
-            for (int i = 0; i < basics.length; i++) {
-                basics[i] = newBasic(elementType, arrayBuf);
-            }
+            for (int i = 0; i < basics.length; i++) basics[i] = newBasic(elementType, arrayBuf);
 
             return basics;
         }
@@ -157,9 +155,7 @@ public @interface ToArray {
         private static <S> S[] readStructArray(Class<S> elementType, int length, ByteBuf arrayBuf) {
             S[] structs = newArray(elementType, length);
 
-            for (int i = 0; i < structs.length; i++) {
-                structs[i] = StructSerializer.read(elementType, arrayBuf);
-            }
+            for (int i = 0; i < structs.length; i++) structs[i] = StructSerializer.read(elementType, arrayBuf);
 
             return structs;
         }
@@ -186,39 +182,25 @@ public @interface ToArray {
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
                     Basic<?> basic = (Basic<?>) iterator.next();
-                    if (basic == null) {
-                        writing.writeBytes(new byte[elementBytesSize]);
-                    } else {
-                        writing.writeBytes(basic.getBytes());
-                    }
-                } else {
-                    writing.writeBytes(new byte[elementBytesSize]);
+                    if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
+                    else               writing.writeBytes(basic.getBytes());
                 }
+                else writing.writeBytes(new byte[elementBytesSize]);
             }
         }
 
-        private static <T> void writeStructArray(Object[] structArray, Class<T> elementType, int length,
-                                                 ByteBuf writing) {
+        private static <T> void writeStructArray(Object[] structArray, Class<T> elementType, int length, ByteBuf writing) {
             for (int i = 0; i < length; i++) {
-                if (i < structArray.length) {
-                    writing.writeBytes(
-                            StructSerializer.write(defaultIfNull(structArray[i], () -> newStruct(elementType))));
-                } else {
-                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
-                }
+                if (i < structArray.length) writing.writeBytes(StructSerializer.write(defaultIfNull(structArray[i], () -> newStruct(elementType))));
+                else                        writing.writeBytes(StructSerializer.write(newStruct(elementType)));
             }
         }
 
-        private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int length,
-                                                  ByteBuf writing) {
+        private static void writeStructCollection(Collection<?> collection, Class<?> elementType, int length, ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
             for (int i = 0; i < length; i++) {
-                if (iterator.hasNext()) {
-                    writing.writeBytes(
-                            StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
-                } else {
-                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
-                }
+                if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+                else                    writing.writeBytes(StructSerializer.write(newStruct(elementType)));
             }
         }
 
