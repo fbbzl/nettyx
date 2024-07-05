@@ -22,7 +22,6 @@ public class Bill {
     public String toString() {
         return "Bill{" + "bid='" + bid + '\'' + '}';
     }
-
     public enum BillType {
         NORMAL, VIP,
         ;
