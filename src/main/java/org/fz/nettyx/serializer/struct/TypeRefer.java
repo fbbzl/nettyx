@@ -27,11 +27,10 @@ public abstract class TypeRefer<T> implements Type {
     }
 
     public static <T> Class<T> getRawType(Type type) {
-        if (type instanceof Class<?>) {
-            return (Class<T>) type;
-        } else if (type instanceof ParameterizedType) {
-            return (Class<T>) ((ParameterizedType) type).getRawType();
-        }
+        if (type instanceof Class<?>)          return (Class<T>) type;
+        else
+        if (type instanceof ParameterizedType) return (Class<T>) ((ParameterizedType) type).getRawType();
+
         throw new TypeJudgmentException(type);
     }
 
@@ -44,16 +43,12 @@ public abstract class TypeRefer<T> implements Type {
     }
 
     public static <T> Class<T> getActualType(Type root, Type type, int index) {
-        if (type instanceof Class) {
-            return (Class<T>) type;
-        }
-        if (!(root instanceof ParameterizedType) || type instanceof WildcardType) {
-            return (Class<T>) Object.class;
-        }
+        if (type instanceof Class) return (Class<T>) type;
 
-        if (type instanceof TypeVariable) {
-            return getActualType(root, TypeUtil.getActualType(root, type));
-        }
+        if (!(root instanceof ParameterizedType) || type instanceof WildcardType) return (Class<T>) Object.class;
+
+        if (type instanceof TypeVariable) return getActualType(root, TypeUtil.getActualType(root, type));
+
         if (type instanceof ParameterizedType) {
             Type   actualType          = TypeUtil.getActualType(root, type);
             Type[] actualTypeArguments = ((ParameterizedType) actualType).getActualTypeArguments();
@@ -62,6 +57,7 @@ public abstract class TypeRefer<T> implements Type {
             }
             return getActualType(root, actualTypeArguments[index]);
         }
+
         if (type instanceof GenericArrayType) {
             GenericArrayType genericArrayType = (GenericArrayType) TypeUtil.getActualType(root, type);
             return getActualType(root, TypeUtil.getActualType(root, genericArrayType.getGenericComponentType()));

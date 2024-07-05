@@ -54,6 +54,7 @@ public @interface ToArrayList {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
+
             Class<?> elementType =
                     (elementType = toArrayList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
                                                                                               field, 0)
