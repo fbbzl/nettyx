@@ -27,13 +27,34 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
 
     protected SerialCommAddress remoteAddress;
 
+    protected boolean open = true;
+
+    @Override
+    public boolean isOpen() {
+        return open;
+    }
+
+    @Override
+    protected boolean isInputShutdown() {
+        return !open;
+    }
+
+    @Override
+    protected void doClose() throws Exception {
+        try {
+            super.doClose();
+        } finally {
+            open = false;
+        }
+    }
+
     protected abstract InputStream getInputStream() throws IOException;
 
     protected abstract OutputStream getOutputStream() throws IOException;
 
     @Override
     protected AbstractUnsafe newUnsafe() {
-        return new SerialCommPortUnsafe();
+        return new SerialCommUnsafe();
     }
 
     @Override
@@ -61,7 +82,7 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
         throw new UnsupportedOperationException("doBind");
     }
 
-    protected final class SerialCommPortUnsafe extends AbstractUnsafe {
+    protected final class SerialCommUnsafe extends AbstractUnsafe {
         @Override
         public void connect(
                 final SocketAddress remoteAddress,

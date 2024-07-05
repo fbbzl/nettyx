@@ -17,13 +17,13 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 @Slf4j
 @SuppressWarnings("deprecation")
-public abstract class SingleRxtxChannellTemplate extends AbstractSingleChannelTemplate<RxtxChannel, RxtxChannelConfig> {
+public abstract class SingleRxtxChannelTemplate extends AbstractSingleChannelTemplate<RxtxChannel, RxtxChannelConfig> {
 
-    protected SingleRxtxChannellTemplate(String commAddress) {
+    protected SingleRxtxChannelTemplate(String commAddress) {
         super(new SerialCommChannel.SerialCommAddress(commAddress));
     }
 
-    protected SingleRxtxChannellTemplate(SerialCommChannel.SerialCommAddress commAddress) {
+    protected SingleRxtxChannelTemplate(SerialCommChannel.SerialCommAddress commAddress) {
         super(commAddress);
     }
 
