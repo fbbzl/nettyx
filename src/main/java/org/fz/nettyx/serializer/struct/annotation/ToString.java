@@ -69,8 +69,10 @@ public @interface ToString {
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
             else               writing.writeBytes(new byte[bufferLength]);
-
         }
 
+        public static void toExceptionNotice() {// TODO
+
+        }
     }
 }
