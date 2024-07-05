@@ -15,6 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -49,8 +50,7 @@ public @interface ToArray {
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
-            Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
-                                   ? getActualType(serializer.getRootType(), field, 0) : elementType;
+            Class<?> elementType = getElementType(serializer.getRootType(), field);
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
@@ -65,8 +65,7 @@ public @interface ToArray {
 
         @Override
         public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation, ByteBuf writing) {
-            Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
-                                   ? getActualType(serializer.getRootType(), field, 0) : elementType;
+            Class<?> elementType = getElementType(serializer.getRootType(), field);
 
             Throws.ifTrue(elementType == Object.class, new TypeJudgmentException(field));
 
@@ -77,6 +76,11 @@ public @interface ToArray {
             } catch (TypeJudgmentException typeJudgmentException) {
                 throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
+        }
+
+        private static Class<?> getElementType(Type rootType, Field field) {
+            Class<?> elementType = getComponentType(field);
+            return !ClassUtil.isAssignable(Basic.class, elementType) ? getActualType(rootType, field, 0) : elementType;
         }
 
         public static <T> T[] readArray(ByteBuf buf, Class<?> elementType, int length) {
