@@ -54,8 +54,7 @@ public class SerializerTest {
         byte[] bytes = new byte[1024 * 6];
         Arrays.fill(bytes, (byte) 67);
 
-        User user = StructSerializer.read(typeRefer,
-                Unpooled.wrappedBuffer(bytes));
+        User user = StructSerializer.read(typeRefer, Unpooled.wrappedBuffer(bytes));
 
         Console.log("read :" + user);
 //        user.setAddress(null);
