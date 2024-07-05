@@ -64,8 +64,7 @@ public @interface ToArray {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation,
-                            ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Field field, Object arrayValue, ToArray annotation, ByteBuf writing) {
             Class<?> elementType = !ClassUtil.isAssignable(Basic.class, (elementType = getComponentType(field)))
                                    ? getActualType(serializer.getRootType(), field, 0) : elementType;
 
@@ -102,14 +101,12 @@ public @interface ToArray {
             else
             if (isStruct(elementType)) {
                 Object[] structArray = defaultIfNull((Object[]) arrayValue, () -> newArray(elementType, length));
-                writeStructArray(defaultIfNull(structArray, () -> newArray(elementType, length)), elementType, length,
-                                 writing);
+                writeStructArray(defaultIfNull(structArray, () -> newArray(elementType, length)), elementType, length, writing);
             }
             else throw new TypeJudgmentException();
         }
 
-        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length,
-                                                       Collection<?> coll) {
+        public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length, Collection<?> coll) {
             if (isBasic(elementType))  return (Collection<T>) readBasicCollection(buf, elementType, length, coll);
             else
             if (isStruct(elementType)) return readStructCollection(buf, elementType, length, coll);
@@ -130,8 +127,7 @@ public @interface ToArray {
             return (T[]) Array.newInstance(componentType, length);
         }
 
-        private static <B extends Basic<?>> B[] readBasicArray(Class<?> elementType, int length,
-                                                               ByteBuf arrayBuf) {
+        private static <B extends Basic<?>> B[] readBasicArray(Class<?> elementType, int length, ByteBuf arrayBuf) {
             B[] basics = newArray(elementType, length);
 
             for (int i = 0; i < basics.length; i++) basics[i] = newBasic(elementType, arrayBuf);
@@ -139,8 +135,7 @@ public @interface ToArray {
             return basics;
         }
 
-        private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType,
-                                                                              int length, Collection<?> coll) {
+        private static <B extends Basic<?>> Collection<B> readBasicCollection(ByteBuf arrayBuf, Class<?> elementType, int length, Collection<?> coll) {
             return (Collection<B>) CollUtil.addAll(coll, readBasicArray(elementType, length, arrayBuf));
         }
 
@@ -152,8 +147,7 @@ public @interface ToArray {
             return structs;
         }
 
-        private static <T> Collection<T> readStructCollection(ByteBuf arrayBuf, Class<?> elementType, int length,
-                                                              Collection<?> coll) {
+        private static <T> Collection<T> readStructCollection(ByteBuf arrayBuf, Class<?> elementType, int length, Collection<?> coll) {
             return (Collection<T>) CollUtil.addAll(coll, readStructArray(elementType, length, arrayBuf));
         }
 
@@ -168,8 +162,7 @@ public @interface ToArray {
             }
         }
 
-        private static void writeBasicCollection(Collection<?> collection, int elementBytesSize, int length,
-                                                 ByteBuf writing) {
+        private static void writeBasicCollection(Collection<?> collection, int elementBytesSize, int length, ByteBuf writing) {
             Iterator<?> iterator = collection.iterator();
             for (int i = 0; i < length; i++) {
                 if (iterator.hasNext()) {
