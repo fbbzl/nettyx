@@ -46,7 +46,7 @@ public class SerializerTest {
     }
 
 
-   static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>> typeRefer = new TypeRefer<User<Bill,
+   static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>> userTypeRefer = new TypeRefer<User<Bill,
             Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>>() {
     };
     @Test
@@ -54,7 +54,7 @@ public class SerializerTest {
         byte[] bytes = new byte[1024 * 6];
         Arrays.fill(bytes, (byte) 67);
 
-        User user = StructSerializer.read(typeRefer, Unpooled.wrappedBuffer(bytes));
+        User user = StructSerializer.read(userTypeRefer, Unpooled.wrappedBuffer(bytes));
 
         Console.log("read :" + user);
 //        user.setAddress(null);
@@ -66,12 +66,12 @@ public class SerializerTest {
 //        user.setWives(null);
 //        user.setWwife(null);
 
-        final byte[] userWriteBytes = StructSerializer.writeBytes(typeRefer, user);
+        final byte[] userWriteBytes = StructSerializer.writeBytes(userTypeRefer, user);
         Console.log("userWriteBytes: " + userWriteBytes.length);
-        User turn = StructSerializer.read(typeRefer, userWriteBytes);
+        User turn = StructSerializer.read(userTypeRefer, userWriteBytes);
 
         System.err.println(turn.equals(user));
-        byte[] bytes1 = StructSerializer.writeBytes(typeRefer, turn);
+        byte[] bytes1 = StructSerializer.writeBytes(userTypeRefer, turn);
         Console.log("bytes1: " + bytes1.length);
         Console.log(Arrays.toString(bytes1));
         Console.log("turn :" + turn);
