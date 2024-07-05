@@ -24,7 +24,7 @@ public class Bill {
     }
 
     public enum BillType {
-        NORMAL, VIP,
+        NORMAL, VIP,CCCC,
         ;
     }
 }
