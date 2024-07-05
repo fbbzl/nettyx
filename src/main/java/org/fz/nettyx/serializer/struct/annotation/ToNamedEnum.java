@@ -61,8 +61,7 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum,
-                            ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum, ByteBuf writing) {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();
 
