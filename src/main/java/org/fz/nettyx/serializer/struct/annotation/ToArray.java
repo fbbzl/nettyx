@@ -81,13 +81,10 @@ public @interface ToArray {
         }
 
         public static <T> T[] readArray(ByteBuf buf, Class<?> elementType, int length) {
-            if (isBasic(elementType)) {
-                return (T[]) readBasicArray(elementType, length, buf);
-            } else if (isStruct(elementType)) {
-                return (T[]) readStructArray(elementType, length, buf);
-            } else {
-                throw new TypeJudgmentException();
-            }
+            if (isBasic(elementType))  return (T[]) readBasicArray(elementType, length, buf);
+            else
+            if (isStruct(elementType)) return (T[]) readStructArray(elementType, length, buf);
+            else                       throw new TypeJudgmentException();
         }
 
         public static void writeArray(Object arrayValue, Class<?> elementType, int length, ByteBuf writing) {
@@ -101,13 +98,14 @@ public @interface ToArray {
                 }
 
                 writeBasicArray(basicArray, basicElementSize, length, writing);
-            } else if (isStruct(elementType)) {
+            }
+            else
+            if (isStruct(elementType)) {
                 Object[] structArray = defaultIfNull((Object[]) arrayValue, () -> newArray(elementType, length));
                 writeStructArray(defaultIfNull(structArray, () -> newArray(elementType, length)), elementType, length,
                                  writing);
-            } else {
-                throw new TypeJudgmentException();
             }
+            else throw new TypeJudgmentException();
         }
 
         public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length,
