@@ -10,6 +10,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,13 +53,14 @@ public @interface ToLinkedList {
      * The type To linked list handler.
      */
     class ToLinkedListHandler implements StructPropHandler.ReadWriteHandler<ToLinkedList> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
-            Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
-                                                                                               field, 0)
-                                                                               : elementType;
+            Class<?> elementType = getElementType(serializer.getRootType(), toLinkedList, field);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
@@ -66,18 +68,17 @@ public @interface ToLinkedList {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList,
-                            ByteBuf writing) {
-            Class<?> elementType =
-                    (elementType = toLinkedList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
-                                                                                               field, 0)
-                                                                               : elementType;
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList, ByteBuf writing) {
+            Class<?> elementType = getElementType(serializer.getRootType(), toLinkedList, field);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
+            writeCollection((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
+        }
 
-            writeCollection(list, elementType, toLinkedList.size(), writing);
+        private static Class<?> getElementType(Type rootType, ToLinkedList toLinkedList, Field field) {
+            Class<?> elementType = toLinkedList.elementType();
+            return elementType == Object.class ? getActualType(rootType, field, 0) : elementType;
         }
     }
 

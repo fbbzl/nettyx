@@ -24,9 +24,9 @@ import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    private final       SocketAddress              remoteAddress;
-    private final       Bootstrap                  bootstrap;
-    private             Channel                    channel;
+    private final SocketAddress remoteAddress;
+    private final Bootstrap     bootstrap;
+    private       C             channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
@@ -41,10 +41,10 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
     }
 
     protected void storeChannel(ChannelFuture cf) {
-        storeChannel(cf.channel());
+        storeChannel((C) cf.channel());
     }
 
-    protected void storeChannel(Channel channel) {
+    protected void storeChannel(C channel) {
         if (isActive(this.channel)) closeChannelDirectly(true);
 
         this.channel = channel;

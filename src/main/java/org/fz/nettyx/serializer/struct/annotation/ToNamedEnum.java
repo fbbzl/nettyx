@@ -50,6 +50,10 @@ public @interface ToNamedEnum {
      * The type To named enum handler.
      */
     class ToNamedEnumHandler implements StructPropHandler.ReadWriteHandler<ToNamedEnum> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToNamedEnum toNamedEnum) {
@@ -61,13 +65,12 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum,
-                            ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Field field, Object value, ToNamedEnum toNamedEnum, ByteBuf writing) {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else writing.writeBytes(new byte[bufferLength]);
+            else               writing.writeBytes(new byte[bufferLength]);
         }
     }
 

@@ -30,8 +30,7 @@ import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                                  Template<C> {
+public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 

@@ -44,6 +44,10 @@ public @interface ToString {
     int bufferLength();
 
     class ToStringHandler implements StructPropHandler.ReadWriteHandler<ToString> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToString toString) {
@@ -68,9 +72,7 @@ public @interface ToString {
             String charset      = toString.charset();
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else writing.writeBytes(new byte[bufferLength]);
-
+            else               writing.writeBytes(new byte[bufferLength]);
         }
-
     }
 }

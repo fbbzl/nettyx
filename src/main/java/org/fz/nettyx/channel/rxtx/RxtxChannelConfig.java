@@ -19,6 +19,7 @@ import gnu.io.SerialPort;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
 import lombok.RequiredArgsConstructor;
+import org.fz.nettyx.exception.UnknownConfigException;
 
 import java.util.Map;
 
@@ -204,7 +205,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
                     return stopbit;
                 }
             }
-            throw new IllegalArgumentException("unknown " + StopBits.class.getSimpleName() + " value: " + value);
+            throw new UnknownConfigException(StopBits.class.getSimpleName(), value);
         }
     }
 

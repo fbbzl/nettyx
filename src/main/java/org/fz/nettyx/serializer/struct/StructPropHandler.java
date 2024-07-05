@@ -23,6 +23,14 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.*;
 @SuppressWarnings("all")
 public interface StructPropHandler<A extends Annotation> {
 
+    /**
+     * config the handler instance if is singleton
+     * @return if is singleton-handler
+     */
+    default boolean isSingleton() {
+        return false;
+    }
+
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
         if (!ClassUtil.isNormalClass(clazz)) {
             return null;
