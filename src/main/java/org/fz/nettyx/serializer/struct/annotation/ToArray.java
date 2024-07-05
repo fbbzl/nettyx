@@ -112,13 +112,10 @@ public @interface ToArray {
 
         public static <T> Collection<T> readCollection(ByteBuf buf, Class<?> elementType, int length,
                                                        Collection<?> coll) {
-            if (isBasic(elementType)) {
-                return (Collection<T>) readBasicCollection(buf, elementType, length, coll);
-            } else if (isStruct(elementType)) {
-                return readStructCollection(buf, elementType, length, coll);
-            } else {
-                throw new TypeJudgmentException();
-            }
+            if (isBasic(elementType))  return (Collection<T>) readBasicCollection(buf, elementType, length, coll);
+            else
+            if (isStruct(elementType)) return readStructCollection(buf, elementType, length, coll);
+            else                       throw new TypeJudgmentException();
         }
 
         public static void writeCollection(Collection<?> collection, Class<?> elementType, int length,
