@@ -57,7 +57,7 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
                 .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
                         byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 1);
+                        Arrays.fill(msg, (byte) 67);
                         testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
 

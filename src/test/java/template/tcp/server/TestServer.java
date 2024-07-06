@@ -48,7 +48,7 @@ public class TestServer extends TcpServerTemplate {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object in) throws Exception {
                                 byte[] msg = new byte[2048];
-                                Arrays.fill(msg, (byte) 1);
+                                Arrays.fill(msg, (byte) 67);
                                 ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
                                 super.channelRead(ctx, in);
                             }

@@ -37,7 +37,7 @@ public class SerializerTest {
     @Test
     public void testXmlSerializer() {
         byte[] bytes = new byte[1024 * 2];
-        Arrays.fill(bytes, (byte) 0);
+        Arrays.fill(bytes, (byte) 67);
         Model model1 = XmlSerializerContext.findModel("school", "student");
         Dict doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
 

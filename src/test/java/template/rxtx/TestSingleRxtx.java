@@ -55,7 +55,7 @@ public class TestSingleRxtx extends SingleRxtxChannellTemplate {
                 .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
                         byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 1);
+                        Arrays.fill(msg, (byte) 67);
                         testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
 
