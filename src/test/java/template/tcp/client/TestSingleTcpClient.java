@@ -41,7 +41,7 @@ public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
                 .whenSuccess((ls, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
                         byte[] msg = new byte[2048];
-                        Arrays.fill(msg, (byte) 1);
+                        Arrays.fill(msg, (byte) 67);
                         testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
                     System.err.println(testClient);
