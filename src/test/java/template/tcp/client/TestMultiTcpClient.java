@@ -50,7 +50,7 @@ public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
+                        byte[] msg = new byte[2048];
                         Arrays.fill(msg, (byte) 67);
                         cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
                     }, 2, 30, TimeUnit.MILLISECONDS);
