@@ -42,19 +42,19 @@ public class TestReflect {
         StopWatch stopWatch = StopWatch.create("");
 
         stopWatch.start("new ");
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1_000_000_000; i++) {
             Order order = new Order();
         }
         stopWatch.stop();
 
         stopWatch.start("ref construct");
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1_000_000_000; i++) {
             Order order = refConstruct.newInstance();
         }
         stopWatch.stop();
 
         stopWatch.start("method handle");
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1_000_000_000; i++) {
             Object invoke = methodHandle.invoke();
         }
         stopWatch.stop();
