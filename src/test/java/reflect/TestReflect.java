@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static java.lang.invoke.MethodType.methodType;
 
@@ -28,6 +29,7 @@ public class TestReflect {
 
     private static final Constructor<Order> refConstruct = ReflectUtil.getConstructor(Order.class);
     private static final MethodHandle       methodHandle;
+    private static final Supplier<Order> supplier = Order::new;
 
     static {
         try {
@@ -41,9 +43,15 @@ public class TestReflect {
     public void testReflect() throws Throwable {
         StopWatch stopWatch = StopWatch.create("");
 
-        stopWatch.start("new ");
+        stopWatch.start("new");
         for (int i = 0; i < 1_000_000_000; i++) {
             Order order = new Order();
+        }
+        stopWatch.stop();
+
+        stopWatch.start("supplier");
+        for (int i = 0; i < 1_000_000_000; i++) {
+            Order order = supplier.get();
         }
         stopWatch.stop();
 
