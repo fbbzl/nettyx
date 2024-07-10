@@ -2,6 +2,7 @@ package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import org.fz.nettyx.util.Throws;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2021 /4/25 15:46
  */
+@SuppressWarnings("unchecked")
 public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     protected final boolean defaultInterceptAll;
@@ -425,6 +427,30 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
     }
 
     //***************************************    public static start   ***********************************************//
+
+    public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, String interceptorName) {
+        for (Map.Entry<String, ChannelHandler> entry : pipeline) {
+            boolean isTargetInterceptor =
+                    entry.getKey().equalsIgnoreCase(interceptorName)
+                    &&
+                    ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass());
+
+            if (isTargetInterceptor) return (T) entry.getValue();
+        }
+
+        return null;
+    }
+
+    public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, Class<?> interceptorClass) {
+        Throws.ifNotAssignable(ChannelInterceptor.class, interceptorClass, "class [" + interceptorClass + "] is not assignable to ChannelInterceptor");
+
+        for (Map.Entry<String, ChannelHandler> entry : pipeline) {
+            if (interceptorClass.isAssignableFrom(entry.getValue().getClass())) return (T) entry.getValue();
+        }
+
+        return null;
+    }
+
     public static <T extends ChannelInterceptor> List<T> getInterceptors(Channel channel) {
         return getInterceptors(channel.pipeline());
     }
@@ -433,14 +459,12 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         return getInterceptors(ctx.pipeline());
     }
 
-    @SuppressWarnings("unchecked")
+
     public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelPipeline pipeline) {
         List<T> result = new ArrayList<>(10);
 
         for (Map.Entry<String, ChannelHandler> entry : pipeline) {
-            if (ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass())) {
-                result.add((T) entry.getValue());
-            }
+            if (ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass())) result.add((T) entry.getValue());
         }
 
         return result;
