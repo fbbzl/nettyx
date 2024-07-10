@@ -46,28 +46,24 @@ public class TestReflect {
         stopWatch.start("new");
         for (int i = 0; i < 1_000_000_000; i++) {
             Order order = new Order();
-            int   i1    = order.hashCode();
         }
         stopWatch.stop();
 
         stopWatch.start("supplier");
         for (int i = 0; i < 1_000_000_000; i++) {
             Order order = supplier.get();
-            int   i1    = order.hashCode();
         }
         stopWatch.stop();
 
         stopWatch.start("ref construct");
         for (int i = 0; i < 1_000_000_000; i++) {
             Order order = refConstruct.newInstance();
-            int   i1    = order.hashCode();
         }
         stopWatch.stop();
 
         stopWatch.start("method handle");
         for (int i = 0; i < 1_000_000_000; i++) {
-            Object order = methodHandle.invoke();
-            int   i1    = order.hashCode();
+            Object invoke = methodHandle.invoke();
         }
         stopWatch.stop();
 
