@@ -470,6 +470,32 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         return result;
     }
 
+    public static void free(Channel channel, Class<?> interceptorClass) {
+        free(channel.pipeline(), interceptorClass);
+    }
+
+    public static void free(ChannelHandlerContext ctx, Class<?> interceptorClass) {
+        free(ctx.pipeline(), interceptorClass);
+    }
+
+    public static void free(Channel channel, String interceptorName) {
+        free(channel.pipeline(), interceptorName);
+    }
+
+    public static void free(ChannelHandlerContext ctx, String interceptorName) {
+        free(ctx.pipeline(), interceptorName);
+    }
+
+    public static void free(ChannelPipeline pipeline, String interceptorName) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorName);
+        if (interceptor != null) interceptor.free();
+    }
+
+    public static void free(ChannelPipeline pipeline, Class<?> interceptorClass) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorClass);
+        if (interceptor != null) interceptor.free();
+    }
+
     public static void freeAll(Channel channel) {
         freeAll(channel.pipeline());
     }
@@ -480,6 +506,32 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     public static void freeAll(ChannelPipeline pipeline) {
         getInterceptors(pipeline).stream().filter(ChannelInterceptor::isNotFreed).forEach(ChannelInterceptor::free);
+    }
+
+    public static void reset(Channel channel, Class<?> interceptorClass) {
+        reset(channel.pipeline(), interceptorClass);
+    }
+
+    public static void reset(ChannelHandlerContext ctx, Class<?> interceptorClass) {
+        reset(ctx.pipeline(), interceptorClass);
+    }
+
+    public static void reset(Channel channel, String interceptorName) {
+        reset(channel.pipeline(), interceptorName);
+    }
+
+    public static void reset(ChannelHandlerContext ctx, String interceptorName) {
+        reset(ctx.pipeline(), interceptorName);
+    }
+
+    public static void reset(ChannelPipeline pipeline, String interceptorName) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorName);
+        if (interceptor != null) interceptor.reset();
+    }
+
+    public static void reset(ChannelPipeline pipeline, Class<?> interceptorClass) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorClass);
+        if (interceptor != null) interceptor.reset();
     }
 
     public static void resetAll(Channel channel) {
