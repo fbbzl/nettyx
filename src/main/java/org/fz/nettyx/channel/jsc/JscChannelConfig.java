@@ -5,6 +5,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
 import lombok.RequiredArgsConstructor;
+import org.fz.nettyx.exception.UnknownConfigException;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -155,8 +156,7 @@ public interface JscChannelConfig extends ChannelConfig {
             return Arrays.stream(StopBits.values())
                          .filter(stopBit -> stopBit.value == value)
                          .findFirst()
-                         .orElseThrow(() -> new IllegalArgumentException(
-                                 "unknown " + StopBits.class.getSimpleName() + " value: " + value));
+                         .orElseThrow(() -> new UnknownConfigException(StopBits.class.getSimpleName(), value));
         }
 
         public int value() {
