@@ -68,9 +68,7 @@ public @interface ToString {
             String charset      = toString.charset();
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else writing.writeBytes(new byte[bufferLength]);
-
+            else               writing.writeBytes(new byte[bufferLength]);
         }
-
     }
 }
