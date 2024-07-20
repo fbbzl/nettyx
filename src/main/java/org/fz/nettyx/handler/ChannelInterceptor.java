@@ -2,6 +2,7 @@ package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import org.fz.nettyx.util.Throws;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2021 /4/25 15:46
  */
+@SuppressWarnings("unchecked")
 public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     protected final boolean defaultInterceptAll;
@@ -425,6 +427,30 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
     }
 
     //***************************************    public static start   ***********************************************//
+
+    public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, String interceptorName) {
+        for (Map.Entry<String, ChannelHandler> entry : pipeline) {
+            boolean isTargetInterceptor =
+                    entry.getKey().equalsIgnoreCase(interceptorName)
+                    &&
+                    ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass());
+
+            if (isTargetInterceptor) return (T) entry.getValue();
+        }
+
+        return null;
+    }
+
+    public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, Class<?> interceptorClass) {
+        Throws.ifNotAssignable(ChannelInterceptor.class, interceptorClass, "class [" + interceptorClass + "] is not assignable to ChannelInterceptor");
+
+        for (Map.Entry<String, ChannelHandler> entry : pipeline) {
+            if (interceptorClass.isAssignableFrom(entry.getValue().getClass())) return (T) entry.getValue();
+        }
+
+        return null;
+    }
+
     public static <T extends ChannelInterceptor> List<T> getInterceptors(Channel channel) {
         return getInterceptors(channel.pipeline());
     }
@@ -433,17 +459,41 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         return getInterceptors(ctx.pipeline());
     }
 
-    @SuppressWarnings("unchecked")
+
     public static <T extends ChannelInterceptor> List<T> getInterceptors(ChannelPipeline pipeline) {
         List<T> result = new ArrayList<>(10);
 
         for (Map.Entry<String, ChannelHandler> entry : pipeline) {
-            if (ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass())) {
-                result.add((T) entry.getValue());
-            }
+            if (ChannelInterceptor.class.isAssignableFrom(entry.getValue().getClass())) result.add((T) entry.getValue());
         }
 
         return result;
+    }
+
+    public static void free(Channel channel, Class<?> interceptorClass) {
+        free(channel.pipeline(), interceptorClass);
+    }
+
+    public static void free(ChannelHandlerContext ctx, Class<?> interceptorClass) {
+        free(ctx.pipeline(), interceptorClass);
+    }
+
+    public static void free(Channel channel, String interceptorName) {
+        free(channel.pipeline(), interceptorName);
+    }
+
+    public static void free(ChannelHandlerContext ctx, String interceptorName) {
+        free(ctx.pipeline(), interceptorName);
+    }
+
+    public static void free(ChannelPipeline pipeline, String interceptorName) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorName);
+        if (interceptor != null) interceptor.free();
+    }
+
+    public static void free(ChannelPipeline pipeline, Class<?> interceptorClass) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorClass);
+        if (interceptor != null) interceptor.free();
     }
 
     public static void freeAll(Channel channel) {
@@ -456,6 +506,32 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     public static void freeAll(ChannelPipeline pipeline) {
         getInterceptors(pipeline).stream().filter(ChannelInterceptor::isNotFreed).forEach(ChannelInterceptor::free);
+    }
+
+    public static void reset(Channel channel, Class<?> interceptorClass) {
+        reset(channel.pipeline(), interceptorClass);
+    }
+
+    public static void reset(ChannelHandlerContext ctx, Class<?> interceptorClass) {
+        reset(ctx.pipeline(), interceptorClass);
+    }
+
+    public static void reset(Channel channel, String interceptorName) {
+        reset(channel.pipeline(), interceptorName);
+    }
+
+    public static void reset(ChannelHandlerContext ctx, String interceptorName) {
+        reset(ctx.pipeline(), interceptorName);
+    }
+
+    public static void reset(ChannelPipeline pipeline, String interceptorName) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorName);
+        if (interceptor != null) interceptor.reset();
+    }
+
+    public static void reset(ChannelPipeline pipeline, Class<?> interceptorClass) {
+        ChannelInterceptor interceptor = getInterceptor(pipeline, interceptorClass);
+        if (interceptor != null) interceptor.reset();
     }
 
     public static void resetAll(Channel channel) {
