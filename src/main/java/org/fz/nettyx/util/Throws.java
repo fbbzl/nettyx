@@ -19,13 +19,13 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Throws {
 
-    static final String MAP_NULL = "map can not be null";
-    static final String KEY_NULL = "key can not be null";
-    static final String VALUE_NULL = "value can not be null";
+    static final String MAP_NULL        = "map can not be null";
+    static final String KEY_NULL        = "key can not be null";
+    static final String VALUE_NULL      = "value can not be null";
     static final String COLLECTION_NULL = "collection can not be null";
-    static final String ELEMENT_NULL = "element can not be null";
-    static final String ARRAY_NULL  = "array can not be null";
-    static final String NUMBER_NULL = "bigDecimal can not be null";
+    static final String ELEMENT_NULL    = "element can not be null";
+    static final String ARRAY_NULL      = "array can not be null";
+    static final String NUMBER_NULL     = "bigDecimal can not be null";
 
     public static void ifTrue(Object expression, RuntimeException runtimeException) {
         if (Objects.equals(expression, Boolean.TRUE)) throw runtimeException;
