@@ -19,6 +19,14 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Throws {
 
+    static final String MAP_NULL = "map can not be null";
+    static final String KEY_NULL = "key can not be null";
+    static final String VALUE_NULL = "value can not be null";
+    static final String COLLECTION_NULL = "collection can not be null";
+    static final String ELEMENT_NULL = "element can not be null";
+    static final String ARRAY_NULL  = "array can not be null";
+    static final String NUMBER_NULL = "bigDecimal can not be null";
+
     public static void ifTrue(Object expression, RuntimeException runtimeException) {
         if (Objects.equals(expression, Boolean.TRUE)) throw runtimeException;
     }
@@ -148,8 +156,8 @@ public final class Throws {
     }
 
     public static <T> void ifContains(Collection<T> collection, T element, RuntimeException runtimeException) {
-        ifNull(collection, "collection can not be null");
-        ifNull(element, "element can not be null");
+        ifNull(collection, COLLECTION_NULL);
+        ifNull(element, ELEMENT_NULL);
 
         if (collection.contains(element)) throw runtimeException;
     }
@@ -159,8 +167,8 @@ public final class Throws {
     }
 
     public static <T> void ifNotContains(Collection<T> collection, T element, RuntimeException runtimeException) {
-        ifNull(collection, "collection can not be null");
-        ifNull(element, "element can not be null");
+        ifNull(collection, COLLECTION_NULL);
+        ifNull(element, ELEMENT_NULL);
 
         if (!collection.contains(element)) throw runtimeException;
     }
@@ -186,8 +194,8 @@ public final class Throws {
     }
 
     public static <K, V> void ifContainsKey(Map<K, V> map, K key, RuntimeException runtimeException) {
-        ifNull(map, "map can not be null");
-        ifNull(key, "key can not be null");
+        ifNull(map, MAP_NULL);
+        ifNull(key, KEY_NULL);
 
         if (map.containsKey(key)) throw runtimeException;
     }
@@ -197,8 +205,8 @@ public final class Throws {
     }
 
     public static <K, V> void ifNotContainsKey(Map<K, V> map, K key, RuntimeException runtimeException) {
-        ifNull(map, "map can not be null");
-        ifNull(key, "key can not be null");
+        ifNull(map, MAP_NULL);
+        ifNull(key, KEY_NULL);
 
         if (!map.containsKey(key)) throw runtimeException;
     }
@@ -208,8 +216,8 @@ public final class Throws {
     }
 
     public static <K, V> void ifContainsValue(Map<K, V> map, V value, RuntimeException runtimeException) {
-        ifNull(map, "map can not be null");
-        ifNull(value, "value can not be null");
+        ifNull(map, MAP_NULL);
+        ifNull(value, VALUE_NULL);
 
         if (map.containsValue(value)) throw runtimeException;
     }
@@ -219,8 +227,8 @@ public final class Throws {
     }
 
     public static <K, V> void ifNotContainsValue(Map<K, V> map, V value, RuntimeException runtimeException) {
-        ifNull(map, "map can not be null");
-        ifNull(value, "value can not be null");
+        ifNull(map, MAP_NULL);
+        ifNull(value, VALUE_NULL);
 
         if (!map.containsValue(value)) throw runtimeException;
     }
@@ -252,7 +260,7 @@ public final class Throws {
     }
 
     public static <T> void ifHasNullElement(Collection<T> collection, RuntimeException runtimeException) {
-        Throws.ifNull(collection, "collection can not be null");
+        Throws.ifNull(collection, COLLECTION_NULL);
 
         for (T t : collection) Throws.ifNull(t, runtimeException);
     }
@@ -262,7 +270,7 @@ public final class Throws {
     }
 
     public static <T> void ifHasNullElement(T[] array, RuntimeException runtimeException) {
-        Throws.ifNull(array, "array can not be null");
+        Throws.ifNull(array, ARRAY_NULL);
 
         for (T t : array) Throws.ifNull(t, runtimeException);
     }
@@ -340,7 +348,7 @@ public final class Throws {
     }
 
     public static void ifGreater(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException("do not compare with null decimal");
+        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
         if (left.compareTo(right) > 0) throw exception;
     }
 
@@ -365,7 +373,7 @@ public final class Throws {
     }
 
     public static void ifGreaterEquals(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException("do not compare with null decimal");
+        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
         if (left.compareTo(right) >= 0) throw exception;
     }
 
@@ -390,7 +398,7 @@ public final class Throws {
     }
 
     public static void ifLess(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException("do not compare with null decimal");
+        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
         if (left.compareTo(right) < 0) throw exception;
     }
 
@@ -415,7 +423,7 @@ public final class Throws {
     }
 
     public static void ifLessEquals(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException("do not compare with null decimal");
+        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
         if (left.compareTo(right) <= 0) throw exception;
     }
 
