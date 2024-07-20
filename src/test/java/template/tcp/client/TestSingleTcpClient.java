@@ -8,7 +8,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
-import org.fz.nettyx.template.tcp.client.SingleTcpChannellClientTemplate;
+import org.fz.nettyx.template.tcp.client.SingleTcpChannelClientTemplate;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
@@ -21,7 +21,7 @@ import static org.fz.nettyx.action.ListenerAction.redo;
 
 
 @Slf4j
-public class TestSingleTcpClient extends SingleTcpChannellClientTemplate {
+public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
 
     static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
