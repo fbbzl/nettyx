@@ -1,10 +1,9 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -16,7 +15,10 @@ import org.fz.nettyx.util.Try;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findMethod;
@@ -25,6 +27,7 @@ import static java.lang.invoke.MethodType.methodType;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
+import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CACHE;
 
 
 /**
@@ -44,8 +47,14 @@ public class StructUtils {
      * @param field the field
      * @return the boolean
      */
-    public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((StructPropHandler<?>) StructUtils.getPropHandler(field));
+    public static boolean useReadHandler(Field field) {
+        Annotation propHandlerAnnotation = findPropHandlerAnnotation(field);
+        if (propHandlerAnnotation != null) {
+            Class<? extends StructPropHandler<? extends Annotation>>
+                    handlerClass = StructPropHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
+            if (handlerClass != null) return isReadHandler(handlerClass);
+        }
+        return false;
     }
 
     /**
@@ -54,48 +63,46 @@ public class StructUtils {
      * @param field the field
      * @return the boolean
      */
-    public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((StructPropHandler<?>) StructUtils.getPropHandler(field));
+    public static boolean useWriteHandler(Field field) {
+        Annotation propHandlerAnnotation = findPropHandlerAnnotation(field);
+        if (propHandlerAnnotation != null) {
+            Class<? extends StructPropHandler<? extends Annotation>>
+                    handlerClass = StructPropHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
+            if (handlerClass != null) return isWriteHandler(handlerClass);
+        }
+        return false;
     }
 
     /**
      * Find handler annotation a.
      *
      * @param <A>     the type parameter
-     * @param element the element
+     * @param field the field
      * @return the a
      */
-    public <A extends Annotation> A findHandlerAnnotation(AnnotatedElement element) {
-        for (Annotation annotation : AnnotationUtil.getAnnotations(element, false)) {
-            Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (ANNOTATION_HANDLER_MAPPING.containsKey(annotationType)) {
-                return (A) annotation;
-            }
-        }
-        return null;
+    public <A extends Annotation> A findPropHandlerAnnotation(Field field) {
+        return (A) FIELD_PROP_HANDLER_ANNOTATION_CACHE.get(field);
     }
 
     /**
      * Gets serializer handler.
      *
-     * @param <H>     the type parameter
-     * @param element the element
+     * @param <H>   the type parameter
+     * @param field the element
      * @return the serializer handler
      */
-    public <H extends StructPropHandler<?>> H getPropHandler(AnnotatedElement element) {
-        Annotation handlerAnnotation = findHandlerAnnotation(element);
+    public <H extends StructPropHandler<?>> H getPropHandler(Field field) {
+        Annotation handlerAnnotation = findPropHandlerAnnotation(field);
+
         if (handlerAnnotation != null) {
             Class<? extends StructPropHandler<? extends Annotation>>
-                    handlerClass = ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
-            Singleton.exists(handlerClass);
-            H handler = (H) newPropHandler();
+                    handlerClass = StructPropHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
+            boolean isSingleton = Singleton.exists(handlerClass);
 
-            if (handler.isSingleton() && ) {
-                Singleton.put(handler);
-            }
-
-            return h;
+            if (isSingleton) return (H) Singleton.get(handlerClass);
+            else             return (H) newPropHandler(handlerClass);
         }
+
         return null;
     }
 
@@ -106,12 +113,9 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    public static <H extends StructPropHandler<?>> H newPropHandler(Class<H> clazz) {
+    static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Class<H> clazz) {
         try {
-            H handler = (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
-            // will put into singleton if handler is singleton
-            if (handler.isSingleton()) Singleton.put(handler);
-            return handler;
+            return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
@@ -126,7 +130,7 @@ public class StructUtils {
     }
 
     public static int findBasicSize(Class<?> basicClass) {
-        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(StructUtils::reflectForSize));
+        return Basic.BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(StructUtils::reflectForSize));
     }
 
     public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass) {
@@ -223,24 +227,52 @@ public class StructUtils {
         return findMethod(clazz, upperFirstAndAddPre(field.getName(), "set"), methodType(void.class, field.getType()));
     }
 
-    /**
-     * Gets component type.
-     *
-     * @param arrayField the array field
-     * @return the component type
-     */
     public static <C> Class<C> getComponentType(Field arrayField) {
         return (Class<C>) ArrayUtil.getComponentType(arrayField.getType());
     }
 
-    /**
-     * Get all fields.
-     *
-     * @param clazz the clazz
-     * @return the field [ ]
-     */
     public static Field[] getStructFields(Class<?> clazz) {
-        return ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()));
+        return STRUCT_FIELD_CACHE.get(clazz);
     }
+
+    public static boolean isNotBasic(Class<?> clazz) {
+        return !isBasic(clazz);
+    }
+
+    public static boolean isBasic(Class<?> clazz) {
+        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    }
+
+    public static boolean isBasic(Type root, Field field) {
+        return isBasic(root, TypeUtil.getType(field));
+    }
+
+    public static boolean isBasic(Type root, Type type) {
+        if (type instanceof Class)        return isBasic((Class<?>) type);
+        if (type instanceof TypeVariable) return isBasic(root, TypeUtil.getActualType(root, type));
+
+        return false;
+    }
+
+    public static boolean isNotStruct(Class<?> clazz) {
+        return !isStruct(clazz);
+    }
+
+    public static boolean isStruct(Class<?> clazz) {
+        return STRUCT_FIELD_CACHE.containsKey(clazz);
+    }
+
+    public static boolean isStruct(Type root, Field field) {
+        return isStruct(root, TypeUtil.getType(field));
+    }
+
+    public static boolean isStruct(Type root, Type type) {
+        if (type instanceof Class)             return isStruct((Class<?>) type);
+        if (type instanceof ParameterizedType) return isStruct((Class<?>) ((ParameterizedType) type).getRawType());
+        if (type instanceof TypeVariable)      return isStruct(root, TypeUtil.getActualType(root, type));
+
+        return false;
+    }
+
 
 }

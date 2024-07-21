@@ -44,6 +44,10 @@ public @interface ToString {
     int bufferLength();
 
     class ToStringHandler implements StructPropHandler.ReadWriteHandler<ToString> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToString toString) {

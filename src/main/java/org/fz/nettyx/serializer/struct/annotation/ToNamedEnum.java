@@ -50,6 +50,10 @@ public @interface ToNamedEnum {
      * The type To named enum handler.
      */
     class ToNamedEnumHandler implements StructPropHandler.ReadWriteHandler<ToNamedEnum> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToNamedEnum toNamedEnum) {

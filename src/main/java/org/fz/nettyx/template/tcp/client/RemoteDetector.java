@@ -74,7 +74,7 @@ public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
                 throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
 
             // 3. store channel
-            super.storeChannel(cf.channel());
+            super.storeChannel((NioSocketChannel) cf.channel());
 
             // 4. try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);

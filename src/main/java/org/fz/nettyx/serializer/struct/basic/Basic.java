@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic;
 
+import cn.hutool.core.map.SafeConcurrentHashMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -10,6 +11,7 @@ import org.fz.nettyx.util.Throws;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Map;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -21,6 +23,8 @@ import java.nio.ByteOrder;
  */
 @Getter
 public abstract class Basic<V> {
+
+    public static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new SafeConcurrentHashMap<>(64);
 
     private final int size;
 
