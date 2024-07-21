@@ -53,6 +53,10 @@ public @interface ToLinkedList {
      * The type To linked list handler.
      */
     class ToLinkedListHandler implements StructPropHandler.ReadWriteHandler<ToLinkedList> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
