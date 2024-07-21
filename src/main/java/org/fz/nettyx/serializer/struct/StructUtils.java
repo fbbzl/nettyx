@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -84,18 +83,8 @@ public class StructUtils {
      */
     public <H extends StructPropHandler<?>> H getPropHandler(AnnotatedElement element) {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
-        if (handlerAnnotation != null) {
-            Class<? extends StructPropHandler<? extends Annotation>>
-                    handlerClass = ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
-            Singleton.exists(handlerClass);
-            H handler = (H) newPropHandler();
-
-            if (handler.isSingleton() && ) {
-                Singleton.put(handler);
-            }
-
-            return h;
-        }
+        if (handlerAnnotation != null)
+            return (H) newPropHandler(ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType()));
         return null;
     }
 
@@ -108,10 +97,7 @@ public class StructUtils {
      */
     public static <H extends StructPropHandler<?>> H newPropHandler(Class<H> clazz) {
         try {
-            H handler = (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
-            // will put into singleton if handler is singleton
-            if (handler.isSingleton()) Singleton.put(handler);
-            return handler;
+            return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
