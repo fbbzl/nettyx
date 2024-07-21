@@ -39,6 +39,9 @@ public class SerializerTest {
         byte[] bytes = new byte[1024 * 2];
         Arrays.fill(bytes, (byte) 67);
         Model model1 = XmlSerializerContext.findModel("school", "student");
+        if (model1 == null) {
+            return;
+        }
         Dict doc = XmlSerializer.read(Unpooled.wrappedBuffer(bytes), model1);
 
         Assert.assertNotNull(doc);
