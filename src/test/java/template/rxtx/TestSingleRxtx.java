@@ -8,15 +8,12 @@ import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.rxtx.RxtxChannel;
 import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
-import org.fz.nettyx.template.serial.rxtx.SingleRxtxChannellTemplate;
+import org.fz.nettyx.template.serial.rxtx.SingleRxtxChannelTemplate;
 import template.TestChannelInitializer;
 
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
 
@@ -25,9 +22,7 @@ import static org.fz.nettyx.action.ListenerAction.redo;
  * @version 1.0
  * @since 2024/2/29 10:31
  */
-public class TestSingleRxtx extends SingleRxtxChannellTemplate {
-
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+public class TestSingleRxtx extends SingleRxtxChannelTemplate {
 
     public TestSingleRxtx(String commAddress) {
         super(commAddress);
@@ -50,20 +45,18 @@ public class TestSingleRxtx extends SingleRxtxChannellTemplate {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM3");
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM5");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 67);
-                        testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
-                    }, 2, 30, TimeUnit.MILLISECONDS);
+                    byte[] msg = new byte[2048];
+                    Arrays.fill(msg, (byte) 67);
+                    testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
 
                     RxtxChannelConfig config =(RxtxChannelConfig) cf.channel().config();
                     Console.log(config.getBaudRate());
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))
-                .whenFailure(redo(testSingleRxtx::connect, 2, SECONDS))
+                .whenFailure(redo(testSingleRxtx::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> System.err.println(c.cause())))
                 .whenDone((l, cf) -> Console.log("done"));
 
         testSingleRxtx.connect().addListener(listener);

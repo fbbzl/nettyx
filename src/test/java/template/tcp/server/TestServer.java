@@ -54,7 +54,6 @@ public class TestServer extends TcpServerTemplate {
                             }
                         }
                         , new UserCodec()
-
                         , inboundAdvice);
             }
         };

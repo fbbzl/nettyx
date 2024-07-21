@@ -13,8 +13,6 @@ import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.fz.nettyx.action.ListenerAction.redo;
@@ -22,8 +20,6 @@ import static org.fz.nettyx.action.ListenerAction.redo;
 
 @Slf4j
 public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
-
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public TestSingleTcpClient(InetSocketAddress address) {
         super(address);
@@ -39,12 +35,10 @@ public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
 
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((ls, cf) -> {
-                    executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[2048];
-                        Arrays.fill(msg, (byte) 67);
-                        testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
-                    }, 2, 30, TimeUnit.MILLISECONDS);
-                    System.err.println(testClient);
+                    byte[] msg = new byte[2048];
+                    Arrays.fill(msg, (byte) 67);
+                    testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
+
                     Console.log(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancelled((ls, cf) -> Console.log("cancel"))

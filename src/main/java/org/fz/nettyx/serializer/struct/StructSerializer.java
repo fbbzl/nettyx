@@ -1,8 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.TypeReference;
-import cn.hutool.core.util.ModifierUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -14,8 +12,6 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructPropHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.StructPropHandler.WriteHandler;
-import org.fz.nettyx.serializer.struct.annotation.Ignore;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 
@@ -27,7 +23,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
@@ -156,9 +151,6 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue;
-                // some fields may ignore
-                if (isIgnore(field)) continue;
-
                 if (useReadHandler(field))     fieldValue = readHandled(field, this);
                 else
                 if (isBasic(rootType, field))  fieldValue = readBasic(rootType, field, this.getByteBuf());
@@ -184,9 +176,6 @@ public final class StructSerializer implements Serializer {
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue = StructUtils.readField(struct, field);
-
-                // some fields may ignore
-                if (isIgnore(field)) continue;
 
                 if (useWriteHandler(field)) writeHandled(field, fieldValue, this);
                 else
@@ -218,7 +207,7 @@ public final class StructSerializer implements Serializer {
 
     public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
         ReadHandler<A> readHandler       = StructUtils.getPropHandler(handleField);
-        A              handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        A              handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
         try {
             readHandler.preReadHandle(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, handleField, handlerAnnotation);
@@ -232,9 +221,6 @@ public final class StructSerializer implements Serializer {
 
     //*************************************         read write splitter         **************************************//
 
-    /**
-     * write basic bytes
-     */
     public static <B extends Basic<?>> void writeBasic(Object basicValue, ByteBuf writingBuf) {
         writingBuf.writeBytes(((B) (basicValue)).getBytes());
     }
@@ -243,10 +229,9 @@ public final class StructSerializer implements Serializer {
         writingBuf.writeBytes(StructSerializer.write(rootType, structValue));
     }
 
-    public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue,
-                                                           StructSerializer upperSerializer) {
+    public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue, StructSerializer upperSerializer) {
         WriteHandler<A> writeHandler      = StructUtils.getPropHandler(handleField);
-        A               handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        A               handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
         ByteBuf         writing           = upperSerializer.getByteBuf();
         try {
             writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
@@ -271,58 +256,4 @@ public final class StructSerializer implements Serializer {
     }
 
     //******************************************      public end       ***********************************************//
-
-    public static boolean isTransient(Field field) {
-        return ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
-    }
-
-    public static boolean isNotBasic(Class<?> clazz) {
-        return !isBasic(clazz);
-    }
-
-    public static boolean isBasic(Class<?> clazz) {
-        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-    }
-
-    public static boolean isBasic(Type root, Field field) {
-        return isBasic(root, TypeUtil.getType(field));
-    }
-
-    public static boolean isBasic(Type root, Type type) {
-        if (type instanceof Class)        return isBasic((Class<?>) type);
-        if (type instanceof TypeVariable) return isBasic(root, TypeUtil.getActualType(root, type));
-
-        return false;
-    }
-
-    public static boolean isNotStruct(Class<?> clazz) {
-        return !isStruct(clazz);
-    }
-
-    public static boolean isStruct(Class<?> clazz) {
-        return AnnotationUtil.hasAnnotation(clazz, Struct.class);
-    }
-
-    public static boolean isStruct(Type root, Field field) {
-        return isStruct(root, TypeUtil.getType(field));
-    }
-
-    public static boolean isStruct(Type root, Type type) {
-        if (type instanceof Class)             return isStruct((Class<?>) type);
-        if (type instanceof ParameterizedType) return isStruct((Class<?>) ((ParameterizedType) type).getRawType());
-        if (type instanceof TypeVariable)      return isStruct(root, TypeUtil.getActualType(root, type));
-
-        return false;
-    }
-
-    /**
-     * Is ignore boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean isIgnore(Field field) {
-        return AnnotationUtil.hasAnnotation(field, Ignore.class) || isTransient(field);
-    }
-
 }

@@ -52,16 +52,16 @@
         <nexus-staging-maven-plugin-version>1.6.7</nexus-staging-maven-plugin-version>
 
         <!--log support-->
-        <log4j-slf4j-series.version>2.23.0</log4j-slf4j-series.version>
-        <jul-to-slf4j.version>2.0.12</jul-to-slf4j.version>
+        <log4j-slf4j-series.version>2.23.1</log4j-slf4j-series.version>
+        <jul-to-slf4j.version>2.0.13</jul-to-slf4j.version>
 
         <!--transport-->
-        <jSerialComm.version>2.10.4</jSerialComm.version>
+        <jSerialComm.version>2.11.0</jSerialComm.version>
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <netty-all.version>4.1.109.Final</netty-all.version>
-        <hutool-core.version>5.8.26</hutool-core.version>
+        <netty-all.version>4.1.112.Final</netty-all.version>
+        <hutool-core.version>5.8.29</hutool-core.version>
         <rxtx.version>2.1.7</rxtx.version>
         <dom4j.version>2.1.4</dom4j.version>
         <mvel2.version>2.5.2.Final</mvel2.version>
@@ -134,7 +134,13 @@
 
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <artifactId>hutool-core</artifactId>
+            <version>${hutool-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-system</artifactId>
             <version>${hutool-core.version}</version>
         </dependency>
 
