@@ -1,6 +1,7 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
@@ -44,7 +45,7 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useReadHandler(AnnotatedElement field) {
-        return isReadHandler((StructPropHandler<?>) StructUtils.getHandler(field));
+        return isReadHandler((StructPropHandler<?>) StructUtils.getPropHandler(field));
     }
 
     /**
@@ -54,7 +55,7 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useWriteHandler(AnnotatedElement field) {
-        return isWriteHandler((StructPropHandler<?>) StructUtils.getHandler(field));
+        return isWriteHandler((StructPropHandler<?>) StructUtils.getPropHandler(field));
     }
 
     /**
@@ -81,12 +82,19 @@ public class StructUtils {
      * @param element the element
      * @return the serializer handler
      */
-    public <H extends StructPropHandler<?>> H getHandler(AnnotatedElement element) {
+    public <H extends StructPropHandler<?>> H getPropHandler(AnnotatedElement element) {
         Annotation handlerAnnotation = findHandlerAnnotation(element);
         if (handlerAnnotation != null) {
-            Class<? extends StructPropHandler<? extends Annotation>> handlerClass = ANNOTATION_HANDLER_MAPPING.get(
-                    handlerAnnotation.annotationType());
-            return (H) newHandler(handlerClass);
+            Class<? extends StructPropHandler<? extends Annotation>>
+                    handlerClass = ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
+            Singleton.exists(handlerClass);
+            H handler = (H) newPropHandler();
+
+            if (handler.isSingleton() && ) {
+                Singleton.put(handler);
+            }
+
+            return h;
         }
         return null;
     }
@@ -98,9 +106,12 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    public static <H extends StructPropHandler<?>> H newHandler(Class<H> clazz) {
+    public static <H extends StructPropHandler<?>> H newPropHandler(Class<H> clazz) {
         try {
-            return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
+            H handler = (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
+            // will put into singleton if handler is singleton
+            if (handler.isSingleton()) Singleton.put(handler);
+            return handler;
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
