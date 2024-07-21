@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
+import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.map.WeakConcurrentMap;
 import cn.hutool.core.util.ClassUtil;
@@ -71,21 +72,24 @@ public final class StructSerializerContext {
                 scanBasics(classes);
                 scanStructs(classes);
             }
-        } catch (Exception e) {
-            throw new NotInitedException("init struct-serializer context failed please check", e);
+        } catch (Throwable t) {
+            throw new NotInitedException("init struct-serializer context failed please check", t);
         }
     }
 
-    private synchronized static void scanPropHandlers(Set<Class<?>> classes) {
+    private synchronized static void scanPropHandlers(Set<Class<?>> classes) throws Throwable {
         for (Class<?> clazz : classes) {
             boolean isPropertyHandler = StructPropHandler.class.isAssignableFrom(clazz);
 
             if (isPropertyHandler) {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                 if (targetAnnotationType != null) {
-                    CONSTRUCTOR_CACHE.putIfAbsent(clazz, findConstructor(clazz));
-                    ANNOTATION_HANDLER_MAPPING.putIfAbsent(targetAnnotationType,
-                                                           (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
+                    MethodHandle handlerConstructor = findConstructor(clazz);
+                    CONSTRUCTOR_CACHE.putIfAbsent(clazz, handlerConstructor);
+                    StructPropHandler handler = (StructPropHandler) handlerConstructor.invoke();
+                    if (handler.isSingleton()) Singleton.put(handler);
+
+                    ANNOTATION_HANDLER_MAPPING.putIfAbsent(targetAnnotationType, (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
                 }
             }
         }
