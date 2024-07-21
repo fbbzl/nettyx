@@ -88,10 +88,10 @@ public final class StructSerializerContext {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                 if (targetAnnotationType != null) {
                     MethodHandle handlerConstructor = findConstructor(clazz);
-                    // 1 cache constructor
+                    // 1 cache prop-handler constructor
                     CONSTRUCTOR_CACHE.putIfAbsent(clazz, handlerConstructor);
 
-                    // 2 init singleton
+                    // 2 cache singleton prop-handler
                     StructPropHandler handler = (StructPropHandler) handlerConstructor.invoke();
                     if (handler.isSingleton()) Singleton.put(handler);
 
@@ -108,10 +108,10 @@ public final class StructSerializerContext {
             boolean isBasic = Basic.class.isAssignableFrom(clazz);
 
             if (isBasic) {
-                // 1 cache constructor
+                // 1 cache basics constructor
                 CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, findConstructor(clazz, ByteBuf.class));
 
-                //2
+                //2 cache bytes size
                 BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
             }
         }
@@ -120,11 +120,13 @@ public final class StructSerializerContext {
     private synchronized static void scanStructs(Set<Class<?>> classes) throws IntrospectionException {
         for (Class<?> clazz : classes) {
             if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
+                // 1 cache struct constructor
                 CONSTRUCTOR_CACHE.putIfAbsent(clazz, findConstructor(clazz));
 
                 Field[] structFields = StructUtils.getStructFields(clazz);
                 for (Field field : structFields) {
 
+                    // 2 cache field reader and writer
                     FIELD_READER_CACHE.putIfAbsent(field, getReaderHandle(clazz, field));
                     FIELD_WRITER_CACHE.putIfAbsent(field, getWriterHandle(clazz, field));
 
