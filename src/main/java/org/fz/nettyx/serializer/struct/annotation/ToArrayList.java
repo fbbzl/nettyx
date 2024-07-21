@@ -52,6 +52,10 @@ public @interface ToArrayList {
      * The type Array list handler.
      */
     class ToArrayListHandler implements StructPropHandler.ReadWriteHandler<ToArrayList> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {

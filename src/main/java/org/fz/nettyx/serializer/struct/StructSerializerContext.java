@@ -68,8 +68,11 @@ public final class StructSerializerContext {
             for (String packageName : packageNames) {
                 Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
+                // 1 scan property handler
                 scanPropHandlers(classes);
+                // 2 scan basic
                 scanBasics(classes);
+                // 3 scan struct
                 scanStructs(classes);
             }
         } catch (Throwable t) {
@@ -85,10 +88,14 @@ public final class StructSerializerContext {
                 Class<Annotation> targetAnnotationType = getTargetAnnotationType(clazz);
                 if (targetAnnotationType != null) {
                     MethodHandle handlerConstructor = findConstructor(clazz);
+                    // 1 cache constructor
                     CONSTRUCTOR_CACHE.putIfAbsent(clazz, handlerConstructor);
+
+                    // 2 init singleton
                     StructPropHandler handler = (StructPropHandler) handlerConstructor.invoke();
                     if (handler.isSingleton()) Singleton.put(handler);
 
+                    // 3 cache annotation -> handler mapping relation
                     ANNOTATION_HANDLER_MAPPING.putIfAbsent(targetAnnotationType, (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
                 }
             }
@@ -101,7 +108,10 @@ public final class StructSerializerContext {
             boolean isBasic = Basic.class.isAssignableFrom(clazz);
 
             if (isBasic) {
+                // 1 cache constructor
                 CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, findConstructor(clazz, ByteBuf.class));
+
+                //2
                 BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
             }
         }
