@@ -73,9 +73,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
-
-            writeCollection(list, elementType, toLinkedList.size(), writing);
+            writeCollection((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
         }
 
         private static Class<?> getElementType(Type rootType, ToLinkedList toLinkedList, Field field) {
