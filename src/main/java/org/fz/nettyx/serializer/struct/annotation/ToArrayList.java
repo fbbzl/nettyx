@@ -60,6 +60,7 @@ public @interface ToArrayList {
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
             Class<?> elementType = getElementType(serializer.getRootType(), toArrayList, field);
+
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
             return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), new ArrayList<>(10));
@@ -71,9 +72,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
-
-            writeCollection(list, elementType, toArrayList.size(), writing);
+            writeCollection((List<?>) defaultIfNull(value, () -> newArrayList()), elementType, toArrayList.size(), writing);
         }
 
         private static Class<?> getElementType(Type rootType, ToArrayList toArrayList, Field field) {
