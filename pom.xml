@@ -61,7 +61,7 @@
 
         <!--util-->
         <netty-all.version>4.1.109.Final</netty-all.version>
-        <hutool-core.version>5.8.26</hutool-core.version>
+        <hutool-core.version>5.8.29</hutool-core.version>
         <rxtx.version>2.1.7</rxtx.version>
         <dom4j.version>2.1.4</dom4j.version>
         <mvel2.version>2.5.2.Final</mvel2.version>
@@ -134,7 +134,13 @@
 
         <dependency>
             <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <artifactId>hutool-core</artifactId>
+            <version>${hutool-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-system</artifactId>
             <version>${hutool-core.version}</version>
         </dependency>
 
