@@ -98,10 +98,10 @@ public class StructUtils {
      */
     public static <H extends StructPropHandler<?>> H newPropHandler(Class<H> clazz) {
         try {
-            H handler = Singleton.get(clazz);
+            boolean singletonHandler = Singleton.exists(clazz);
 
-            if (handler == null) return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
-            else                 return handler;
+            if (singletonHandler) return Singleton.get(clazz);
+            else                  return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
