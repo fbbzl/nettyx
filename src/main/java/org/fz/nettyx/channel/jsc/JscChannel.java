@@ -26,16 +26,6 @@ public class JscChannel extends SerialCommChannel {
     }
 
     @Override
-    public boolean isOpen() {
-        return serialPort != null && serialPort.isOpen();
-    }
-
-    @Override
-    protected boolean isInputShutdown() {
-        return !isOpen();
-    }
-
-    @Override
     protected int available() {
         return serialPort.bytesAvailable();
     }

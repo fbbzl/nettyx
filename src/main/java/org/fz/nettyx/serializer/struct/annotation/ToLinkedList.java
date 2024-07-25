@@ -53,6 +53,10 @@ public @interface ToLinkedList {
      * The type To linked list handler.
      */
     class ToLinkedListHandler implements StructPropHandler.ReadWriteHandler<ToLinkedList> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
@@ -69,9 +73,12 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newLinkedList());
+            writeCollection((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
+        }
 
-            writeCollection(list, elementType, toLinkedList.size(), writing);
+        private static Class<?> getElementType(Type rootType, ToLinkedList toLinkedList, Field field) {
+            Class<?> elementType = toLinkedList.elementType();
+            return elementType == Object.class ? getActualType(rootType, field, 0) : elementType;
         }
 
         private static Class<?> getElementType(Type rootType, ToLinkedList toLinkedList, Field field) {

@@ -47,6 +47,10 @@ public @interface ToArray {
 
     @SuppressWarnings("unchecked")
     class ToArrayHandler implements StructPropHandler.ReadWriteHandler<ToArray> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
         public Object doRead(StructSerializer serializer, Field field, ToArray annotation) {
