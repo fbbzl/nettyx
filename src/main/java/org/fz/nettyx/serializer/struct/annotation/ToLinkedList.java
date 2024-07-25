@@ -80,11 +80,6 @@ public @interface ToLinkedList {
             Class<?> elementType = toLinkedList.elementType();
             return elementType == Object.class ? getActualType(rootType, field, 0) : elementType;
         }
-
-        private static Class<?> getElementType(Type rootType, ToLinkedList toLinkedList, Field field) {
-            Class<?> elementType = toLinkedList.elementType();
-            return elementType == Object.class ? getActualType(rootType, field, 0) : elementType;
-        }
     }
 
 }
