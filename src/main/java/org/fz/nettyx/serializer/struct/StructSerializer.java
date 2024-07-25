@@ -217,8 +217,8 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <A extends Annotation> Object readHandled(Field handleField, StructSerializer upperSerializer) {
-        ReadHandler<A> readHandler       = StructUtils.getHandler(handleField);
-        A              handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        ReadHandler<A> readHandler       = StructUtils.getPropHandler(handleField);
+        A              handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
         try {
             readHandler.preReadHandle(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, handleField, handlerAnnotation);
@@ -245,8 +245,8 @@ public final class StructSerializer implements Serializer {
 
     public static <A extends Annotation> void writeHandled(Field handleField, Object fieldValue,
                                                            StructSerializer upperSerializer) {
-        WriteHandler<A> writeHandler      = StructUtils.getHandler(handleField);
-        A               handlerAnnotation = StructUtils.findHandlerAnnotation(handleField);
+        WriteHandler<A> writeHandler      = StructUtils.getPropHandler(handleField);
+        A               handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
         ByteBuf         writing           = upperSerializer.getByteBuf();
         try {
             writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
