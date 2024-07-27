@@ -116,7 +116,7 @@ public class StructUtils {
      */
     static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Class<H> clazz) {
         try {
-            return (H) CONSTRUCTOR_SUPPLIER_CACHE.computeIfAbsent(clazz, StructUtils::constructorSupplier).get();
+            return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructorSupplier).get();
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
@@ -166,7 +166,7 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
-            return (B) BASIC_CONSTRUCTOR_FUNCTION_CACHE.computeIfAbsent(basicClass, bc -> constructorFunction(basicClass, ByteBuf.class)).apply(buf);
+            return (B) BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructorFunction(basicClass, ByteBuf.class)).apply(buf);
         } catch (Throwable instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException) {
@@ -200,9 +200,9 @@ public class StructUtils {
     public static <S> S newStruct(Type structClass) {
         try {
             if (structClass instanceof Class)
-                return (S) CONSTRUCTOR_SUPPLIER_CACHE.computeIfAbsent((Class<S>) structClass, StructUtils::constructorSupplier).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) structClass, StructUtils::constructorSupplier).get();
             if (structClass instanceof ParameterizedType)
-                return (S) CONSTRUCTOR_SUPPLIER_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), StructUtils::constructorSupplier).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), StructUtils::constructorSupplier).get();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         } catch (Throwable instanceError) {
