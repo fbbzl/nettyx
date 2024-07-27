@@ -43,26 +43,17 @@ import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CAC
 @SuppressWarnings("all")
 public final class StructSerializerContext {
 
-    /**
-     * cache field handler-annotation
-     */
-    public static final Map<Field, Annotation>   FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
-    /**
-     * cache getter/setter
-     */
-    static final        Map<Field, MethodHandle> FIELD_READER_CACHE                  = new ConcurrentHashMap<>(512);
-    static final        Map<Field, MethodHandle> FIELD_WRITER_CACHE                  = new ConcurrentHashMap<>(512);
+    public static final Map<Field, Annotation> FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
 
-    static final Map<Class<?>, Supplier<?>>          CONSTRUCTOR_SUPPLIER_CACHE       = new ConcurrentHashMap<>(128);
-    static final Map<Class<?>, Function<ByteBuf, ?>> BASIC_CONSTRUCTOR_FUNCTION_CACHE = new ConcurrentHashMap<>(128);
+    static final Map<Field, MethodHandle> FIELD_READER_CACHE = new ConcurrentHashMap<>(512);
+    static final Map<Field, MethodHandle> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(512);
+
+    static final Map<Class<?>, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
+    static final Map<Class<?>, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
 
     static {
         // scan classes
-        try {
-            doScan(EMPTY);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        doScan(EMPTY);
     }
 
     /**
@@ -97,7 +88,7 @@ public final class StructSerializerContext {
                 if (annotationType != null) {
                     Supplier<?> constructorSupplier = constructorSupplier(clazz);
                     // 1 cache prop-handler constructor
-                    CONSTRUCTOR_SUPPLIER_CACHE.putIfAbsent(clazz, constructorSupplier);
+                    NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
 
                     // 2 cache singleton prop-handler
                     StructPropHandler handler = (StructPropHandler) constructorSupplier.get();
@@ -117,7 +108,7 @@ public final class StructSerializerContext {
 
             if (isBasic) {
                 // 1 cache basics constructor
-                BASIC_CONSTRUCTOR_FUNCTION_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructorFunction(clazz, ByteBuf.class));
+                BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructorFunction(clazz, ByteBuf.class));
 
                 //2 cache bytes size
                 Basic.BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
@@ -129,7 +120,7 @@ public final class StructSerializerContext {
         for (Class<?> clazz : classes) {
             if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                 // 1 cache struct constructor
-                CONSTRUCTOR_SUPPLIER_CACHE.putIfAbsent(clazz, constructorSupplier(clazz));
+                NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier(clazz));
 
                 Field[] structFields = ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()) && !isIgnore(f));
                 // 2 cache the fields
