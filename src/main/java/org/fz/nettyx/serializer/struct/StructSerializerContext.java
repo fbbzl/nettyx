@@ -15,14 +15,13 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -44,8 +43,8 @@ public final class StructSerializerContext {
 
     public static final Map<Field, Annotation> FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
 
-    static final Map<Field, MethodHandle> FIELD_READER_CACHE = new ConcurrentHashMap<>(512);
-    static final Map<Field, MethodHandle> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(512);
+    static final Map<Field, Function<?, ?>>   FIELD_GETTER_CACHE = new ConcurrentHashMap<>(512);
+    static final Map<Field, BiConsumer<?, ?>> FIELD_SETTER_CACHE = new ConcurrentHashMap<>(512);
 
     static final Map<Class<?>, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
     static final Map<Class<?>, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
@@ -65,90 +64,90 @@ public final class StructSerializerContext {
         for (String packageName : packageNames) {
             Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
+            // 1 scan property handler
+            scanPropHandlers(classes);
+
+            // 2 scan basic
+            scanBasics(classes);
+
+            // 3 scan struct
+            scanStructs(classes);
+        }
+    }
+
+    private synchronized static void scanPropHandlers(Set<Class<?>> classes) {
+        for (Class<?> clazz : classes) {
             try {
-                // 1 scan property handler
-                scanPropHandlers(classes);
+                boolean isPropertyHandler = StructPropHandler.class.isAssignableFrom(clazz);
+
+                if (isPropertyHandler) {
+                    Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
+                    if (annotationType != null) {
+                        Supplier<?> constructorSupplier = StructUtils.constructor(clazz);
+                        // 1 cache prop-handler constructor
+                        NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
+
+                        // 2 cache singleton prop-handler
+                        StructPropHandler handler = (StructPropHandler) constructorSupplier.get();
+                        if (handler.isSingleton()) Singleton.put(handler);
+
+                        // 3 cache annotation -> handler mapping relation
+                        StructPropHandler.ANNOTATION_HANDLER_MAPPING.putIfAbsent(annotationType, (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
+                    }
+                }
             } catch (Throwable throwable) {
                 log.error("scan struct-prop-handler failed please check", throwable);
             }
+        }
+    }
 
-            // 2 scan basic
+    private synchronized static void scanBasics(Set<Class<?>> classes) {
+        for (Class<?> clazz : classes) {
             try {
-                scanBasics(classes);
+                boolean isBasic = Basic.class.isAssignableFrom(clazz);
+
+                if (isBasic) {
+                    // 1 cache basics constructor
+                    BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructor(clazz, ByteBuf.class));
+
+                    //2 cache bytes size
+                    Basic.BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
+                }
             } catch (Throwable throwable) {
                 log.error("scan basic failed please check", throwable);
             }
+        }
+    }
 
+    private synchronized static void scanStructs(Set<Class<?>> classes) {
+        for (Class<?> clazz : classes) {
             try {
-                // 3 scan struct
-                scanStructs(classes);
-            } catch (Throwable throwable) {
-                log.error("scan struct failed please check", throwable);
-            }
-        }
-    }
+                if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
+                    // 1 cache struct constructor
+                    NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, StructUtils.constructor(clazz));
 
-    private synchronized static void scanPropHandlers(Set<Class<?>> classes) throws Throwable {
-        for (Class<?> clazz : classes) {
-            boolean isPropertyHandler = StructPropHandler.class.isAssignableFrom(clazz);
+                    Field[] structFields = ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()) && !isIgnore(f));
+                    // 2 cache the fields
+                    STRUCT_FIELD_CACHE.put(clazz, structFields);
 
-            if (isPropertyHandler) {
-                Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
-                if (annotationType != null) {
-                    Supplier<?> constructorSupplier = constructorSupplier(clazz);
-                    // 1 cache prop-handler constructor
-                    NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
+                    for (Field field : structFields) {
+                        // 3 cache field reader and writer
+                        FIELD_GETTER_CACHE.putIfAbsent(field, getGetter(clazz, field));
+                        FIELD_SETTER_CACHE.putIfAbsent(field, getSetter(clazz, field));
 
-                    // 2 cache singleton prop-handler
-                    StructPropHandler handler = (StructPropHandler) constructorSupplier.get();
-                    if (handler.isSingleton()) Singleton.put(handler);
-
-                    // 3 cache annotation -> handler mapping relation
-                    StructPropHandler.ANNOTATION_HANDLER_MAPPING.putIfAbsent(annotationType, (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
-                }
-            }
-        }
-    }
-
-    private synchronized static void scanBasics(Set<Class<?>> classes)
-            throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        for (Class<?> clazz : classes) {
-            boolean isBasic = Basic.class.isAssignableFrom(clazz);
-
-            if (isBasic) {
-                // 1 cache basics constructor
-                BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructorFunction(clazz, ByteBuf.class));
-
-                //2 cache bytes size
-                Basic.BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
-            }
-        }
-    }
-
-    private synchronized static void scanStructs(Set<Class<?>> classes) throws Throwable {
-        for (Class<?> clazz : classes) {
-            if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
-                // 1 cache struct constructor
-                NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier(clazz));
-
-                Field[] structFields = ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()) && !isIgnore(f));
-                // 2 cache the fields
-                STRUCT_FIELD_CACHE.put(clazz, structFields);
-
-                for (Field field : structFields) {
-                    // 3 cache field reader and writer
-                    FIELD_READER_CACHE.putIfAbsent(field, getReaderHandle(clazz, field));
-                    FIELD_WRITER_CACHE.putIfAbsent(field, getWriterHandle(clazz, field));
-
-                    // 4 cache field prop handler annotation
-                    for (Annotation annotation : AnnotationUtil.getAnnotations(field, false)) {
-                        if (StructPropHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
-                            Throws.ifContainsKey(FIELD_PROP_HANDLER_ANNOTATION_CACHE, field, "don't specify more than one prop handler on field [" + field + "]");
-                            FIELD_PROP_HANDLER_ANNOTATION_CACHE.put(field, annotation);
+                        // 4 cache field prop handler annotation
+                        for (Annotation annotation : AnnotationUtil.getAnnotations(field, false)) {
+                            if (StructPropHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
+                                Throws.ifContainsKey(FIELD_PROP_HANDLER_ANNOTATION_CACHE, field, "don't specify more than one prop handler on field [" + field + "]");
+                                FIELD_PROP_HANDLER_ANNOTATION_CACHE.put(field, annotation);
+                            }
                         }
                     }
                 }
+            } catch (Throwable throwable) {
+                log.error("scan struct failed please check", throwable);
             }
+
         }
     }
 
