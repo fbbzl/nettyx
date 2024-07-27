@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.exceptions.NotInitedException;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
@@ -63,19 +62,29 @@ public final class StructSerializerContext {
      */
     public synchronized static void doScan(String... packageNames) {
         log.debug("will scan " + Arrays.toString(packageNames) + " packages");
-        try {
-            for (String packageName : packageNames) {
-                Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
+        for (String packageName : packageNames) {
+            Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
+            try {
                 // 1 scan property handler
                 scanPropHandlers(classes);
-                // 2 scan basic
+            } catch (Throwable throwable) {
+                log.error("scan struct-prop-handler failed please check", throwable);
+            }
+
+            // 2 scan basic
+            try {
                 scanBasics(classes);
+            } catch (Throwable throwable) {
+                log.error("scan basic failed please check", throwable);
+            }
+
+            try {
                 // 3 scan struct
                 scanStructs(classes);
+            } catch (Throwable throwable) {
+                log.error("scan struct failed please check", throwable);
             }
-        } catch (Throwable t) {
-            throw new NotInitedException("init struct-serializer context failed please check", t);
         }
     }
 
@@ -146,6 +155,5 @@ public final class StructSerializerContext {
     static boolean isIgnore(Field field) {
         return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
-
 
 }
