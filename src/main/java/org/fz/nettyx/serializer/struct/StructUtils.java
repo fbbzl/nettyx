@@ -11,6 +11,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
+import org.fz.nettyx.util.Try.LambdasException;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.*;
@@ -19,10 +20,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static cn.hutool.core.lang.reflect.MethodHandleUtil.findMethod;
 import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
 import static java.lang.invoke.MethodType.methodType;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.isReadHandler;
@@ -116,7 +117,7 @@ public class StructUtils {
      */
     static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Class<H> clazz) {
         try {
-            return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructorSupplier).get();
+            return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructor).get();
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
@@ -166,7 +167,7 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
-            return (B) BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructorFunction(basicClass, ByteBuf.class)).apply(buf);
+            return (B) BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructor(basicClass, ByteBuf.class)).apply(buf);
         } catch (Throwable instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException) {
@@ -200,9 +201,9 @@ public class StructUtils {
     public static <S> S newStruct(Type structClass) {
         try {
             if (structClass instanceof Class)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) structClass, StructUtils::constructorSupplier).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) structClass, StructUtils::constructor).get();
             if (structClass instanceof ParameterizedType)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), StructUtils::constructorSupplier).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), StructUtils::constructor).get();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         } catch (Throwable instanceError) {
@@ -210,7 +211,7 @@ public class StructUtils {
         }
     }
 
-    public static <T> Supplier<T> constructorSupplier(Class<T> clazz) {
+    public static <T> Supplier<T> constructor(Class<T> clazz) {
         try {
             Lookup       lookup            = MethodHandles.lookup();
             MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class));
@@ -225,14 +226,14 @@ public class StructUtils {
 
             return (Supplier<T>) site.getTarget().invokeExact();
         } catch (Throwable throwable) {
-            throw new IllegalArgumentException("can not generate lambda constructor");
+            throw new LambdasException("can not generate lambda constructor for class [" + clazz + "]");
         }
     }
 
-    public static <A, T> Function<A, T> constructorFunction(Class<T> clazz, Class<?>... args) {
+    public static <A, T> Function<A, T> constructor(Class<T> clazz, Class<A> paramType) {
         try {
             Lookup       lookup            = MethodHandles.lookup();
-            MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class, args));
+            MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class, paramType));
 
             CallSite site = LambdaMetafactory.metafactory(
                     lookup,
@@ -244,26 +245,62 @@ public class StructUtils {
 
             return (Function<A, T>) site.getTarget().invokeExact();
         } catch (Throwable throwable) {
-            throw new IllegalArgumentException("can not generate lambda constructor");
+            throw new LambdasException("can not generate lambda constructor for class [" + clazz + "], param type: [" + paramType + "]");
         }
     }
 
-    public static void writeField(Object object, Field field, Object value) throws Throwable {
-        MethodHandle writeMethod = FIELD_WRITER_CACHE.computeIfAbsent(field, f -> getWriterHandle(object.getClass(), f));
-        writeMethod.invoke(object, value);
+    public static <A, R> Function<A, R> getter(Class<A> clazz, Class<R> returnType, String methodName) {
+        try {
+            Lookup       lookup       = MethodHandles.lookup();
+            MethodHandle getterHandle = lookup.findVirtual(clazz, methodName, methodType(returnType));
+
+            CallSite site = LambdaMetafactory.metafactory(
+                    lookup,
+                    "apply",
+                    methodType(Function.class),
+                    methodType(Object.class, Object.class),
+                    getterHandle,
+                    getterHandle.type());
+
+            return (Function<A, R>) site.getTarget().invokeExact();
+        } catch (Throwable throwable) {
+            throw new IllegalArgumentException("can not generate lambda getter, class [" + clazz + "], method: [" + methodName + "], return type: [" + returnType + "]");
+        }
     }
 
-    public static <T> T readField(Object object, Field field) throws Throwable {
-        MethodHandle readMethod = FIELD_READER_CACHE.computeIfAbsent(field, f -> getReaderHandle(object.getClass(), f));
-        return (T) readMethod.invoke(object);
+    public static <A, P> BiConsumer<A, P> setter(Class<A> clazz, Class<P> paramType, String methodName) {
+        try {
+            Lookup       lookup       = MethodHandles.lookup();
+            MethodHandle setterHandle = lookup.findVirtual(clazz, methodName, methodType(void.class, paramType));
+
+            CallSite site = LambdaMetafactory.metafactory(
+                    lookup,
+                    "accept",
+                    methodType(BiConsumer.class),
+                    methodType(void.class, Object.class, Object.class),
+                    setterHandle,
+                    setterHandle.type());
+
+            return (BiConsumer<A, P>) site.getTarget().invokeExact();
+        } catch (Throwable throwable) {
+            throw new IllegalArgumentException("can not generate lambda setter, class [" + clazz + "], method: [" + methodName + "], param type: [" + paramType + "]");
+        }
     }
 
-    public static MethodHandle getReaderHandle(Class<?> clazz, Field field) {
-        return findMethod(clazz, upperFirstAndAddPre(field.getName(), "get"), methodType(field.getType()));
+    public static <A, P> void writeField(A object, Field field, P value) {
+        ((BiConsumer<A, P>) FIELD_SETTER_CACHE.computeIfAbsent(field, f -> getSetter(object.getClass(), f))).accept(object, value);
     }
 
-    public static MethodHandle getWriterHandle(Class<?> clazz, Field field) {
-        return findMethod(clazz, upperFirstAndAddPre(field.getName(), "set"), methodType(void.class, field.getType()));
+    public static <A, R> R readField(A object, Field field) {
+        return ((Function<A, R>) FIELD_GETTER_CACHE.computeIfAbsent(field, f -> getGetter(object.getClass(), f))).apply(object);
+    }
+
+    public static <A, R> Function<A, R> getGetter(Class<A> clazz, Field field) {
+        return (Function<A, R>) getter(clazz, field.getType(), upperFirstAndAddPre(field.getName(), "get"));
+    }
+
+    public static <A, P> BiConsumer<A, P> getSetter(Class<A> clazz, Field field) {
+        return (BiConsumer<A, P>) setter(clazz, field.getType(), upperFirstAndAddPre(field.getName(), "set"));
     }
 
     public static <C> Class<C> getComponentType(Field arrayField) {

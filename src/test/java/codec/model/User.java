@@ -62,6 +62,15 @@ public class User<T, W, G> {
     @ToArray(length = 50)
     private Cppushort[] qqNames;
 
+    @ToLinkedList(size = 50)
+    private List<Bom<T, W, G>> bsss;
+
+    @ToArrayList(size = 50)
+    private List<Bom<T, W, G>> bs2d;
+
+    @ToArray(length = 50)
+    private Bom<T, W, G>[] g111fs;
+
     private T       sonsbaba;
     @ToLinkedList(size = 50)
     private List<T> sons;
