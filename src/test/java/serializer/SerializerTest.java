@@ -48,10 +48,10 @@ public class SerializerTest {
         Console.print(doc);
     }
 
-
    static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>> userTypeRefer = new TypeRefer<User<Bill,
             Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>>() {
     };
+
     @Test
     public void testStructSerializer() {
         byte[] bytes = new byte[1024 * 6];

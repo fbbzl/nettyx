@@ -15,7 +15,6 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 
-import java.beans.IntrospectionException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
@@ -25,12 +24,12 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.getTargetAnnotationType;
-import static org.fz.nettyx.serializer.struct.StructUtils.getReaderHandle;
-import static org.fz.nettyx.serializer.struct.StructUtils.getWriterHandle;
+import static org.fz.nettyx.serializer.struct.StructUtils.*;
 import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CACHE;
 
 /**
@@ -47,17 +46,15 @@ public final class StructSerializerContext {
     /**
      * cache field handler-annotation
      */
-    public static final Map<Field, Annotation> FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
+    public static final Map<Field, Annotation>   FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
     /**
      * cache getter/setter
      */
-    static final Map<Field, MethodHandle> FIELD_READER_CACHE = new ConcurrentHashMap<>(512);
-    static final Map<Field, MethodHandle> FIELD_WRITER_CACHE = new ConcurrentHashMap<>(512);
-    /**
-     * cache constructor
-     */
-    static final Map<Class<?>, MethodHandle> CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
+    static final        Map<Field, MethodHandle> FIELD_READER_CACHE                  = new ConcurrentHashMap<>(512);
+    static final        Map<Field, MethodHandle> FIELD_WRITER_CACHE                  = new ConcurrentHashMap<>(512);
 
+    static final Map<Class<?>, Supplier<?>>          CONSTRUCTOR_SUPPLIER_CACHE       = new ConcurrentHashMap<>(128);
+    static final Map<Class<?>, Function<ByteBuf, ?>> BASIC_CONSTRUCTOR_FUNCTION_CACHE = new ConcurrentHashMap<>(128);
 
     static {
         // scan classes
@@ -98,12 +95,12 @@ public final class StructSerializerContext {
             if (isPropertyHandler) {
                 Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
                 if (annotationType != null) {
-                    MethodHandle handlerConstructor = findConstructor(clazz);
+                    Supplier<?> constructorSupplier = constructorSupplier(clazz);
                     // 1 cache prop-handler constructor
-                    CONSTRUCTOR_CACHE.putIfAbsent(clazz, handlerConstructor);
+                    CONSTRUCTOR_SUPPLIER_CACHE.putIfAbsent(clazz, constructorSupplier);
 
                     // 2 cache singleton prop-handler
-                    StructPropHandler handler = (StructPropHandler) handlerConstructor.invoke();
+                    StructPropHandler handler = (StructPropHandler) constructorSupplier.get();
                     if (handler.isSingleton()) Singleton.put(handler);
 
                     // 3 cache annotation -> handler mapping relation
@@ -120,7 +117,7 @@ public final class StructSerializerContext {
 
             if (isBasic) {
                 // 1 cache basics constructor
-                CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, findConstructor(clazz, ByteBuf.class));
+                BASIC_CONSTRUCTOR_FUNCTION_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructorFunction(clazz, ByteBuf.class));
 
                 //2 cache bytes size
                 Basic.BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
@@ -128,11 +125,11 @@ public final class StructSerializerContext {
         }
     }
 
-    private synchronized static void scanStructs(Set<Class<?>> classes) throws IntrospectionException {
+    private synchronized static void scanStructs(Set<Class<?>> classes) throws Throwable {
         for (Class<?> clazz : classes) {
             if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                 // 1 cache struct constructor
-                CONSTRUCTOR_CACHE.putIfAbsent(clazz, findConstructor(clazz));
+                CONSTRUCTOR_SUPPLIER_CACHE.putIfAbsent(clazz, constructorSupplier(clazz));
 
                 Field[] structFields = ReflectUtil.getFields(clazz, f -> !Modifier.isStatic(f.getModifiers()) && !isIgnore(f));
                 // 2 cache the fields

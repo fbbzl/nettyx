@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.lang.Singleton;
-import cn.hutool.core.lang.reflect.MethodHandleUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -14,13 +13,15 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Try;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
+import java.lang.invoke.*;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import static cn.hutool.core.lang.reflect.MethodHandleUtil.findConstructor;
 import static cn.hutool.core.lang.reflect.MethodHandleUtil.findMethod;
 import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
 import static java.lang.invoke.MethodType.methodType;
@@ -115,7 +116,7 @@ public class StructUtils {
      */
     static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Class<H> clazz) {
         try {
-            return (H) CONSTRUCTOR_CACHE.computeIfAbsent(clazz, MethodHandleUtil::findConstructor).invoke();
+            return (H) CONSTRUCTOR_SUPPLIER_CACHE.computeIfAbsent(clazz, StructUtils::constructorSupplier).get();
         } catch (Throwable exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
@@ -165,7 +166,7 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
-            return (B) CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> findConstructor(basicClass, ByteBuf.class)).invoke(buf);
+            return (B) BASIC_CONSTRUCTOR_FUNCTION_CACHE.computeIfAbsent(basicClass, bc -> constructorFunction(basicClass, ByteBuf.class)).apply(buf);
         } catch (Throwable instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException) {
@@ -199,13 +200,51 @@ public class StructUtils {
     public static <S> S newStruct(Type structClass) {
         try {
             if (structClass instanceof Class)
-                return (S) CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) structClass, MethodHandleUtil::findConstructor).invoke();
+                return (S) CONSTRUCTOR_SUPPLIER_CACHE.computeIfAbsent((Class<S>) structClass, StructUtils::constructorSupplier).get();
             if (structClass instanceof ParameterizedType)
-                return (S) CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), MethodHandleUtil::findConstructor).invoke();
+                return (S) CONSTRUCTOR_SUPPLIER_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), StructUtils::constructorSupplier).get();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         } catch (Throwable instanceError) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", instanceError);
+        }
+    }
+
+    public static <T> Supplier<T> constructorSupplier(Class<T> clazz) {
+        try {
+            Lookup       lookup            = MethodHandles.lookup();
+            MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class));
+
+            CallSite site = LambdaMetafactory.metafactory(
+                    lookup,
+                    "get",
+                    MethodType.methodType(Supplier.class),
+                    constructorHandle.type().generic(),
+                    constructorHandle,
+                    constructorHandle.type());
+
+            return (Supplier<T>) site.getTarget().invokeExact();
+        } catch (Throwable throwable) {
+            throw new IllegalArgumentException("can not generate lambda constructor");
+        }
+    }
+
+    public static <A, T> Function<A, T> constructorFunction(Class<T> clazz, Class<?>... args) {
+        try {
+            Lookup       lookup            = MethodHandles.lookup();
+            MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class, args));
+
+            CallSite site = LambdaMetafactory.metafactory(
+                    lookup,
+                    "apply",
+                    MethodType.methodType(Function.class),
+                    constructorHandle.type().generic(),
+                    constructorHandle,
+                    constructorHandle.type());
+
+            return (Function<A, T>) site.getTarget().invokeExact();
+        } catch (Throwable throwable) {
+            throw new IllegalArgumentException("can not generate lambda constructor");
         }
     }
 
