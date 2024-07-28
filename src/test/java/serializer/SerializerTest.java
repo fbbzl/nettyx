@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.fz.nettyx.serializer.xml.XmlSerializer;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext;
 import org.fz.nettyx.serializer.xml.XmlSerializerContext.Model;
@@ -25,11 +26,11 @@ import java.util.Arrays;
 @Slf4j
 public class SerializerTest {
 
-   // @BeforeClass
+    // @BeforeClass
     public static void initContext() {
-        String u = "pc";
-        File file = new File("C:\\Users\\" + u + "\\Desktop");
-        File file2 = new File("C:\\Users\\" + u + "\\Desktop");
+        String               u                    = "pc";
+        File                 file                 = new File("C:\\Users\\" + u + "\\Desktop");
+        File                 file2                = new File("C:\\Users\\" + u + "\\Desktop");
         XmlSerializerContext xmlSerializerContext = new XmlSerializerContext(file, file2);
 
     }
@@ -48,8 +49,8 @@ public class SerializerTest {
         Console.print(doc);
     }
 
-   static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>> userTypeRefer = new TypeRefer<User<Bill,
-            Wife<GirlFriend, Son<Clong4, Bill>>, GirlFriend>>() {
+    static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>> userTypeRefer = new TypeRefer<User<Bill,
+            Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>>() {
     };
 
     @Test
@@ -60,22 +61,27 @@ public class SerializerTest {
         User user = StructSerializer.read(userTypeRefer, Unpooled.wrappedBuffer(bytes));
 
         Console.log("read :" + user);
-//        user.setAddress(null);
-//        user.setQqNames(null);
-//        user.setQqNames(null);
-//        user.setWives(null);
-//        user.setSons(null);
-//        user.setWives121212(null);
-//        user.setWives(null);
-//        user.setWwife(null);
+        user.setAddress(null);
+        user.setQqNames(null);
+        user.setSs(null);
+        user.setWives(null);
+        user.setWives121212(null);
+        user.setG111fs(null);
+        user.setBs2d(null);
+        user.setSonsbaba(null);
+        user.setSonff(null);
+        user.setSo111ns(null);
+        user.setWwife(null);
+        user.setWives(null);
+        user.setWives121212(null);
 
         final byte[] userWriteBytes = StructSerializer.writeBytes(userTypeRefer, user);
-        Console.log("userWriteBytes: " + userWriteBytes.length);
+        System.err.println("userWriteBytes: " + userWriteBytes.length);
         User turn = StructSerializer.read(userTypeRefer, userWriteBytes);
 
         System.err.println(turn.equals(user));
-        byte[] bytes1 = StructSerializer.writeBytes(userTypeRefer, turn);
-        Console.log("bytes1: " + bytes1.length);
+        byte[] bytes1 = StructSerializer.writeBytes(userTypeRefer, new User<>());
+        System.err.println("bytes1: " + bytes1.length);
         Console.log(Arrays.toString(bytes1));
         Console.log("turn :" + turn);
 

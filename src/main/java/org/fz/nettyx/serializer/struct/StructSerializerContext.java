@@ -17,6 +17,7 @@ import org.fz.nettyx.util.Throws;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -46,8 +47,8 @@ public final class StructSerializerContext {
     static final Map<Field, Function<?, ?>>   FIELD_GETTER_CACHE = new ConcurrentHashMap<>(512);
     static final Map<Field, BiConsumer<?, ?>> FIELD_SETTER_CACHE = new ConcurrentHashMap<>(512);
 
-    static final Map<Class<?>, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
-    static final Map<Class<?>, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
+    static final Map<Type, Supplier<?>>      NO_ARGS_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
+    static final Map<Type, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
 
     static {
         // scan classes
