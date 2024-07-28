@@ -26,7 +26,7 @@ public class ChannelStorage<K> {
      * Instantiates a new Channel storage.
      */
     public ChannelStorage() {
-        this.storage = new SafeConcurrentHashMap<>();
+        this.storage = new SafeConcurrentHashMap<>(8);
     }
 
     /**

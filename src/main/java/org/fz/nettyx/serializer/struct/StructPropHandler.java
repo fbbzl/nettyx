@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
+import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -9,10 +10,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructSerializer.*;
+import static org.fz.nettyx.serializer.struct.StructUtils.isBasic;
+import static org.fz.nettyx.serializer.struct.StructUtils.isStruct;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -24,7 +28,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.*;
 public interface StructPropHandler<A extends Annotation> {
 
     /**
+     * cache annotation and handler class
+     */
+    Map<Class<? extends Annotation>, Class<? extends StructPropHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>(16);
+
+    /**
      * config the handler instance if is singleton
+     *
      * @return if is singleton-handler
      */
     default boolean isSingleton() {
