@@ -18,9 +18,7 @@ import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
+
 
 /**
  * The interface List.
@@ -33,13 +31,6 @@ import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ToArrayList {
-
-    /**
-     * Element type class.
-     *
-     * @return the class
-     */
-    Class<?> elementType() default Object.class;
 
     /**
      * list size
@@ -58,26 +49,21 @@ public @interface ToArrayList {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
-            Class<?> elementType = getElementType(serializer.getRootType(), toArrayList, field);
+        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToArrayList toArrayList) {
+            Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), new ArrayList<>(10));
+            return serializer.readCollection(elementType, toArrayList.size(), new ArrayList<>(10));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList, ByteBuf writing) {
-            Class<?> elementType = getElementType(serializer.getRootType(), toArrayList, field);
+        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToArrayList toArrayList, ByteBuf writing) {
+            Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            writeCollection((List<?>) defaultIfNull(value, () -> newArrayList()), elementType, toArrayList.size(), writing);
-        }
-
-        private static Class<?> getElementType(Type rootType, ToArrayList toArrayList, Field field) {
-            Class<?> elementType = toArrayList.elementType();
-            return elementType == Object.class ? getActualType(rootType, field, 0) : elementType;
+            serializer.writeCollection((List<?>) defaultIfNull(value, () -> newArrayList()), elementType, toArrayList.size(), writing);
         }
     }
 }

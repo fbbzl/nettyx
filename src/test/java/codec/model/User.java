@@ -17,8 +17,32 @@ import java.util.List;
 @Struct
 public class User<T, W, G> {
 
-    private Bom<T, W, G> b;
-    private Clong4       uid;
+    private Clong4          uid;
+    @ToArray(length = 10)
+    private Cppushort[]     qqNames;
+    @ToLinkedList(size = 10)
+    private List<Cppushort> ss;
+    @ToArrayList(size = 10)
+    private List<Cppushort> tts;
+
+    private Bom<T, W, G>                                b;
+    @ToArray(length = 10)
+    private Bom<T, W, Clong4>[]                         g111fs;
+    @ToArrayList(size = 10)
+    private List<Bom<T, Son<Cuchar, Bill>, GirlFriend>> bs2d;
+
+    private T       sonsbaba;
+    @ToArray(length = 10)
+    private T[]     sonff;
+    @ToArrayList(size = 10)
+    private List<T> so111ns;
+
+    private W       wwife;
+    @ToArrayList(size = 10)
+    private List<W> wives;
+    @ToArray(length = 10)
+    private W[]     wives121212;
+
     private Cchar        uname;
     private Cint         isMarried;
     private Cchar        sex;
@@ -59,30 +83,4 @@ public class User<T, W, G> {
     private Cppushort    cppushort;
     private CppBool      cppBool;
 
-    @ToArray(length = 50)
-    private Cppushort[] qqNames;
-
-    @ToLinkedList(size = 50)
-    private List<Bom<T, W, G>> bsss;
-
-    @ToArrayList(size = 50)
-    private List<Bom<T, W, G>> bs2d;
-
-    @ToArray(length = 50)
-    private Bom<T, W, G>[] g111fs;
-
-    private T       sonsbaba;
-    @ToLinkedList(size = 50)
-    private List<T> sons;
-    @ToArray(length = 50)
-    private T[]     sons11;
-
-    private W       wwife;
-    @ToArrayList(size = 50)
-    private List<W> wives;
-    @ToArray(length = 50)
-    private W[]     wives121212;
-
-    @ToArray(length = 50)
-    private G[] gfs;
 }
