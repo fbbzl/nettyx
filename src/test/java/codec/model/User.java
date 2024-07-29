@@ -1,10 +1,7 @@
 package codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
+import org.fz.nettyx.serializer.struct.annotation.*;
 import org.fz.nettyx.serializer.struct.basic.c.signed.*;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.*;
 import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
@@ -16,6 +13,9 @@ import java.util.List;
 @Data
 @Struct
 public class User<T, W, G> {
+
+    @ToNamedEnum(enumType = Ccc.class, bufferLength = 2)
+    private Ccc cccEnum;
 
     private Clong4          uid;
     @ToArray(length = 10)
@@ -82,5 +82,11 @@ public class User<T, W, G> {
     private Cppulonglong cppulonglong;
     private Cppushort    cppushort;
     private CppBool      cppBool;
+
+    private enum Ccc {
+        TT,
+        CC,
+        ;
+    }
 
 }
