@@ -83,7 +83,7 @@ public class User<T, W, G> {
     private Cppushort    cppushort;
     private CppBool      cppBool;
 
-    private enum Ccc {
+    public enum Ccc {
         TT,
         CC,
         ;
