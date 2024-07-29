@@ -2,10 +2,7 @@ package template.tcp.server;
 
 import cn.hutool.core.lang.Console;
 import codec.UserCodec;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.codec.EscapeCodec;
@@ -13,9 +10,8 @@ import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
+import org.fz.nettyx.handler.MessageEchoHandler;
 import org.fz.nettyx.template.tcp.server.TcpServerTemplate;
-
-import java.util.Arrays;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 
@@ -44,15 +40,7 @@ public class TestServer extends TcpServerTemplate {
                         outboundAdvice
                         , new StartEndFlagFrameCodec(3000, true, wrappedBuffer(new byte[]{(byte) 0x7e}))
                         , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
-                        , new ChannelInboundHandlerAdapter() {
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object in) throws Exception {
-                                byte[] msg = new byte[2048];
-                                Arrays.fill(msg, (byte) 67);
-                                ctx.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
-                                super.channelRead(ctx, in);
-                            }
-                        }
+                        , new MessageEchoHandler()
                         , new UserCodec()
                         , inboundAdvice);
             }
