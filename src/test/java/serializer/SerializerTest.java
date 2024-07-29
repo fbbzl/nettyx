@@ -75,6 +75,7 @@ public class SerializerTest {
         user.setWives(null);
         user.setWives121212(null);
 
+
         final byte[] userWriteBytes = StructSerializer.writeBytes(userTypeRefer, user);
         System.err.println("userWriteBytes: " + userWriteBytes.length);
         User turn = StructSerializer.read(userTypeRefer, userWriteBytes);
