@@ -18,9 +18,7 @@ import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
+
 
 /**
  * The interface To linked list.
@@ -34,13 +32,6 @@ import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ToLinkedList {
-
-    /**
-     * Element type class.
-     *
-     * @return the class
-     */
-    Class<?> elementType() default Object.class;
 
     /**
      * list size int.
@@ -59,26 +50,21 @@ public @interface ToLinkedList {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToLinkedList toLinkedList) {
-            Class<?> elementType = getElementType(serializer.getRootType(), toLinkedList, field);
+        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToLinkedList toLinkedList) {
+            Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return readCollection(serializer.getByteBuf(), elementType, toLinkedList.size(), new LinkedList<>());
+            return serializer.readCollection(elementType, toLinkedList.size(), new LinkedList<>());
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToLinkedList toLinkedList, ByteBuf writing) {
-            Class<?> elementType = getElementType(serializer.getRootType(), toLinkedList, field);
+        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToLinkedList toLinkedList, ByteBuf writing) {
+            Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            writeCollection((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
-        }
-
-        private static Class<?> getElementType(Type rootType, ToLinkedList toLinkedList, Field field) {
-            Class<?> elementType = toLinkedList.elementType();
-            return elementType == Object.class ? getActualType(rootType, field, 0) : elementType;
+            serializer.writeCollection((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
         }
     }
 
