@@ -68,6 +68,7 @@
 
         <!--test-->
         <junit.version>4.13.2</junit.version>
+        <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
     <dependencies>
@@ -162,6 +163,14 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>reflectasm</artifactId>
+            <version>${reflectasm.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
