@@ -54,7 +54,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return serializer.readCollection(elementType, toArrayList.size(), new ArrayList<>(10));
+            return serializer.readList(elementType, toArrayList.size(), new ArrayList<>(10));
         }
 
         @Override
@@ -63,7 +63,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            serializer.writeCollection((List<?>) defaultIfNull(value, () -> newArrayList()), elementType, toArrayList.size(), writing);
+            serializer.writeList((List<?>) defaultIfNull(value, () -> newArrayList()), elementType, toArrayList.size(), writing);
         }
     }
 }

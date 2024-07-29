@@ -23,8 +23,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
@@ -205,10 +205,10 @@ public final class StructSerializer implements Serializer {
         else                       throw new TypeJudgmentException();
     }
 
-    public <T> Collection<T> readCollection(Type elementType, int length, Collection<?> coll) {
-        if (isBasic(elementType))  return (Collection<T>) readBasicCollection(elementType, length, coll);
+    public <T> List<T> readList(Type elementType, int length, List<?> coll) {
+        if (isBasic(elementType))  return (List<T>) readBasicList(elementType, length, coll);
         else
-        if (isStruct(elementType)) return readStructCollection(elementType, length, coll);
+        if (isStruct(elementType)) return readStructList(elementType, length, coll);
         else                       throw new TypeJudgmentException();
     }
 
@@ -220,8 +220,8 @@ public final class StructSerializer implements Serializer {
         return basics;
     }
 
-    public <B extends Basic<?>> Collection<B> readBasicCollection(Type elementType, int length, Collection<?> coll) {
-        return (Collection<B>) CollUtil.addAll(coll, readBasicArray(elementType, length));
+    public <B extends Basic<?>> List<B> readBasicList(Type elementType, int length, List<?> coll) {
+        return (List<B>) CollUtil.addAll(coll, readBasicArray(elementType, length));
     }
 
     public <S> S[] readStructArray(Type elementType, int length) {
@@ -233,8 +233,8 @@ public final class StructSerializer implements Serializer {
         return structs;
     }
 
-    public <T> Collection<T> readStructCollection(Type elementType, int length, Collection<?> coll) {
-        return (Collection<T>) CollUtil.addAll(coll, readStructArray(elementType, length));
+    public <T> List<T> readStructList(Type elementType, int length, List<?> coll) {
+        return (List<T>) CollUtil.addAll(coll, readStructArray(elementType, length));
     }
 
     <A extends Annotation> Object readHandled(Field handleField, Type fieldActualType, StructSerializer upperSerializer) {
@@ -308,10 +308,10 @@ public final class StructSerializer implements Serializer {
         else throw new TypeJudgmentException();
     }
 
-    public void writeCollection(Collection<?> collection, Type elementType, int length, ByteBuf writing) {
-        if (isBasic(elementType))  writeBasicCollection(collection, findBasicSize(elementType), length, writing);
+    public void writeList(List<?> list, Type elementType, int length, ByteBuf writing) {
+        if (isBasic(elementType))  writeBasicList(list, findBasicSize(elementType), length, writing);
         else
-        if (isStruct(elementType)) writeStructCollection(collection, elementType, length, writing);
+        if (isStruct(elementType)) writeStructList(list, elementType, length, writing);
         else                       throw new TypeJudgmentException();
     }
 
@@ -335,8 +335,8 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public void writeBasicCollection(Collection<?> collection, int elementBytesSize, int length, ByteBuf writing) {
-        Iterator<?> iterator = collection.iterator();
+    public void writeBasicList(List<?> list, int elementBytesSize, int length, ByteBuf writing) {
+        Iterator<?> iterator = list.iterator();
         for (int i = 0; i < length; i++) {
             if (iterator.hasNext()) {
                 Basic<?> basic = (Basic<?>) iterator.next();
@@ -358,8 +358,8 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public void writeStructCollection(Collection<?> collection, Type elementType, int length, ByteBuf writing) {
-        Iterator<?> iterator = collection.iterator();
+    public void writeStructList(List<?> list, Type elementType, int length, ByteBuf writing) {
+        Iterator<?> iterator = list.iterator();
         for (int i = 0; i < length; i++) {
             if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(elementType, defaultIfNull(iterator.next(), () -> newStruct(elementType))));
             else writing.writeBytes(StructSerializer.write(elementType, newStruct(elementType)));

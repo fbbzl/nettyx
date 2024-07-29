@@ -55,7 +55,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            return serializer.readCollection(elementType, toLinkedList.size(), new LinkedList<>());
+            return serializer.readList(elementType, toLinkedList.size(), new LinkedList<>());
         }
 
         @Override
@@ -64,7 +64,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            serializer.writeCollection((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
+            serializer.writeList((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
         }
     }
 
