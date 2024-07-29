@@ -14,9 +14,6 @@ import template.TestChannelInitializer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.action.ListenerAction.redo;
@@ -28,8 +25,6 @@ import static org.fz.nettyx.action.ListenerAction.redo;
  * @since 2024/3/1 22:58
  */
 public class TestMultiRxtx extends MultiRxtxChannelTemplate<String> {
-
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     protected TestMultiRxtx(Map<String, SerialCommChannel.SerialCommAddress> stringRxtxDeviceAddressMap) {
         super(stringRxtxDeviceAddressMap);
@@ -55,17 +50,15 @@ public class TestMultiRxtx extends MultiRxtxChannelTemplate<String> {
     public static void main(String[] args) {
         Map<String, SerialCommChannel.SerialCommAddress> map = new HashMap<>();
 
-        map.put("5", new SerialCommChannel.SerialCommAddress("COM5"));
+        map.put("5", new SerialCommChannel.SerialCommAddress("COM2"));
         map.put("6", new SerialCommChannel.SerialCommAddress("COM6"));
 
         TestMultiRxtx testMultiTcp = new TestMultiRxtx(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 67);
-                        cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
-                    }, 2, 30, TimeUnit.MILLISECONDS);
+                    byte[] msg = new byte[2048];
+                    Arrays.fill(msg, (byte) 67);
+                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
 
                     Console.log(cf.channel().localAddress() + ": ok");
                 })

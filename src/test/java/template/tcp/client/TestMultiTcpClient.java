@@ -14,9 +14,6 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.action.ListenerAction.redo;
@@ -28,8 +25,6 @@ import static org.fz.nettyx.action.ListenerAction.redo;
  * @since 2024/2/29 14:58
  */
 public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
-
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     protected TestMultiTcpClient(Map<String, InetSocketAddress> inetSocketAddressMap) {
         super(inetSocketAddressMap);
@@ -50,11 +45,9 @@ public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
         TestMultiTcpClient testMultiTcp = new TestMultiTcpClient(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[2048];
-                        Arrays.fill(msg, (byte) 67);
-                        cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
-                    }, 2, 30, TimeUnit.MILLISECONDS);
+                    byte[] msg = new byte[2048];
+                    Arrays.fill(msg, (byte) 67);
+                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
 
                     Console.log(cf.channel().localAddress() + ": ok");
                 })

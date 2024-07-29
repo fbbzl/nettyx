@@ -13,8 +13,6 @@ import org.fz.nettyx.template.serial.jsc.SingleJscChannelTemplate;
 import template.TestChannelInitializer;
 
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.fz.nettyx.action.ListenerAction.redo;
@@ -28,8 +26,6 @@ import static org.fz.nettyx.action.ListenerAction.redo;
 
 @Slf4j
 public class TestSingleJsc extends SingleJscChannelTemplate {
-
-    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     public TestSingleJsc(String commAddress) {
         super(commAddress);
@@ -55,17 +51,15 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 67);
-                        testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
-                    }, 2, 30, TimeUnit.MILLISECONDS);
-
-                    JscChannelConfig config = (JscChannelConfig) cf.channel().config();
-                    Console.log(config.getBaudRate());
+                    byte[] msg = new byte[2048];
+                    Arrays.fill(msg, (byte) 67);
+                    testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))
-                .whenFailure(redo(testSingleJsc::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> System.err.println("最后次失败后执行")))
+                .whenFailure(redo(testSingleJsc::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> {
+
+                    c.cause().printStackTrace();
+                }))
                 .whenDone((l, cf) -> Console.log("done"));
 
         testSingleJsc.connect().addListener(listener);
