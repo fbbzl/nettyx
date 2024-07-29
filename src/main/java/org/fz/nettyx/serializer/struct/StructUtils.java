@@ -149,7 +149,7 @@ public class StructUtils {
     public static <B extends Basic<?>> B newBasic(Type basicClass, ByteBuf buf) {
         try {
             return (B) BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructor(basicClass, ByteBuf.class)).apply(buf);
-        } catch (Throwable instanceError) {
+        } catch (Exception instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException) {
                 throw new SerializeException(instanceError);
