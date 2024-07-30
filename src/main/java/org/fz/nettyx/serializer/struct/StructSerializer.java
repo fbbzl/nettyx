@@ -269,8 +269,7 @@ public final class StructSerializer implements Serializer {
             writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.postWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
         } catch (Exception writeHandlerException) {
-            writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing,
-                                         writeHandlerException);
+            writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
             throw new SerializeHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
     }
