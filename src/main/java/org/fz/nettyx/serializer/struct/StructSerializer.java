@@ -85,9 +85,7 @@ public final class StructSerializer implements Serializer {
 
     public static <T> T read(Type rootType, InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (int b = is.read(); b >= 0; b = is.read()) {
-            baos.write(b);
-        }
+        for (int b = is.read(); b >= 0; b = is.read()) baos.write(b);
         is.close();
         return read(rootType, baos.toByteArray());
     }
