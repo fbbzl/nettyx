@@ -154,7 +154,7 @@ public final class StructSerializer implements Serializer {
                 else throw new TypeJudgmentException(field);
 
                 StructUtils.writeField(struct, field, fieldValue);
-            } catch (Throwable exception) {
+            } catch (Exception exception) {
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
@@ -169,9 +169,9 @@ public final class StructSerializer implements Serializer {
                 Type   fieldActualType = TypeUtil.getActualType(rootType, field);
                 if (useWriteHandler(field)) writeHandled(field, fieldActualType, fieldValue, this);
                 else
-                if (isBasic(field)) writeBasic(defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType)), writing);
+                if (isBasic(field)) writeBasic(newBasicDefault(fieldValue, fieldActualType), writing);
                 else
-                if (isStruct(field)) writeStruct(fieldActualType, defaultIfNull(fieldValue, () -> newStruct(fieldActualType)), writing);
+                if (isStruct(field)) writeStruct(fieldActualType, newStructDefault(fieldValue, fieldActualType), writing);
 
                 else throw new TypeJudgmentException(field);
             } catch (Exception exception) {
@@ -284,9 +284,9 @@ public final class StructSerializer implements Serializer {
         else                                   return type;
     }
 
-    public void writeArray(Object arrayValue, Type elementType, int length, ByteBuf writing) {
-        if (isBasic(elementType)) {
-            int        basicElementSize = StructUtils.findBasicSize(elementType);
+    public void writeArray(Object arrayValue, Type componentType, int length, ByteBuf writing) {
+        if (isBasic(componentType)) {
+            int        basicElementSize = StructUtils.findBasicSize(componentType);
             Basic<?>[] basicArray       = (Basic<?>[]) arrayValue;
 
             if (basicArray == null) {
@@ -297,9 +297,8 @@ public final class StructSerializer implements Serializer {
             writeBasicArray(basicArray, basicElementSize, length, writing);
         }
         else
-        if (isStruct(elementType)) {
-            Object[] structArray = defaultIfNull((Object[]) arrayValue, () -> newArray(elementType, length));
-            writeStructArray(defaultIfNull(structArray, () -> newArray(elementType, length)), elementType, length, writing);
+        if (isStruct(componentType)) {
+            writeStructArray(newArrayDefault(arrayValue, componentType, length), componentType, length, writing);
         }
         else throw new TypeJudgmentException();
     }
@@ -311,7 +310,7 @@ public final class StructSerializer implements Serializer {
         else                       throw new TypeJudgmentException();
     }
 
-    public <T> T[] newArray(Type componentType, int length) {
+    public static  <T> T[] newArray(Type componentType, int length) {
         if (componentType instanceof Class)
             return (T[]) Array.newInstance((Class<?>) componentType, length);
         if (componentType instanceof ParameterizedType)
@@ -347,7 +346,7 @@ public final class StructSerializer implements Serializer {
         for (int i = 0; i < length; i++) {
             if (i < structArray.length) {
                 T object = structArray[i];
-                ByteBuf write = StructSerializer.write(elementType, defaultIfNull(object, () -> newStruct(elementType)));
+                ByteBuf write = StructSerializer.write(elementType, newStructDefault(object, elementType));
                 writing.writeBytes(write);
             }
             else writing.writeBytes(StructSerializer.write(newStruct(elementType)));
@@ -357,9 +356,21 @@ public final class StructSerializer implements Serializer {
     public void writeStructList(List<?> list, Type elementType, int length, ByteBuf writing) {
         Iterator<?> iterator = list.iterator();
         for (int i = 0; i < length; i++) {
-            if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(elementType, defaultIfNull(iterator.next(), () -> newStruct(elementType))));
+            if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(elementType, newStructDefault(iterator.next(), elementType)));
             else writing.writeBytes(StructSerializer.write(elementType, newStruct(elementType)));
         }
+    }
+
+    public static  <T> T newBasicDefault(Object fieldValue, Type fieldActualType) {
+        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
+    }
+
+    public static <T> T newStructDefault(Object fieldValue, Type fieldActualType) {
+        return (T) defaultIfNull(fieldValue, () -> newStruct(fieldActualType));
+    }
+
+    public static <T> T[] newArrayDefault(Object arrayValue, Type componentType, int length) {
+        return (T[]) defaultIfNull(arrayValue, () -> newArray(componentType, length));
     }
 
     public boolean isBasic(Field field) {

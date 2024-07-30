@@ -11,10 +11,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static cn.hutool.core.collection.CollUtil.newLinkedList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -64,7 +64,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            serializer.writeList((List<?>) defaultIfNull(value, () -> newLinkedList()), elementType, toLinkedList.size(), writing);
+            serializer.writeList(defaultIfNull((List<?>) value, Collections::emptyList), elementType, toLinkedList.size(), writing);
         }
     }
 
