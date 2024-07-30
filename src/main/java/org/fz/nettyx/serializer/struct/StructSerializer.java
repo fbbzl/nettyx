@@ -90,7 +90,7 @@ public final class StructSerializer implements Serializer {
         return read(rootType, baos.toByteArray());
     }
 
-    //*************************************      read write splitter      ********************************************//
+    //*************************************       read write splitter       ********************************************//
 
     public static <T> ByteBuf write(T struct) {
         return write(struct.getClass(), struct);
