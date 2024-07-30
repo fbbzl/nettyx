@@ -275,14 +275,13 @@ public final class StructSerializer implements Serializer {
     public Type getComponentType(Type type) {
         if (type instanceof Class)            return ((Class<?>) type).getComponentType();
         if (type instanceof GenericArrayType) return TypeUtil.getActualType(rootType, ((GenericArrayType) type).getGenericComponentType());
-        else return type;
+        else                                  return type;
     }
 
     public Type getElementType(Type type) {
-        if (type instanceof Class) return ((Class<?>) type).getComponentType();
-        if (type instanceof ParameterizedType)
-            return TypeUtil.getActualType(rootType, ((ParameterizedType) type).getActualTypeArguments()[0]);
-        else return type;
+        if (type instanceof Class)             return ((Class<?>) type).getComponentType();
+        if (type instanceof ParameterizedType) return TypeUtil.getActualType(rootType, ((ParameterizedType) type).getActualTypeArguments()[0]);
+        else                                   return type;
     }
 
     public void writeArray(Object arrayValue, Type elementType, int length, ByteBuf writing) {
