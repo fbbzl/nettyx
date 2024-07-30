@@ -184,8 +184,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> Class<T> getRawType(Type type) {
-        if (type instanceof Class<?>) return (Class<T>) type;
-        else if (type instanceof ParameterizedType) return (Class<T>) ((ParameterizedType) type).getRawType();
+        if (type instanceof Class<?>)          return (Class<T>) type;
+        else
+        if (type instanceof ParameterizedType) return (Class<T>) ((ParameterizedType) type).getRawType();
 
         throw new TypeJudgmentException(type);
     }
@@ -205,23 +206,12 @@ public final class StructSerializer implements Serializer {
         else                       throw new TypeJudgmentException();
     }
 
-    public <T> List<T> readList(Type elementType, int length, List<?> coll) {
-        if (isBasic(elementType))  return (List<T>) readBasicList(elementType, length, coll);
-        else
-        if (isStruct(elementType)) return readStructList(elementType, length, coll);
-        else                       throw new TypeJudgmentException();
-    }
-
     public <B extends Basic<?>> B[] readBasicArray(Type elementType, int length) {
         B[] basics = newArray(elementType, length);
 
         for (int i = 0; i < basics.length; i++) basics[i] = newBasic(elementType, getByteBuf());
 
         return basics;
-    }
-
-    public <B extends Basic<?>> List<B> readBasicList(Type elementType, int length, List<?> coll) {
-        return (List<B>) CollUtil.addAll(coll, readBasicArray(elementType, length));
     }
 
     public <S> S[] readStructArray(Type elementType, int length) {
@@ -231,6 +221,17 @@ public final class StructSerializer implements Serializer {
         for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementActualType);
 
         return structs;
+    }
+
+    public <T> List<T> readList(Type elementType, int length, List<?> coll) {
+        if (isBasic(elementType))  return (List<T>) readBasicList(elementType, length, coll);
+        else
+        if (isStruct(elementType)) return readStructList(elementType, length, coll);
+        else                       throw new TypeJudgmentException();
+    }
+
+    public <B extends Basic<?>> List<B> readBasicList(Type elementType, int length, List<?> coll) {
+        return (List<B>) CollUtil.addAll(coll, readBasicArray(elementType, length));
     }
 
     public <T> List<T> readStructList(Type elementType, int length, List<?> coll) {
@@ -259,33 +260,6 @@ public final class StructSerializer implements Serializer {
     <S> void writeStruct(Type rootType, S structValue, ByteBuf writingBuf) {
         writingBuf.writeBytes(StructSerializer.write(rootType, structValue));
     }
-
-    <A extends Annotation> void writeHandled(Field handleField, Type fieldActualType, Object fieldValue, StructSerializer upperSerializer) {
-        WriteHandler<A> writeHandler      = StructUtils.getPropHandler(handleField);
-        A               handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
-        ByteBuf         writing           = upperSerializer.getByteBuf();
-        try {
-            writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
-            writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
-            writeHandler.postWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
-        } catch (Exception writeHandlerException) {
-            writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
-            throw new SerializeHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
-        }
-    }
-
-    public Type getComponentType(Type type) {
-        if (type instanceof Class)            return ((Class<?>) type).getComponentType();
-        if (type instanceof GenericArrayType) return TypeUtil.getActualType(rootType, ((GenericArrayType) type).getGenericComponentType());
-        else                                  return type;
-    }
-
-    public Type getElementType(Type type) {
-        if (type instanceof Class)             return ((Class<?>) type).getComponentType();
-        if (type instanceof ParameterizedType) return TypeUtil.getActualType(rootType, ((ParameterizedType) type).getActualTypeArguments()[0]);
-        else                                   return type;
-    }
-
     public void writeArray(Object arrayValue, Type componentType, int length, ByteBuf writing) {
         if (isBasic(componentType)) {
             int        basicElementSize = StructUtils.findBasicSize(componentType);
@@ -305,22 +279,6 @@ public final class StructSerializer implements Serializer {
         else throw new TypeJudgmentException();
     }
 
-    public void writeList(List<?> list, Type elementType, int length, ByteBuf writing) {
-        if (isBasic(elementType))  writeBasicList(list, findBasicSize(elementType), length, writing);
-        else
-        if (isStruct(elementType)) writeStructList(list, elementType, length, writing);
-        else                       throw new TypeJudgmentException();
-    }
-
-    public static  <T> T[] newArray(Type componentType, int length) {
-        if (componentType instanceof Class)
-            return (T[]) Array.newInstance((Class<?>) componentType, length);
-        if (componentType instanceof ParameterizedType)
-            return (T[]) Array.newInstance((Class<?>) ((ParameterizedType) componentType).getRawType(), length);
-        else
-            return (T[]) Array.newInstance(Object.class, length);
-    }
-
     public void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
         for (int i = 0; i < length; i++) {
             if (i < basicArray.length) {
@@ -328,8 +286,25 @@ public final class StructSerializer implements Serializer {
                 if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
                 else               writing.writeBytes(basicArray[i].getBytes());
             }
-            else writing.writeBytes(new byte[elementBytesSize]);
+            else
+                writing.writeBytes(new byte[elementBytesSize]);
         }
+    }
+
+    public <T> void writeStructArray(T[] structArray, Type elementType, int length, ByteBuf writing) {
+        for (int i = 0; i < length; i++) {
+            if (i < structArray.length)
+                writing.writeBytes(StructSerializer.write(elementType, structNullDefault(structArray[i], elementType)));
+            else
+                writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+        }
+    }
+
+    public void writeList(List<?> list, Type elementType, int length, ByteBuf writing) {
+        if (isBasic(elementType))  writeBasicList(list, findBasicSize(elementType), length, writing);
+        else
+        if (isStruct(elementType)) writeStructList(list, elementType, length, writing);
+        else                       throw new TypeJudgmentException();
     }
 
     public void writeBasicList(List<?> list, int elementBytesSize, int length, ByteBuf writing) {
@@ -344,23 +319,49 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public <T> void writeStructArray(T[] structArray, Type elementType, int length, ByteBuf writing) {
-        for (int i = 0; i < length; i++) {
-            if (i < structArray.length) {
-                T object = structArray[i];
-                ByteBuf write = StructSerializer.write(elementType, structNullDefault(object, elementType));
-                writing.writeBytes(write);
-            }
-            else writing.writeBytes(StructSerializer.write(newStruct(elementType)));
-        }
-    }
-
     public void writeStructList(List<?> list, Type elementType, int length, ByteBuf writing) {
         Iterator<?> iterator = list.iterator();
         for (int i = 0; i < length; i++) {
-            if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(elementType, structNullDefault(iterator.next(), elementType)));
-            else writing.writeBytes(StructSerializer.write(elementType, newStruct(elementType)));
+            if (iterator.hasNext())
+                writing.writeBytes(StructSerializer.write(elementType, structNullDefault(iterator.next(), elementType)));
+            else
+                writing.writeBytes(StructSerializer.write(elementType, newStruct(elementType)));
         }
+    }
+
+    <A extends Annotation> void writeHandled(Field handleField, Type fieldActualType, Object fieldValue, StructSerializer upperSerializer) {
+        WriteHandler<A> writeHandler      = StructUtils.getPropHandler(handleField);
+        A               handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
+        ByteBuf         writing           = upperSerializer.getByteBuf();
+        try {
+            writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.postWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+        } catch (Exception writeHandlerException) {
+            writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
+            throw new SerializeHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
+        }
+    }
+
+    public static  <T> T[] newArray(Type componentType, int length) {
+        if (componentType instanceof Class)
+            return (T[]) Array.newInstance((Class<?>) componentType, length);
+        if (componentType instanceof ParameterizedType)
+            return (T[]) Array.newInstance((Class<?>) ((ParameterizedType) componentType).getRawType(), length);
+        else
+            return (T[]) Array.newInstance(Object.class, length);
+    }
+
+    public Type getComponentType(Type type) {
+        if (type instanceof Class)            return ((Class<?>) type).getComponentType();
+        if (type instanceof GenericArrayType) return TypeUtil.getActualType(rootType, ((GenericArrayType) type).getGenericComponentType());
+        else                                  return type;
+    }
+
+    public Type getElementType(Type type) {
+        if (type instanceof Class)             return ((Class<?>) type).getComponentType();
+        if (type instanceof ParameterizedType) return TypeUtil.getActualType(rootType, ((ParameterizedType) type).getActualTypeArguments()[0]);
+        else                                   return type;
     }
 
     public static  <T> T basicNullDefault(Object fieldValue, Type fieldActualType) {
