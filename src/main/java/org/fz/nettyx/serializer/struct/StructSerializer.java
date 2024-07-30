@@ -197,7 +197,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public <T> T[] readArray(Type elementType, int length) {
-        if (isBasic(elementType)) return (T[]) readBasicArray(elementType, length);
+        if (isBasic(elementType))  return (T[]) readBasicArray(elementType, length);
         else
         if (isStruct(elementType)) return readStructArray(elementType, length);
         else                       throw new TypeJudgmentException();
