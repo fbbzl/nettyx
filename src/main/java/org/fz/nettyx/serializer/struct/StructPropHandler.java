@@ -12,11 +12,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static cn.hutool.core.util.TypeUtil.getActualType;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructUtils.newBasic;
-import static org.fz.nettyx.serializer.struct.StructUtils.newStruct;
+import static org.fz.nettyx.serializer.struct.StructSerializer.basicNullDefault;
+import static org.fz.nettyx.serializer.struct.StructSerializer.structNullDefault;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -156,8 +153,8 @@ public interface StructPropHandler<A extends Annotation> {
         default void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, A annotation, ByteBuf writing) {
             Type rootType = serializer.getRootType();
 
-            if (serializer.isBasic(field)) serializer.writeBasic((Basic<?>) defaultIfNull(value, () -> newBasic(getActualType(rootType, field), buffer())), writing);
-            if (serializer.isStruct(field)) serializer.writeStruct(rootType, defaultIfNull(value, () -> newStruct(getActualType(rootType, field))), writing);
+            if (serializer.isBasic(field)) serializer.writeBasic((Basic<?>) basicNullDefault(value, fieldType), writing);
+            if (serializer.isStruct(field)) serializer.writeStruct(rootType, structNullDefault(value, fieldType), writing);
 
             throw new TypeJudgmentException(field);
         }

@@ -169,9 +169,9 @@ public final class StructSerializer implements Serializer {
                 Type   fieldActualType = TypeUtil.getActualType(rootType, field);
                 if (useWriteHandler(field)) writeHandled(field, fieldActualType, fieldValue, this);
                 else
-                if (isBasic(field)) writeBasic(newBasicDefault(fieldValue, fieldActualType), writing);
+                if (isBasic(field)) writeBasic(basicNullDefault(fieldValue, fieldActualType), writing);
                 else
-                if (isStruct(field)) writeStruct(fieldActualType, newStructDefault(fieldValue, fieldActualType), writing);
+                if (isStruct(field)) writeStruct(fieldActualType, structNullDefault(fieldValue, fieldActualType), writing);
 
                 else throw new TypeJudgmentException(field);
             } catch (Exception exception) {
@@ -298,7 +298,7 @@ public final class StructSerializer implements Serializer {
         }
         else
         if (isStruct(componentType)) {
-            writeStructArray(newArrayDefault(arrayValue, componentType, length), componentType, length, writing);
+            writeStructArray(arrayNullDefault(arrayValue, componentType, length), componentType, length, writing);
         }
         else throw new TypeJudgmentException();
     }
@@ -346,7 +346,7 @@ public final class StructSerializer implements Serializer {
         for (int i = 0; i < length; i++) {
             if (i < structArray.length) {
                 T object = structArray[i];
-                ByteBuf write = StructSerializer.write(elementType, newStructDefault(object, elementType));
+                ByteBuf write = StructSerializer.write(elementType, structNullDefault(object, elementType));
                 writing.writeBytes(write);
             }
             else writing.writeBytes(StructSerializer.write(newStruct(elementType)));
@@ -356,20 +356,20 @@ public final class StructSerializer implements Serializer {
     public void writeStructList(List<?> list, Type elementType, int length, ByteBuf writing) {
         Iterator<?> iterator = list.iterator();
         for (int i = 0; i < length; i++) {
-            if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(elementType, newStructDefault(iterator.next(), elementType)));
+            if (iterator.hasNext()) writing.writeBytes(StructSerializer.write(elementType, structNullDefault(iterator.next(), elementType)));
             else writing.writeBytes(StructSerializer.write(elementType, newStruct(elementType)));
         }
     }
 
-    public static  <T> T newBasicDefault(Object fieldValue, Type fieldActualType) {
+    public static  <T> T basicNullDefault(Object fieldValue, Type fieldActualType) {
         return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
     }
 
-    public static <T> T newStructDefault(Object fieldValue, Type fieldActualType) {
+    public static <T> T structNullDefault(Object fieldValue, Type fieldActualType) {
         return (T) defaultIfNull(fieldValue, () -> newStruct(fieldActualType));
     }
 
-    public static <T> T[] newArrayDefault(Object arrayValue, Type componentType, int length) {
+    public static <T> T[] arrayNullDefault(Object arrayValue, Type componentType, int length) {
         return (T[]) defaultIfNull(arrayValue, () -> newArray(componentType, length));
     }
 
