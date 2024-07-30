@@ -1,8 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.lang.Singleton;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -19,7 +17,6 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -115,27 +112,23 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Class<H> clazz) {
+    static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Type clazz) {
         try {
             return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructor).get();
-        } catch (Throwable exception) {
+        } catch (Exception exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
     }
 
-    public static <B extends Basic<?>> B newEmptyBasic(Field basicField) {
-        return newEmptyBasic(basicField.getType());
-    }
-
-    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
+    public static <B extends Basic<?>> B newEmptyBasic(Type basicClass) {
         return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
-    public static int findBasicSize(Class<?> basicClass) {
-        return Basic.BASIC_BYTES_SIZE_CACHE.computeIfAbsent((Class<? extends Basic<?>>) basicClass, Try.apply(StructUtils::reflectForSize));
+    public static int findBasicSize(Type basicClass) {
+        return Basic.BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(StructUtils::reflectForSize));
     }
 
-    public static <B extends Basic<?>> int reflectForSize(Class<B> basicClass) {
+    public static int reflectForSize(Type basicClass) {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try {
             return newBasic(basicClass, fillingBuf).getSize();
@@ -149,46 +142,21 @@ public class StructUtils {
      * New basic instance t.
      *
      * @param <B>        the type parameter
-     * @param basicField the basic field
-     * @param buf        the buf
-     * @return the t
-     */
-    public static <B extends Basic<?>> B newBasic(Field basicField, ByteBuf buf) {
-        return newBasic(basicField.getType(), buf);
-    }
-
-    /**
-     * New basic instance t.
-     *
-     * @param <B>        the type parameter
      * @param basicClass the basic class
      * @param buf        the buf
      * @return the t
      */
-    public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
+    public static <B extends Basic<?>> B newBasic(Type basicClass, ByteBuf buf) {
         try {
             return (B) BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructor(basicClass, ByteBuf.class)).apply(buf);
-        } catch (Throwable instanceError) {
+        } catch (Exception instanceError) {
             Throwable cause = instanceError.getCause();
-            if (cause instanceof TooLessBytesException) {
+            if (cause instanceof TooLessBytesException)
                 throw new SerializeException(instanceError);
-            } else {
-                throw new SerializeException(
-                        "basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf)
-                        + "]", instanceError);
-            }
-        }
-    }
+            else
+                throw new SerializeException("basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", instanceError);
 
-    /**
-     * New struct instance t.
-     *
-     * @param <S>         the type parameter
-     * @param structField the struct field
-     * @return the t
-     */
-    public static <S> S newStruct(Field structField) {
-        return (S) newStruct(structField.getType());
+        }
     }
 
     /**
@@ -201,20 +169,20 @@ public class StructUtils {
     public static <S> S newStruct(Type structClass) {
         try {
             if (structClass instanceof Class)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) structClass, StructUtils::constructor).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(structClass, StructUtils::constructor).get();
             if (structClass instanceof ParameterizedType)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent((Class<S>) ((ParameterizedType) structClass).getRawType(), StructUtils::constructor).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(((ParameterizedType) structClass).getRawType(), StructUtils::constructor).get();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
-        } catch (Throwable instanceError) {
+        } catch (Exception instanceError) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", instanceError);
         }
     }
 
-    public static <T> Supplier<T> constructor(Class<T> clazz) {
+    public static <T> Supplier<T> constructor(Type clazz) {
         try {
             Lookup       lookup            = MethodHandles.lookup();
-            MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class));
+            MethodHandle constructorHandle = lookup.findConstructor((Class<T>) clazz, methodType(void.class));
 
             CallSite site = LambdaMetafactory.metafactory(
                     lookup,
@@ -230,10 +198,10 @@ public class StructUtils {
         }
     }
 
-    public static <A, T> Function<A, T> constructor(Class<T> clazz, Class<A> paramType) {
+    public static <P, T> Function<P, T> constructor(Type clazz, Class<P> paramType) {
         try {
             Lookup       lookup            = MethodHandles.lookup();
-            MethodHandle constructorHandle = lookup.findConstructor(clazz, methodType(void.class, paramType));
+            MethodHandle constructorHandle = lookup.findConstructor((Class<T>) clazz, methodType(void.class, paramType));
 
             CallSite site = LambdaMetafactory.metafactory(
                     lookup,
@@ -243,16 +211,16 @@ public class StructUtils {
                     constructorHandle,
                     constructorHandle.type());
 
-            return (Function<A, T>) site.getTarget().invokeExact();
+            return (Function<P, T>) site.getTarget().invokeExact();
         } catch (Throwable throwable) {
             throw new LambdasException("can not generate lambda constructor for class [" + clazz + "], param type: [" + paramType + "]");
         }
     }
 
-    public static <A, R> Function<A, R> getter(Class<A> clazz, Class<R> returnType, String methodName) {
+    public static <T, R> Function<T, R> getter(Type clazz, Class<R> returnType, String methodName) {
         try {
             Lookup       lookup       = MethodHandles.lookup();
-            MethodHandle getterHandle = lookup.findVirtual(clazz, methodName, methodType(returnType));
+            MethodHandle getterHandle = lookup.findVirtual((Class<T>) clazz, methodName, methodType(returnType));
 
             CallSite site = LambdaMetafactory.metafactory(
                     lookup,
@@ -262,7 +230,7 @@ public class StructUtils {
                     getterHandle,
                     getterHandle.type());
 
-            return (Function<A, R>) site.getTarget().invokeExact();
+            return (Function<T, R>) site.getTarget().invokeExact();
         } catch (Throwable throwable) {
             throw new IllegalArgumentException("can not generate lambda getter, class [" + clazz + "], method: [" + methodName + "], return type: [" + returnType + "]");
         }
@@ -303,52 +271,7 @@ public class StructUtils {
         return (BiConsumer<A, P>) setter(clazz, field.getType(), upperFirstAndAddPre(field.getName(), "set"));
     }
 
-    public static <C> Class<C> getComponentType(Field arrayField) {
-        return (Class<C>) ArrayUtil.getComponentType(arrayField.getType());
-    }
-
     public static Field[] getStructFields(Class<?> clazz) {
         return STRUCT_FIELD_CACHE.get(clazz);
     }
-
-    public static boolean isNotBasic(Class<?> clazz) {
-        return !isBasic(clazz);
-    }
-
-    public static boolean isBasic(Class<?> clazz) {
-        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-    }
-
-    public static boolean isBasic(Type root, Field field) {
-        return isBasic(root, TypeUtil.getType(field));
-    }
-
-    public static boolean isBasic(Type root, Type type) {
-        if (type instanceof Class)        return isBasic((Class<?>) type);
-        if (type instanceof TypeVariable) return isBasic(root, TypeUtil.getActualType(root, type));
-
-        return false;
-    }
-
-    public static boolean isNotStruct(Class<?> clazz) {
-        return !isStruct(clazz);
-    }
-
-    public static boolean isStruct(Class<?> clazz) {
-        return STRUCT_FIELD_CACHE.containsKey(clazz);
-    }
-
-    public static boolean isStruct(Type root, Field field) {
-        return isStruct(root, TypeUtil.getType(field));
-    }
-
-    public static boolean isStruct(Type root, Type type) {
-        if (type instanceof Class)             return isStruct((Class<?>) type);
-        if (type instanceof ParameterizedType) return isStruct((Class<?>) ((ParameterizedType) type).getRawType());
-        if (type instanceof TypeVariable)      return isStruct(root, TypeUtil.getActualType(root, type));
-
-        return false;
-    }
-
-
 }

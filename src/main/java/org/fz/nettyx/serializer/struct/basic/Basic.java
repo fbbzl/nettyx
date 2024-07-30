@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.util.Throws;
 
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
@@ -24,7 +25,7 @@ import java.util.Map;
 @Getter
 public abstract class Basic<V> {
 
-    public static final Map<Class<? extends Basic<?>>, Integer> BASIC_BYTES_SIZE_CACHE = new SafeConcurrentHashMap<>(64);
+    public static final Map<Type, Integer> BASIC_BYTES_SIZE_CACHE = new SafeConcurrentHashMap<>(64);
 
     private final int size;
 
