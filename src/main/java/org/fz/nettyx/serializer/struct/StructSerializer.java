@@ -145,11 +145,12 @@ public final class StructSerializer implements Serializer {
             try {
                 Object fieldValue;
                 Type   fieldActualType = TypeUtil.getActualType(rootType, field);
+
                 if (useReadHandler(field)) fieldValue = readHandled(field, fieldActualType, this);
                 else
-                if (isBasic(field)) fieldValue = readBasic(fieldActualType);
+                if (isBasic(field))        fieldValue = readBasic(fieldActualType);
                 else
-                if (isStruct(field)) fieldValue = readStruct(fieldActualType);
+                if (isStruct(field))       fieldValue = readStruct(fieldActualType);
 
                 else throw new TypeJudgmentException(field);
 
@@ -167,11 +168,12 @@ public final class StructSerializer implements Serializer {
             try {
                 Object fieldValue      = StructUtils.readField(struct, field);
                 Type   fieldActualType = TypeUtil.getActualType(rootType, field);
+
                 if (useWriteHandler(field)) writeHandled(field, fieldActualType, fieldValue, this);
                 else
-                if (isBasic(field)) writeBasic(basicNullDefault(fieldValue, fieldActualType), writing);
+                if (isBasic(field))         writeBasic(basicNullDefault(fieldValue, fieldActualType), writing);
                 else
-                if (isStruct(field)) writeStruct(fieldActualType, structNullDefault(fieldValue, fieldActualType), writing);
+                if (isStruct(field))        writeStruct(fieldActualType, structNullDefault(fieldValue, fieldActualType), writing);
 
                 else throw new TypeJudgmentException(field);
             } catch (Exception exception) {
