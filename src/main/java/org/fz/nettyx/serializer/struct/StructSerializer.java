@@ -351,7 +351,7 @@ public final class StructSerializer implements Serializer {
                 ByteBuf write = StructSerializer.write(elementType, defaultIfNull(object, () -> newStruct(elementType)));
                 writing.writeBytes(write);
             }
-            else                        writing.writeBytes(StructSerializer.write(newStruct(elementType)));
+            else writing.writeBytes(StructSerializer.write(newStruct(elementType)));
         }
     }
 
