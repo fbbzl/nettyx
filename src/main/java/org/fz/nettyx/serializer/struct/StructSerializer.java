@@ -191,7 +191,7 @@ public final class StructSerializer implements Serializer {
     }
 
     <B extends Basic<?>> B readBasic(Type basicType) {
-        return StructUtils.newBasic(basicType, this.getByteBuf());
+        return newBasic(basicType, this.getByteBuf());
     }
 
     <S> S readStruct(Type structType) {
