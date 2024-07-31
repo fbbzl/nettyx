@@ -40,9 +40,9 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
     protected void doChannelConfig(JscChannelConfig channelConfig) {
         channelConfig
                 .setBaudRate(115200)
-                .setDataBits(JscChannelConfig.DataBits.DATABITS_8)
-                .setStopBits(JscChannelConfig.StopBits.ONE_STOP_BIT)
-                .setParityBit(JscChannelConfig.ParityBit.NO_PARITY)
+                .setDataBits(JscChannelConfig.DataBits.DATA_BITS_8)
+                .setStopBits(JscChannelConfig.StopBits.STOP_BITS_1)
+                .setParityBit(JscChannelConfig.ParityBit.NO)
                 .setDtr(false)
                 .setRts(false);
     }

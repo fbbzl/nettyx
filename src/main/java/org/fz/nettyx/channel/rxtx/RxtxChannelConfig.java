@@ -95,17 +95,17 @@ public interface RxtxChannelConfig extends ChannelConfig {
     int getBaudRate();
 
     /**
-     * @return The configured stop bits, defaulting to {@link StopBits#STOPBITS_1} if unset
+     * @return The configured stop bits, defaulting to {@link StopBits#STOP_BITS_1} if unset
      */
     StopBits getStopBits();
 
     /**
-     * @return The configured data bits, defaulting to {@link DataBits#DATABITS_8} if unset
+     * @return The configured data bits, defaulting to {@link DataBits#DATA_BITS_8} if unset
      */
     DataBits getDataBits();
 
     /**
-     * @return The configured parity bit, defaulting to {@link ParityBit#NONE} if unset
+     * @return The configured parity bit, defaulting to {@link ParityBit#NO} if unset
      */
     ParityBit getParityBit();
 
@@ -183,15 +183,15 @@ public interface RxtxChannelConfig extends ChannelConfig {
         /**
          * 1 stop bit will be sent at the end of every character
          */
-        STOPBITS_1(SerialPort.STOPBITS_1),
+        STOP_BITS_1(SerialPort.STOPBITS_1),
         /**
          * 2 stop bits will be sent at the end of every character
          */
-        STOPBITS_2(SerialPort.STOPBITS_2),
+        STOP_BITS_2(SerialPort.STOPBITS_2),
         /**
          * 1.5 stop bits will be sent at the end of every character
          */
-        STOPBITS_1_5(SerialPort.STOPBITS_1_5);
+        STOP_BITS_1_5(SerialPort.STOPBITS_1_5);
 
         private final int value;
 
@@ -214,19 +214,19 @@ public interface RxtxChannelConfig extends ChannelConfig {
         /**
          * 5 data bits will be used for each character (ie. Baudot code)
          */
-        DATABITS_5(SerialPort.DATABITS_5),
+        DATA_BITS_5(SerialPort.DATABITS_5),
         /**
          * 6 data bits will be used for each character
          */
-        DATABITS_6(SerialPort.DATABITS_6),
+        DATA_BITS_6(SerialPort.DATABITS_6),
         /**
          * 7 data bits will be used for each character (ie. ASCII)
          */
-        DATABITS_7(SerialPort.DATABITS_7),
+        DATA_BITS_7(SerialPort.DATABITS_7),
         /**
          * 8 data bits will be used for each character (ie. binary data)
          */
-        DATABITS_8(SerialPort.DATABITS_8);
+        DATA_BITS_8(SerialPort.DATABITS_8);
 
         private final int value;
 
@@ -249,7 +249,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
         /**
          * No parity bit will be sent with each data character at all
          */
-        NONE(SerialPort.PARITY_NONE),
+        NO(SerialPort.PARITY_NONE),
         /**
          * An odd parity bit will be sent with each data character, ie. will be set
          * to 1 if the data character contains an even number of bits set to 1.
@@ -292,17 +292,16 @@ public interface RxtxChannelConfig extends ChannelConfig {
      * @version 1.0
      * @since 2024/3/1 14:44
      */
-
     @SuppressWarnings("deprecation")
     final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements RxtxChannelConfig {
 
-        private volatile int       baudrate    = 115200;
+        private volatile int       baudRate    = 115200;
+        private volatile StopBits  stopbits    = StopBits.STOP_BITS_1;
+        private volatile DataBits  databits    = DataBits.DATA_BITS_8;
+        private volatile ParityBit paritybit   = ParityBit.NO;
+        private volatile int       readTimeout = 1000;
         private volatile boolean   dtr;
         private volatile boolean   rts;
-        private volatile StopBits  stopbits    = StopBits.STOPBITS_1;
-        private volatile DataBits  databits    = DataBits.DATABITS_8;
-        private volatile ParityBit paritybit   = ParityBit.NONE;
-        private volatile int       readTimeout = 1000;
 
         DefaultRxtxChannelConfig(RxtxChannel channel) {
             super(channel);
@@ -366,8 +365,8 @@ public interface RxtxChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public RxtxChannelConfig setBaudRate(final int baudrate) {
-            this.baudrate = baudrate;
+        public RxtxChannelConfig setBaudRate(final int baudRate) {
+            this.baudRate = baudRate;
             return this;
         }
 
@@ -391,7 +390,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
 
         @Override
         public int getBaudRate() {
-            return baudrate;
+            return baudRate;
         }
 
         @Override
