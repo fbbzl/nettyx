@@ -39,7 +39,7 @@ public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
                     Arrays.fill(msg, (byte) 67);
                     testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
 
-                    Console.log(cf.channel().localAddress() + ":: ok");
+                    Console.log(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancelled((ls, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testClient::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> System.err.println("最后次失败后执行")))
