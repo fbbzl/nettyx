@@ -28,8 +28,8 @@ import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_FIELD_CACHE;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
-import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CACHE;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields

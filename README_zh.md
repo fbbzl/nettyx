@@ -68,7 +68,6 @@ handler                             提供了一些基本的通道处理程序�
   ---ActionWriteTimeoutHandler         可操作的 写超时 处理程序
   ---ChannelAdvice                     包含入站建言和出站建言
   ---IdledHeartBeater                  闲置后的心跳器
-  ---LoggerHandler                     简单的日志处理器, 可以打印简单的日志
   ---MessageFilter                     消息过滤器
 listener
   ---ActionableChannelFutureListener   可操作的频道未来侦听器
