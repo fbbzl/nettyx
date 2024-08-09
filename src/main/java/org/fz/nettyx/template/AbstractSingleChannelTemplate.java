@@ -3,9 +3,10 @@ package org.fz.nettyx.template;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 
@@ -19,14 +20,14 @@ import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
  * @since 2024/3/1 14:44
  */
 
-@Slf4j
 @Getter
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    private final SocketAddress remoteAddress;
-    private final Bootstrap     bootstrap;
-    private       C             channel;
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(AbstractSingleChannelTemplate.class);
+    private final        SocketAddress  remoteAddress;
+    private final        Bootstrap      bootstrap;
+    private              C              channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.remoteAddress = remoteAddress;
@@ -53,7 +54,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
     @SneakyThrows(InterruptedException.class)
     public void closeChannelDirectly(boolean sync) {
         if (sync) this.channel.close().sync();
-        else      this.channel.close();
+        else this.channel.close();
     }
 
     public void closeChannelGracefully() {

@@ -8,7 +8,6 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameDecoder;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
 
@@ -19,7 +18,6 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
  * @version 1.0
  * @since 2021 /1/20 15:13
  */
-@Slf4j
 public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEndFlagFrameDecoder, StartEndFlagFrameEncoder> {
 
     public StartEndFlagFrameCodec(int maxFrameLength, boolean strip, ByteBuf startFlag, ByteBuf endFlag) {

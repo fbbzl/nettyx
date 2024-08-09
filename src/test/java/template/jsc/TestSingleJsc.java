@@ -5,7 +5,6 @@ import cn.hutool.core.lang.Console;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -24,7 +23,6 @@ import static org.fz.nettyx.action.ListenerAction.redo;
  * @since 2024/2/28 14:49
  */
 
-@Slf4j
 public class TestSingleJsc extends SingleJscChannelTemplate {
 
     public TestSingleJsc(String commAddress) {
