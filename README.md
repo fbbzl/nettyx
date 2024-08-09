@@ -69,7 +69,6 @@ handler                             Provided some basic channel handler implemen
   ---ActionWriteTimeoutHandler         Actionable WriteTimeout Handler
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---IdledHeartBeater                  will do heartbeat after idle
-  ---LoggerHandler                     Entry and exit message log
   ---MessageFilter                     use to filter message
 
 listener
