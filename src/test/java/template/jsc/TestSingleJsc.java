@@ -2,7 +2,6 @@ package template.jsc;
 
 
 import cn.hutool.core.lang.Console;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.jsc.JscChannel;
@@ -11,7 +10,6 @@ import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.serial.jsc.SingleJscChannelTemplate;
 import template.TestChannelInitializer;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static org.fz.nettyx.action.ListenerAction.redo;
@@ -49,9 +47,9 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    byte[] msg = new byte[2048];
-                    Arrays.fill(msg, (byte) 67);
-                    testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
+//                    byte[] msg = new byte[3000];
+//                    Arrays.fill(msg, (byte) 67);
+//                    testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testSingleJsc::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> {
