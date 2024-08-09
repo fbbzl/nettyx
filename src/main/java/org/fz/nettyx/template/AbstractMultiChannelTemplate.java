@@ -16,6 +16,7 @@ import org.fz.nettyx.util.Try;
 
 import java.net.SocketAddress;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
 
@@ -30,14 +31,13 @@ import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
 @Slf4j
 @Getter
 @SuppressWarnings({"unchecked", "unused"})
-public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends
-                                                                                                  Template<C> {
+public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
 
-    private final ChannelStorage<K>     channelStorage = new ChannelStorage<>(16);
-    private final Map<K, SocketAddress> addressMap;
-    private final Map<K, Bootstrap>     bootstrapMap;
+    private final ChannelStorage<K>           channelStorage = new ChannelStorage<>(16);
+    private final Map<K, SocketAddress>       addressMap;
+    private final ConcurrentMap<K, Bootstrap> bootstrapMap;
 
     protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap) {
         this.addressMap   = (Map<K, SocketAddress>) addressMap;

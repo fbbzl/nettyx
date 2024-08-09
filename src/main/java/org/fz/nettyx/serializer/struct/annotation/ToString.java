@@ -9,6 +9,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
@@ -44,9 +45,13 @@ public @interface ToString {
     int bufferLength();
 
     class ToStringHandler implements StructPropHandler.ReadWriteHandler<ToString> {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
 
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToString toString) {
+        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToString toString) {
             String charset = toString.charset();
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
@@ -63,14 +68,12 @@ public @interface ToString {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToString toString, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToString toString, ByteBuf writing) {
             int    bufferLength = toString.bufferLength();
             String charset      = toString.charset();
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else writing.writeBytes(new byte[bufferLength]);
-
+            else               writing.writeBytes(new byte[bufferLength]);
         }
-
     }
 }

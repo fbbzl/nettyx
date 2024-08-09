@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Getter
 @Setter
 @SuppressWarnings("all")
-public abstract class RemoteDetector<M> extends SingleTcpChannellClientTemplate {
+public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
 
     private static final int DEFAULT_DETECT_RETRY_TIMES   = 3;
     private static final int DEFAULT_WAIT_RESPONSE_MILLIS = 1000;
@@ -74,7 +74,7 @@ public abstract class RemoteDetector<M> extends SingleTcpChannellClientTemplate 
                 throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]");
 
             // 3. store channel
-            super.storeChannel(cf.channel());
+            super.storeChannel((NioSocketChannel) cf.channel());
 
             // 4. try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
