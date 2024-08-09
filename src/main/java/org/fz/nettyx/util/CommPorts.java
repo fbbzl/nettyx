@@ -5,7 +5,6 @@ import cn.hutool.system.OsInfo;
 import cn.hutool.system.SystemUtil;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -23,9 +22,8 @@ import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
  * @version 1.0
  * @since 3/31/2022 11:06 AM
  */
-@Slf4j
 @UtilityClass
-public class CommPorts {
+public final class CommPorts {
 
     static final OsInfo                 OS_INFO = SystemUtil.getOsInfo();
     static final Supplier<List<String>> GET_COM_PORT;

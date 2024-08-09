@@ -6,8 +6,9 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.channel.ChannelStorage;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -28,12 +29,12 @@ import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
  * @since 2024/3/1 14:44
  */
 
-@Slf4j
 @Getter
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
+    private static final   InternalLogger  log               = InternalLoggerFactory.getInstance(AbstractMultiChannelTemplate.class);
 
     private final ChannelStorage<K>           channelStorage = new ChannelStorage<>(16);
     private final Map<K, SocketAddress>       addressMap;
