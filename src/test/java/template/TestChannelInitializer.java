@@ -24,7 +24,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
     @Override
     protected void initChannel(C channel) {
         channel.pipeline().addLast(
-                new StartEndFlagFrameCodec(3000, true, wrappedBuffer(new byte[]{ (byte) 0x7e }))
+                new StartEndFlagFrameCodec(1024*1024, true, wrappedBuffer(new byte[]{ (byte) 0x7e }))
                 , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
                 , new UserCodec()
                 , new MessageEchoHandler()

@@ -48,11 +48,11 @@ public class TestSingleRxtx extends SingleRxtxChannelTemplate {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM5");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    byte[] msg = new byte[2048];
+                    byte[] msg = new byte[3000];
                     Arrays.fill(msg, (byte) 67);
                     testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
 
-                    RxtxChannelConfig config =(RxtxChannelConfig) cf.channel().config();
+                    RxtxChannelConfig config = (RxtxChannelConfig) cf.channel().config();
                     Console.log(config.getBaudRate());
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))

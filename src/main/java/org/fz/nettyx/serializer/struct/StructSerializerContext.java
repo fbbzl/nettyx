@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
-import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CACHE;
 
 /**
  * The type Struct cache.
@@ -42,7 +41,8 @@ import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CAC
 @SuppressWarnings("all")
 public final class StructSerializerContext {
 
-    public static final Map<Type, Integer> BASIC_BYTES_SIZE_CACHE = new SafeConcurrentHashMap<>(64);
+    public static final Map<Type, Integer>     BASIC_BYTES_SIZE_CACHE = new SafeConcurrentHashMap<>(64);
+    public static final Map<Class<?>, Field[]> STRUCT_FIELD_CACHE     = new ConcurrentHashMap<>(512);
 
     public static final Map<Field, Annotation> FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
 
