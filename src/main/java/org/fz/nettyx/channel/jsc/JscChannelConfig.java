@@ -5,6 +5,7 @@ import com.fazecast.jSerialComm.SerialPort;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
 import lombok.RequiredArgsConstructor;
+import org.fz.nettyx.exception.UnknownConfigException;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -31,7 +32,7 @@ public interface JscChannelConfig extends ChannelConfig {
     JscChannelConfig setBaudRate(int baudRate);
 
     /**
-     * @return The configured stop bits, defaulting to {@link StopBits#ONE_STOP_BIT} if unset
+     * @return The configured stop bits, defaulting to {@link StopBits#STOP_BITS_1} if unset
      */
     StopBits getStopBits();
 
@@ -56,7 +57,7 @@ public interface JscChannelConfig extends ChannelConfig {
     JscChannelConfig setDataBits(DataBits dataBits);
 
     /**
-     * @return The configured parity bit, defaulting to {@link ParityBit#NO_PARITY} if unset
+     * @return The configured parity bit, defaulting to {@link ParityBit#NO} if unset
      */
     ParityBit getParityBit();
 
@@ -139,15 +140,15 @@ public interface JscChannelConfig extends ChannelConfig {
         /**
          * 1 stop bit will be sent at the end of every character
          */
-        ONE_STOP_BIT(SerialPort.ONE_STOP_BIT),
+        STOP_BITS_1(SerialPort.ONE_STOP_BIT),
         /**
          * 2 stop bits will be sent at the end of every character
          */
-        TWO_STOP_BITS(SerialPort.TWO_STOP_BITS),
+        STOP_BITS_2(SerialPort.TWO_STOP_BITS),
         /**
          * 1.5 stop bits will be sent at the end of every character
          */
-        ONE_POINT_FIVE_STOP_BITS(SerialPort.ONE_POINT_FIVE_STOP_BITS);
+        STOP_BITS_1_5(SerialPort.ONE_POINT_FIVE_STOP_BITS);
 
         private final int value;
 
@@ -155,8 +156,7 @@ public interface JscChannelConfig extends ChannelConfig {
             return Arrays.stream(StopBits.values())
                          .filter(stopBit -> stopBit.value == value)
                          .findFirst()
-                         .orElseThrow(() -> new IllegalArgumentException(
-                                 "unknown " + StopBits.class.getSimpleName() + " value: " + value));
+                         .orElseThrow(() -> new UnknownConfigException(StopBits.class.getSimpleName(), value));
         }
 
         public int value() {
@@ -169,19 +169,19 @@ public interface JscChannelConfig extends ChannelConfig {
         /**
          * 5 data bits will be used for each character (ie. Baudot code)
          */
-        DATABITS_5(5),
+        DATA_BITS_5(5),
         /**
          * 6 data bits will be used for each character
          */
-        DATABITS_6(6),
+        DATA_BITS_6(6),
         /**
          * 7 data bits will be used for each character (ie. ASCII)
          */
-        DATABITS_7(7),
+        DATA_BITS_7(7),
         /**
          * 8 data bits will be used for each character (ie. binary data)
          */
-        DATABITS_8(8);
+        DATA_BITS_8(8);
 
         private final int value;
 
@@ -204,25 +204,25 @@ public interface JscChannelConfig extends ChannelConfig {
         /**
          * No parity bit will be sent with each data character at all
          */
-        NO_PARITY(SerialPort.NO_PARITY),
+        NO(SerialPort.NO_PARITY),
         /**
          * An odd parity bit will be sent with each data character, ie. will be set to 1 if the data character contains
          * an even number of bits set to 1.
          */
-        ODD_PARITY(SerialPort.ODD_PARITY),
+        ODD(SerialPort.ODD_PARITY),
         /**
          * An even parity bit will be sent with each data character, ie. will be set to 1 if the data character contains
          * an odd number of bits set to 1.
          */
-        EVEN_PARITY(SerialPort.EVEN_PARITY),
+        EVEN(SerialPort.EVEN_PARITY),
         /**
          * A mark parity bit (ie. always 1) will be sent with each data character
          */
-        MARK_PARITY(SerialPort.MARK_PARITY),
+        MARK(SerialPort.MARK_PARITY),
         /**
          * A space parity bit (ie. always 0) will be sent with each data character
          */
-        SPACE_PARITY(SerialPort.SPACE_PARITY);
+        SPACE(SerialPort.SPACE_PARITY);
 
         private final int value;
 
@@ -245,17 +245,16 @@ public interface JscChannelConfig extends ChannelConfig {
      * @version 1.0
      * @since 2024/3/2 13:29
      */
-
     @SuppressWarnings("deprecation")
     final class DefaultJscChannelConfig extends DefaultChannelConfig implements JscChannelConfig {
 
         private volatile int       baudRate    = 115200;
-        private volatile DataBits  dataBits    = DataBits.DATABITS_8;
-        private volatile StopBits  stopbits    = StopBits.ONE_STOP_BIT;
-        private volatile ParityBit paritybit   = ParityBit.NO_PARITY;
+        private volatile DataBits  dataBits    = DataBits.DATA_BITS_8;
+        private volatile StopBits  stopbits    = StopBits.STOP_BITS_1;
+        private volatile ParityBit paritybit   = ParityBit.NO;
+        private volatile int       readTimeout = 1000;
         private volatile boolean   dtr;
         private volatile boolean   rts;
-        private volatile int       readTimeout = 1000;
 
         DefaultJscChannelConfig(JscChannel channel) {
             super(channel);

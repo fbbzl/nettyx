@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
+import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -9,10 +10,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructSerializer.*;
+import static org.fz.nettyx.serializer.struct.StructSerializer.basicNullDefault;
+import static org.fz.nettyx.serializer.struct.StructSerializer.structNullDefault;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -22,6 +23,20 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.*;
  */
 @SuppressWarnings("all")
 public interface StructPropHandler<A extends Annotation> {
+
+    /**
+     * cache annotation and handler class
+     */
+    Map<Class<? extends Annotation>, Class<? extends StructPropHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>(16);
+
+    /**
+     * config the handler instance if is singleton
+     *
+     * @return if is singleton-handler
+     */
+    default boolean isSingleton() {
+        return false;
+    }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
         if (!ClassUtil.isNormalClass(clazz)) {
@@ -94,17 +109,13 @@ public interface StructPropHandler<A extends Annotation> {
          * Do read object. if not override, this method will return null
          *
          * @param serializer the serializer
+         * @param fieldType  field type
          * @param field      the field
          * @return the final returned field length
          */
-        default Object doRead(StructSerializer serializer, Field field, A annotation) {
-            Type rootType = serializer.getRootType();
-            if (isBasic(rootType, field)) {
-                return readBasic(rootType, field, serializer.getByteBuf());
-            }
-            if (isStruct(rootType, field)) {
-                return readStruct(rootType, field, serializer.getByteBuf());
-            }
+        default Object doRead(StructSerializer serializer, Type fieldType, Field field, A annotation) {
+            if (serializer.isBasic(fieldType))  return serializer.readBasic(fieldType);
+            if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType);
 
             throw new TypeJudgmentException(field);
         }
@@ -134,34 +145,29 @@ public interface StructPropHandler<A extends Annotation> {
          * Do write.
          *
          * @param serializer the serializer
+         * @param fieldType
          * @param field      the field
          * @param value      the length
          * @param writing
          */
-        default void doWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
+        default void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, A annotation, ByteBuf writing) {
             Type rootType = serializer.getRootType();
-            if (isBasic(rootType, field)) {
-                writeBasic((Basic<?>) defaultIfNull(value, () -> StructUtils.newBasic(field, buffer())), writing);
-            }
-            if (isStruct(rootType, field)) {
-                writeStruct(rootType, defaultIfNull(value, () -> StructUtils.newStruct(field)), writing);
-            } else {
-                throw new TypeJudgmentException(field);
-            }
+
+            if (serializer.isBasic(field)) serializer.writeBasic((Basic<?>) basicNullDefault(value, fieldType), writing);
+            if (serializer.isStruct(field)) serializer.writeStruct(rootType, structNullDefault(value, fieldType), writing);
+
+            throw new TypeJudgmentException(field);
         }
 
-        default void preWriteHandle(StructSerializer serializer, Field field, Object value, A annotation,
-                                    ByteBuf writing) {
+        default void preWriteHandle(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
             // default is no nothing
         }
 
-        default void postWriteHandle(StructSerializer serializer, Field field, Object value, A annotation,
-                                     ByteBuf writing) {
+        default void postWriteHandle(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
             // default is no nothing
         }
 
-        default void afterWriteThrow(StructSerializer serializer, Field field, Object value, A annotation,
-                                     ByteBuf writing, Throwable throwable) {
+        default void afterWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
             // default is no nothing
         }
 

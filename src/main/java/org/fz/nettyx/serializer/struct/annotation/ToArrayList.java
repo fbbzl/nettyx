@@ -10,16 +10,15 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.TypeRefer.getActualType;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.readCollection;
-import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.writeCollection;
+
 
 /**
  * The interface List.
@@ -34,13 +33,6 @@ import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.
 public @interface ToArrayList {
 
     /**
-     * Element type class.
-     *
-     * @return the class
-     */
-    Class<?> elementType() default Object.class;
-
-    /**
      * list size
      *
      * @return the int
@@ -51,32 +43,27 @@ public @interface ToArrayList {
      * The type Array list handler.
      */
     class ToArrayListHandler implements StructPropHandler.ReadWriteHandler<ToArrayList> {
-
         @Override
-        public Object doRead(StructSerializer serializer, Field field, ToArrayList toArrayList) {
-            Class<?> elementType =
-                    (elementType = toArrayList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
-                                                                                              field, 0)
-                                                                              : elementType;
-
-            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
-
-            return readCollection(serializer.getByteBuf(), elementType, toArrayList.size(), new ArrayList<>(10));
+        public boolean isSingleton() {
+            return true;
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Field field, Object value, ToArrayList toArrayList,
-                            ByteBuf writing) {
-            Class<?> elementType =
-                    (elementType = toArrayList.elementType()) == Object.class ? getActualType(serializer.getRootType(),
-                                                                                              field, 0)
-                                                                              : elementType;
+        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToArrayList toArrayList) {
+            Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
 
-            List<?> list = (List<?>) defaultIfNull(value, () -> newArrayList());
+            return serializer.readList(elementType, toArrayList.size(), new ArrayList<>(10));
+        }
 
-            writeCollection(list, elementType, toArrayList.size(), writing);
+        @Override
+        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToArrayList toArrayList, ByteBuf writing) {
+            Type elementType = serializer.getElementType(fieldType);
+
+            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
+
+            serializer.writeList(defaultIfNull((List<?>) value, Collections::emptyList), elementType, toArrayList.size(), writing);
         }
     }
 }
