@@ -10,7 +10,6 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
@@ -31,7 +30,6 @@ import static java.util.stream.Collectors.toList;
  * @author fengbinbin
  * @since 2022 -01-27 18:07
  */
-@Slf4j
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
 
     public EscapeCodec(ByteBuf real, ByteBuf replacement) {

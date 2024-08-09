@@ -3,10 +3,11 @@ package org.fz.nettyx.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelHandlerContextAction;
 import org.fz.nettyx.event.ChannelEvents;
 
@@ -20,13 +21,13 @@ import static org.fz.nettyx.action.Actions.invokeAction;
  * @author fengbinbin
  * @since 2021 -12-29 18:46
  */
-@Slf4j
 @Getter
 @Setter
 @Accessors(fluent = true, chain = true)
 public class ActionIdleStateHandler extends IdleStateHandler {
 
-    private ChannelHandlerContextAction readIdleAction, writeIdleAction, allIdleAction;
+    private static final InternalLogger              log = InternalLoggerFactory.getInstance(ActionIdleStateHandler.class);
+    private              ChannelHandlerContextAction readIdleAction, writeIdleAction, allIdleAction;
     private final boolean fireNext;
 
     /**

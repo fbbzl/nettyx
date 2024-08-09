@@ -1,11 +1,12 @@
 package org.fz.nettyx.util;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.bluetooth.*;
 import java.io.IOException;
@@ -20,9 +21,10 @@ import java.util.function.Predicate;
  * @since 2024/5/30 11:04
  */
 
-@Slf4j
 @UtilityClass
 public final class BtFinder {
+
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(BtFinder.class);
 
     @NoArgsConstructor
     public static class DeviceFinder {

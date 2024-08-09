@@ -4,7 +4,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ListenerAction;
 
 /**
@@ -14,7 +13,6 @@ import org.fz.nettyx.action.ListenerAction;
  * @version 1.0
  * @since 2021 /2/4 17:48
  */
-@Slf4j
 @Setter
 @Accessors(chain = true, fluent = true)
 public class ActionChannelFutureListener implements ChannelFutureListener {
@@ -30,10 +28,10 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
 
     @Override
     public final void operationComplete(ChannelFuture cf) {
-        if (whenDone      != null && cf.isDone())        whenDone.act(this, cf);
-        if (whenSuccess   != null && cf.isSuccess())     whenSuccess.act(this, cf);
-        if (whenFailure   != null && cf.cause() != null) whenFailure.act(this, cf);
-        if (whenCancelled != null && cf.isCancelled())   whenCancelled.act(this, cf);
+        if (whenDone != null && cf.isDone()) whenDone.act(this, cf);
+        if (whenSuccess != null && cf.isSuccess()) whenSuccess.act(this, cf);
+        if (whenFailure != null && cf.cause() != null) whenFailure.act(this, cf);
+        if (whenCancelled != null && cf.isCancelled()) whenCancelled.act(this, cf);
     }
 
 }

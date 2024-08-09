@@ -125,7 +125,7 @@ public class StructUtils {
     }
 
     public static int findBasicSize(Type basicClass) {
-        return Basic.BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(StructUtils::reflectForSize));
+        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(StructUtils::reflectForSize));
     }
 
     public static int reflectForSize(Type basicClass) {

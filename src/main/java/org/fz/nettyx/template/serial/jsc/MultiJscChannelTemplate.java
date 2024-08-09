@@ -3,7 +3,6 @@ package org.fz.nettyx.template.serial.jsc;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.channel.SerialCommChannel;
 import org.fz.nettyx.channel.jsc.JscChannel;
 import org.fz.nettyx.channel.jsc.JscChannelConfig;
@@ -17,7 +16,6 @@ import java.util.Map;
  * @since 2024/2/29 10:12
  */
 
-@Slf4j
 @SuppressWarnings("deprecation")
 public abstract class MultiJscChannelTemplate<K> extends AbstractMultiChannelTemplate<K, JscChannel, JscChannelConfig> {
 
