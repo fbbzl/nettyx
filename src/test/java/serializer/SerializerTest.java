@@ -4,7 +4,6 @@ import cn.hutool.core.lang.Console;
 import cn.hutool.core.lang.Dict;
 import codec.model.*;
 import io.netty.buffer.Unpooled;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
@@ -23,7 +22,6 @@ import java.util.Arrays;
  * @version 1.0
  * @since 2023/5/23 21:35
  */
-@Slf4j
 public class SerializerTest {
 
     // @BeforeClass

@@ -1,8 +1,9 @@
 package org.fz.nettyx.util;
 
 
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 import java.util.function.*;
@@ -13,12 +14,13 @@ import java.util.function.*;
  * @author fengbinbin
  * @since 2020-02-13 14:23
  */
-@Slf4j
 @UtilityClass
 @SuppressWarnings("all")
-public class Try {
+public final class Try {
 
-    public Runnable run(UncheckedRunnable runnable) {
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(Try.class);
+
+    public static Runnable run(UncheckedRunnable runnable) {
         Objects.requireNonNull(runnable);
         return () -> {
             try {
@@ -30,7 +32,7 @@ public class Try {
         };
     }
 
-    public <T, R> Function<T, R> apply(UncheckedFunction<T, R> function) {
+    public static <T, R> Function<T, R> apply(UncheckedFunction<T, R> function) {
         Objects.requireNonNull(function);
         return t -> {
             try {
@@ -42,7 +44,7 @@ public class Try {
         };
     }
 
-    public <T, U, R> BiFunction<T, U, R> apply(UncheckedBiFunction<T, U, R> function) {
+    public static <T, U, R> BiFunction<T, U, R> apply(UncheckedBiFunction<T, U, R> function) {
         Objects.requireNonNull(function);
         return (t, u) -> {
             try {
@@ -54,7 +56,7 @@ public class Try {
         };
     }
 
-    public <T> Consumer<T> accept(UncheckedConsumer<T> consumer) {
+    public static <T> Consumer<T> accept(UncheckedConsumer<T> consumer) {
         Objects.requireNonNull(consumer);
         return t -> {
             try {
@@ -66,7 +68,7 @@ public class Try {
         };
     }
 
-    public <T, U> BiConsumer<T, U> accept(UncheckedBiConsumer<T, U> consumer) {
+    public static <T, U> BiConsumer<T, U> accept(UncheckedBiConsumer<T, U> consumer) {
         Objects.requireNonNull(consumer);
         return (k, v) -> {
             try {
@@ -78,7 +80,7 @@ public class Try {
         };
     }
 
-    public <T> Supplier<T> get(UncheckedSupplier<T> supplier) {
+    public static <T> Supplier<T> get(UncheckedSupplier<T> supplier) {
         Objects.requireNonNull(supplier);
         return () -> {
             try {
@@ -90,7 +92,7 @@ public class Try {
         };
     }
 
-    public <T> Predicate<T> test(UncheckedPredicate<T> predicate) {
+    public static <T> Predicate<T> test(UncheckedPredicate<T> predicate) {
         Objects.requireNonNull(predicate);
         return t -> {
             try {
@@ -106,7 +108,7 @@ public class Try {
      * Use this method with caution!! Capture, but it can be used in scenarios where only information is printed, and it
      * is not recommended for other scenarios
      */
-    public Runnable suppress(UncheckedRunnable run) {
+    public static Runnable suppress(UncheckedRunnable run) {
         return () -> {
             try {
                 run.run();
@@ -116,7 +118,7 @@ public class Try {
         };
     }
 
-    public <T> Consumer<T> suppress(UncheckedConsumer<T> consumer) {
+    public static <T> Consumer<T> suppress(UncheckedConsumer<T> consumer) {
         return t -> {
             try {
                 consumer.accept(t);

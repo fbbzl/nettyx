@@ -3,9 +3,10 @@ package org.fz.nettyx.ssl;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLException;
 import java.nio.file.Path;
@@ -20,11 +21,11 @@ import java.nio.file.Paths;
  */
 
 @Data
-@Slf4j
 @RequiredArgsConstructor
 public class OpenSslContextFactory {
 
-    private final OpenSslConfig openSslConfig;
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(OpenSslContextFactory.class);
+    private final        OpenSslConfig  openSslConfig;
 
     public SslContext getServerSslContext() throws SSLException {
         return getServerSslContext(Paths.get(openSslConfig.cert()), Paths.get(openSslConfig.key()),

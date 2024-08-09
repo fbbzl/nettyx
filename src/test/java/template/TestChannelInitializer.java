@@ -3,15 +3,15 @@ package template;
 import codec.UserCodec;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import lombok.extern.slf4j.Slf4j;
+import io.netty.handler.logging.LoggingHandler;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
-import org.fz.nettyx.handler.LoggerHandler;
 import org.fz.nettyx.handler.MessageEchoHandler;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
-import static org.fz.nettyx.handler.LoggerHandler.Sl4jLevel.INFO;
+import static io.netty.handler.logging.ByteBufFormat.HEX_DUMP;
+
 
 /**
  * @author fengbinbin
@@ -19,7 +19,6 @@ import static org.fz.nettyx.handler.LoggerHandler.Sl4jLevel.INFO;
  * @since 2024/3/1 22:59
  */
 
-@Slf4j
 public class TestChannelInitializer<C extends Channel> extends ChannelInitializer<C> {
 
     @Override
@@ -29,6 +28,6 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
                 , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
                 , new UserCodec()
                 , new MessageEchoHandler()
-                , new LoggerHandler(log, INFO));
+                , new LoggingHandler(HEX_DUMP));
     }
 }

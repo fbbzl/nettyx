@@ -6,7 +6,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.tcp.client.SingleTcpChannelClientTemplate;
 import template.TestChannelInitializer;
@@ -18,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
 
-@Slf4j
 public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
 
     public TestSingleTcpClient(InetSocketAddress address) {
