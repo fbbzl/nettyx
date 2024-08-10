@@ -3,9 +3,10 @@ package org.fz.nettyx.template.tcp.client;
 
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
@@ -13,19 +14,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * It is used to detect whether it is the target server
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2/17/2023
  */
 
-@Slf4j
 @Getter
 @Setter
 @SuppressWarnings("all")
 public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
 
-    private static final int DEFAULT_DETECT_RETRY_TIMES   = 3;
-    private static final int DEFAULT_WAIT_RESPONSE_MILLIS = 1000;
+    private static final int            DEFAULT_DETECT_RETRY_TIMES   = 3;
+    private static final int            DEFAULT_WAIT_RESPONSE_MILLIS = 1000;
+    private static final InternalLogger log                          = InternalLoggerFactory.getInstance(RemoteDetector.class);
 
     private int detectRetryTimes   = DEFAULT_DETECT_RETRY_TIMES;
     private int waitResponseMillis = DEFAULT_WAIT_RESPONSE_MILLIS;
@@ -98,7 +100,7 @@ public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).await();
 
                 if (promise.isSuccess()) log.info("success send detect message [{}]", detectMsg);
-                else                     log.info("something wrong when sending detect message [{}]",  detectMsg);
+                else                     log.info("something wrong when sending detect message [{}]", detectMsg);
             } finally {
                 retryTimes--;
                 log.info("re-send-times left: [{}]", retryTimes);

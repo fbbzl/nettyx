@@ -2,8 +2,9 @@ package org.fz.nettyx.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.ChannelHandlerContextAction;
 import org.fz.nettyx.event.ChannelEvents;
 
@@ -17,11 +18,11 @@ import static org.fz.nettyx.action.Actions.invokeAction;
  * @version 1.0
  * @since 2022 /11/27 22:36
  */
-@Slf4j
 @Getter
 public abstract class IdledHeartBeater extends ActionIdleStateHandler {
 
-    private final ChannelHandlerContextAction idledHeartBeatAction;
+    private static final InternalLogger              log = InternalLoggerFactory.getInstance(IdledHeartBeater.class);
+    private final        ChannelHandlerContextAction idledHeartBeatAction;
 
     protected IdledHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction) {
         super(readIdleSeconds, 0, 0, SECONDS);

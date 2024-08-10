@@ -8,7 +8,8 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ModifierUtil;
 import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
-import lombok.extern.slf4j.Slf4j;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -26,10 +27,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
-import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CACHE;
 
 /**
  * The type Struct cache.
@@ -38,17 +38,17 @@ import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CAC
  * @version 1.0
  * @since 2021 /10/22 13:18
  */
-@Slf4j
 @SuppressWarnings("all")
 public final class StructSerializerContext {
 
-    public static final Map<Field, Annotation> FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
-
-    static final Map<Field, Function<?, ?>>   FIELD_GETTER_CACHE = new ConcurrentHashMap<>(512);
-    static final Map<Field, BiConsumer<?, ?>> FIELD_SETTER_CACHE = new ConcurrentHashMap<>(512);
-
-    static final Map<Type, Supplier<?>>      NO_ARGS_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
-    static final Map<Type, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(128);
+    public static final  Map<Type, Integer>              BASIC_BYTES_SIZE_CACHE              = new SafeConcurrentHashMap<>(64);
+    public static final  Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                  = new ConcurrentHashMap<>(512);
+    public static final  Map<Field, Annotation>          FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
+    static final         Map<Field, Function<?, ?>>      FIELD_GETTER_CACHE                  = new ConcurrentHashMap<>(512);
+    static final         Map<Field, BiConsumer<?, ?>>    FIELD_SETTER_CACHE                  = new ConcurrentHashMap<>(512);
+    static final         Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE           = new ConcurrentHashMap<>(128);
+    static final         Map<Type, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE           = new ConcurrentHashMap<>(128);
+    private static final InternalLogger                  log                                 = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     static {
         // scan classes
@@ -112,7 +112,7 @@ public final class StructSerializerContext {
                     BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructor(clazz, ByteBuf.class));
 
                     //2 cache bytes size
-                    Basic.BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
+                    BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
                 }
             } catch (Throwable throwable) {
                 log.error("scan basic failed please check", throwable);

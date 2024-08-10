@@ -19,7 +19,7 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.7-RELEASE</version>
+    <version>2.3.8-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -69,7 +69,6 @@ handler                             Provided some basic channel handler implemen
   ---ActionWriteTimeoutHandler         Actionable WriteTimeout Handler
   ---ChannelAdvice                     contains inbound-advice and outbound-advice
   ---IdledHeartBeater                  will do heartbeat after idle
-  ---LoggerHandler                     Entry and exit message log
   ---MessageFilter                     use to filter message
 
 listener

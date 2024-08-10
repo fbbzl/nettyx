@@ -3,8 +3,9 @@ package org.fz.nettyx.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -16,11 +17,11 @@ import java.util.List;
  * @version 1.0
  * @since 2021 /4/9 16:35
  */
-@Slf4j
 @RequiredArgsConstructor
 public class StringMessageCodec extends ByteToMessageCodec<String> {
 
-    private final Charset charset;
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(StringMessageCodec.class);
+    private final        Charset        charset;
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf in, List<Object> list) {
