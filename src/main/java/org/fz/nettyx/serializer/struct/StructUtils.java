@@ -26,7 +26,6 @@ import static java.lang.invoke.MethodType.methodType;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.isReadHandler;
 import static org.fz.nettyx.serializer.struct.StructPropHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
-import static org.fz.nettyx.serializer.struct.annotation.Struct.STRUCT_FIELD_CACHE;
 
 
 /**
@@ -272,6 +271,7 @@ public class StructUtils {
     }
 
     public static Field[] getStructFields(Class<?> clazz) {
-        return STRUCT_FIELD_CACHE.get(clazz);
+        Field[] fields = STRUCT_FIELD_CACHE.get(clazz);
+        return fields != null ? fields : new Field[]{};
     }
 }

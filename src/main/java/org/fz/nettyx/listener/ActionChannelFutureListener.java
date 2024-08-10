@@ -16,7 +16,6 @@ import org.fz.nettyx.action.ListenerAction;
 @Setter
 @Accessors(chain = true, fluent = true)
 public class ActionChannelFutureListener implements ChannelFutureListener {
-
     /**
      * When the different state of the channel is monitored, the corresponding method will be called
      */
