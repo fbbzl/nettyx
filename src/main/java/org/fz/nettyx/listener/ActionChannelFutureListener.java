@@ -2,8 +2,6 @@ package org.fz.nettyx.listener;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.util.internal.logging.InternalLogger;
-import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.action.ListenerAction;
@@ -18,23 +16,21 @@ import org.fz.nettyx.action.ListenerAction;
 @Setter
 @Accessors(chain = true, fluent = true)
 public class ActionChannelFutureListener implements ChannelFutureListener {
-
-    private static final InternalLogger log = InternalLoggerFactory.getInstance(ActionChannelFutureListener.class);
     /**
      * When the different state of the channel is monitored, the corresponding method will be called
      */
-    private              ListenerAction
-                                        whenSuccess,
+    private ListenerAction
+            whenSuccess,
             whenFailure,
             whenCancelled,
             whenDone;
 
     @Override
     public final void operationComplete(ChannelFuture cf) {
-        if (whenDone != null && cf.isDone()) whenDone.act(this, cf);
-        if (whenSuccess != null && cf.isSuccess()) whenSuccess.act(this, cf);
-        if (whenFailure != null && cf.cause() != null) whenFailure.act(this, cf);
-        if (whenCancelled != null && cf.isCancelled()) whenCancelled.act(this, cf);
+        if (whenDone      != null && cf.isDone())        whenDone.act(this, cf);
+        if (whenSuccess   != null && cf.isSuccess())     whenSuccess.act(this, cf);
+        if (whenFailure   != null && cf.cause() != null) whenFailure.act(this, cf);
+        if (whenCancelled != null && cf.isCancelled())   whenCancelled.act(this, cf);
     }
 
 }
