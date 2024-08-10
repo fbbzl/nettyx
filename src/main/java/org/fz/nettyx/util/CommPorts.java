@@ -25,8 +25,8 @@ import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
 @UtilityClass
 public final class CommPorts {
 
-    static final         OsInfo                 OS_INFO = SystemUtil.getOsInfo();
-    static final         Supplier<List<String>> GET_COM_PORT;
+    static final OsInfo                 OS_INFO = SystemUtil.getOsInfo();
+    static final Supplier<List<String>> GET_COM_PORT;
 
     static {
         if (OS_INFO.isLinux()) {
