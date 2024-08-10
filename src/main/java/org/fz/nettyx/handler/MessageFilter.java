@@ -2,8 +2,9 @@ package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Predicate;
 
@@ -14,9 +15,10 @@ import java.util.function.Predicate;
  * @version 1.0
  * @since 4 /14/2022 7:30 PM
  */
-@Slf4j
 @SuppressWarnings("unchecked")
 public class MessageFilter extends ChannelHandlerAdapter {
+
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(MessageFilter.class);
 
     @RequiredArgsConstructor
     public static class InboundFilter<M> extends ChannelInboundHandlerAdapter {

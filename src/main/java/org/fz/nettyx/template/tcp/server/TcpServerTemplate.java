@@ -8,8 +8,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -22,13 +23,11 @@ import java.net.SocketAddress;
  * @since 2021/5/13 9:10
  */
 
-@Slf4j
 @Getter
 public abstract class TcpServerTemplate {
 
-    private final EventLoopGroup
-            parentEventLoopGroup,
-            childEventLoopGroup;
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(TcpServerTemplate.class);
+    private final        EventLoopGroup parentEventLoopGroup, childEventLoopGroup;
 
     private final ServerBootstrap serverBootstrap;
 

@@ -1,13 +1,14 @@
 package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 import org.fz.nettyx.action.*;
 
 import java.net.SocketAddress;
@@ -26,14 +27,14 @@ public class ChannelAdvice {
     /**
      * The type Inbound advice.
      */
-    @Slf4j
     @Setter
     @RequiredArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private final Channel                     channel;
-        private       ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
+        private static final InternalLogger              log = InternalLoggerFactory.getInstance(InboundAdvice.class);
+        private final        Channel                     channel;
+        private              ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
                 whenChannelInactive, whenWritabilityChanged, whenChannelReadComplete;
         private ChannelReadAction        whenChannelRead;
         private ChannelExceptionAction   whenExceptionCaught;
@@ -140,16 +141,16 @@ public class ChannelAdvice {
     /**
      * The type Outbound advice.
      */
-    @Slf4j
     @Setter
     @RequiredArgsConstructor
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
-        private final Channel              channel;
-        private       ChannelBindAction    whenBind;
-        private       ChannelConnectAction whenConnect;
-        private       ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        private static final InternalLogger       log = InternalLoggerFactory.getInstance(OutboundAdvice.class);
+        private final        Channel              channel;
+        private              ChannelBindAction    whenBind;
+        private              ChannelConnectAction whenConnect;
+        private              ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction        whenWrite;
         private ActionIdleStateHandler    writeIdleStateHandler;
@@ -251,13 +252,13 @@ public class ChannelAdvice {
             super.flush(ctx);
         }
 
-        @Slf4j
         @Setter
         @NoArgsConstructor
         @AllArgsConstructor
         private static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
 
-            private ChannelExceptionAction whenExceptionCaught;
+            private static final InternalLogger         log = InternalLoggerFactory.getInstance(SimpleOutboundExceptionHandler.class);
+            private              ChannelExceptionAction whenExceptionCaught;
 
             @Override
             public void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise) throws Exception {
