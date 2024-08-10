@@ -45,7 +45,7 @@ public abstract class StructCodec<T> extends ByteToMessageCodec<T> {
             // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes is true
             if (skipLeftBytes && msg.readableBytes() > 0) {
                 int readableLength = msg.readableBytes();
-                log.warn("There is still readable bytes in the buffer after serialization, it will be skipped, length is [{}]", readableLength);
+                log.debug("There is still readable bytes in the buffer after serialization, it will be skipped, length is [{}]", readableLength);
                 msg.skipBytes(readableLength);
             }
         }
