@@ -32,10 +32,17 @@ public class ChannelAdvice {
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
-        private static final InternalLogger              log = InternalLoggerFactory.getInstance(InboundAdvice.class);
-        private final        Channel                     channel;
-        private              ChannelHandlerContextAction whenChannelRegister, whenChannelUnRegister, whenChannelActive,
-                whenChannelInactive, whenWritabilityChanged, whenChannelReadComplete;
+        private static final InternalLogger log = InternalLoggerFactory.getInstance(InboundAdvice.class);
+        private final        Channel        channel;
+
+        private ChannelHandlerContextAction
+                whenChannelRegister,
+                whenChannelUnRegister,
+                whenChannelActive,
+                whenChannelInactive,
+                whenWritabilityChanged,
+                whenChannelReadComplete;
+
         private ChannelReadAction        whenChannelRead;
         private ChannelExceptionAction   whenExceptionCaught;
         private ActionIdleStateHandler   readIdleStateHandler;
