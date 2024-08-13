@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implements Comparable<CBasic<V>> {
+public abstract class CBasic<V extends Comparable<V>> extends Basic<V> {
 
     private static final boolean   C_DEFAULT_SINGED = true;
     private static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
@@ -50,35 +50,8 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> implement
     }
 
     @Override
-    public int hashCode() {
-        return this.getValue().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object anotherObj) {
-        if (anotherObj == null) return false;
-
-        if (anotherObj instanceof CBasic<?>) {
-            CBasic<?> anotherCBasic = (CBasic<?>) anotherObj;
-            if (this.getSize() != anotherCBasic.getSize()
-                || this.hasSinged() != anotherCBasic.hasSinged()
-                || this.order() != anotherCBasic.order()) {
-                return false;
-            }
-
-            return this.getValue().equals(anotherCBasic.getValue());
-        }
-        return false;
-    }
-
-    @Override
     public String toString() {
         return this.getValue().toString();
-    }
-
-    @Override
-    public int compareTo(CBasic<V> anotherCBasic) {
-        return this.getValue().compareTo(anotherCBasic.getValue());
     }
 
 }
