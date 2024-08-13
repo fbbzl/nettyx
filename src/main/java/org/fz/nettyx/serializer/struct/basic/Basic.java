@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 import org.fz.nettyx.util.Throws;
 
 import java.nio.ByteBuffer;
@@ -20,7 +21,7 @@ import java.nio.ByteOrder;
  * @since 2021 /10/22 13:26
  */
 @Getter
-public abstract class Basic<V> {
+public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
     private final int size;
 
@@ -122,5 +123,35 @@ public abstract class Basic<V> {
      */
     public String hexDump() {
         return ByteBufUtil.hexDump(this.getBytes());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getValue().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object anotherObj) {
+        if (anotherObj == null) return false;
+
+        if (anotherObj instanceof CBasic<?>) {
+            CBasic<?> anotherCBasic = (CBasic<?>) anotherObj;
+
+            if (this.getSize()   != anotherCBasic.getSize()
+                ||
+                this.hasSinged() != anotherCBasic.hasSinged()
+                ||
+                this.order()     != anotherCBasic.order()) {
+                return false;
+            }
+
+            return this.getValue().equals(anotherCBasic.getValue());
+        }
+        return false;
+    }
+
+    @Override
+    public int compareTo(Basic<V> anotherCBasic) {
+        return this.getValue().compareTo(anotherCBasic.getValue());
     }
 }
