@@ -2,7 +2,6 @@ package template.tcp.client;
 
 
 import cn.hutool.core.lang.Console;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -11,9 +10,9 @@ import org.fz.nettyx.template.tcp.client.SingleTcpChannelClientTemplate;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static codec.UserCodec.TEST_USER;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
 
@@ -33,9 +32,8 @@ public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
 
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((ls, cf) -> {
-                    byte[] msg = new byte[2048];
-                    Arrays.fill(msg, (byte) 67);
-                    testClient.writeAndFlush(Unpooled.wrappedBuffer(msg));
+
+                    testClient.writeAndFlush(TEST_USER);
 
                     Console.log(cf.channel().localAddress() + ": ok");
                 })

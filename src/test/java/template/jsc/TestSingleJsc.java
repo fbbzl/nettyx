@@ -47,9 +47,7 @@ public class TestSingleJsc extends SingleJscChannelTemplate {
         TestSingleJsc testSingleJsc = new TestSingleJsc("COM2");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-//                    byte[] msg = new byte[3000];
-//                    Arrays.fill(msg, (byte) 67);
-//                    testSingleJsc.writeAndFlush(Unpooled.wrappedBuffer(msg));
+
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))
                 .whenFailure(redo(testSingleJsc::connect, 2, TimeUnit.MILLISECONDS, 3, (l, c) -> {
