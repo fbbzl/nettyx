@@ -2,7 +2,6 @@ package template.bluetooth;
 
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.bluetooth.client.BtChannel;
@@ -12,11 +11,12 @@ import org.fz.nettyx.util.BtFinder;
 import template.TestChannelInitializer;
 
 import javax.bluetooth.RemoteDevice;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static codec.UserCodec.TEST_USER;
 
 /**
  * @author fengbinbin
@@ -49,9 +49,7 @@ public class TestBtClient extends SingleBtChannelTemplate {
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
                     executor.scheduleAtFixedRate(() -> {
-                        byte[] msg = new byte[300];
-                        Arrays.fill(msg, (byte) 67);
-                        client.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                        client.writeAndFlush(TEST_USER);
                     }, 2, 30, TimeUnit.MILLISECONDS);
                 })
                 .whenCancelled((l, cf) -> Console.log("cancel"))

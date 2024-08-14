@@ -2,7 +2,6 @@ package template.tcp.client;
 
 
 import cn.hutool.core.lang.Console;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -11,10 +10,10 @@ import org.fz.nettyx.template.tcp.client.MultiTcpChannelClientTemplate;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static codec.UserCodec.TEST_USER;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
@@ -45,9 +44,8 @@ public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
         TestMultiTcpClient testMultiTcp = new TestMultiTcpClient(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    byte[] msg = new byte[2048];
-                    Arrays.fill(msg, (byte) 67);
-                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
+
+                    cf.channel().writeAndFlush(TEST_USER);
 
                     Console.log(cf.channel().localAddress() + ": ok");
                 })

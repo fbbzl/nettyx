@@ -2,7 +2,6 @@ package template.rxtx;
 
 
 import cn.hutool.core.lang.Console;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.rxtx.RxtxChannel;
@@ -11,9 +10,9 @@ import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.serial.rxtx.SingleRxtxChannelTemplate;
 import template.TestChannelInitializer;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static codec.UserCodec.TEST_USER;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
 
@@ -48,9 +47,7 @@ public class TestSingleRxtx extends SingleRxtxChannelTemplate {
         TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM5");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    byte[] msg = new byte[3000];
-                    Arrays.fill(msg, (byte) 67);
-                    testSingleRxtx.writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    testSingleRxtx.writeAndFlush(TEST_USER);
 
                     RxtxChannelConfig config = (RxtxChannelConfig) cf.channel().config();
                     Console.log(config.getBaudRate());

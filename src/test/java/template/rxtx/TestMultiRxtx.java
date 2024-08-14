@@ -1,7 +1,6 @@
 package template.rxtx;
 
 import cn.hutool.core.lang.Console;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import org.fz.nettyx.channel.SerialCommChannel;
@@ -11,10 +10,10 @@ import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.template.serial.rxtx.MultiRxtxChannelTemplate;
 import template.TestChannelInitializer;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static codec.UserCodec.TEST_USER;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
@@ -56,9 +55,7 @@ public class TestMultiRxtx extends MultiRxtxChannelTemplate<String> {
         TestMultiRxtx testMultiTcp = new TestMultiRxtx(map);
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
-                    byte[] msg = new byte[2048];
-                    Arrays.fill(msg, (byte) 67);
-                    cf.channel().writeAndFlush(Unpooled.wrappedBuffer(msg));
+                    cf.channel().writeAndFlush(TEST_USER);
 
                     Console.log(cf.channel().localAddress() + ": ok");
                 })
