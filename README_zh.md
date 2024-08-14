@@ -20,7 +20,7 @@ Gitee地址: https://gitee.com/fbbzl/nettyx<br>
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.9-RELEASE</version>
+    <version>2.3.10-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -90,19 +90,6 @@ serializer                             序列化工具
      ---StructSerializerContext        struct 序列化器的上下文，包含 handler-instance、type cache等等
      ---StructUtils                    序列化工具
      ---TypeRefer                      结构泛型类型应用
-  xml
-     dtd
-        ---Dtd                         xml序列化器定义
-     handler
-        ---EnumHandler                 
-        ---NumberHandler             
-        ---PropHandler                 顶级的xml prop处理器
-        ---PropTypeHandler             处理prop-type的处理器
-        ---StringHandler             
-        ---SwitchHandler             
-     ---XmlSerializer                  从xml中读取配置, 然后序列化成LinkedMap
-     ---XmlSerializerContext           xml序列化器的上下文
-     ---XmlUtils        
   ---Serializer.java                    顶级序列化器接口
 ssl
   ---OpenSslContextFactory           OpenSSL 上下文工厂
