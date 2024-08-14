@@ -19,7 +19,7 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.9-RELEASE</version>
+    <version>2.3.10-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -91,20 +91,7 @@ serializer                             Serialization tool
      ---StructSerializer               core struct serializer tool
      ---StructSerializerContext        the context of struct serializer, contains handler-instance, type cache, etc
      ---StructUtils                    struct serializer tool
-     ---TypeRefer                      struct serializer generic-type util
-  xml
-     dtd
-        ---Dtd                         xml serializer defination
-     handler
-        ---EnumHandler                 
-        ---NumberHandler             
-        ---PropHandler                 top level xml prop handler
-        ---PropTypeHandler             handle xlm prop type 
-        ---StringHandler             
-        ---SwitchHandler             
-     ---XmlSerializer                  parse from xml config file
-     ---XmlSerializerContext           the xml serializer context. 
-     ---XmlUtils                      
+     ---TypeRefer                      struct serializer generic-type util                    
   ---Serializer.java                   top level serializer interface
 ssl
   ---OpenSslContextFactory           OpenSSL context factory
