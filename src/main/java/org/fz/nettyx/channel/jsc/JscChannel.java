@@ -11,6 +11,8 @@ import java.net.SocketAddress;
 
 
 /**
+ * java serial comm channel
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/2 13:29
