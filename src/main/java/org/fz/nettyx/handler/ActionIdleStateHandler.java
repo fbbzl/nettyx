@@ -95,10 +95,14 @@ public class ActionIdleStateHandler extends IdleStateHandler {
         if (ChannelEvents.isReadIdle(evt)) {
             log.warn("have been in read-idle state for [{}] seconds on [{}]", getReaderIdleSeconds(), ctx.channel().remoteAddress());
             invokeAction(readIdleAction, ctx);
-        } else if (ChannelEvents.isWriteIdle(evt)) {
+        }
+        else
+        if (ChannelEvents.isWriteIdle(evt)) {
             log.warn("have been in write-idle state for [{}] seconds on [{}]", getWriterIdleSeconds(), ctx.channel().remoteAddress());
             invokeAction(writeIdleAction, ctx);
-        } else if (ChannelEvents.isAllIdle(evt)) {
+        }
+        else
+        if (ChannelEvents.isAllIdle(evt)) {
             log.warn("have been in all-idle state for [{}] seconds on [{}]", getAllIdleSeconds(), ctx.channel().remoteAddress());
             invokeAction(allIdleAction, ctx);
         }

@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
+ * java serial comm channel config
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/2 13:29

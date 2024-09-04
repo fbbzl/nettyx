@@ -9,6 +9,7 @@ import org.fz.nettyx.channel.jsc.JscChannelConfig;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
+ * template with single-jsc channel
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/29 10:09
