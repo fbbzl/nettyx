@@ -11,6 +11,7 @@ import java.net.SocketAddress;
 
 
 /**
+ * rxtx channel
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/4 19:29
