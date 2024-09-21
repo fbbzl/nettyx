@@ -21,7 +21,7 @@ import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.ParityBit;
 import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.StopBits;
 
 /**
- * Option for configuring a serial port connection
+ * rxtx channel option
  *
  * @author fengbinbin
  * @version 1.0
