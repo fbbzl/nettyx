@@ -38,7 +38,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
 
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
-        Throws.ifLess(byteBuf.readableBytes(), size, new TooLessBytesException(size, byteBuf.readableBytes()));
+        Throws.ifTrue(byteBuf.readableBytes() < size, new TooLessBytesException(size, byteBuf.readableBytes()));
 
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);

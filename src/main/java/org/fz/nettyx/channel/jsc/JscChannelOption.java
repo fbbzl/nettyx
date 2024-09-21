@@ -4,7 +4,7 @@ package org.fz.nettyx.channel.jsc;
 import io.netty.channel.ChannelOption;
 
 /**
- * Option for configuring a serial port connection.
+ * java serial comm channel options
  *
  * @param <T>
  * @author fengbinbin

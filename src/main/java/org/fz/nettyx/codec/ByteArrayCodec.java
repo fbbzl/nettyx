@@ -10,6 +10,7 @@ import io.netty.util.ReferenceCountUtil;
 import java.util.List;
 
 /**
+ * byte array codec
  * @author fengbinbin
  * @version 1.0
  * @since 2024/8/4 21:53
