@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.SocketAddress;
 
 /**
+ * bluetooth client channel
  *
  * @author fengbinbin
  * @version 1.0

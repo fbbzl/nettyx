@@ -16,6 +16,7 @@ import java.net.SocketAddress;
 import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
+ * channel advice
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/27 10:58
@@ -155,9 +156,10 @@ public class ChannelAdvice {
 
         private static final InternalLogger       log = InternalLoggerFactory.getInstance(OutboundAdvice.class);
         private final        Channel              channel;
-        private              ChannelBindAction    whenBind;
-        private              ChannelConnectAction whenConnect;
-        private              ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+
+        private ChannelBindAction    whenBind;
+        private ChannelConnectAction whenConnect;
+        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         private ChannelHandlerContextAction whenRead, whenFlush;
         private ChannelWriteAction        whenWrite;
         private ActionIdleStateHandler    writeIdleStateHandler;
