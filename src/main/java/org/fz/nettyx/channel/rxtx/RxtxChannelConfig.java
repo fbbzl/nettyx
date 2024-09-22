@@ -51,6 +51,7 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
  * </tr>
  * </table>
  *
+ * rxtx channel config
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 14:44

@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
+ * struct codec
  * @author fengbinbin
  * @version 1.0
  * @since 2024/7/26 18:58

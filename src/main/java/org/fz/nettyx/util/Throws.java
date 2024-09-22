@@ -3,7 +3,6 @@ package org.fz.nettyx.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
@@ -20,12 +19,11 @@ import java.util.Objects;
 public final class Throws {
 
     static final String MAP_NULL        = "map is null";
-    static final String KEY_NULL        = "key cis null";
+    static final String KEY_NULL        = "key is null";
     static final String VALUE_NULL      = "value is null";
-    static final String COLLECTION_NULL = "collection cis null";
-    static final String ELEMENT_NULL    = "element cis null";
+    static final String COLLECTION_NULL = "collection is null";
+    static final String ELEMENT_NULL    = "element is null";
     static final String ARRAY_NULL      = "array is null";
-    static final String NUMBER_NULL     = "bigDecimal is null";
 
     public static void ifTrue(Object expression, RuntimeException runtimeException) {
         if (Objects.equals(expression, Boolean.TRUE)) throw runtimeException;
@@ -279,38 +277,6 @@ public final class Throws {
         ifHasNullElement(array, new RuntimeException(exceptionMessage));
     }
 
-    public static void ifBetweenClose(long current, long min, long max, String exceptionMessage) {
-        ifBetweenClose(current, min, max, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifBetweenClose(long current, long min, long max, RuntimeException exception) {
-        if (current >= min && current <= max) throw exception;
-    }
-
-    public static void ifNotBetweenClose(long current, long min, long max, String exceptionMessage) {
-        ifNotBetweenClose(current, min, max, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifNotBetweenClose(long current, long min, long max, RuntimeException exception) {
-        if (current <= min || current >= max) throw exception;
-    }
-
-    public static void ifBetweenOpen(long current, long min, long max, String exceptionMessage) {
-        ifBetweenOpen(current, min, max, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifBetweenOpen(long current, long min, long max, RuntimeException exception) {
-        if (current > min && current < max) throw exception;
-    }
-
-    public static void ifNotBetweenOpen(long current, long min, long max, String exceptionMessage) {
-        ifNotBetweenOpen(current, min, max, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifNotBetweenOpen(long current, long min, long max, RuntimeException exception) {
-        if (current < min || current > max) throw exception;
-    }
-
     public static void ifAssignable(Class<?> superType, Class<?> subType, String exceptionMessage) {
         ifAssignable(superType, subType, new RuntimeException(exceptionMessage));
     }
@@ -325,106 +291,6 @@ public final class Throws {
 
     public static void ifNotAssignable(Class<?> superType, Class<?> subType, RuntimeException exception) {
         if (superType == null || subType == null || !superType.isAssignableFrom(subType)) throw exception;
-    }
-
-    public static void ifGreater(Number left, Number right, String exceptionMessage) {
-        ifGreater(left.toString(), right.toString(), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifGreater(Number left, Number right, RuntimeException exception) {
-        ifGreater(left.toString(), right.toString(), exception);
-    }
-
-    public static void ifGreater(String left, String right, String exceptionMessage) {
-        ifGreater(new BigDecimal(left), new BigDecimal(right), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifGreater(String left, String right, RuntimeException exception) {
-        ifGreater(new BigDecimal(left), new BigDecimal(right), exception);
-    }
-
-    public static void ifGreater(BigDecimal left, BigDecimal right, String exceptionMessage) {
-        ifGreater(left, right, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifGreater(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
-        if (left.compareTo(right) > 0) throw exception;
-    }
-
-    public static void ifGreaterEquals(Number left, Number right, String exceptionMessage) {
-        ifGreaterEquals(left.toString(), right.toString(), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifGreaterEquals(Number left, Number right, RuntimeException exception) {
-        ifGreaterEquals(left.toString(), right.toString(), exception);
-    }
-
-    public static void ifGreaterEquals(String left, String right, String exceptionMessage) {
-        ifGreaterEquals(new BigDecimal(left), new BigDecimal(right), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifGreaterEquals(String left, String right, RuntimeException exception) {
-        ifGreaterEquals(new BigDecimal(left), new BigDecimal(right), exception);
-    }
-
-    public static void ifGreaterEquals(BigDecimal left, BigDecimal right, String exceptionMessage) {
-        ifGreaterEquals(left, right, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifGreaterEquals(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
-        if (left.compareTo(right) >= 0) throw exception;
-    }
-
-    public static void ifLess(Number left, Number right, String exceptionMessage) {
-        ifLess(left.toString(), right.toString(), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifLess(Number left, Number right, RuntimeException exception) {
-        ifLess(left.toString(), right.toString(), exception);
-    }
-
-    public static void ifLess(String left, String right, String exceptionMessage) {
-        ifLess(new BigDecimal(left), new BigDecimal(right), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifLess(String left, String right, RuntimeException exception) {
-        ifLess(new BigDecimal(left), new BigDecimal(right), exception);
-    }
-
-    public static void ifLess(BigDecimal left, BigDecimal right, String exceptionMessage) {
-        ifLess(left, right, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifLess(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
-        if (left.compareTo(right) < 0) throw exception;
-    }
-
-    public static void ifLessEquals(Number left, Number right, String exceptionMessage) {
-        ifLessEquals(left.toString(), right.toString(), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifLessEquals(Number left, Number right, RuntimeException exception) {
-        ifLessEquals(left.toString(), right.toString(), exception);
-    }
-
-    public static void ifLessEquals(String left, String right, String exceptionMessage) {
-        ifLessEquals(new BigDecimal(left), new BigDecimal(right), new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifLessEquals(String left, String right, RuntimeException exception) {
-        ifLessEquals(new BigDecimal(left), new BigDecimal(right), exception);
-    }
-
-    public static void ifLessEquals(BigDecimal left, BigDecimal right, String exceptionMessage) {
-        ifLessEquals(left, right, new RuntimeException(exceptionMessage));
-    }
-
-    public static void ifLessEquals(BigDecimal left, BigDecimal right, RuntimeException exception) {
-        if (left == null || right == null) throw new IllegalArgumentException(NUMBER_NULL);
-        if (left.compareTo(right) <= 0) throw exception;
     }
 
 }
