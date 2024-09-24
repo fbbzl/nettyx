@@ -41,7 +41,7 @@ public abstract class StructCodec<T> extends ByteToMessageCodec<T> {
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
         try {
-            out.add(StructSerializer.read(type, msg));
+            out.add(StructSerializer.toStruct(type, msg));
         } finally {
             // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes is true
             if (skipLeftBytes && msg.readableBytes() > 0) {
@@ -54,6 +54,6 @@ public abstract class StructCodec<T> extends ByteToMessageCodec<T> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, T msg, ByteBuf out) {
-        out.writeBytes(StructSerializer.write(type, msg));
+        out.writeBytes(StructSerializer.toByteBuf(type, msg));
     }
 }
