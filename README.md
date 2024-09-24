@@ -19,7 +19,7 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.12-RELEASE</version>
+    <version>2.3.13-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -87,7 +87,7 @@ serializer                             Serialization tool
         c                              internal c basic types
         cpp                            internal cpp basic types
         ---Basic                       basic type
-     ---StructPropHandler              top struct field handler interface
+     ---StructFieldHandler             top struct field handler interface
      ---StructSerializer               core struct serializer tool
      ---StructSerializerContext        the context of struct serializer, contains handler-instance, type cache, etc
      ---StructUtils                    struct serializer tool
