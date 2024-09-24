@@ -11,8 +11,8 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.SerializeHandlerException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.StructPropHandler.ReadHandler;
-import org.fz.nettyx.serializer.struct.StructPropHandler.WriteHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.util.Throws;
 
