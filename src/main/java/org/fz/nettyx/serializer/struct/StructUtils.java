@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 
 import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
 import static java.lang.invoke.MethodType.methodType;
-import static org.fz.nettyx.serializer.struct.StructPropHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.StructPropHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -48,8 +48,8 @@ public class StructUtils {
     public static boolean useReadHandler(Field field) {
         Annotation propHandlerAnnotation = findPropHandlerAnnotation(field);
         if (propHandlerAnnotation != null) {
-            Class<? extends StructPropHandler<? extends Annotation>>
-                    handlerClass = StructPropHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
+            Class<? extends StructFieldHandler<? extends Annotation>>
+                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
             if (handlerClass != null) return isReadHandler(handlerClass);
         }
         return false;
@@ -64,8 +64,8 @@ public class StructUtils {
     public static boolean useWriteHandler(Field field) {
         Annotation propHandlerAnnotation = findPropHandlerAnnotation(field);
         if (propHandlerAnnotation != null) {
-            Class<? extends StructPropHandler<? extends Annotation>>
-                    handlerClass = StructPropHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
+            Class<? extends StructFieldHandler<? extends Annotation>>
+                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
             if (handlerClass != null) return isWriteHandler(handlerClass);
         }
         return false;
@@ -89,12 +89,12 @@ public class StructUtils {
      * @param field the element
      * @return the serializer handler
      */
-    public <H extends StructPropHandler<?>> H getPropHandler(Field field) {
+    public <H extends StructFieldHandler<?>> H getPropHandler(Field field) {
         Annotation handlerAnnotation = findPropHandlerAnnotation(field);
 
         if (handlerAnnotation != null) {
-            Class<? extends StructPropHandler<? extends Annotation>>
-                    handlerClass = StructPropHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
+            Class<? extends StructFieldHandler<? extends Annotation>>
+                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
             boolean isSingleton = Singleton.exists(handlerClass);
 
             if (isSingleton) return (H) Singleton.get(handlerClass);
@@ -111,7 +111,7 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    static <H extends StructPropHandler<? extends Annotation>> H newPropHandler(Type clazz) {
+    static <H extends StructFieldHandler<? extends Annotation>> H newPropHandler(Type clazz) {
         try {
             return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructor).get();
         } catch (Exception exception) {
