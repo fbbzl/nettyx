@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
-import org.fz.nettyx.serializer.struct.StructPropHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.util.Throws;
 
@@ -43,7 +43,7 @@ public @interface ToLinkedList {
     /**
      * The type To linked list handler.
      */
-    class ToLinkedListHandler implements StructPropHandler.ReadWriteHandler<ToLinkedList> {
+    class ToLinkedListHandler implements StructFieldHandler.ReadWriteHandler<ToLinkedList> {
         @Override
         public boolean isSingleton() {
             return true;
