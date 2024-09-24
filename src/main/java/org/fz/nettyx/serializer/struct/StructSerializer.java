@@ -65,9 +65,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> T toStruct(Type rootType, ByteBuf byteBuf) {
-        if (rootType instanceof Class<?>)          return new StructSerializer(rootType, byteBuf, newStruct(rootType)).doDeserialization();
+        if (rootType instanceof Class<?>)          return new StructSerializer(rootType, byteBuf, newStruct(rootType)).doDeserialize();
         else
-        if (rootType instanceof ParameterizedType) return new StructSerializer(rootType, byteBuf, newStruct(((ParameterizedType) rootType).getRawType())).doDeserialization();
+        if (rootType instanceof ParameterizedType) return new StructSerializer(rootType, byteBuf, newStruct(((ParameterizedType) rootType).getRawType())).doDeserialize();
         else
         if (rootType instanceof TypeRefer)         return toStruct(((TypeRefer<T>) rootType).getTypeValue(), byteBuf);
         else
@@ -99,7 +99,7 @@ public final class StructSerializer implements Serializer {
     public static <T> ByteBuf toByteBuf(Type rootType, T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
 
-        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(rootType, buffer(), struct).doSerialization();
+        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(rootType, buffer(), struct).doSerialize();
         else
         if (rootType instanceof TypeRefer)                                         return toByteBuf(((TypeRefer<T>) rootType).getTypeValue(), struct);
         else
@@ -140,7 +140,7 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      working code splitter      ******************************************//
 
-    <T> T doDeserialization() {
+    <T> T doDeserialize() {
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue;
@@ -162,7 +162,7 @@ public final class StructSerializer implements Serializer {
         return (T) struct;
     }
 
-    ByteBuf doSerialization() {
+    ByteBuf doSerialize() {
         ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
@@ -416,6 +416,11 @@ public final class StructSerializer implements Serializer {
      */
     public <T> T earlyStruct() {
         return (T) this.struct;
+    }
+
+    @Override
+    public Type getType() {
+        return this.rootType;
     }
 
     //******************************************      public end       ***********************************************//
