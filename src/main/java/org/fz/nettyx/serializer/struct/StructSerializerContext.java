@@ -28,7 +28,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
-import static org.fz.nettyx.serializer.struct.StructPropHandler.getTargetAnnotationType;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
 import static org.fz.nettyx.serializer.struct.StructUtils.*;
 
 /**
@@ -48,7 +48,8 @@ public final class StructSerializerContext {
     static final         Map<Field, BiConsumer<?, ?>>    FIELD_SETTER_CACHE                  = new ConcurrentHashMap<>(512);
     static final         Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE           = new ConcurrentHashMap<>(128);
     static final         Map<Type, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE           = new ConcurrentHashMap<>(128);
-    private static final InternalLogger                  log                                 = InternalLoggerFactory.getInstance(StructSerializerContext.class);
+
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     static {
         // scan classes
@@ -79,7 +80,7 @@ public final class StructSerializerContext {
     private synchronized static void scanPropHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
-                boolean isPropertyHandler = StructPropHandler.class.isAssignableFrom(clazz);
+                boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
 
                 if (isPropertyHandler) {
                     Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
@@ -89,11 +90,11 @@ public final class StructSerializerContext {
                         NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
 
                         // 2 cache singleton prop-handler
-                        StructPropHandler handler = (StructPropHandler) constructorSupplier.get();
+                        StructFieldHandler handler = (StructFieldHandler) constructorSupplier.get();
                         if (handler.isSingleton()) Singleton.put(handler);
 
                         // 3 cache annotation -> handler mapping relation
-                        StructPropHandler.ANNOTATION_HANDLER_MAPPING.putIfAbsent(annotationType, (Class<? extends StructPropHandler<? extends Annotation>>) clazz);
+                        StructFieldHandler.ANNOTATION_HANDLER_MAPPING.putIfAbsent(annotationType, (Class<? extends StructFieldHandler<? extends Annotation>>) clazz);
                     }
                 }
             } catch (Throwable throwable) {
@@ -138,7 +139,7 @@ public final class StructSerializerContext {
 
                         // 4 cache field prop handler annotation
                         for (Annotation annotation : AnnotationUtil.getAnnotations(field, false)) {
-                            if (StructPropHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
+                            if (StructFieldHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
                                 Throws.ifContainsKey(FIELD_PROP_HANDLER_ANNOTATION_CACHE, field, "don't specify more than one prop handler on field [" + field + "]");
                                 FIELD_PROP_HANDLER_ANNOTATION_CACHE.put(field, annotation);
                             }

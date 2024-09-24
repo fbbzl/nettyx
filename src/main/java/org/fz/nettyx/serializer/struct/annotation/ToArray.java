@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructPropHandler;
+import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.util.Throws;
 
@@ -34,7 +34,7 @@ public @interface ToArray {
      */
     int length();
 
-    class ToArrayHandler implements StructPropHandler.ReadWriteHandler<ToArray> {
+    class ToArrayHandler implements StructFieldHandler.ReadWriteHandler<ToArray> {
         @Override
         public boolean isSingleton() {
             return true;
