@@ -21,7 +21,7 @@ public class Cushort extends CBasic<Integer> {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cushort MAX_VALUE = new Cushort(Short.MAX_VALUE >> 2);
+    public static final Cushort MAX_VALUE = new Cushort(Short.MAX_VALUE * 2);
 
     /**
      * Instantiates a new Cushort.

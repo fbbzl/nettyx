@@ -30,7 +30,7 @@
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -39,7 +39,7 @@
         <!--base-->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.30</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
 
         <!--build-->
         <maven.compiler.source>8</maven.compiler.source>
@@ -52,23 +52,26 @@
         <nexus-staging-maven-plugin-version>1.6.7</nexus-staging-maven-plugin-version>
 
         <!--transport-->
+        <netty-all.version>4.1.113.Final</netty-all.version>
+
+        <!--comm-->
         <jSerialComm.version>2.11.0</jSerialComm.version>
+        <rxtx.version>2.1.7</rxtx.version>
+
+        <!--bluetooth-->
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <netty-all.version>4.1.112.Final</netty-all.version>
-        <hutool-core.version>5.8.29</hutool-core.version>
-        <rxtx.version>2.1.7</rxtx.version>
-        <dom4j.version>2.1.4</dom4j.version>
-        <mvel2.version>2.5.2.Final</mvel2.version>
+        <hutool-core.version>5.8.32</hutool-core.version>
+
+        <!--reflect-->
+        <reflectasm.version>1.11.9</reflectasm.version>
 
         <!--test-->
         <junit.version>4.13.2</junit.version>
-        <reflectasm.version>1.11.9</reflectasm.version>
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
@@ -118,15 +121,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>${dom4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mvel</groupId>
-            <artifactId>mvel2</artifactId>
-            <version>${mvel2.version}</version>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>reflectasm</artifactId>
+            <version>${reflectasm.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -135,15 +133,6 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>reflectasm</artifactId>
-            <version>${reflectasm.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-
     </dependencies>
 
     <build>
