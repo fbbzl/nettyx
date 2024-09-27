@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.fz.nettyx.channel.rxtx;
+package org.fz.nettyx.channel.serial.rxtx;
 
 import gnu.io.SerialPort;
 import io.netty.buffer.ByteBufAllocator;
@@ -113,7 +113,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
     /**
      * @return true if the serial device should support the Data Terminal Ready signal
      */
-    boolean isDtr();
+    boolean getDtr();
 
     /**
      * Sets whether the serial device supports the Data Terminal Ready signal, used for
@@ -126,7 +126,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
     /**
      * @return true if the serial device should support the Ready to Send signal
      */
-    boolean isRts();
+    boolean getRts();
 
     /**
      * Sets whether the serial device supports the Request To Send signal, used for flow
@@ -137,7 +137,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
     RxtxChannelConfig setRts(boolean rts);
 
     /**
-     * Sets the maximal time (in ms) to block while try to read from the serial port. Default is 1000ms
+     * Sets the maximal time (in ms) to block while try to read from the serial port.
      */
     RxtxChannelConfig setReadTimeout(int readTimeout);
 
@@ -321,10 +321,10 @@ public interface RxtxChannelConfig extends ChannelConfig {
                 return (T) Integer.valueOf(getBaudRate());
             }
             if (option == RxtxChannelOption.DTR) {
-                return (T) Boolean.valueOf(isDtr());
+                return (T) Boolean.valueOf(getDtr());
             }
             if (option == RxtxChannelOption.RTS) {
-                return (T) Boolean.valueOf(isRts());
+                return (T) Boolean.valueOf(getRts());
             }
             if (option == RxtxChannelOption.STOP_BITS) {
                 return (T) getStopBits();
@@ -410,7 +410,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public boolean isDtr() {
+        public boolean getDtr() {
             return dtr;
         }
 
@@ -421,7 +421,7 @@ public interface RxtxChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public boolean isRts() {
+        public boolean getRts() {
             return rts;
         }
 

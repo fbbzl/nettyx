@@ -22,7 +22,7 @@ import static java.lang.invoke.MethodType.methodType;
  */
 
 @SuppressWarnings("all")
-public class TestReflect {
+public class ReflectTest {
 
     @Data
     public static class Order {
