@@ -1,8 +1,8 @@
-package org.fz.nettyx.channel.jsc;
+package org.fz.nettyx.channel.serial.jsc;
 
 
 import com.fazecast.jSerialComm.SerialPort;
-import org.fz.nettyx.channel.SerialCommChannel;
+import org.fz.nettyx.channel.serial.SerialCommChannel;
 import org.fz.nettyx.util.Throws;
 
 import java.io.InputStream;

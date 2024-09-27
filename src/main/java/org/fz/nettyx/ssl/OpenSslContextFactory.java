@@ -94,7 +94,7 @@ public class OpenSslContextFactory {
         private int handshakeTimeoutSeconds = DEFAULT_HANDSHAKE_TIMEOUT_SECONDS;
 
         /**
-         * Cert string.
+         * Crt string.
          *
          * @return the string
          */

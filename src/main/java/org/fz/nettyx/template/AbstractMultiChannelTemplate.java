@@ -9,9 +9,9 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import org.fz.nettyx.channel.ChannelState;
-import org.fz.nettyx.channel.ChannelStorage;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.util.ChannelState;
+import org.fz.nettyx.util.ChannelStorage;
 import org.fz.nettyx.util.Throws;
 import org.fz.nettyx.util.Try;
 
@@ -19,7 +19,7 @@ import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
-import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
+import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 
 /**
  * multichannel client
