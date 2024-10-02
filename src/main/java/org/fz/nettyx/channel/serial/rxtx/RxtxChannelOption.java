@@ -13,12 +13,12 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.fz.nettyx.channel.rxtx;
+package org.fz.nettyx.channel.serial.rxtx;
 
 import io.netty.channel.ChannelOption;
-import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.DataBits;
-import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.ParityBit;
-import org.fz.nettyx.channel.rxtx.RxtxChannelConfig.StopBits;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.DataBits;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.ParityBit;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.StopBits;
 
 /**
  * rxtx channel option

@@ -1,9 +1,10 @@
-package org.fz.nettyx.channel;
+package org.fz.nettyx.channel.serial;
 
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.oio.AbstractOioChannel;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.fz.nettyx.channel.enhanced.EnhancedOioByteStreamChannel;
 
 import java.io.IOException;
 import java.io.InputStream;
