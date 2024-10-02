@@ -2,16 +2,16 @@ package org.fz.nettyx.action;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.exception.StopRedoException;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.util.ChannelState;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import static org.fz.nettyx.channel.ChannelState.getChannelState;
+import static org.fz.nettyx.util.ChannelState.getChannelState;
 
 /**
  * @author fengbinbin

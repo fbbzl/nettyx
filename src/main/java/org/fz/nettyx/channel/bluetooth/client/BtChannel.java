@@ -5,9 +5,9 @@ import com.intel.bluetooth.BlueCoveImpl;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelPromise;
-import org.fz.nettyx.channel.EnhancedOioByteStreamChannel;
 import org.fz.nettyx.channel.bluetooth.BtChannelConfig;
 import org.fz.nettyx.channel.bluetooth.BtDeviceAddress;
+import org.fz.nettyx.channel.enhanced.EnhancedOioByteStreamChannel;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;

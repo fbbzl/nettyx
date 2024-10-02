@@ -2,9 +2,9 @@ package org.fz.nettyx.template.serial.rxtx;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.channel.rxtx.RxtxChannel;
-import org.fz.nettyx.channel.rxtx.RxtxChannelConfig;
+import org.fz.nettyx.channel.serial.SerialCommChannel;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannel;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig;
 import org.fz.nettyx.template.AbstractMultiChannelTemplate;
 
 import java.util.Map;

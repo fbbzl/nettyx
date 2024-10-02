@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.fz.nettyx.channel.rxtx;
+package org.fz.nettyx.channel.serial.rxtx;
 
 import gnu.io.SerialPort;
 import io.netty.buffer.ByteBufAllocator;

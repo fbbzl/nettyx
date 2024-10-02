@@ -1,4 +1,4 @@
-package org.fz.nettyx.channel;
+package org.fz.nettyx.channel.enhanced;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;

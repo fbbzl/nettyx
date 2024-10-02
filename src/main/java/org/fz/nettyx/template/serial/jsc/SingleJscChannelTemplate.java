@@ -3,9 +3,9 @@ package org.fz.nettyx.template.serial.jsc;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
-import org.fz.nettyx.channel.SerialCommChannel;
-import org.fz.nettyx.channel.jsc.JscChannel;
-import org.fz.nettyx.channel.jsc.JscChannelConfig;
+import org.fz.nettyx.channel.serial.SerialCommChannel;
+import org.fz.nettyx.channel.serial.jsc.JscChannel;
+import org.fz.nettyx.channel.serial.jsc.JscChannelConfig;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
