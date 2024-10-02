@@ -1,4 +1,4 @@
-package org.fz.nettyx.channel;
+package org.fz.nettyx.util;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
