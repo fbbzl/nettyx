@@ -1,8 +1,8 @@
-package org.fz.nettyx.channel.rxtx;
+package org.fz.nettyx.channel.serial.rxtx;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
-import org.fz.nettyx.channel.SerialCommChannel;
+import org.fz.nettyx.channel.serial.SerialCommChannel;
 
 import java.io.IOException;
 import java.io.InputStream;
