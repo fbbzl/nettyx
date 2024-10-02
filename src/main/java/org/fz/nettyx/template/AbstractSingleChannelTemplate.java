@@ -7,12 +7,12 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.fz.nettyx.channel.ChannelState;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.util.ChannelState;
 
 import java.net.SocketAddress;
 
-import static org.fz.nettyx.channel.ChannelState.CHANNEL_STATE_KEY;
+import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 
 /**
  * @author fengbinbin
