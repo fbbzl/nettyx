@@ -24,8 +24,8 @@ public class Cuchar extends CBasic<Short> {
 	/**
 	 * The constant MAX_VALUE.
 	 */
-	public static final Cuchar MAX_VALUE = new Cuchar(Byte.MAX_VALUE * 2);
-
+	public static final Cuchar MAX_VALUE = new Cuchar(Byte.MAX_VALUE * 2 + 1);
+	
 	/**
 	 * Instantiates a new Cuchar.
 	 *

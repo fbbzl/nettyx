@@ -13,31 +13,32 @@ import java.math.BigInteger;
  */
 public class Culonglong extends Culong8 {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Culonglong MIN_VALUE = new Culonglong(BigInteger.ZERO);
+	/**
+	 * The constant MIN_VALUE.
+	 */
+	public static final Culonglong MIN_VALUE = new Culonglong(BigInteger.ZERO);
 
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Culonglong MAX_VALUE = new Culonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
+	/**
+	 * The constant MAX_VALUE.
+	 */
+	public static final Culonglong MAX_VALUE =
+        new Culonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
-    /**
-     * Instantiates a new Culonglong.
-     *
-     * @param value the length
-     */
-    public Culonglong(BigInteger value) {
-        super(value);
-    }
+	/**
+	 * Instantiates a new Culonglong.
+	 *
+	 * @param value the length
+	 */
+	public Culonglong(BigInteger value) {
+		super(value);
+	}
 
-    /**
-     * Instantiates a new Culonglong.
-     *
-     * @param buf the buf
-     */
-    public Culonglong(ByteBuf buf) {
-        super(buf);
-    }
+	/**
+	 * Instantiates a new Culonglong.
+	 *
+	 * @param buf the buf
+	 */
+	public Culonglong(ByteBuf buf) {
+		super(buf);
+	}
 }

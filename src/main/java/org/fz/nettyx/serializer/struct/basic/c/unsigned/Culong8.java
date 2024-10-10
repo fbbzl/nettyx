@@ -24,8 +24,8 @@ public class Culong8 extends CBasic<BigInteger> {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Culong8 MAX_VALUE = new Culong8(
-            BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
+    public static final Culong8 MAX_VALUE =
+        new Culong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
     /**
      * Instantiates a new Culong 8.
