@@ -20,7 +20,7 @@ public class Cppushort extends Cushort {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cppushort MAX_VALUE = new Cppushort(Short.MAX_VALUE >> 2);
+    public static final Cppushort MAX_VALUE = new Cppushort(Short.MAX_VALUE * 2);
 
     public Cppushort(Integer value) {
         super(value);

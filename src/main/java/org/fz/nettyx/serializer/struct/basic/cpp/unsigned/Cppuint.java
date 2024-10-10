@@ -12,21 +12,21 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuint;
  */
 public class Cppuint extends Cuint {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppuint MIN_VALUE = new Cppuint(0L);
+	/**
+	 * The constant MIN_VALUE.
+	 */
+	public static final Cppuint MIN_VALUE = new Cppuint(0L);
 
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppuint MAX_VALUE = new Cppuint(Long.valueOf(Integer.MAX_VALUE >> 2));
+	/**
+	 * The constant MAX_VALUE.
+	 */
+	public static final Cppuint MAX_VALUE = new Cppuint(Integer.MAX_VALUE * 2L);
 
-    public Cppuint(Long value) {
-        super(value);
-    }
+	public Cppuint(Long value) {
+		super(value);
+	}
 
-    public Cppuint(ByteBuf buf) {
-        super(buf);
-    }
+	public Cppuint(ByteBuf buf) {
+		super(buf);
+	}
 }
