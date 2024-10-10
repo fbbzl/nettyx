@@ -20,7 +20,7 @@ public class Cppuint extends Cuint {
 	/**
 	 * The constant MAX_VALUE.
 	 */
-	public static final Cppuint MAX_VALUE = new Cppuint(Integer.MAX_VALUE * 2L);
+	public static final Cppuint MAX_VALUE = new Cppuint(Integer.MAX_VALUE * 2L + 1);
 
 	public Cppuint(Long value) {
 		super(value);

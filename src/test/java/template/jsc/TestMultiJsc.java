@@ -24,50 +24,49 @@ import static org.fz.nettyx.action.ListenerAction.redo;
  */
 public class TestMultiJsc extends MultiJscChannelTemplate<String> {
 
-    public TestMultiJsc(Map<String, SerialCommChannel.SerialCommAddress> stringJscDeviceAddressMap) {
-        super(stringJscDeviceAddressMap);
-    }
+	public TestMultiJsc(Map<String, SerialCommChannel.SerialCommAddress> stringJscDeviceAddressMap) {
+		super(stringJscDeviceAddressMap);
+	}
 
-    @Override
-    protected ChannelInitializer<JscChannel> channelInitializer() {
-        return new TestChannelInitializer<>();
-    }
+	@Override
+	protected ChannelInitializer<JscChannel> channelInitializer() {
+		return new TestChannelInitializer<>();
+	}
 
+	@Override
+	protected void doChannelConfig(String targetChannelKey, JscChannelConfig channelConfig) {
+		// if(targetChannelKey=="MES") {br=19200}
+		channelConfig
+			.setBaudRate(115200)
+			.setDataBits(JscChannelConfig.DataBits.DATA_BITS_8)
+			.setStopBits(JscChannelConfig.StopBits.STOP_BITS_1)
+			.setParityBit(JscChannelConfig.ParityBit.NO)
+			.setDtr(false)
+			.setRts(false);
+	}
 
-    @Override
-    protected void doChannelConfig(String targetChannelKey, JscChannelConfig channelConfig) {
-        // if(targetChannelKey=="MES") {br=19200}
-        channelConfig
-               .setBaudRate(115200)
-               .setDataBits(JscChannelConfig.DataBits.DATA_BITS_8)
-               .setStopBits(JscChannelConfig.StopBits.STOP_BITS_1)
-               .setParityBit(JscChannelConfig.ParityBit.NO)
-               .setDtr(false)
-               .setRts(false);
-    }
+	public static void main(String[] args) {
+		Map<String, SerialCommChannel.SerialCommAddress> map = new HashMap<>();
 
-    public static void main(String[] args) {
-        Map<String, SerialCommChannel.SerialCommAddress> map = new HashMap<>();
+		map.put("5", new SerialCommChannel.SerialCommAddress("COM5"));
+		map.put("6", new SerialCommChannel.SerialCommAddress("COM7"));
 
-        map.put("5", new SerialCommChannel.SerialCommAddress("COM5"));
-        map.put("6", new SerialCommChannel.SerialCommAddress("COM7"));
+		TestMultiJsc testMultiJsc = new TestMultiJsc(map);
+		ChannelFutureListener listener = new ActionChannelFutureListener()
+			.whenSuccess((l, cf) -> {
+				cf.channel().writeAndFlush(TEST_USER);
 
-        TestMultiJsc testMultiJsc = new TestMultiJsc(map);
-        ChannelFutureListener listener = new ActionChannelFutureListener()
-                .whenSuccess((l, cf) -> {
-                    cf.channel().writeAndFlush(TEST_USER);
+				Console.log(cf.channel().localAddress() + ": ok");
+			})
+			.whenCancelled((l, cf) -> Console.log("cancel"))
+			.whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
+			.whenDone((l, cf) -> Console.log("done"));
 
-                    Console.log(cf.channel().localAddress() + ": ok");
-                })
-                .whenCancelled((l, cf) -> Console.log("cancel"))
-                .whenFailure(redo(cf -> testMultiJsc.connect(channelKey(cf)), 2, SECONDS))
-                .whenDone((l, cf) -> Console.log("done"));
+		testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
 
-        testMultiJsc.connectAll().values().forEach(c -> c.addListener(listener));
-
-        // send msg
-        testMultiJsc.write("5", "this is msg from 5 write");
-        testMultiJsc.writeAndFlush("6", "this is msg from 6 writeAndFlush");
-    }
+		// send msg
+		testMultiJsc.write("5", "this is msg from 5 write");
+		testMultiJsc.writeAndFlush("6", "this is msg from 6 writeAndFlush");
+	}
 
 }
