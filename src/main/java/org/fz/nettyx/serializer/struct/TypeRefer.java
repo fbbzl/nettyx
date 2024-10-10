@@ -20,6 +20,7 @@ public abstract class TypeRefer<T> implements Type {
 
     private final Type typeValue = TypeUtil.getTypeArgument(this.getClass());
 
+    @Override
     public String toString() {
         return "TypeRefer(typeValue=" + this.getTypeValue() + ")";
     }
