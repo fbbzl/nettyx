@@ -12,27 +12,27 @@ import java.nio.charset.StandardCharsets;
  */
 public class Cppuchar extends Cuchar {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppuchar MIN_VALUE = new Cppuchar(0);
+	/**
+	 * The constant MIN_VALUE.
+	 */
+	public static final Cppuchar MIN_VALUE = new Cppuchar(0);
 
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppuchar MAX_VALUE = new Cppuchar(Byte.MAX_VALUE >> 2);
+	/**
+	 * The constant MAX_VALUE.
+	 */
+	public static final Cppuchar MAX_VALUE = new Cppuchar(Byte.MAX_VALUE * 2);
 
-    public Cppuchar(Integer value) {
-        super(value);
-    }
+	public Cppuchar(Integer value) {
+		super(value);
+	}
 
-    public Cppuchar(ByteBuf buf) {
-        super(buf);
-    }
+	public Cppuchar(ByteBuf buf) {
+		super(buf);
+	}
 
-    @Override
-    public String toString() {
-        return new String(this.getBytes(), StandardCharsets.UTF_8);
-    }
+	@Override
+	public String toString() {
+		return new String(this.getBytes(), StandardCharsets.UTF_8);
+	}
 
 }
