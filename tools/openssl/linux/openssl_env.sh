@@ -24,16 +24,12 @@ export root_key_valid_days=36500
 
 #specifies the openssl client file generation location
 export client_dir=${app_openssl_dir}/client
-export client_csr=${client_dir}/${app_name}_client.csr
-export client_key=${client_dir}/${app_name}_client.key
 export client_key_pass=Aqqaazz123!@@
 export client_key_length=2048
 export client_key_valid_days=36500
 
 #specifies the openssl server file generation location
 export server_dir=${app_openssl_dir}/server
-export server_csr=${app_openssl_dir}/server/${app_name}_server.csr
-export server_key=${app_openssl_dir}/server/${app_name}_server.key
 export server_key_pass=Aqqaazz123!@@
 export server_key_length=2048
 export server_key_valid_days=36500
