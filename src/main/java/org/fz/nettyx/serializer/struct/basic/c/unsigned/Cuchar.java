@@ -16,56 +16,56 @@ import java.nio.charset.StandardCharsets;
  */
 public class Cuchar extends CBasic<Short> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cuchar MIN_VALUE = new Cuchar(0);
+	/**
+	 * The constant MIN_VALUE.
+	 */
+	public static final Cuchar MIN_VALUE = new Cuchar(0);
 
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cuchar MAX_VALUE = new Cuchar(Byte.MAX_VALUE >> 2);
+	/**
+	 * The constant MAX_VALUE.
+	 */
+	public static final Cuchar MAX_VALUE = new Cuchar(Byte.MAX_VALUE * 2);
 
-    /**
-     * Instantiates a new Cuchar.
-     *
-     * @param value the length
-     */
-    public Cuchar(Integer value) {
-        super(value.shortValue(), 1);
-    }
+	/**
+	 * Instantiates a new Cuchar.
+	 *
+	 * @param value the length
+	 */
+	public Cuchar(Integer value) {
+		super(value.shortValue(), 1);
+	}
 
-    /**
-     * Instantiates a new Cuchar.
-     *
-     * @param buf the buf
-     */
-    public Cuchar(ByteBuf buf) {
-        super(buf, 1);
-    }
+	/**
+	 * Instantiates a new Cuchar.
+	 *
+	 * @param buf the buf
+	 */
+	public Cuchar(ByteBuf buf) {
+		super(buf, 1);
+	}
 
-    @Override
-    public boolean hasSinged() {
-        return false;
-    }
+	@Override
+	public boolean hasSinged() {
+		return false;
+	}
 
-    @Override
-    protected ByteBuf toByteBuf(Short value, int size) {
-        return Unpooled.buffer(size).writeByte(value.byteValue());
-    }
+	@Override
+	protected ByteBuf toByteBuf(Short value, int size) {
+		return Unpooled.buffer(size).writeByte(value.byteValue());
+	}
 
-    @Override
-    protected Short toValue(ByteBuf byteBuf) {
-        return byteBuf.readUnsignedByte();
-    }
+	@Override
+	protected Short toValue(ByteBuf byteBuf) {
+		return byteBuf.readUnsignedByte();
+	}
 
-    @Override
-    public String toString() {
-        return new String(this.getBytes(), StandardCharsets.US_ASCII);
-    }
+	@Override
+	public String toString() {
+		return new String(this.getBytes(), StandardCharsets.US_ASCII);
+	}
 
-    public String toString(Charset charset) {
-        return new String(this.getBytes(), charset);
-    }
+	public String toString(Charset charset) {
+		return new String(this.getBytes(), charset);
+	}
 
 }
