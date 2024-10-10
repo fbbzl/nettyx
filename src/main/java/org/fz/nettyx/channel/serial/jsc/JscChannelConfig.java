@@ -73,7 +73,7 @@ public interface JscChannelConfig extends ChannelConfig {
     /**
      * @return true if the serial device should support the Data Terminal Ready signal
      */
-    boolean isDtr();
+    boolean getDtr();
 
     /**
      * Sets whether the serial device supports the Data Terminal Ready signal, used for flow control
@@ -85,7 +85,7 @@ public interface JscChannelConfig extends ChannelConfig {
     /**
      * @return true if the serial device should support the Ready to Send signal
      */
-    boolean isRts();
+    boolean getRts();
 
     /**
      * Sets whether the serial device supports the Request To Send signal, used for flow control
@@ -100,7 +100,7 @@ public interface JscChannelConfig extends ChannelConfig {
     int getReadTimeout();
 
     /**
-     * Sets the maximal time (in ms) to block while try to read from the serial port. Default is 1000ms
+     * Sets the maximal time (in ms) to block while try to read from the serial port.
      */
     JscChannelConfig setReadTimeout(int readTimeout);
 
@@ -275,10 +275,10 @@ public interface JscChannelConfig extends ChannelConfig {
                 return (T) Integer.valueOf(getBaudRate());
             }
             if (option == JscChannelOption.DTR) {
-                return (T) Boolean.valueOf(isDtr());
+                return (T) Boolean.valueOf(getDtr());
             }
             if (option == JscChannelOption.RTS) {
-                return (T) Boolean.valueOf(isRts());
+                return (T) Boolean.valueOf(getRts());
             }
             if (option == JscChannelOption.STOP_BITS) {
                 return (T) getStopBits();
@@ -431,7 +431,7 @@ public interface JscChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public boolean isDtr() {
+        public boolean getDtr() {
             return dtr;
         }
 
@@ -442,7 +442,7 @@ public interface JscChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public boolean isRts() {
+        public boolean getRts() {
             return rts;
         }
 
