@@ -21,7 +21,7 @@ public class Cuint extends CBasic<Long> {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cuint MAX_VALUE = new Cuint(Integer.MAX_VALUE * 2L);
+    public static final Cuint MAX_VALUE = new Cuint(Integer.MAX_VALUE * 2L + 1);
 
     /**
      * Instantiates a new Cuint.

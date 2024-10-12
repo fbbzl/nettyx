@@ -21,7 +21,7 @@ public class Cppulonglong extends Cppulong8 {
     /**
      * The constant MAX_VALUE.
      */
-    public static final Cppulonglong MAX_VALUE = new Cppulonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)));
+    public static final Cppulonglong MAX_VALUE = new Cppulonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
     /**
      * Instantiates a new Culonglong.
