@@ -20,7 +20,7 @@ public class Cppuchar extends Cuchar {
 	/**
 	 * The constant MAX_VALUE.
 	 */
-	public static final Cppuchar MAX_VALUE = new Cppuchar(Byte.MAX_VALUE * 2);
+	public static final Cppuchar MAX_VALUE = new Cppuchar(Byte.MAX_VALUE * 2 + 1);
 
 	public Cppuchar(Integer value) {
 		super(value);
