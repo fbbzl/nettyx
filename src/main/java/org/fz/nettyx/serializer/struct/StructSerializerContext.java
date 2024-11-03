@@ -45,9 +45,9 @@ public final class StructSerializerContext {
     public static final  Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                  = new ConcurrentHashMap<>(512);
     public static final  Map<Field, Annotation>          FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
     static final         Map<Field, Function<?, ?>>      FIELD_GETTER_CACHE                  = new ConcurrentHashMap<>(512);
-    static final         Map<Field, BiConsumer<?, ?>>    FIELD_SETTER_CACHE                  = new ConcurrentHashMap<>(512);
-    static final         Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE           = new ConcurrentHashMap<>(128);
-    static final         Map<Type, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE           = new ConcurrentHashMap<>(128);
+    static final         Map<Field, BiConsumer<?, ?>>    FIELD_SETTER_CACHE                  = new SafeConcurrentHashMap<>(512);
+    static final         Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE           = new SafeConcurrentHashMap<>(128);
+    static final         Map<Type, Function<ByteBuf, ?>> BYTEBUF_CONSTRUCTOR_CACHE           = new SafeConcurrentHashMap<>(128);
     private static final InternalLogger                  log                                 = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     static {
