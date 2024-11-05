@@ -51,8 +51,10 @@ public final class StructSerializerContext {
     private static final InternalLogger                  log                                 = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     static {
-        // scan classes
-        doScan(EMPTY);
+        synchronized (StructSerializerContext.class) {
+            // scan all classes using empty
+            doScan(EMPTY);
+        }
     }
 
     /**
@@ -60,8 +62,9 @@ public final class StructSerializerContext {
      *
      * @param packageNames the packages with struct or basic
      */
-    public synchronized static void doScan(String... packageNames) {
-        log.debug("will scan " + Arrays.toString(packageNames) + " packages");
+    static void doScan(String... packageNames) {
+        if (log.isDebugEnabled()) log.debug("will scan [{}] packages", Arrays.toString(packageNames));
+
         for (String packageName : packageNames) {
             Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
 
@@ -76,7 +79,7 @@ public final class StructSerializerContext {
         }
     }
 
-    private synchronized static void scanPropHandlers(Set<Class<?>> classes) {
+    static void scanPropHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
@@ -97,12 +100,12 @@ public final class StructSerializerContext {
                     }
                 }
             } catch (Throwable throwable) {
-                log.error("scan struct-prop-handler failed please check", throwable);
+                log.error("scan struct-prop-handler failed please check, prop-handler class: [{}]", clazz, throwable);
             }
         }
     }
 
-    private synchronized static void scanBasics(Set<Class<?>> classes) {
+    static void scanBasics(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 boolean isBasic = Basic.class.isAssignableFrom(clazz);
@@ -115,12 +118,12 @@ public final class StructSerializerContext {
                     BASIC_BYTES_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructUtils.reflectForSize((Class<? extends Basic<?>>) clazz));
                 }
             } catch (Throwable throwable) {
-                log.error("scan basic failed please check", throwable);
+                log.error("scan basic failed please check, basic type is: [{}]", clazz, throwable);
             }
         }
     }
 
-    private synchronized static void scanStructs(Set<Class<?>> classes) {
+    static void scanStructs(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
@@ -146,9 +149,8 @@ public final class StructSerializerContext {
                     }
                 }
             } catch (Throwable throwable) {
-                log.error("scan struct failed please check", throwable);
+                log.error("scan struct failed please check, struct class is: [{}]", clazz, throwable);
             }
-
         }
     }
 
