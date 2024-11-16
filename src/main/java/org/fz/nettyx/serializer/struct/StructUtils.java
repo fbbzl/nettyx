@@ -98,7 +98,7 @@ public class StructUtils {
             boolean isSingleton = Singleton.exists(handlerClass);
 
             if (isSingleton) return (H) Singleton.get(handlerClass);
-            else             return (H) newPropHandler(handlerClass);
+            else             return newPropHandler(handlerClass);
         }
 
         return null;
