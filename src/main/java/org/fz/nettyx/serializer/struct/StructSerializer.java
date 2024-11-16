@@ -425,10 +425,5 @@ public final class StructSerializer implements Serializer {
         return (T) this.struct;
     }
 
-    @Override
-    public Type getType() {
-        return this.rootType;
-    }
-
     //******************************************      public end       ***********************************************//
 }
