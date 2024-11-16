@@ -18,10 +18,10 @@ import java.lang.reflect.Type;
 @NoArgsConstructor
 public abstract class TypeRefer<T> implements Type {
 
-    private final Type typeValue = TypeUtil.getTypeArgument(this.getClass());
+	private final Type typeValue = TypeUtil.getTypeArgument(this.getClass());
 
-    @Override
-    public String toString() {
-        return "TypeRefer(typeValue=" + this.getTypeValue() + ")";
-    }
+	@Override
+	public String toString() {
+		return "TypeRefer(typeValue=" + this.getTypeValue() + ")";
+	}
 }
