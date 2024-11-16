@@ -6,7 +6,6 @@ import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
-import lombok.Getter;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.SerializeHandlerException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -44,19 +43,27 @@ public final class StructSerializer implements Serializer {
     /**
      * rootType of struct
      */
-    @Getter
     private final Type rootType;
 
     /**
      * byteBuf ready for serialization/deserialization
      */
-    @Getter
     private final ByteBuf byteBuf;
 
     /**
      * an object ready for serialization/deserialization
      */
     private final Object struct;
+
+    @Override
+    public Type getType() {
+        return rootType;
+    }
+
+    @Override
+    public ByteBuf getByteBuf() {
+        return byteBuf;
+    }
 
     StructSerializer(Type rootType, ByteBuf byteBuf, Object struct) {
         this.rootType = rootType;
@@ -416,11 +423,6 @@ public final class StructSerializer implements Serializer {
      */
     public <T> T earlyStruct() {
         return (T) this.struct;
-    }
-
-    @Override
-    public Type getType() {
-        return this.rootType;
     }
 
     //******************************************      public end       ***********************************************//
