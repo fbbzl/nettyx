@@ -18,29 +18,29 @@ public class User<T, W, G> {
     private Ccc cccEnum;
 
     private Clong4          uid;
-    @ToArray(length = 10)
+    @ToArray(length = 50)
     private Cppushort[]     qqNames;
-    @ToLinkedList(size = 10)
+    @ToLinkedList(size = 50)
     private List<Cppushort> ss;
-    @ToArrayList(size = 10)
+    @ToArrayList(size = 50)
     private List<Cppushort> tts;
 
     private Bom<T, W, G>                                b;
-    @ToArray(length = 10)
+    @ToArray(length = 50)
     private Bom<T, W, Clong4>[]                         g111fs;
-    @ToArrayList(size = 10)
+    @ToArrayList(size = 50)
     private List<Bom<T, Son<Cuchar, Bill>, GirlFriend>> bs2d;
 
     private T       sonsbaba;
-    @ToArray(length = 10)
+    @ToArray(length = 50)
     private T[]     sonff;
-    @ToArrayList(size = 10)
+    @ToArrayList(size = 50)
     private List<T> so111ns;
 
     private W       wwife;
-    @ToArrayList(size = 10)
+    @ToArrayList(size = 50)
     private List<W> wives;
-    @ToArray(length = 10)
+    @ToArray(length = 50)
     private W[]     wives121212;
 
     private Cchar        uname;
