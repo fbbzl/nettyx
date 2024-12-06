@@ -200,7 +200,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
         if (tarLength == 1 || !sameHead) return sameHead;
-        else return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
+        else                             return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
     }
 
     @RequiredArgsConstructor
