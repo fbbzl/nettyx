@@ -2,14 +2,19 @@ package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.ClassScanner;
+import cn.hutool.core.lang.Filter;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.map.SafeConcurrentHashMap;
+import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ModifierUtil;
 import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -19,7 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,12 +43,13 @@ import static org.fz.nettyx.serializer.struct.StructUtils.*;
  * @version 1.0
  * @since 2021 /10/22 13:18
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("all")
 public final class StructSerializerContext {
 
-    public static final  Map<Type, Integer>              BASIC_BYTES_SIZE_CACHE              = new SafeConcurrentHashMap<>(64);
-    public static final  Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                  = new ConcurrentHashMap<>(512);
-    public static final  Map<Field, Annotation>          FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
+    static final         Map<Type, Integer>              BASIC_BYTES_SIZE_CACHE              = new SafeConcurrentHashMap<>(64);
+    static final         Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                  = new ConcurrentHashMap<>(512);
+    static final         Map<Field, Annotation>          FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
     static final         Map<Field, Function<?, ?>>      FIELD_GETTER_CACHE                  = new ConcurrentHashMap<>(512);
     static final         Map<Field, BiConsumer<?, ?>>    FIELD_SETTER_CACHE                  = new SafeConcurrentHashMap<>(512);
     static final         Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE           = new SafeConcurrentHashMap<>(128);
@@ -51,35 +57,73 @@ public final class StructSerializerContext {
     private static final InternalLogger                  log                                 = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     static {
-        synchronized (StructSerializerContext.class) {
-            // scan all classes using empty
-            doScan(EMPTY);
+        try {
+            synchronized (StructSerializerContext.class) {
+                new StructSerializerContext().doScan();
+            }
+        } catch (Exception exception) {
+            log.error("exception occur while scanning classes", exception);
         }
     }
 
     /**
-     * scan assigned packages
-     *
-     * @param packageNames the packages with struct or basic
+     * do package scan
      */
-    static void doScan(String... packageNames) {
-        if (log.isDebugEnabled()) log.debug("will scan [{}] packages", Arrays.toString(packageNames));
+    void doScan() {
+        Set<Class<?>> classes = this.scannableClasses();
 
-        for (String packageName : packageNames) {
-            Set<Class<?>> classes = ClassScanner.scanPackage(packageName, ClassUtil::isNormalClass);
+        // 1 scan property handler
+        scanPropHandlers(classes);
 
-            // 1 scan property handler
-            scanPropHandlers(classes);
+        // 2 scan basic
+        scanBasics(classes);
 
-            // 2 scan basic
-            scanBasics(classes);
-
-            // 3 scan struct
-            scanStructs(classes);
-        }
+        // 3 scan struct
+        scanStructs(classes);
     }
 
-    static void scanPropHandlers(Set<Class<?>> classes) {
+    /**
+     * assign package to NOT do class scan
+     *
+     * @return packages will not be scanned
+     */
+    String[] excludePackagesForScan() {
+        String[] currLibPack = {
+                "cn.hutool", "com.fazecast", "io.netty", "org.hamcrest", "lombok", "gnu.io", "org.omg", "org.w3c", "org.xml", "org.junit", "junit", "com.intel",
+                "xcodemap"
+        };
+        String[] popularPack = {
+                "org.springframework", "org.apache", "com.google"
+        };
+
+        String[] systemPack = { "jdk", "javafx", "sun", "com.sun" };
+
+        return ArrayUtil.addAll(currLibPack, popularPack, systemPack);
+    }
+
+    /**
+     * default scannable-class condition
+     *
+     * @return the class can be scanned
+     */
+    Set<Class<?>> scannableClasses() {
+        Set<Class<?>> forScan = new HashSet<>(128);
+
+        String[] excludePackages = excludePackagesForScan();
+
+        Filter<Class<?>> scanCondition = clazz ->
+                !CharSequenceUtil.startWithAny(ClassUtil.getPackage(clazz), excludePackages)
+                &&
+                !ClassUtil.isJdkClass(clazz)
+                &&
+                ClassUtil.isNormalClass(clazz);
+
+        forScan.addAll(ClassScanner.scanAllPackage(EMPTY, scanCondition));
+
+        return forScan;
+    }
+
+    void scanPropHandlers(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 boolean isPropertyHandler = StructFieldHandler.class.isAssignableFrom(clazz);
@@ -105,7 +149,7 @@ public final class StructSerializerContext {
         }
     }
 
-    static void scanBasics(Set<Class<?>> classes) {
+    void scanBasics(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 boolean isBasic = Basic.class.isAssignableFrom(clazz);
@@ -123,7 +167,7 @@ public final class StructSerializerContext {
         }
     }
 
-    static void scanStructs(Set<Class<?>> classes) {
+    void scanStructs(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
@@ -154,7 +198,7 @@ public final class StructSerializerContext {
         }
     }
 
-    static boolean isIgnore(Field field) {
+    boolean isIgnore(Field field) {
         return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
