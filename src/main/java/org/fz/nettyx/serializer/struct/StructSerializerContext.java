@@ -47,9 +47,9 @@ import static org.fz.nettyx.serializer.struct.StructUtils.*;
 @SuppressWarnings("all")
 public final class StructSerializerContext {
 
-    public static final  Map<Type, Integer>              BASIC_BYTES_SIZE_CACHE              = new SafeConcurrentHashMap<>(64);
-    public static final  Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                  = new ConcurrentHashMap<>(512);
-    public static final  Map<Field, Annotation>          FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
+    static final         Map<Type, Integer>              BASIC_BYTES_SIZE_CACHE              = new SafeConcurrentHashMap<>(64);
+    static final         Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                  = new ConcurrentHashMap<>(512);
+    static final         Map<Field, Annotation>          FIELD_PROP_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
     static final         Map<Field, Function<?, ?>>      FIELD_GETTER_CACHE                  = new ConcurrentHashMap<>(512);
     static final         Map<Field, BiConsumer<?, ?>>    FIELD_SETTER_CACHE                  = new SafeConcurrentHashMap<>(512);
     static final         Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE           = new SafeConcurrentHashMap<>(128);
@@ -83,8 +83,8 @@ public final class StructSerializerContext {
     }
 
     /**
-     * internal assign package to NOT do class scan
-     * When performing a full package scan, in order to improve the scanning performance, some mainstream class libraries will be excluded.
+     * assign package to NOT do class scan
+     *
      * @return packages will not be scanned
      */
     String[] excludePackagesForScan() {
