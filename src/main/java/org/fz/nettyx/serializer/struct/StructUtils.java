@@ -46,10 +46,10 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useReadHandler(Field field) {
-        Annotation propHandlerAnnotation = findPropHandlerAnnotation(field);
-        if (propHandlerAnnotation != null) {
+        Annotation handlerAnnotation = findFieldHandlerAnnotation(field);
+        if (handlerAnnotation != null) {
             Class<? extends StructFieldHandler<? extends Annotation>>
-                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
+                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
             if (handlerClass != null) return isReadHandler(handlerClass);
         }
         return false;
@@ -62,10 +62,10 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useWriteHandler(Field field) {
-        Annotation propHandlerAnnotation = findPropHandlerAnnotation(field);
-        if (propHandlerAnnotation != null) {
+        Annotation handlerAnnotation = findFieldHandlerAnnotation(field);
+        if (handlerAnnotation != null) {
             Class<? extends StructFieldHandler<? extends Annotation>>
-                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(propHandlerAnnotation.annotationType());
+                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
             if (handlerClass != null) return isWriteHandler(handlerClass);
         }
         return false;
@@ -78,8 +78,8 @@ public class StructUtils {
      * @param field the field
      * @return the a
      */
-    public <A extends Annotation> A findPropHandlerAnnotation(Field field) {
-        return (A) FIELD_PROP_HANDLER_ANNOTATION_CACHE.get(field);
+    public <A extends Annotation> A findFieldHandlerAnnotation(Field field) {
+        return (A) STRUCT_FIELD_HANDLER_ANNOTATION_CACHE.get(field);
     }
 
     /**
@@ -89,8 +89,8 @@ public class StructUtils {
      * @param field the element
      * @return the serializer handler
      */
-    public <H extends StructFieldHandler<?>> H getPropHandler(Field field) {
-        Annotation handlerAnnotation = findPropHandlerAnnotation(field);
+    public <H extends StructFieldHandler<?>> H getFieldHandler(Field field) {
+        Annotation handlerAnnotation = findFieldHandlerAnnotation(field);
 
         if (handlerAnnotation != null) {
             Class<? extends StructFieldHandler<? extends Annotation>>
@@ -98,7 +98,7 @@ public class StructUtils {
             boolean isSingleton = Singleton.exists(handlerClass);
 
             if (isSingleton) return (H) Singleton.get(handlerClass);
-            else             return newPropHandler(handlerClass);
+            else             return newFieldHandler(handlerClass);
         }
 
         return null;
@@ -111,7 +111,7 @@ public class StructUtils {
      * @param clazz the struct class
      * @return the t
      */
-    static <H extends StructFieldHandler<? extends Annotation>> H newPropHandler(Type clazz) {
+    static <H extends StructFieldHandler<? extends Annotation>> H newFieldHandler(Type clazz) {
         try {
             return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructor).get();
         } catch (Exception exception) {
@@ -124,7 +124,7 @@ public class StructUtils {
     }
 
     public static int findBasicSize(Type basicClass) {
-        return BASIC_BYTES_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(StructUtils::reflectForSize));
+        return BASIC_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(StructUtils::reflectForSize));
     }
 
     public static int reflectForSize(Type basicClass) {
@@ -147,7 +147,7 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Type basicClass, ByteBuf buf) {
         try {
-            return (B) BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructor(basicClass, ByteBuf.class)).apply(buf);
+            return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructor(basicClass, ByteBuf.class)).apply(buf);
         } catch (Exception instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException)
@@ -255,11 +255,11 @@ public class StructUtils {
     }
 
     public static <A, P> void writeField(A object, Field field, P value) {
-        ((BiConsumer<A, P>) FIELD_SETTER_CACHE.computeIfAbsent(field, f -> getSetter(object.getClass(), f))).accept(object, value);
+        ((BiConsumer<A, P>) STRUCT_FIELD_SETTER_CACHE.computeIfAbsent(field, f -> getSetter(object.getClass(), f))).accept(object, value);
     }
 
     public static <A, R> R readField(A object, Field field) {
-        return ((Function<A, R>) FIELD_GETTER_CACHE.computeIfAbsent(field, f -> getGetter(object.getClass(), f))).apply(object);
+        return ((Function<A, R>) STRUCT_FIELD_GETTER_CACHE.computeIfAbsent(field, f -> getGetter(object.getClass(), f))).apply(object);
     }
 
     public static <A, R> Function<A, R> getGetter(Class<A> clazz, Field field) {
