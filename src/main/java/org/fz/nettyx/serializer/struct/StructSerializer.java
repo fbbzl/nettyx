@@ -72,9 +72,9 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> T toStruct(Type rootType, ByteBuf byteBuf) {
-        if (rootType instanceof Class<?>)          return new StructSerializer(rootType, byteBuf, newStruct(rootType)).doDeserialization();
+        if (rootType instanceof Class<?>)          return new StructSerializer(rootType, byteBuf, newStruct(rootType)).doDeserialize();
         else
-        if (rootType instanceof ParameterizedType) return new StructSerializer(rootType, byteBuf, newStruct(((ParameterizedType) rootType).getRawType())).doDeserialization();
+        if (rootType instanceof ParameterizedType) return new StructSerializer(rootType, byteBuf, newStruct(((ParameterizedType) rootType).getRawType())).doDeserialize();
         else
         if (rootType instanceof TypeRefer)         return toStruct(((TypeRefer<T>) rootType).getTypeValue(), byteBuf);
         else
@@ -106,7 +106,7 @@ public final class StructSerializer implements Serializer {
     public static <T> ByteBuf toByteBuf(Type rootType, T struct) {
         Throws.ifNull(struct, "struct can not be null when write");
 
-        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(rootType, buffer(), struct).doSerialization();
+        if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(rootType, buffer(), struct).doSerialize();
         else
         if (rootType instanceof TypeRefer)                                         return toByteBuf(((TypeRefer<T>) rootType).getTypeValue(), struct);
         else
@@ -147,7 +147,7 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      working code splitter      ******************************************//
 
-    <T> T doDeserialization() {
+    <T> T doDeserialize() {
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue;
@@ -169,7 +169,7 @@ public final class StructSerializer implements Serializer {
         return (T) struct;
     }
 
-    ByteBuf doSerialization() {
+    ByteBuf doSerialize() {
         ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
@@ -246,13 +246,13 @@ public final class StructSerializer implements Serializer {
     }
 
     <A extends Annotation> Object readHandled(Field handleField, Type fieldActualType, StructSerializer upperSerializer) {
-        ReadHandler<A> readHandler       = StructUtils.getPropHandler(handleField);
-        A              handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
+        ReadHandler<A> readHandler       = StructUtils.getFieldHandler(handleField);
+        A              handlerAnnotation = StructUtils.findFieldHandlerAnnotation(handleField);
 
         try {
-            readHandler.preReadHandle(upperSerializer, handleField, handlerAnnotation);
+            readHandler.preRead(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, fieldActualType, handleField, handlerAnnotation);
-            readHandler.postReadHandle(upperSerializer, handleField, handlerAnnotation);
+            readHandler.postRead(upperSerializer, handleField, handlerAnnotation);
             return handledValue;
         } catch (Exception readHandlerException) {
             readHandler.afterReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
@@ -337,13 +337,13 @@ public final class StructSerializer implements Serializer {
     }
 
     <A extends Annotation> void writeHandled(Field handleField, Type fieldActualType, Object fieldValue, StructSerializer upperSerializer) {
-        WriteHandler<A> writeHandler      = StructUtils.getPropHandler(handleField);
-        A               handlerAnnotation = StructUtils.findPropHandlerAnnotation(handleField);
+        WriteHandler<A> writeHandler      = StructUtils.getFieldHandler(handleField);
+        A               handlerAnnotation = StructUtils.findFieldHandlerAnnotation(handleField);
         ByteBuf         writing           = upperSerializer.getByteBuf();
         try {
-            writeHandler.preWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.preWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
-            writeHandler.postWriteHandle(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.postWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
         } catch (Exception writeHandlerException) {
             writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
             throw new SerializeHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
