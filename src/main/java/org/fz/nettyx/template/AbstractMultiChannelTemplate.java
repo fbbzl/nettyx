@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 
 /**
- * multichannel client
+ * multi-channel template
  *
  * @author fengbinbin
  * @version 1.0

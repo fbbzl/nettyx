@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 /**
- * The type Multi channel client. use channel key to retrieve and use channels
+ * multi tcp channel template
  *
  * @param <K> the channel channelKey type
  * @author fengbinbin

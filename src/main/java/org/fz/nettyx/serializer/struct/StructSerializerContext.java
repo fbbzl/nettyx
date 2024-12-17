@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -99,9 +100,9 @@ public class StructSerializerContext {
                 &&
                 ClassUtil.isNormalClass(clazz);
 
-        if (log.isDebugEnabled()) log.debug("serializer context start scanning, base-packages: [{}]", getBasePackages());
+        if (log.isDebugEnabled()) log.debug("serializer context started scanning, base-packages: {}", Arrays.toString(getBasePackages()));
         for (String basePackage : append(getBasePackages(), ClassUtil.getPackage(this.getClass()))) forScan.addAll(ClassScanner.scanAllPackage(basePackage, scanCondition));
-        if (log.isDebugEnabled()) log.debug("serializer context finished scanning, base-packages: [{}]", getBasePackages());
+        if (log.isDebugEnabled()) log.debug("serializer context finished scanning, base-packages: {}", Arrays.toString(getBasePackages()));
 
         return forScan;
     }
