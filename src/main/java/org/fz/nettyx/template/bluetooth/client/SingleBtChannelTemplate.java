@@ -8,6 +8,7 @@ import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
+ * single blue tooth channel template
  * @author fengbinbin
  * @version 1.0
  * @since 2024/5/15 12:21
