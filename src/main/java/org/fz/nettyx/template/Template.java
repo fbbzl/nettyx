@@ -9,7 +9,7 @@ import lombok.Getter;
 import java.lang.reflect.Type;
 
 /**
- * top level client based on netty
+ * top level template based on netty
  *
  * @author fengbinbin
  * @since 2021 /5/6 16:49
