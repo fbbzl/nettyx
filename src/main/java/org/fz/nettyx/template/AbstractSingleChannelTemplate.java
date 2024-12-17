@@ -15,6 +15,7 @@ import java.net.SocketAddress;
 import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 
 /**
+ * single channel template
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 14:44

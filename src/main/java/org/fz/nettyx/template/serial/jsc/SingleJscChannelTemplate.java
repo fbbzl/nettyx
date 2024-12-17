@@ -9,7 +9,7 @@ import org.fz.nettyx.channel.serial.jsc.JscChannelConfig;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
- * template with single-jsc channel
+ * single jsc channel template
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/29 10:09

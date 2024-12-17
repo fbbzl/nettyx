@@ -69,6 +69,7 @@
 
         <!--test-->
         <junit.version>4.13.2</junit.version>
+        <cglib.version>3.3.0</cglib.version>
     </properties>
 
     <dependencies>
@@ -124,6 +125,13 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>reflectasm</artifactId>
             <version>${reflectasm.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
             <scope>test</scope>
         </dependency>
 
