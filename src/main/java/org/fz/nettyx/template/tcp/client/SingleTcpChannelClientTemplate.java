@@ -10,7 +10,7 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 import java.net.InetSocketAddress;
 
 /**
- * Single channel client
+ * single tcp channel template
  *
  * @author fengbinbin
  * @version 1.0
