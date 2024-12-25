@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 /**
- * basic server abstraction
+ * basic server template
  *
  * @author fengbinbin
  * @version 1.0
@@ -51,7 +51,9 @@ public abstract class TcpServerTemplate {
     }
 
     public ChannelFuture bind() {
-        return this.getServerBootstrap().clone().bind();
+        ChannelFuture bindFuture = this.getServerBootstrap().clone().bind();
+        log.debug("already finish bind, bind future is [{}]", bindFuture);
+        return bindFuture;
     }
 
     protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress) {
@@ -76,6 +78,7 @@ public abstract class TcpServerTemplate {
     protected void syncShutdownGracefully() throws InterruptedException {
         childEventLoopGroup.shutdownGracefully().sync();
         parentEventLoopGroup.shutdownGracefully().sync();
+        log.debug("has already successfully shutdown, child-event-loop-group is [{}], parent-event-loop-group is [{}]", childEventLoopGroup, parentEventLoopGroup);
     }
 
 }
