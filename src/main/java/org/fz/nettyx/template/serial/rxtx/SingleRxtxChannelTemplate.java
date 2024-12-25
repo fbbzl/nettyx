@@ -8,7 +8,7 @@ import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig;
 import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 /**
- * single channel rxtx client
+ * single rxtx channel template
  *
  * @author fengbinbin
  * @since 2022-01-26 20:25
