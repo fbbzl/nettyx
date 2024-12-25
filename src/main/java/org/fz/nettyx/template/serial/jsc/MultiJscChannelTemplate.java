@@ -11,7 +11,7 @@ import org.fz.nettyx.template.AbstractMultiChannelTemplate;
 import java.util.Map;
 
 /**
- * template with multi-jsc channel
+ * multi jsc channel template
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/29 10:12
