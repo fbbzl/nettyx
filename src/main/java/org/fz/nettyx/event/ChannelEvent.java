@@ -14,17 +14,17 @@ import java.net.SocketAddress;
 /**
  * wrap channel event to ChannelEvent, keep channel event could propagate in ApplicationContext and the others
  *
- * @param <T> the type parameter
+ * @param <S> the type parameter
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /5/13 9:10
  */
 @Getter
 @RequiredArgsConstructor
-public abstract class ChannelEvent<T> {
+public abstract class ChannelEvent<S> {
 
     private final long                  happenTime = System.currentTimeMillis();
-    private       T                     source;
+    private       S                     source;
     private final ChannelHandlerContext ctx;
 
     /**
@@ -33,7 +33,7 @@ public abstract class ChannelEvent<T> {
      * @param source the source
      * @param ctx    the ctx
      */
-    protected ChannelEvent(T source, ChannelHandlerContext ctx) {
+    protected ChannelEvent(S source, ChannelHandlerContext ctx) {
         this.source = source;
         this.ctx    = ctx;
     }

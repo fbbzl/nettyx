@@ -131,7 +131,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         channelStorage.clear();
     }
 
-    protected void doChannelConfig(K targetChannelKey, F channelConfig) {
+    protected void doChannelConfig(K channelKey, F channelConfig) {
         // default is nothing
     }
 
