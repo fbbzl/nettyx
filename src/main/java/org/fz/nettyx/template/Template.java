@@ -2,8 +2,6 @@ package org.fz.nettyx.template;
 
 import cn.hutool.core.util.TypeUtil;
 import io.netty.channel.*;
-import io.netty.util.internal.logging.InternalLogger;
-import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
 
 import java.lang.reflect.Type;
@@ -18,7 +16,6 @@ import java.lang.reflect.Type;
 @SuppressWarnings("unchecked")
 abstract class Template<C extends Channel> {
 
-    private static final InternalLogger log = InternalLoggerFactory.getInstance(Template.class);
     private final        Class<C>       channelClass;
     private final        EventLoopGroup eventLoopGroup;
 

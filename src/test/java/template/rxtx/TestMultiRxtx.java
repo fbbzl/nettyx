@@ -30,7 +30,7 @@ public class TestMultiRxtx extends MultiRxtxChannelTemplate<String> {
     }
 
     @Override
-    protected void doChannelConfig(String targetChannelKey, RxtxChannelConfig channelConfig) {
+    protected void doChannelConfig(String channelKey, RxtxChannelConfig channelConfig) {
         // if(targetChannelKey=="MES") {br=19200}
         channelConfig
                 .setBaudRate(115200)
