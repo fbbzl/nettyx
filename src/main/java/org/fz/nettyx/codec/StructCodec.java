@@ -14,13 +14,14 @@ import java.util.List;
 
 /**
  * struct codec
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/7/26 18:58
  */
 
 @Getter
-public abstract class StructCodec<T> extends ByteToMessageCodec<T> {
+public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(StructCodec.class);
 
@@ -53,7 +54,7 @@ public abstract class StructCodec<T> extends ByteToMessageCodec<T> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, T msg, ByteBuf out) {
-        out.writeBytes(StructSerializer.toByteBuf(type, msg));
+    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
+        out.writeBytes(StructSerializer.toByteBuf(type, struct));
     }
 }

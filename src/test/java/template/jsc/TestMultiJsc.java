@@ -34,7 +34,7 @@ public class TestMultiJsc extends MultiJscChannelTemplate<String> {
 	}
 
 	@Override
-	protected void doChannelConfig(String targetChannelKey, JscChannelConfig channelConfig) {
+	protected void doChannelConfig(String channelKey, JscChannelConfig channelConfig) {
 		// if(targetChannelKey=="MES") {br=19200}
 		channelConfig
 			.setBaudRate(115200)
