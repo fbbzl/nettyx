@@ -20,7 +20,7 @@ Gitee地址: https://gitee.com/fbbzl/nettyx<br>
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.20-RELEASE</version>
+    <version>2.3.21-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -64,10 +64,10 @@ exception                           异常扩展
 handler                             提供了一些基本的通道处理程序实现
   ---ChannelInterceptor                channel拦截器，适用于通信前握手等预操作
   ---ActionIdleStateHandler            空闲状态处理程序,lambda增强
-  ---ActioneReadTimeoutHandler         可操作的 读取超时 处理程序
-  ---ActionWriteTimeoutHandler         可操作的 写超时 处理程序
-  ---ChannelAdvice                     包含入站建言和出站建言
-  ---IdledHeartBeater                  闲置后的心跳器
+  ---ActioneReadTimeoutHandler         可操作的 读取超时 处理器
+  ---ActionWriteTimeoutHandler         可操作的 写超时 处理器
+  ---ChannelAdvice                     包含入站建言(InboundAdvice)和出站建言(OutboundAdvice)
+  ---IdledHeartBeater                  闲置心跳器,读闲置,写闲置,读写闲置
   ---MessageFilter                     消息过滤器
 listener
   ---ActionableChannelFutureListener   可操作的频道未来侦听器
