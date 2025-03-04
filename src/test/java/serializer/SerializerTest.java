@@ -3,6 +3,7 @@ package serializer;
 import cn.hutool.core.util.ArrayUtil;
 import codec.model.*;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
@@ -16,9 +17,12 @@ import java.util.Arrays;
  * @since 2023/5/23 21:35
  */
 public class SerializerTest {
-    static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>> userTypeRefer = new TypeRefer<User<Bill,
-            Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>>() {
-    };
+    static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
+            new TypeRefer<User<Bill,
+                    Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>>() {
+            };
+
+    private static final StructSerializerContext context = new StructSerializerContext("codec.model");
 
     @Test
     public void testStructSerializer() {
@@ -26,6 +30,7 @@ public class SerializerTest {
         Arrays.fill(bytes, (byte) 67);
 
         User turn = StructSerializer.toStruct(userTypeRefer, bytes);
+        System.err.println(turn.getBill().getBid().getValue());
         final byte[] userWriteBytes = StructSerializer.toBytes(userTypeRefer, turn);
 
         System.err.println(ArrayUtil.equals(bytes, userWriteBytes));
