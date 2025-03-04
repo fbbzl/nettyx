@@ -23,6 +23,8 @@ import java.util.function.Function;
 import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.getBytes;
 import static java.util.stream.Collectors.toList;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMapping.REAL;
+import static org.fz.nettyx.codec.EscapeCodec.EscapeMapping.REPLACEMENT;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -61,7 +63,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-            ByteBuf decode = doEscape(in, mappings, EscapeMapping::getReplacement, EscapeMapping::getReal);
+            ByteBuf decode = doEscape(in, mappings, REPLACEMENT, REAL);
             out.add(decode);
         }
     }
@@ -79,7 +81,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         @Override
         protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-            ByteBuf encoded = doEscape(msg, mappings, EscapeMapping::getReal, EscapeMapping::getReplacement);
+            ByteBuf encoded = doEscape(msg, mappings, REAL, REPLACEMENT);
             try {
                 out.writeBytes(encoded);
             } finally {
@@ -97,8 +99,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         // 2 check if intersection is not empty
-        List<ByteBuf> reals = Arrays.stream(mappings).map(EscapeMapping::getReal).collect(toList()),
-                replacements = Arrays.stream(mappings).map(EscapeMapping::getReplacement).collect(toList());
+        List<ByteBuf> reals = Arrays.stream(mappings).map(REAL).collect(toList()),
+                replacements = Arrays.stream(mappings).map(REPLACEMENT).collect(toList());
         Collection<ByteBuf> intersection = intersection(reals, replacements);
         Throws.ifNotEmpty(intersection, "do not let the reals intersect with the replacements, please check");
 
@@ -130,6 +132,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return buffer == null || !buffer.isReadable();
     }
 
+    /**
+     * if buf contains part-buf
+     * @param buf the source buf
+     * @param part the part buf
+     */
     static boolean containsContent(ByteBuf buf, ByteBuf part) {
         if (buf.readableBytes() < part.readableBytes()) {
             return false;
@@ -163,7 +170,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 int     tarLength = target.readableBytes();
 
                 if (msgBuf.readableBytes() >= tarLength) {
-                    match = tryMatch(msgBuf, tarLength, target);
+                    match = overlook(msgBuf, tarLength, target);
 
                     if (match) {
                         msgBuf.skipBytes(tarLength);
@@ -178,7 +185,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return escaped;
     }
 
-    private static boolean tryMatch(ByteBuf msgBuf, int tarLength, ByteBuf target) {
+    private static boolean overlook(ByteBuf msgBuf, int tarLength, ByteBuf target) {
         boolean isMatch;
         switch (tarLength) {
             case 1:
@@ -205,6 +212,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     @RequiredArgsConstructor
     public static class EscapeMapping {
+
+        static final Function<EscapeMapping, ByteBuf>
+                REAL        = EscapeMapping::getReal,
+                REPLACEMENT = EscapeMapping::getReplacement;
 
         private final Pair<ByteBuf, ByteBuf> mapping;
 
