@@ -30,7 +30,7 @@ public class SerializerTest {
         Arrays.fill(bytes, (byte) 67);
 
         User turn = StructSerializer.toStruct(userTypeRefer, bytes);
-        System.err.println(turn.getBill().getBid().getValue());
+        System.err.println(turn.getBill().getBid());
         final byte[] userWriteBytes = StructSerializer.toBytes(userTypeRefer, turn);
 
         System.err.println(ArrayUtil.equals(bytes, userWriteBytes));

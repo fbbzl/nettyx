@@ -3,6 +3,7 @@ package codec.model;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 
+
 /**
  * @author fengbinbin
  * @version 1.0

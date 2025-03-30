@@ -55,7 +55,6 @@ public final class StructSerializer implements Serializer {
      */
     private final Object struct;
 
-    @Override
     public Type getType() {
         return rootType;
     }
@@ -147,7 +146,8 @@ public final class StructSerializer implements Serializer {
 
     //*************************************      working code splitter      ******************************************//
 
-    <T> T doDeserialize() {
+    @Override
+    public <T> T doDeserialize() {
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
                 Object fieldValue;
@@ -169,7 +169,8 @@ public final class StructSerializer implements Serializer {
         return (T) struct;
     }
 
-    ByteBuf doSerialize() {
+    @Override
+    public ByteBuf doSerialize() {
         ByteBuf writing = this.getByteBuf();
         for (Field field : getStructFields(getRawType(rootType))) {
             try {
@@ -250,12 +251,12 @@ public final class StructSerializer implements Serializer {
         A              handlerAnnotation = StructUtils.findFieldHandlerAnnotation(handleField);
 
         try {
-            readHandler.preRead(upperSerializer, handleField, handlerAnnotation);
+            readHandler.beforeRead(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, fieldActualType, handleField, handlerAnnotation);
-            readHandler.postRead(upperSerializer, handleField, handlerAnnotation);
+            readHandler.afterRead(upperSerializer, handleField, handlerAnnotation);
             return handledValue;
         } catch (Exception readHandlerException) {
-            readHandler.afterReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
+            readHandler.whenThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
             throw new SerializeHandlerException(handleField, readHandler.getClass(), readHandlerException);
         }
     }
@@ -341,16 +342,16 @@ public final class StructSerializer implements Serializer {
         A               handlerAnnotation = StructUtils.findFieldHandlerAnnotation(handleField);
         ByteBuf         writing           = upperSerializer.getByteBuf();
         try {
-            writeHandler.preWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.beforeWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
-            writeHandler.postWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.afterWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
         } catch (Exception writeHandlerException) {
-            writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
+            writeHandler.whenThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
             throw new SerializeHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
     }
 
-    public static  <T> T[] newArray(Type componentType, int length) {
+    public static <T> T[] newArray(Type componentType, int length) {
         if (componentType instanceof Class)
             return (T[]) Array.newInstance((Class<?>) componentType, length);
         if (componentType instanceof ParameterizedType)
@@ -371,7 +372,7 @@ public final class StructSerializer implements Serializer {
         else                                   return type;
     }
 
-    public static  <T> T basicNullDefault(Object fieldValue, Type fieldActualType) {
+    public static <T> T basicNullDefault(Object fieldValue, Type fieldActualType) {
         return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
     }
 
