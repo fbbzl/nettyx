@@ -120,15 +120,15 @@ public interface StructFieldHandler<A extends Annotation> {
             throw new TypeJudgmentException(field);
         }
 
-        default void preRead(StructSerializer serializer, Field field, A annotation) {
+        default void beforeRead(StructSerializer serializer, Field field, A annotation) {
             // default is no nothing
         }
 
-        default void postRead(StructSerializer serializer, Field field, A annotation) {
+        default void afterRead(StructSerializer serializer, Field field, A annotation) {
             // default is no nothing
         }
 
-        default void afterReadThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
+        default void whenThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
             // default is no nothing
         }
     }
@@ -159,15 +159,15 @@ public interface StructFieldHandler<A extends Annotation> {
             throw new TypeJudgmentException(field);
         }
 
-        default void preWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
+        default void beforeWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
             // default is no nothing
         }
 
-        default void postWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
+        default void afterWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
             // default is no nothing
         }
 
-        default void afterWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
+        default void whenThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
             // default is no nothing
         }
 

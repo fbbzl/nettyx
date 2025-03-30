@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class UserCodec extends StructCodec<User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend>> {
 
 
-    private static final StructSerializerContext context = new StructSerializerContext("codec.model");
-    public static final User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> TEST_USER = new User<>();
+    private static final StructSerializerContext                                    context   = new StructSerializerContext("codec.model");
+    public static final  User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> TEST_USER = new User<>();
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
