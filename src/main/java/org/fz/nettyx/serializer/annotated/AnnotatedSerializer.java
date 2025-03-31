@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.mapping;
+package org.fz.nettyx.serializer.annotated;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.Serializer;
@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
  * @since 2025/3/11 23:08
  */
 
-public class MappingBasedSerializer implements Serializer {
+public class AnnotatedSerializer implements Serializer {
 
     /**
      * rootType of struct
@@ -28,7 +28,7 @@ public class MappingBasedSerializer implements Serializer {
      */
     private final Object struct;
 
-    MappingBasedSerializer(Type rootType, ByteBuf byteBuf, Object struct) {
+    AnnotatedSerializer(Type rootType, ByteBuf byteBuf, Object struct) {
         this.rootType = rootType;
         this.byteBuf  = byteBuf;
         this.struct   = struct;
