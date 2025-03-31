@@ -1,12 +1,12 @@
 package codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.struct.annotation.*;
-import org.fz.nettyx.serializer.struct.basic.c.signed.*;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.*;
-import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.*;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.*;
+import org.fz.nettyx.serializer.typed.annotation.*;
+import org.fz.nettyx.serializer.typed.basic.c.signed.*;
+import org.fz.nettyx.serializer.typed.basic.c.unsigned.*;
+import org.fz.nettyx.serializer.typed.basic.cpp.CppBool;
+import org.fz.nettyx.serializer.typed.basic.cpp.signed.*;
+import org.fz.nettyx.serializer.typed.basic.cpp.unsigned.*;
 
 import java.util.List;
 

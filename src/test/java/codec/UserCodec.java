@@ -6,9 +6,9 @@ import codec.model.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import org.fz.nettyx.codec.StructCodec;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
+import org.fz.nettyx.serializer.typed.TypedSerializerContext;
+import org.fz.nettyx.serializer.typed.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.typed.basic.c.unsigned.Culong8;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,8 +21,8 @@ import java.util.concurrent.TimeUnit;
 public class UserCodec extends StructCodec<User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend>> {
 
 
-    private static final StructSerializerContext context = new StructSerializerContext("codec.model");
-    public static final User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> TEST_USER = new User<>();
+    private static final TypedSerializerContext                                     context   = new TypedSerializerContext("codec.model");
+    public static final  User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> TEST_USER = new User<>();
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
