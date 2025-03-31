@@ -250,7 +250,7 @@ public final class StructSerializer implements Serializer {
         A              handlerAnnotation = StructUtils.findFieldHandlerAnnotation(handleField);
 
         try {
-            readHandler.preRead(upperSerializer, handleField, handlerAnnotation);
+            readHandler.beforeRead(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, fieldActualType, handleField, handlerAnnotation);
             readHandler.postRead(upperSerializer, handleField, handlerAnnotation);
             return handledValue;
@@ -341,7 +341,7 @@ public final class StructSerializer implements Serializer {
         A               handlerAnnotation = StructUtils.findFieldHandlerAnnotation(handleField);
         ByteBuf         writing           = upperSerializer.getByteBuf();
         try {
-            writeHandler.preWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.beforeWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.postWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
         } catch (Exception writeHandlerException) {
@@ -350,7 +350,7 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public static  <T> T[] newArray(Type componentType, int length) {
+    public static <T> T[] newArray(Type componentType, int length) {
         if (componentType instanceof Class)
             return (T[]) Array.newInstance((Class<?>) componentType, length);
         if (componentType instanceof ParameterizedType)
@@ -371,7 +371,7 @@ public final class StructSerializer implements Serializer {
         else                                   return type;
     }
 
-    public static  <T> T basicNullDefault(Object fieldValue, Type fieldActualType) {
+    public static <T> T basicNullDefault(Object fieldValue, Type fieldActualType) {
         return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
     }
 
