@@ -1,13 +1,14 @@
 package codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.typed.annotation.Struct;
-import org.fz.nettyx.serializer.typed.annotation.ToString;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
+
 
 @Data
 @Struct
 public class GirlFriend {
 
-    @ToString(bufferLength = 2)
+    @ToCharSequence(bufferLength = 2)
     private String cup;
 }
