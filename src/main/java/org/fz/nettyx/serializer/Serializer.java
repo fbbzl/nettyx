@@ -2,8 +2,6 @@ package org.fz.nettyx.serializer;
 
 import io.netty.buffer.ByteBuf;
 
-import java.lang.reflect.Type;
-
 /**
  * The top level interface Byte buf serializer.
  *
@@ -13,17 +11,24 @@ import java.lang.reflect.Type;
 public interface Serializer {
 
     /**
-     * object type
-     *
-     * @return the target type
-     */
-    Type getType();
-
-    /**
      * get byte buf.
      *
      * @return the byte buf
      */
     ByteBuf getByteBuf();
 
+    /**
+     * Do deserialize t.
+     *
+     * @param <T> the type parameter
+     * @return the t
+     */
+    <T> T doDeserialize();
+
+    /**
+     * Do serialize byte buf.
+     *
+     * @return the byte buf
+     */
+    ByteBuf doSerialize();
 }

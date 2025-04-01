@@ -27,7 +27,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ToString {
+public @interface ToCharSequence {
 
     /**
      * Charset string.
@@ -44,15 +44,15 @@ public @interface ToString {
      */
     int bufferLength();
 
-    class ToStringHandler implements StructFieldHandler.ReadWriteHandler<ToString> {
+    class ToStringHandler implements StructFieldHandler.ReadWriteHandler<ToCharSequence> {
         @Override
         public boolean isSingleton() {
             return true;
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToString toString) {
-            String charset = toString.charset();
+        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToCharSequence toCharSequence) {
+            String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
@@ -62,15 +62,15 @@ public @interface ToString {
                         "buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "], field is [" + field
                         + "]");
             }
-            byte[] bytes = new byte[toString.bufferLength()];
+            byte[] bytes = new byte[toCharSequence.bufferLength()];
             byteBuf.readBytes(bytes);
             return new String(bytes, Charset.forName(charset));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToString toString, ByteBuf writing) {
-            int    bufferLength = toString.bufferLength();
-            String charset      = toString.charset();
+        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToCharSequence toCharSequence, ByteBuf writing) {
+            int    bufferLength = toCharSequence.bufferLength();
+            String charset      = toCharSequence.charset();
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
             else               writing.writeBytes(new byte[bufferLength]);

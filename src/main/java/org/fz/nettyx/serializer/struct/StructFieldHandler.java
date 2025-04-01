@@ -120,7 +120,7 @@ public interface StructFieldHandler<A extends Annotation> {
             throw new TypeJudgmentException(field);
         }
 
-        default void preRead(StructSerializer serializer, Field field, A annotation) {
+        default void beforeRead(StructSerializer serializer, Field field, A annotation) {
             // default is no nothing
         }
 
@@ -159,7 +159,7 @@ public interface StructFieldHandler<A extends Annotation> {
             throw new TypeJudgmentException(field);
         }
 
-        default void preWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
+        default void beforeWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
             // default is no nothing
         }
 
