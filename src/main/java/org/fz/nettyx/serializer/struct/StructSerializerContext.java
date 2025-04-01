@@ -75,24 +75,24 @@ public class StructSerializerContext {
      * start package scan
      */
     protected void scan() {
-        Set<Class<?>> classes = doScan();
+        Set<Class<?>> classes = this.classForScan();
 
         // 1 scan field handler
-        scanFieldHandlers(classes);
+        this.scanFieldHandlers(classes);
 
         // 2 scan basic
-        scanBasics(classes);
+        this.scanBasics(classes);
 
         // 3 scan struct
-        scanStructs(classes);
+        this.scanStructs(classes);
     }
 
     /**
-     * do class scan
+     * find class for scan
      *
      * @return the classes can be scanned
      */
-    protected Set<Class<?>> doScan() {
+    protected Set<Class<?>> classForScan() {
         Set<Class<?>> forScan = new HashSet<>(256);
 
         Filter<Class<?>> scanCondition = clazz ->
