@@ -20,7 +20,7 @@ abstract class Template<C extends Channel> {
     private final        EventLoopGroup eventLoopGroup;
 
     protected Template() {
-        this.eventLoopGroup = newEventLoopGroup();
+        this.eventLoopGroup = this.newEventLoopGroup();
         this.channelClass   = this.findChannelClass();
     }
 
