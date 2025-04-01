@@ -132,8 +132,7 @@ public class StructUtils {
         try {
             return newBasic(basicClass, fillingBuf).getSize();
         } finally {
-            fillingBuf.skipBytes(fillingBuf.readableBytes());
-            fillingBuf.release();
+            fillingBuf.skipBytes(fillingBuf.readableBytes()).release();
         }
     }
 
