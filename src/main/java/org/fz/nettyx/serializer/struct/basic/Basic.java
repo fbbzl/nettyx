@@ -5,12 +5,15 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 import org.fz.nettyx.util.Throws;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static lombok.AccessLevel.PRIVATE;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -21,15 +24,15 @@ import java.nio.ByteOrder;
  * @since 2021 /10/22 13:26
  */
 @Getter
+@FieldDefaults(level = PRIVATE)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
-    private final int size;
-
-    private byte[] bytes;
-
-    private V value;
+    final int size;
+    byte[] bytes;
+    V      value;
 
     public V getValue() {
+        // do value lazy set
         if (this.bytes != null && this.value == null) {
             this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
         }
