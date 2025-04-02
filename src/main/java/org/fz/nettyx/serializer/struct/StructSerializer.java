@@ -253,10 +253,10 @@ public final class StructSerializer implements Serializer {
         try {
             readHandler.beforeRead(upperSerializer, handleField, handlerAnnotation);
             Object handledValue = readHandler.doRead(upperSerializer, fieldActualType, handleField, handlerAnnotation);
-            readHandler.postRead(upperSerializer, handleField, handlerAnnotation);
+            readHandler.afterRead(upperSerializer, handleField, handlerAnnotation);
             return handledValue;
         } catch (Exception readHandlerException) {
-            readHandler.afterReadThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
+            readHandler.whenThrow(upperSerializer, handleField, handlerAnnotation, readHandlerException);
             throw new SerializeHandlerException(handleField, readHandler.getClass(), readHandlerException);
         }
     }
@@ -344,9 +344,9 @@ public final class StructSerializer implements Serializer {
         try {
             writeHandler.beforeWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
             writeHandler.doWrite(upperSerializer, fieldActualType, handleField, fieldValue, handlerAnnotation, writing);
-            writeHandler.postWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
+            writeHandler.afterWrite(upperSerializer, handleField, fieldValue, handlerAnnotation, writing);
         } catch (Exception writeHandlerException) {
-            writeHandler.afterWriteThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
+            writeHandler.whenThrow(upperSerializer, handleField, fieldValue, handlerAnnotation, writing, writeHandlerException);
             throw new SerializeHandlerException(handleField, writeHandler.getClass(), writeHandlerException);
         }
     }
