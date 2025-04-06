@@ -4,7 +4,8 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.Serializer;
 
 /**
- * 用户会用xml来定义消息模板, xml用attr来指定字段类型,解析规则等
+ * 用户会用xml来定义消息模板, xml用attr来指定字段类型,解析规则等, 最好是直接填充到xml中,有点类似于jsp
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/4/1 22:26
