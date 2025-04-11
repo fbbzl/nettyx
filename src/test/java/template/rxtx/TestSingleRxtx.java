@@ -44,7 +44,7 @@ public class TestSingleRxtx extends SingleRxtxChannelTemplate {
     }
 
     public static void main(String[] args) {
-        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM5");
+        TestSingleRxtx testSingleRxtx = new TestSingleRxtx("COM1");
         ChannelFutureListener listener = new ActionChannelFutureListener()
                 .whenSuccess((l, cf) -> {
                     testSingleRxtx.writeAndFlush(TEST_USER);
