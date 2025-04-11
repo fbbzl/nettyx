@@ -128,7 +128,7 @@ public interface StructFieldHandler<A extends Annotation> {
             // default is no nothing
         }
 
-        default void whenThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
+        default void whenReadThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
             // default is no nothing
         }
     }
@@ -167,7 +167,7 @@ public interface StructFieldHandler<A extends Annotation> {
             // default is no nothing
         }
 
-        default void whenThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
+        default void whenWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
             // default is no nothing
         }
 
