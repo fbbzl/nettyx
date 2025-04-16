@@ -8,7 +8,6 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Try;
 import org.fz.nettyx.util.Try.LambdasException;
 
 import java.lang.annotation.Annotation;
@@ -113,7 +112,7 @@ public class StructUtils {
      */
     static <H extends StructFieldHandler<? extends Annotation>> H newFieldHandler(Type clazz) {
         try {
-            return (H) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(clazz, StructUtils::constructor).get();
+            return (H) NO_ARGS_CONSTRUCTOR_CACHE.get(clazz).get();
         } catch (Exception exception) {
             throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
         }
@@ -124,7 +123,7 @@ public class StructUtils {
     }
 
     public static int findBasicSize(Type basicClass) {
-        return BASIC_SIZE_CACHE.computeIfAbsent(basicClass, Try.apply(StructUtils::reflectForSize));
+        return BASIC_SIZE_CACHE.get(basicClass);
     }
 
     public static int reflectForSize(Type basicClass) {
@@ -146,7 +145,7 @@ public class StructUtils {
      */
     public static <B extends Basic<?>> B newBasic(Type basicClass, ByteBuf buf) {
         try {
-            return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, bc -> constructor(basicClass, ByteBuf.class)).apply(buf);
+            return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
         } catch (Exception instanceError) {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException)
@@ -167,9 +166,9 @@ public class StructUtils {
     public static <S> S newStruct(Type structClass) {
         try {
             if (structClass instanceof Class)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(structClass, StructUtils::constructor).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(structClass).get();
             if (structClass instanceof ParameterizedType)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.computeIfAbsent(((ParameterizedType) structClass).getRawType(), StructUtils::constructor).get();
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(((ParameterizedType) structClass).getRawType()).get();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         } catch (Exception instanceError) {
@@ -254,11 +253,11 @@ public class StructUtils {
     }
 
     public static <A, P> void writeField(A object, Field field, P value) {
-        ((BiConsumer<A, P>) STRUCT_FIELD_SETTER_CACHE.computeIfAbsent(field, f -> getSetter(object.getClass(), f))).accept(object, value);
+        ((BiConsumer<A, P>) STRUCT_FIELD_SETTER_CACHE.get(field)).accept(object, value);
     }
 
     public static <A, R> R readField(A object, Field field) {
-        return ((Function<A, R>) STRUCT_FIELD_GETTER_CACHE.computeIfAbsent(field, f -> getGetter(object.getClass(), f))).apply(object);
+        return ((Function<A, R>) STRUCT_FIELD_GETTER_CACHE.get(field)).apply(object);
     }
 
     public static <A, R> Function<A, R> getGetter(Class<A> clazz, Field field) {
