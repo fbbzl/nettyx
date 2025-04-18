@@ -107,7 +107,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         // 3 check if replacements contains the reals
         for (ByteBuf real : reals) {
             for (ByteBuf replacement : replacements) {
-                Throws.ifTrue(containsContent(replacement, real), "do not let the replacements contain the reals");
+                Throws.ifTrue(containsContent(replacement, real), "do not let the replacements: [" + replacement + "]"
+                                                                  + " contain the reals: [" + real + "]");
             }
         }
 
