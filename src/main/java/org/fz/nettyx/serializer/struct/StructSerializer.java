@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

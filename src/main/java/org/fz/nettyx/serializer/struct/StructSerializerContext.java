@@ -15,7 +15,7 @@ import lombok.Getter;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

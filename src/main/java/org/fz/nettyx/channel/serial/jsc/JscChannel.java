@@ -3,7 +3,7 @@ package org.fz.nettyx.channel.serial.jsc;
 
 import com.fazecast.jSerialComm.SerialPort;
 import org.fz.nettyx.channel.serial.SerialCommChannel;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.io.InputStream;
 import java.io.OutputStream;

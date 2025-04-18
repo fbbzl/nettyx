@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
