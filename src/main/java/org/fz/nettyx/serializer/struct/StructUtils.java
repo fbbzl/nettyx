@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Try.LambdasException;
+import org.fz.util.lambda.Try.LambdasException;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.*;
