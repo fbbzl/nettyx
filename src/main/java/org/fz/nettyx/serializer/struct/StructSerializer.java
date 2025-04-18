@@ -103,7 +103,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> ByteBuf toByteBuf(Type rootType, T struct) {
-        Throws.ifNull(struct, "struct can not be null when write");
+        Throws.ifNull(struct, "struct can not be null when write, root type: [" + rootType + "]");
 
         if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(rootType, buffer(), struct).doSerialize();
         else
