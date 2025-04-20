@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.map.SafeConcurrentHashMap;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -10,7 +9,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Map;
 
 import static org.fz.nettyx.serializer.struct.StructSerializer.basicNullDefault;
 import static org.fz.nettyx.serializer.struct.StructSerializer.structNullDefault;
@@ -23,11 +21,6 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.structNullDefault
  */
 @SuppressWarnings("all")
 public interface StructFieldHandler<A extends Annotation> {
-
-    /**
-     * cache annotation and handler class
-     */
-    Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING = new SafeConcurrentHashMap<>(16);
 
     /**
      * config the handler instance if is singleton
