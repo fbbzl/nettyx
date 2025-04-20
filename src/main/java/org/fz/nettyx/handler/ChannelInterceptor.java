@@ -442,7 +442,8 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
     }
 
     public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, Class<?> interceptorClass) {
-        Throws.ifNotAssignable(ChannelInterceptor.class, interceptorClass, "class [" + interceptorClass + "] is not assignable to ChannelInterceptor");
+        Throws.ifNotAssignable(ChannelInterceptor.class, interceptorClass,
+                               () -> "class [" + interceptorClass + "] is not assignable to ChannelInterceptor");
 
         for (Map.Entry<String, ChannelHandler> entry : pipeline) {
             if (interceptorClass.isAssignableFrom(entry.getValue().getClass())) return (T) entry.getValue();

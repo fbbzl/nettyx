@@ -1,6 +1,7 @@
 package serializer;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.lang.Console;
 import codec.model.*;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
@@ -10,6 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author fengbinbin
@@ -21,19 +23,22 @@ public class SerializerTest {
             new TypeRefer<User<Bill,
                     Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>>() {
             };
-
+    static final Class<You> youCLass = You.class;
     private static final StructSerializerContext context = new StructSerializerContext("codec.model");
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[9999];
+        byte[] bytes = new byte[36];
         Arrays.fill(bytes, (byte) 67);
 
-        User turn = StructSerializer.toStruct(userTypeRefer, bytes);
-        System.err.println(turn.getBill().getBid());
-        final byte[] userWriteBytes = StructSerializer.toBytes(userTypeRefer, turn);
+        StopWatch stopWatch = StopWatch.create("反序列");
+        stopWatch.start();
+        for (int i = 0; i < 1_000_000; i++) {
+            StructSerializer.toStruct(youCLass, bytes);
+        }
+        stopWatch.stop();
+        Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
 
-        System.err.println(ArrayUtil.equals(bytes, userWriteBytes));
     }
 
     public void setNullForTest(User user) {

@@ -2,12 +2,9 @@ package reflect;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
-import cn.hutool.core.util.ClassLoaderUtil;
 import cn.hutool.core.util.ReflectUtil;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 import lombok.Data;
-import net.sf.cglib.reflect.FastClass;
-import net.sf.cglib.reflect.FastConstructor;
 import org.junit.Test;
 
 import java.lang.invoke.*;
@@ -51,7 +48,7 @@ public class ReflectTest {
     private static final MethodHandle             constructorHandle;
     private static final Supplier<Order>          supplier     = Order::new;
     private static final ConstructorAccess<Order> access       = ConstructorAccess.get(Order.class);
-    private static final FastConstructor fastConstructor =  FastClass.create(ClassLoaderUtil.getClassLoader(), Order.class).getConstructor(new Class[]{});
+//    private static final FastConstructor fastConstructor =  FastClass.create(ClassLoaderUtil.getClassLoader(), Order.class).getConstructor(new Class[]{});
     private static final Supplier<Order> orderSupplier;
 
     static {
@@ -77,10 +74,10 @@ public class ReflectTest {
     @Test
     public void testReflect() throws Throwable {
 
-        Order fast1 = (Order) fastConstructor.newInstance();
+       // Order fast1 = (Order) fastConstructor.newInstance();
         Order order = new Order();
         for (int round = 0; round < 5; round++) {
-            int       times     = 10_000_000;
+            int       times     = 100_000;
             StopWatch stopWatch = StopWatch.create("");
 //        stopWatch.start("new");
 //        for (int i = 0; i < times; i++) {
