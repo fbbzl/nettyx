@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -44,7 +44,7 @@ public @interface ToArray {
         public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToArray annotation) {
             Type componentType = serializer.getComponentType(fieldType);
 
-            Throws.ifTrue(componentType == Object.class, new TypeJudgmentException(field));
+            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
@@ -59,7 +59,7 @@ public @interface ToArray {
         public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object arrayValue, ToArray annotation, ByteBuf writing) {
             Type componentType = serializer.getComponentType(fieldType);
 
-            Throws.ifTrue(componentType == Object.class, new TypeJudgmentException(field));
+            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
