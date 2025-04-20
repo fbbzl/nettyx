@@ -13,7 +13,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.fz.nettyx.serializer.struct.StructSerializer.handler;
+
 
 /**
  * @author fengbinbin
@@ -40,7 +40,7 @@ public class SerializerTest {
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-        System.err.println(handler.get());
+       // System.err.println(handler.get());
     }
 
     public void setNullForTest(User user) {

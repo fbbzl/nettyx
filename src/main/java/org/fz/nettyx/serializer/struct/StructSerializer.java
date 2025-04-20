@@ -231,19 +231,19 @@ public final class StructSerializer implements Serializer {
         return structs;
     }
 
-    public <T> List<T> readList(Type elementType, int length, List<?> coll) {
-        if (isBasic(elementType))  return (List<T>) readBasicList(elementType, length, coll);
+    public <T> List<T> readList(Type elementType, int length) {
+        if (isBasic(elementType))  return (List<T>) readBasicList(elementType, length);
         else
-        if (isStruct(elementType)) return readStructList(elementType, length, coll);
+        if (isStruct(elementType)) return readStructList(elementType, length);
         else                       throw new TypeJudgmentException();
     }
 
-    public <B extends Basic<?>> List<B> readBasicList(Type elementType, int length, List<?> coll) {
-        return (List<B>) CollUtil.addAll(coll, readBasicArray(elementType, length));
+    public <B extends Basic<?>> List<B> readBasicList(Type elementType, int length) {
+        return CollUtil.newArrayList(readBasicArray(elementType, length));
     }
 
-    public <T> List<T> readStructList(Type elementType, int length, List<?> coll) {
-        return (List<T>) CollUtil.addAll(coll, readStructArray(elementType, length));
+    public <T> List<T> readStructList(Type elementType, int length) {
+        return CollUtil.newArrayList(readStructArray(elementType, length));
     }
 
     <A extends Annotation> Object readHandled(Field handleField, Type fieldActualType, StructSerializer upperSerializer) {
