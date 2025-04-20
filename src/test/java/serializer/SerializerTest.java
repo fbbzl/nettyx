@@ -13,6 +13,8 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import static org.fz.nettyx.serializer.struct.StructSerializer.handler;
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -28,7 +30,7 @@ public class SerializerTest {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[36];
+        byte[] bytes = new byte[64];
         Arrays.fill(bytes, (byte) 67);
 
         StopWatch stopWatch = StopWatch.create("反序列");
@@ -38,7 +40,7 @@ public class SerializerTest {
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-
+        System.err.println(handler.get());
     }
 
     public void setNullForTest(User user) {

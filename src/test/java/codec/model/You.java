@@ -2,8 +2,11 @@ package codec.model;
 
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.*;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
+
+import java.util.List;
 
 /**
  * @author fengbinbin
@@ -15,12 +18,20 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 @Struct
 public class You {
 
-    Cchar       uname;
-    Cint        isMarried;
-    Cchar       sex;
-    Cfloat      address;
-    Cdouble     platformId;
-    Clong8      description;
-    Culong8     interest;
+    Cchar   uname;
+    Cint    isMarried;
+    Cchar   sex;
+    Cfloat  address;
+    Cdouble platformId;
+    @ToArrayList(size = 1)
+    List<Clong8> description;
+    Culong8 interest;
+    Hit     c;
 
+
+    @Data
+    @Struct
+    public static class Hit {
+        Culong8 interest;
+    }
 }
