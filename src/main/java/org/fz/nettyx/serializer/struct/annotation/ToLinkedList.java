@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -53,7 +53,7 @@ public @interface ToLinkedList {
         public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToLinkedList toLinkedList) {
             Type elementType = serializer.getElementType(fieldType);
 
-            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
+            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
             return serializer.readList(elementType, toLinkedList.size(), new LinkedList<>());
         }
@@ -62,7 +62,7 @@ public @interface ToLinkedList {
         public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToLinkedList toLinkedList, ByteBuf writing) {
             Type elementType = serializer.getElementType(fieldType);
 
-            Throws.ifTrue(elementType == Object.class, new ParameterizedTypeException(field));
+            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
             serializer.writeList(defaultIfNull((List<?>) value, Collections::emptyList), elementType, toLinkedList.size(), writing);
         }
