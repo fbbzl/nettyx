@@ -61,7 +61,7 @@
 
         <!--util-->
         <hutool-core.version>5.8.32</hutool-core.version>
-        <erwin.version>1.1.0-RELEASE</erwin.version>
+        <erwin.version>1.1.1-RELEASE</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>

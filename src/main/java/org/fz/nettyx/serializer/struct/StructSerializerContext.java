@@ -170,7 +170,8 @@ public class StructSerializerContext {
                         // 4 cache field field handler annotation
                         for (Annotation annotation : AnnotationUtil.getAnnotations(field, false)) {
                             if (StructFieldHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
-                                Throws.ifContainsKey(STRUCT_FIELD_HANDLER_ANNOTATION_CACHE, field, "don't specify more than one field handler on field [" + field + "]");
+                                Throws.ifContainsKey(STRUCT_FIELD_HANDLER_ANNOTATION_CACHE, field,
+                                                     () -> "don't specify more than one field handler on field [" + field + "]");
                                 STRUCT_FIELD_HANDLER_ANNOTATION_CACHE.put(field, annotation);
                             }
                         }

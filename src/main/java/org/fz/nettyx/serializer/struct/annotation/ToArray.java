@@ -44,7 +44,7 @@ public @interface ToArray {
         public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToArray annotation) {
             Type componentType = serializer.getComponentType(fieldType);
 
-            Throws.ifTrue(componentType == Object.class, new TypeJudgmentException(field));
+            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
@@ -59,7 +59,7 @@ public @interface ToArray {
         public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object arrayValue, ToArray annotation, ByteBuf writing) {
             Type componentType = serializer.getComponentType(fieldType);
 
-            Throws.ifTrue(componentType == Object.class, new TypeJudgmentException(field));
+            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 

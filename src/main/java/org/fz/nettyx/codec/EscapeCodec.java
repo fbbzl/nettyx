@@ -94,21 +94,21 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         // 1 check if byte buf is valid
         for (EscapeMapping mapping : mappings) {
             ByteBuf real = mapping.getReal(), replacement = mapping.getReplacement();
-            Throws.ifTrue(invalid(real) || invalid(replacement), "reals or replacements contains " +
-                                                                 "invalid buf, please check");
+            Throws.ifTrue(invalid(real) || invalid(replacement),
+                          () -> "reals or replacements contains invalid buf, please check");
         }
 
         // 2 check if intersection is not empty
         List<ByteBuf> reals = Arrays.stream(mappings).map(REAL).collect(toList()),
                 replacements = Arrays.stream(mappings).map(REPLACEMENT).collect(toList());
         Collection<ByteBuf> intersection = intersection(reals, replacements);
-        Throws.ifNotEmpty(intersection, "do not let the reals intersect with the replacements, please check");
+        Throws.ifNotEmpty(intersection, () -> "do not let the reals intersect with the replacements, please check");
 
         // 3 check if replacements contains the reals
         for (ByteBuf real : reals) {
             for (ByteBuf replacement : replacements) {
-                Throws.ifTrue(containsContent(replacement, real), "do not let the replacements: [" + replacement + "]"
-                                                                  + " contain the reals: [" + real + "]");
+                Throws.ifTrue(containsContent(replacement, real),
+                              () -> "do not let the replacements: [" + replacement + "] contain the reals: [" + real + "]");
             }
         }
 
