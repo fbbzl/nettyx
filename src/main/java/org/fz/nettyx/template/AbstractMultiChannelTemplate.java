@@ -12,8 +12,8 @@ import lombok.Getter;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.util.ChannelState;
 import org.fz.nettyx.util.ChannelStorage;
-import org.fz.nettyx.util.Throws;
-import org.fz.nettyx.util.Try;
+import org.fz.util.exception.Throws;
+import org.fz.util.lambda.Try;
 
 import java.net.SocketAddress;
 import java.util.Map;
@@ -51,7 +51,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
 
     public ChannelFuture connect(K key) {
         Bootstrap bootstrap = getBootstrapMap().get(key);
-        Throws.ifNull(bootstrap, "can not find config by key [" + key + "]");
+        Throws.ifNull(bootstrap, () -> "can not find config by key [" + key + "]");
         ChannelFuture channelFuture = bootstrap.clone().connect();
         channelFuture.addListener(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
         return channelFuture;
