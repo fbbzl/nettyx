@@ -45,12 +45,8 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useReadHandler(Field field) {
-        Annotation handlerAnnotation = findFieldHandlerAnnotation(field);
-        if (handlerAnnotation != null) {
-            Class<? extends StructFieldHandler<? extends Annotation>>
-                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
-            if (handlerClass != null) return isReadHandler(handlerClass);
-        }
+        Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = STRUCT_FIELD_HANDLER_CACHE.get(field);
+        if (handlerClass != null) return isReadHandler(handlerClass);
         return false;
     }
 
@@ -61,12 +57,8 @@ public class StructUtils {
      * @return the boolean
      */
     public static boolean useWriteHandler(Field field) {
-        Annotation handlerAnnotation = findFieldHandlerAnnotation(field);
-        if (handlerAnnotation != null) {
-            Class<? extends StructFieldHandler<? extends Annotation>>
-                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
-            if (handlerClass != null) return isWriteHandler(handlerClass);
-        }
+        Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = STRUCT_FIELD_HANDLER_CACHE.get(field);
+        if (handlerClass != null) return isWriteHandler(handlerClass);
         return false;
     }
 
@@ -77,7 +69,7 @@ public class StructUtils {
      * @param field the field
      * @return the a
      */
-    public <A extends Annotation> A findFieldHandlerAnnotation(Field field) {
+    public <A extends Annotation> A getStructFieldHandlerAnnotation(Field field) {
         return (A) STRUCT_FIELD_HANDLER_ANNOTATION_CACHE.get(field);
     }
 
@@ -88,12 +80,10 @@ public class StructUtils {
      * @param field the element
      * @return the serializer handler
      */
-    public <H extends StructFieldHandler<?>> H getFieldHandler(Field field) {
-        Annotation handlerAnnotation = findFieldHandlerAnnotation(field);
+    public <H extends StructFieldHandler<?>> H getStructFieldHandler(Field field) {
+        Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = STRUCT_FIELD_HANDLER_CACHE.get(field);
 
-        if (handlerAnnotation != null) {
-            Class<? extends StructFieldHandler<? extends Annotation>>
-                    handlerClass = StructFieldHandler.ANNOTATION_HANDLER_MAPPING.get(handlerAnnotation.annotationType());
+        if (handlerClass != null) {
             boolean isSingleton = Singleton.exists(handlerClass);
 
             if (isSingleton) return (H) Singleton.get(handlerClass);
