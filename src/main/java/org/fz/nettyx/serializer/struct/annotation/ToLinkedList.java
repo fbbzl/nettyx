@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
@@ -55,7 +54,7 @@ public @interface ToLinkedList {
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
-            return serializer.readList(elementType, toLinkedList.size(), new LinkedList<>());
+            return serializer.readList(elementType, toLinkedList.size());
         }
 
         @Override
