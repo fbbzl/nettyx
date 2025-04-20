@@ -52,9 +52,15 @@ public class StructSerializerContext {
     static final Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE             = new SafeConcurrentHashMap<>(128);
     static final Map<Type, Function<ByteBuf, ?>> BASIC_BYTEBUF_CONSTRUCTOR_CACHE       = new SafeConcurrentHashMap<>(128);
     static final Map<Class<?>, Field[]>          STRUCT_FIELD_CACHE                    = new ConcurrentHashMap<>(512);
-    static final Map<Field, Annotation>          STRUCT_FIELD_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
     static final Map<Field, Function<?, ?>>      STRUCT_FIELD_GETTER_CACHE             = new ConcurrentHashMap<>(512);
     static final Map<Field, BiConsumer<?, ?>>    STRUCT_FIELD_SETTER_CACHE             = new SafeConcurrentHashMap<>(512);
+    static final Map<Field, Annotation>          STRUCT_FIELD_HANDLER_ANNOTATION_CACHE = new SafeConcurrentHashMap<>(256);
+
+    static final Map<Field, Class<? extends StructFieldHandler<? extends Annotation>>> STRUCT_FIELD_HANDLER_CACHE =
+            new SafeConcurrentHashMap<>(256);
+
+    static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE =
+            new SafeConcurrentHashMap<>(16);
 
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
@@ -78,13 +84,13 @@ public class StructSerializerContext {
         Set<Class<?>> classes = this.classForScan();
 
         // 1 scan field handler
-        this.scanFieldHandlers(classes);
+        this.scanHandler(classes);
 
         // 2 scan basic
-        this.scanBasics(classes);
+        this.scanBasic(classes);
 
         // 3 scan struct
-        this.scanStructs(classes);
+        this.scanStruct(classes);
     }
 
     /**
@@ -107,7 +113,7 @@ public class StructSerializerContext {
         return forScan;
     }
 
-    protected void scanFieldHandlers(Set<Class<?>> classes) {
+    protected void scanHandler(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 boolean isFieldHandler = StructFieldHandler.class.isAssignableFrom(clazz);
@@ -124,7 +130,7 @@ public class StructSerializerContext {
                         if (handler.isSingleton()) Singleton.put(handler);
 
                         // 3 cache annotation -> handler mapping relation
-                        StructFieldHandler.ANNOTATION_HANDLER_MAPPING.putIfAbsent(annotationType, (Class<? extends StructFieldHandler<? extends Annotation>>) clazz);
+                        ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(annotationType, (Class<? extends StructFieldHandler<? extends Annotation>>) clazz);
                     }
                 }
             } catch (Throwable throwable) {
@@ -133,10 +139,10 @@ public class StructSerializerContext {
         }
     }
 
-    protected void scanBasics(Set<Class<?>> classes) {
+    protected void scanBasic(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
-                boolean isBasic = Basic.class.isAssignableFrom(clazz);
+                boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
 
                 if (isBasic) {
                     // 1 cache basics constructor
@@ -151,7 +157,7 @@ public class StructSerializerContext {
         }
     }
 
-    protected void scanStructs(Set<Class<?>> classes) {
+    protected void scanStruct(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
@@ -169,11 +175,13 @@ public class StructSerializerContext {
 
                         // 4 cache field field handler annotation
                         for (Annotation annotation : AnnotationUtil.getAnnotations(field, false)) {
-                            if (StructFieldHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
-                                Throws.ifContainsKey(STRUCT_FIELD_HANDLER_ANNOTATION_CACHE, field,
+                            ANNOTATION_HANDLER_MAPPING_CACHE.computeIfPresent(annotation.annotationType(), (a, h) -> {
+                                Throws.ifContainsKey(STRUCT_FIELD_HANDLER_CACHE, field,
                                                      () -> "don't specify more than one field handler on field [" + field + "]");
                                 STRUCT_FIELD_HANDLER_ANNOTATION_CACHE.put(field, annotation);
-                            }
+                                STRUCT_FIELD_HANDLER_CACHE.put(field, h);
+                                return h;
+                            });
                         }
                     }
                 }

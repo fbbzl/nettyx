@@ -11,7 +11,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,7 +53,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
-            return serializer.readList(elementType, toArrayList.size(), new ArrayList<>(10));
+            return serializer.readList(elementType, toArrayList.size());
         }
 
         @Override
