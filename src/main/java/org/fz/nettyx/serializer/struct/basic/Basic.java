@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -41,7 +41,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
 
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
-        Throws.ifTrue(byteBuf.readableBytes() < size, new TooLessBytesException(size, byteBuf.readableBytes()));
+        Throws.ifTrue(byteBuf.readableBytes() < size, () -> new TooLessBytesException(size, byteBuf.readableBytes()));
 
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);

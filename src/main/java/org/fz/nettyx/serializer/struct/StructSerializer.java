@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructFieldHandler.ReadHandler;
 import org.fz.nettyx.serializer.struct.StructFieldHandler.WriteHandler;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -103,7 +103,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public static <T> ByteBuf toByteBuf(Type rootType, T struct) {
-        Throws.ifNull(struct, "struct can not be null when write");
+        Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + rootType + "]");
 
         if (rootType instanceof Class<?> || rootType instanceof ParameterizedType) return new StructSerializer(rootType, buffer(), struct).doSerialize();
         else

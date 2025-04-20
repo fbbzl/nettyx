@@ -15,7 +15,7 @@ import lombok.Getter;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.util.Throws;
+import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -170,7 +170,8 @@ public class StructSerializerContext {
                         // 4 cache field field handler annotation
                         for (Annotation annotation : AnnotationUtil.getAnnotations(field, false)) {
                             if (StructFieldHandler.ANNOTATION_HANDLER_MAPPING.containsKey(annotation.annotationType())) {
-                                Throws.ifContainsKey(STRUCT_FIELD_HANDLER_ANNOTATION_CACHE, field, "don't specify more than one field handler on field [" + field + "]");
+                                Throws.ifContainsKey(STRUCT_FIELD_HANDLER_ANNOTATION_CACHE, field,
+                                                     () -> "don't specify more than one field handler on field [" + field + "]");
                                 STRUCT_FIELD_HANDLER_ANNOTATION_CACHE.put(field, annotation);
                             }
                         }
