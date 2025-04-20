@@ -142,7 +142,7 @@ public class StructSerializerContext {
     protected void scanBasic(Set<Class<?>> classes) {
         for (Class<?> clazz : classes) {
             try {
-                boolean isBasic = Basic.class.isAssignableFrom(clazz);
+                boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
 
                 if (isBasic) {
                     // 1 cache basics constructor
