@@ -2,6 +2,7 @@ package serializer;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.util.TypeUtil;
 import codec.model.*;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
@@ -10,8 +11,11 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
 
 
 
@@ -21,12 +25,12 @@ import java.util.concurrent.TimeUnit;
  * @since 2023/5/23 21:35
  */
 public class SerializerTest {
-    static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
-            new TypeRefer<User<Bill,
-                    Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>>() {
+    static final         TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
+            new TypeRefer<>() {
             };
-    static final Class<You> youCLass = You.class;
-    private static final StructSerializerContext context = new StructSerializerContext("codec.model");
+    static final         Class<You>                                                         youCLass      = You.class;
+    private static final StructSerializerContext                                            context       =
+            new StructSerializerContext("codec.model");
 
     @Test
     public void testStructSerializer() {
@@ -40,7 +44,21 @@ public class SerializerTest {
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-       // System.err.println(handler.get());
+    }
+
+    @Test
+    public void testHutool() throws NoSuchFieldException {
+        Field sonsbaba = User.class.getDeclaredField("sonsbaba");
+        Type fieldActualType1 = TypeUtil.getActualType(userTypeRefer, sonsbaba);
+
+        StopWatch stopWatch = StopWatch.create("1111");
+        stopWatch.start();
+        for (int i = 0; i < 9_000_000; i++) {
+            Type fieldActualType =
+                    TypeUtil.getActualType(userTypeRefer, sonsbaba);
+        }
+        stopWatch.stop();
+        Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
     }
 
     public void setNullForTest(User user) {
