@@ -7,6 +7,7 @@ import io.netty.handler.logging.LoggingHandler;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMapping;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec;
+import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.MessageEchoHandler;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
@@ -23,11 +24,16 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
 
     @Override
     protected void initChannel(C channel) {
+        InboundAdvice inboundAdvice = new InboundAdvice(channel)
+                .whenExceptionCaught((ctx, t) -> System.err.println(t))
+                .whenReadIdle(3, ctx -> System.err.println("read idle"));
+
         channel.pipeline().addLast(
-                new StartEndFlagFrameCodec(1024*1024, true, wrappedBuffer(new byte[]{ (byte) 0x7e }))
+                new StartEndFlagFrameCodec(1024 * 1024, true, wrappedBuffer(new byte[]{ (byte) 0x7e }))
                 , new EscapeCodec(EscapeMapping.mapHex("7e", "7d5e"))
                 , new UserCodec()
                 , new MessageEchoHandler()
-                , new LoggingHandler(HEX_DUMP));
+                , new LoggingHandler(HEX_DUMP)
+                , inboundAdvice);
     }
 }

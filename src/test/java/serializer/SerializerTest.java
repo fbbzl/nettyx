@@ -6,17 +6,15 @@ import cn.hutool.core.util.TypeUtil;
 import codec.model.*;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.TypeRefer;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
+import org.fz.nettyx.util.TypeRefer;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-
-
 
 
 /**
