@@ -21,16 +21,28 @@ import java.util.concurrent.TimeUnit;
 public class UserCodec extends StructCodec<User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend>> {
 
 
-    private static final StructSerializerContext                                    context   = new StructSerializerContext("codec.model");
+    private static final StructSerializerContext                                    context   =
+            new StructSerializerContext("codec.model");
     public static final  User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> TEST_USER = new User<>();
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
-        StopWatch stopWatch = StopWatch.create("serializer");
-        stopWatch.start("obj");
+        StopWatch stopWatch = StopWatch.create("decode");
+        stopWatch.start("decode");
         super.decode(ctx, msg, out);
         stopWatch.stop();
+        Console.log(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+    }
 
+    @Override
+    protected void encode(ChannelHandlerContext ctx,
+                          User<Clong4, Wife<Culong8, Son<Clong4, Bill>>, GirlFriend> struct, ByteBuf out) {
+
+        StopWatch stopWatch = StopWatch.create("encode");
+        stopWatch.start("encode");
+
+        super.encode(ctx, struct, out);
+        stopWatch.stop();
         Console.log(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
     }
 }

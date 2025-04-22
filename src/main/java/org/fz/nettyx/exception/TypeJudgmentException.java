@@ -1,5 +1,7 @@
 package org.fz.nettyx.exception;
 
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
@@ -19,6 +21,11 @@ public class TypeJudgmentException extends RuntimeException {
 
     public TypeJudgmentException(Field field) {
         super("can not determine type of field [" + field + "]");
+    }
+
+
+    public TypeJudgmentException(StructField field) {
+        this(field.getWrapped());
     }
 
     public TypeJudgmentException(Type type) {
