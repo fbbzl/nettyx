@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.util.exception.Throws;
@@ -9,7 +10,6 @@ import org.fz.util.exception.Throws;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -41,14 +41,14 @@ public @interface ToArrayList {
     /**
      * The type Array list handler.
      */
-    class ToArrayListHandler implements StructFieldHandler.ReadWriteHandler<ToArrayList> {
+    class ToArrayListHandler implements StructFieldHandler<ToArrayList> {
         @Override
         public boolean isSingleton() {
             return true;
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToArrayList toArrayList) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList) {
             Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
@@ -57,12 +57,14 @@ public @interface ToArrayList {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToArrayList toArrayList, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList, Object value,
+                            ByteBuf writing) {
             Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
-            serializer.writeList(defaultIfNull((List<?>) value, Collections::emptyList), elementType, toArrayList.size(), writing);
+            serializer.writeList(defaultIfNull((List<?>) value, Collections::emptyList), elementType,
+                                 toArrayList.size(), writing);
         }
     }
 }

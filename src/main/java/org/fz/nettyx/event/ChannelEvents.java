@@ -114,8 +114,8 @@ public class ChannelEvents {
      * @return the boolean
      */
     public static boolean isAssignedState(Object obj, IdleState state) {
-        if (obj instanceof IdleStateEvent) return ((IdleStateEvent) obj).state() == state;
-        else if (obj instanceof IdleState) return obj == state;
+        if (obj instanceof IdleStateEvent idleStateEvent) return idleStateEvent.state() == state;
+        else if (obj instanceof IdleState idleState) return idleState == state;
         else return false;
     }
 
