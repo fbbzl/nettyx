@@ -2,13 +2,13 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -44,14 +44,14 @@ public @interface ToCharSequence {
      */
     int bufferLength();
 
-    class ToStringHandler implements StructFieldHandler.ReadWriteHandler<ToCharSequence> {
+    class ToStringHandler implements StructFieldHandler<ToCharSequence> {
         @Override
         public boolean isSingleton() {
             return true;
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToCharSequence toCharSequence) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToCharSequence toCharSequence) {
             String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
@@ -68,7 +68,7 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToCharSequence toCharSequence, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToCharSequence toCharSequence, Object value, ByteBuf writing) {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
 
