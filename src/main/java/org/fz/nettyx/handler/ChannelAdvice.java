@@ -189,11 +189,6 @@ public class ChannelAdvice {
             return this;
         }
 
-        public final OutboundAdvice whenExceptionCaught(ChannelExceptionAction whenExceptionCaught) {
-            this.channel.pipeline().addFirst(new SimpleOutboundExceptionHandler(whenExceptionCaught));
-            return this;
-        }
-
         @Override
         public final void bind(ChannelHandlerContext ctx, SocketAddress localAddress, ChannelPromise promise)
                 throws Exception {
@@ -264,7 +259,7 @@ public class ChannelAdvice {
         @Setter
         @NoArgsConstructor
         @AllArgsConstructor
-        private static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
+        public static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
 
             private static final InternalLogger         log = InternalLoggerFactory.getInstance(SimpleOutboundExceptionHandler.class);
             private              ChannelExceptionAction whenExceptionCaught;

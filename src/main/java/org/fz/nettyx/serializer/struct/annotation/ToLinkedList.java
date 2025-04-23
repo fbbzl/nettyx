@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.util.exception.Throws;
@@ -9,7 +10,6 @@ import org.fz.util.exception.Throws;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -42,14 +42,14 @@ public @interface ToLinkedList {
     /**
      * The type To linked list handler.
      */
-    class ToLinkedListHandler implements StructFieldHandler.ReadWriteHandler<ToLinkedList> {
+    class ToLinkedListHandler implements StructFieldHandler<ToLinkedList> {
         @Override
         public boolean isSingleton() {
             return true;
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToLinkedList toLinkedList) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToLinkedList toLinkedList) {
             Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
@@ -58,7 +58,7 @@ public @interface ToLinkedList {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, ToLinkedList toLinkedList, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToLinkedList toLinkedList, Object value, ByteBuf writing) {
             Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
