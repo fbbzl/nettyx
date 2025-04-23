@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.util.exception.Throws;
@@ -9,7 +10,6 @@ import org.fz.util.exception.Throws;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -34,14 +34,14 @@ public @interface ToArray {
      */
     int length();
 
-    class ToArrayHandler implements StructFieldHandler.ReadWriteHandler<ToArray> {
+    class ToArrayHandler implements StructFieldHandler<ToArray> {
         @Override
         public boolean isSingleton() {
             return true;
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, Field field, ToArray annotation) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation) {
             Type componentType = serializer.getComponentType(fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
@@ -56,7 +56,7 @@ public @interface ToArray {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, Field field, Object arrayValue, ToArray annotation, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation, Object arrayValue, ByteBuf writing) {
             Type componentType = serializer.getComponentType(fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
