@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.util.ClassUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.annotation.Annotation;
@@ -22,6 +23,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.structNullDefault
 @SuppressWarnings("all")
 public interface StructFieldHandler<A extends Annotation> {
 
+    StructFieldHandler<? extends Annotation> DEFAULT_READ_WRITE_HANDLER = new StructFieldHandler() {
+        @Override
+        public boolean isSingleton() {
+            return true;
+        }
+    };
+
     /**
      * config the handler instance if is singleton
      *
@@ -29,6 +37,59 @@ public interface StructFieldHandler<A extends Annotation> {
      */
     default boolean isSingleton() {
         return false;
+    }
+
+    default Object doRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
+        Field field = structField.getWrapped();
+
+        if (serializer.isBasic(fieldType)) return serializer.readBasic(fieldType);
+        if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType);
+
+        throw new TypeJudgmentException(field);
+    }
+
+    default void beforeRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
+        // default is no nothing
+    }
+
+    default void afterRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
+        // default is no nothing
+    }
+
+    default void whenReadThrow(StructSerializer serializer, Type fieldType, StructField structField, A annotation,
+                               Throwable throwable) {
+        // default is no nothing
+    }
+
+    default void doWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
+                         ByteBuf writing) {
+        Field field = structField.getWrapped();
+
+        if (serializer.isBasic(field)) {
+            serializer.writeBasic((Basic<?>) basicNullDefault(value, fieldType), writing);
+            return;
+        }
+        if (serializer.isStruct(field)) {
+            serializer.writeStruct(fieldType, structNullDefault(value, fieldType), writing);
+            return;
+        }
+
+        throw new TypeJudgmentException(field);
+    }
+
+    default void beforeWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
+                             ByteBuf writing) {
+        // default is no nothing
+    }
+
+    default void afterWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
+                            ByteBuf writing) {
+        // default is no nothing
+    }
+
+    default void whenWriteThrow(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
+                                ByteBuf writing, Throwable throwable) {
+        // default is no nothing
     }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
@@ -39,141 +100,13 @@ public interface StructFieldHandler<A extends Annotation> {
         Type[] genericInterfaces = clazz.getGenericInterfaces();
 
         for (Type genericInterface : genericInterfaces) {
-            if (genericInterface instanceof ParameterizedType) {
-                ParameterizedType type                = (ParameterizedType) genericInterface;
-                Type[]            actualTypeArguments = type.getActualTypeArguments();
-                if (type.getOwnerType() == StructFieldHandler.class && actualTypeArguments.length > 0) {
+            if (genericInterface instanceof ParameterizedType parameterizedType) {
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                if (actualTypeArguments.length > 0) {
                     return (Class<A>) actualTypeArguments[0];
                 }
             }
         }
         return null;
     }
-
-    /**
-     * Is read handler boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
-    static <S extends StructFieldHandler<?>> boolean isReadHandler(Class<S> clazz) {
-        return ReadHandler.class.isAssignableFrom(clazz);
-    }
-
-    /**
-     * Is write handler boolean.
-     *
-     * @param clazz the clazz
-     * @return the boolean
-     */
-    static <S extends StructFieldHandler<?>> boolean isWriteHandler(Class<S> clazz) {
-        return WriteHandler.class.isAssignableFrom(clazz);
-    }
-
-    /**
-     * Is read handler boolean.
-     *
-     * @param handler the handler
-     * @return the boolean
-     */
-    static <S extends StructFieldHandler<?>> boolean isReadHandler(S handler) {
-        return handler instanceof ReadHandler;
-    }
-
-    /**
-     * Is write handler boolean.
-     *
-     * @param handler the handler
-     * @return the boolean
-     */
-    static <S extends StructFieldHandler<?>> boolean isWriteHandler(S handler) {
-        return handler instanceof ReadHandler.WriteHandler;
-    }
-
-    /**
-     * The interface Read handler.
-     *
-     * @author fengbinbin
-     * @since 2022 -01-16 13:37
-     */
-    interface ReadHandler<A extends Annotation> extends StructFieldHandler<A> {
-
-        /**
-         * Do read object. if not override, this method will return null
-         *
-         * @param serializer the serializer
-         * @param fieldType  field type
-         * @param field      the field
-         * @return the final returned field length
-         */
-        default Object doRead(StructSerializer serializer, Type fieldType, Field field, A annotation) {
-            if (serializer.isBasic(fieldType))  return serializer.readBasic(fieldType);
-            if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType);
-
-            throw new TypeJudgmentException(field);
-        }
-
-        default void beforeRead(StructSerializer serializer, Field field, A annotation) {
-            // default is no nothing
-        }
-
-        default void afterRead(StructSerializer serializer, Field field, A annotation) {
-            // default is no nothing
-        }
-
-        default void whenReadThrow(StructSerializer serializer, Field field, A annotation, Throwable throwable) {
-            // default is no nothing
-        }
-    }
-
-    /**
-     * The interface Write handler.
-     *
-     * @author fengbinbin
-     * @since 2022 -01-16 13:37
-     */
-    interface WriteHandler<A extends Annotation> extends StructFieldHandler<A> {
-
-        /**
-         * Do write.
-         *
-         * @param serializer the serializer
-         * @param fieldType
-         * @param field      the field
-         * @param value      the length
-         * @param writing
-         */
-        default void doWrite(StructSerializer serializer, Type fieldType, Field field, Object value, A annotation, ByteBuf writing) {
-            Type rootType = serializer.getType();
-
-            if (serializer.isBasic(field)) serializer.writeBasic((Basic<?>) basicNullDefault(value, fieldType), writing);
-            if (serializer.isStruct(field)) serializer.writeStruct(rootType, structNullDefault(value, fieldType), writing);
-
-            throw new TypeJudgmentException(field);
-        }
-
-        default void beforeWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
-            // default is no nothing
-        }
-
-        default void afterWrite(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing) {
-            // default is no nothing
-        }
-
-        default void whenWriteThrow(StructSerializer serializer, Field field, Object value, A annotation, ByteBuf writing, Throwable throwable) {
-            // default is no nothing
-        }
-
-    }
-
-    /**
-     * The interface Read write handler. support read and write
-     *
-     * @author fengbinbin
-     * @since 2022 -01-20 19:46
-     */
-    interface ReadWriteHandler<A extends Annotation> extends ReadHandler<A>, WriteHandler<A> {
-
-    }
-
 }
