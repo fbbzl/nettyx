@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct;
+package org.fz.nettyx.util;
 
 import cn.hutool.core.util.TypeUtil;
 import lombok.Getter;

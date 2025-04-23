@@ -137,9 +137,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public boolean equals(Object anotherObj) {
         if (anotherObj == null) return false;
 
-        if (anotherObj instanceof CBasic<?>) {
-            CBasic<?> anotherCBasic = (CBasic<?>) anotherObj;
-
+        if (anotherObj instanceof CBasic<?> anotherCBasic) {
             if (this.getSize()   != anotherCBasic.getSize()
                 ||
                 this.hasSinged() != anotherCBasic.hasSinged()

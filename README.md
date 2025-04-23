@@ -19,7 +19,7 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.3.28-RELEASE</version>
+    <version>2.4.1-RELEASE</version>
 </dependency>
 ```
 ## api
@@ -37,21 +37,31 @@ action                              Contains sufficient functional interfaces to
   ---ChannelReadAction
   ---ChannelWriteAction
 channel                               channel extention
-  ---jsc                              java serial comm channel
-    ---JscChannel
-    ---JscChannelConfig
-    ---JscChannelOption                       
-  ---rxtx                             java rxtx channel
-    ---RxtxChannel
-    ---RxtxChannelConfig
-    ---RxtxChannelOption
-  EnhancedOioByteStreamChannel         non blocking read Oio
-  SerialCommChannel                    abstract serial comm channel
+  ---bluetooth
+    ---client
+      ---BtChannel                    blue tooth channel   
+      ---BtChannelConfig              bt channel config
+      ---BtChannelOption              bt channel option
+      ---BtDeviceAddress              bt device address      
+  ---enhanced
+    ---EnhancedOioByteStreamChannel   optimize read task blocking   
+  ---serial
+    ---jsc                              java serial comm channel
+      ---JscChannel                     jsc channel
+      ---JscChannelConfig               jsc channel config
+      ---JscChannelOption               jsc channel option        
+    ---rxtx                             java rxtx channel
+      ---RxtxChannel                    rxtx channel
+      ---RxtxChannelConfig              rxtx channel config
+      ---RxtxChannelOption              rxtx channel option
+    SerialCommChannel                   abstract serial comm channel
 codec                               Provided some basic codecs
+  ---ByteArrayCodec                    ByteArray Codec
   ---DelimiterBasedFrameCodec          Based on the delimiter codec
   ---EscapeCodec                       Protocol sensitive word replacement, such as escape
   ---StartEndFlagFrameCodec            Start End Flag Codec, use to decoe message based on start and end flag
   ---StringMessageCodec                String Codec
+  ---StructCodec                       Struct Codec
 envet                                Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
@@ -87,11 +97,11 @@ serializer                             Serialization tool
         c                              internal c basic types
         cpp                            internal cpp basic types
         ---Basic                       basic type
+     ---StructDefinition               struct definition
      ---StructFieldHandler             top struct field handler interface
      ---StructSerializer               core struct serializer tool
      ---StructSerializerContext        the context of struct serializer, contains handler-instance, type cache, etc
-     ---StructUtils                    struct serializer tool
-     ---TypeRefer                      struct serializer generic-type util                    
+     ---StructHepler                    struct serializer tool               
   ---Serializer.java                   top level serializer interface
 ssl
   ---OpenSslContextFactory           OpenSSL context factory
@@ -116,12 +126,10 @@ template
 util                              nettyx tool class
   ---Bins                            binary util
   ---BtFinder                        bluetooth device search util. [Sorry, im not your Lou, Sam]
-  ---ChannelStorage                  Storage channel, internally using KV pairs for storage
   ---CommPorts                       commport util
   ---EndianKit                       bytes tool
   ---Exceptions                      exceptioin util
   ---HexKit                          Hexadecimal tool
-  ---Throws                          assert util
-  ---Try                             lambda exception
+  ---TypeRefer                      struct serializer generic-type util     
   
 ```
