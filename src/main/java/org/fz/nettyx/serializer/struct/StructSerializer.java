@@ -153,13 +153,14 @@ public final class StructSerializer implements Serializer {
             Type                  fieldActualType = TypeUtil.getActualType(rootType, field);
 
             try {
-                handler.beforeRead(this, fieldActualType, structField, structField.getAnnotation());
-                Object fieldValue = handler.doRead(this, fieldActualType, structField, structField.getAnnotation());
-                handler.afterRead(this, fieldActualType, structField, structField.getAnnotation());
+                handler.beforeRead(    this, fieldActualType, structField, structField.getAnnotation());
+                Object fieldValue =
+                        handler.doRead(this, fieldActualType, structField, structField.getAnnotation());
+                handler.afterRead(     this, fieldActualType, structField, structField.getAnnotation());
                 structField.getSetter().accept(struct, fieldValue);
             }
             catch (Exception exception) {
-                handler.whenReadThrow(this, fieldActualType, structField, structField.getAnnotation(), exception);
+                handler.whenReadThrow( this, fieldActualType, structField, structField.getAnnotation(), exception);
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
@@ -179,15 +180,12 @@ public final class StructSerializer implements Serializer {
             Type                  fieldActualType = TypeUtil.getActualType(rootType, field);
 
             try {
-                handler.beforeWrite(this, fieldActualType, structField, structField.getAnnotation(), fieldValue,
-                                    writing);
-                handler.doWrite(this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
-                handler.afterWrite(this, fieldActualType, structField, structField.getAnnotation(), fieldValue,
-                                   writing);
+                handler.beforeWrite(   this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
+                handler.doWrite(       this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
+                handler.afterWrite(    this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
             }
             catch (Exception exception) {
-                handler.whenWriteThrow(this, fieldActualType, structField, structField.getAnnotation(), fieldValue,
-                                       writing, exception);
+                handler.whenWriteThrow(this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing, exception);
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);
             }
         }
