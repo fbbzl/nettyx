@@ -1,5 +1,7 @@
 package org.fz.nettyx.exception;
 
+import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -13,10 +15,14 @@ public class ParameterizedTypeException extends RuntimeException {
     static String toExceptionMessage(Object entry) {
         return "can not determine field [" + entry + "] parameterized type";
     }
+    public ParameterizedTypeException(StructField field) {
+        this(field.getWrapped());
+    }
 
     public ParameterizedTypeException(Field field) {
         super(toExceptionMessage(field));
     }
+
 
     public ParameterizedTypeException(Method method) {
         super(toExceptionMessage(method));
