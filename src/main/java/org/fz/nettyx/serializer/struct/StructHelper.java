@@ -1,19 +1,21 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.lang.Singleton;
+import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.ModifierUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.util.lambda.Try.LambdasException;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.*;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
@@ -22,8 +24,7 @@ import java.util.function.Supplier;
 
 import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
 import static java.lang.invoke.MethodType.methodType;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isReadHandler;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.isWriteHandler;
+import static org.fz.nettyx.serializer.struct.StructDefinition.STRUCT_DEFINITION_CACHE;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -36,77 +37,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
  */
 @SuppressWarnings("unchecked")
 @UtilityClass
-public class StructUtils {
-
-    /**
-     * Is read handleable boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean useReadHandler(Field field) {
-        Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = STRUCT_FIELD_HANDLER_CACHE.get(field);
-        if (handlerClass != null) return isReadHandler(handlerClass);
-        return false;
-    }
-
-    /**
-     * Is write handleable boolean.
-     *
-     * @param field the field
-     * @return the boolean
-     */
-    public static boolean useWriteHandler(Field field) {
-        Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = STRUCT_FIELD_HANDLER_CACHE.get(field);
-        if (handlerClass != null) return isWriteHandler(handlerClass);
-        return false;
-    }
-
-    /**
-     * Find handler annotation a.
-     *
-     * @param <A>     the type parameter
-     * @param field the field
-     * @return the a
-     */
-    public <A extends Annotation> A getStructFieldHandlerAnnotation(Field field) {
-        return (A) STRUCT_FIELD_HANDLER_ANNOTATION_CACHE.get(field);
-    }
-
-    /**
-     * Gets serializer handler.
-     *
-     * @param <H>   the type parameter
-     * @param field the element
-     * @return the serializer handler
-     */
-    public <H extends StructFieldHandler<?>> H getStructFieldHandler(Field field) {
-        Class<? extends StructFieldHandler<? extends Annotation>> handlerClass = STRUCT_FIELD_HANDLER_CACHE.get(field);
-
-        if (handlerClass != null) {
-            boolean isSingleton = Singleton.exists(handlerClass);
-
-            if (isSingleton) return (H) Singleton.get(handlerClass);
-            else             return newFieldHandler(handlerClass);
-        }
-
-        return null;
-    }
-
-    /**
-     * New handler instance t.
-     *
-     * @param <H>   the type parameter
-     * @param clazz the struct class
-     * @return the t
-     */
-    static <H extends StructFieldHandler<? extends Annotation>> H newFieldHandler(Type clazz) {
-        try {
-            return (H) NO_ARGS_CONSTRUCTOR_CACHE.get(clazz).get();
-        } catch (Exception exception) {
-            throw new SerializeException("serializer handler [" + clazz + "] instantiate failed...", exception);
-        }
-    }
+public class StructHelper {
 
     public static <B extends Basic<?>> B newEmptyBasic(Type basicClass) {
         return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
@@ -142,7 +73,6 @@ public class StructUtils {
                 throw new SerializeException(instanceError);
             else
                 throw new SerializeException("basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", instanceError);
-
         }
     }
 
@@ -157,13 +87,21 @@ public class StructUtils {
         try {
             if (structClass instanceof Class)
                 return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(structClass).get();
-            if (structClass instanceof ParameterizedType)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(((ParameterizedType) structClass).getRawType()).get();
+            if (structClass instanceof ParameterizedType parameterizedType)
+                return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(parameterizedType.getRawType()).get();
 
             throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not find @Struct annotation on class");
         } catch (Exception instanceError) {
             throw new SerializeException("struct [" + structClass + "] instantiate failed...", instanceError);
         }
+    }
+
+    public static boolean legalStructField(Field field) {
+       return  !Modifier.isStatic(field.getModifiers()) && !isIgnore(field);
+    }
+
+    public static boolean isIgnore(Field field) {
+        return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
     public static <T> Supplier<T> constructor(Type clazz) {
@@ -242,24 +180,15 @@ public class StructUtils {
         }
     }
 
-    public static <A, P> void writeField(A object, Field field, P value) {
-        ((BiConsumer<A, P>) STRUCT_FIELD_SETTER_CACHE.get(field)).accept(object, value);
+    public static <A, R> Function<A, R> lambdaGetter(Field field) {
+        return (Function<A, R>) getter(field.getDeclaringClass(), field.getType(), upperFirstAndAddPre(field.getName(), "get"));
     }
 
-    public static <A, R> R readField(A object, Field field) {
-        return ((Function<A, R>) STRUCT_FIELD_GETTER_CACHE.get(field)).apply(object);
+    public static <A, P> BiConsumer<A, P> lambdaSetter(Field field) {
+        return (BiConsumer<A, P>) setter(field.getDeclaringClass(), field.getType(), upperFirstAndAddPre(field.getName(), "set"));
     }
 
-    public static <A, R> Function<A, R> getGetter(Class<A> clazz, Field field) {
-        return (Function<A, R>) getter(clazz, field.getType(), upperFirstAndAddPre(field.getName(), "get"));
-    }
-
-    public static <A, P> BiConsumer<A, P> getSetter(Class<A> clazz, Field field) {
-        return (BiConsumer<A, P>) setter(clazz, field.getType(), upperFirstAndAddPre(field.getName(), "set"));
-    }
-
-    public static Field[] getStructFields(Class<?> clazz) {
-        Field[] fields = STRUCT_FIELD_CACHE.get(clazz);
-        return fields != null ? fields : new Field[]{};
+    public static StructDefinition getStructDefinition(Class<?> clazz) {
+        return STRUCT_DEFINITION_CACHE.get(clazz);
     }
 }
