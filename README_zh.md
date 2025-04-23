@@ -38,14 +38,24 @@ action                              包含足够的功能接口来支持nettyx�
   ---ChannelReadAction
   ---ChannelWriteAction
 channel                               channel扩展
-  ---jsc                              jsc
-    ---JscChannel                     jsc通道 
-    ---JscChannelConfig               jsc通道配置
-    ---JscChannelOption               jsc通道配置项
-  ---rxtx                             rxtx
-    ---RxtxChannel                    rxtx通道
-    ---RxtxChannelConfig              rxtx通道配置
-    ---RxtxChannelOption              rxtx通道项
+  ---bluetooth
+    ---client
+      ---BtChannel                    蓝牙channel 
+      ---BtChannelConfig              蓝牙channel 配置
+      ---BtChannelOption              蓝牙channel 配置选项
+      ---BtDeviceAddress              蓝牙设备地址     
+  ---enhanced
+    ---EnhancedOioByteStreamChannel     优化读任务阻塞   
+  ---serial
+    ---jsc                              jsc
+      ---JscChannel                     jsc 串口channel
+      ---JscChannelConfig               jsc 串口channel 配置
+      ---JscChannelOption               jsc 串口channel 配置选项        
+    ---rxtx                             rxtx 串口channel
+      ---RxtxChannel                    rxtx 串口channel
+      ---RxtxChannelConfig              rxtx 串口channel 配置
+      ---RxtxChannelOption              rxtx 串口channel 配置选项
+    SerialCommChannel                   通用串口通道
 codec                              提供了一些基本的编解码器
   ---DelimiterBasedFrameCodec          基于分隔符编解码器
   ---EscapeCodec                       协议敏感字替换，例如转义
@@ -89,8 +99,7 @@ serializer                             序列化工具
      ---StructFieldHandler             字段处理器
      ---StructSerializer               核心结构体序列化器
      ---StructSerializerContext        struct 序列化器的上下文，包含 handler-instance、type cache等等
-     ---StructUtils                    序列化工具
-     ---TypeRefer                      结构泛型类型应用
+     ---StructHepler                   序列化工具
   ---Serializer.java                    顶级序列化器接口
 ssl
   ---OpenSslContextFactory           OpenSSL 上下文工厂
@@ -114,13 +123,11 @@ template
   ---AbstractSingleChannelTemplate     抽象单通道模板
 util                                 基础工具
   ---Bins                            二进制工具
-  ---ChannelStorage                  存储通道，内部使用 KV 对进行存储
   ---CommPorts                       串口工具
   ---EndianKit                       字节工具  
   ---Exceptions                      异常工具
   ---HexKit                          16进制工具
-  ---Throws                          建言工具
-  ---Try                             lambda受检异常工具
+  ---TypeRefer                      结构泛型类型应用
   
 ```
 
