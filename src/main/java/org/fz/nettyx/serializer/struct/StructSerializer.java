@@ -192,14 +192,6 @@ public final class StructSerializer implements Serializer {
         return writing;
     }
 
-    public <T> Class<T> getRawType(Type type) {
-        if (type instanceof Class<?> clazz)                      return (Class<T>) clazz;
-        else
-        if (type instanceof ParameterizedType parameterizedType) return (Class<T>) parameterizedType.getRawType();
-
-        throw new TypeJudgmentException(type);
-    }
-
     <B extends Basic<?>> B readBasic(Type basicType) {
         return newBasic(basicType, this.getByteBuf());
     }
