@@ -357,7 +357,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public boolean isBasic(Field field) {
-        return isBasic(TypeUtil.getType(field));
+        return isBasic(field.getGenericType());
     }
 
     public boolean isBasic(Class<?> clazz) {
@@ -376,7 +376,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public boolean isStruct(Field field) {
-        return isStruct(TypeUtil.getType(field));
+        return isStruct(field.getGenericType());
     }
 
     public boolean isStruct(Type type) {
