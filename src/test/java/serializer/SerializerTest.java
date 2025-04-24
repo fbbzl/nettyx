@@ -64,21 +64,6 @@ public class SerializerTest {
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-    }
+    }}
 
-    public void setNullForTest(User user) {
-        user.setAddress(null);
-        user.setQqNames(null);
-        user.setSs(null);
-        user.setWives(null);
-        user.setWives121212(null);
-        user.setG111fs(null);
-        user.setBs2d(null);
-        user.setSonsbaba(null);
-        user.setSonff(null);
-        user.setSo111ns(null);
-        user.setWwife(null);
-        user.setWives(null);
-        user.setWives121212(null);
-    }
-}
+
