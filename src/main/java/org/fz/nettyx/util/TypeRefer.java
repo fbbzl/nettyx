@@ -32,8 +32,8 @@ public abstract class TypeRefer<T> implements Type {
 
     private final Type typeValue = TypeUtil.getTypeArgument(this.getClass());
 
-    public TypeInspector getTypeInspector() {
-        return TypeInspector.doInspect(this.getTypeValue());
+    public TypeTable getTypeTable() {
+        return TypeTable.of(this.getTypeValue());
     }
 
     @Override
@@ -43,13 +43,13 @@ public abstract class TypeRefer<T> implements Type {
 
     @Getter
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class TypeInspector {
+    public static class TypeTable {
 
         final Type             root;
-        final Map<Field, Type> classMap;
+        final Map<Type, Type> classMap;
 
-        public static TypeInspector doInspect(Type type) {
-            TypeInspector typeInspector = new TypeInspector(type, new HashMap<>(16));
+        public static TypeTable of(Type type) {
+            TypeTable typeTable = new TypeTable(type, new HashMap<>(16));
 
             StructDefinition structDef = getStructDefinition(getRawType(type));
 
@@ -61,10 +61,10 @@ public abstract class TypeRefer<T> implements Type {
                 StructFieldHandler<?>      handler         = structField.getStructFieldHandler();
                 Type                       fieldActualType = TypeUtil.getActualType(type, field);
 
-                typeInspector.getClassMap().put(field, fieldActualType);
+                typeTable.getClassMap().put(field.getGenericType(), fieldActualType);
             }
 
-            return typeInspector;
+            return typeTable;
         }
     }
 }

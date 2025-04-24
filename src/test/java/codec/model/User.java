@@ -3,12 +3,14 @@ package codec.model;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.fz.nettyx.serializer.struct.annotation.*;
-import org.fz.nettyx.serializer.struct.basic.c.signed.*;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.*;
-import org.fz.nettyx.serializer.struct.basic.cpp.CppBool;
-import org.fz.nettyx.serializer.struct.basic.cpp.signed.*;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.*;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
+import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 
 import java.util.List;
 
@@ -17,8 +19,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User<T, W, G> {
 
-    @ToNamedEnum(enumType = Ccc.class, bufferLength = 2)
-    Ccc cccEnum;
+
 
     Clong4 uid;
     @ToArray(length = 5)
@@ -47,49 +48,5 @@ public class User<T, W, G> {
     W[]     wives121212;
 
     Cchar        uname;
-    Cint         isMarried;
-    Cchar        sex;
-    Cfloat       address;
-    Cdouble      platformId;
-    Clong8       description;
-    Culong8      interest;
-    Bill         bill;
-    Cchar        cchar;
-    Cdouble      cdouble;
-    Cfloat       cfloat;
-    Cint         cint;
-    Clong4       clong4;
-    Clong8       clong8;
-    Clonglong    clonglong;
-    Cshort       cshort;
-    Cuchar       cuchar;
-    Cuint        cuint;
-    Culong4      culong4;
-    Culong8      culong8;
-    Culonglong   culonglong;
-    Cushort      cushort;
-    Cpp8tchar    cpp8tchar;
-    Cpp16tchar   cpp16tchar;
-    Cpp32tchar   cpp32tchar;
-    Cppdouble    cppdouble;
-    Cppfloat     cppfloat;
-    Cppint       cppint;
-    Cpplong4     cpplong4;
-    Cpplong8     cpplong8;
-    Cpplonglong  cpplonglong;
-    Cppshort     cppshort;
-    Cppuchar     cppuchar;
-    Cppuint      cppuint;
-    Cppulong4    cppulong4;
-    Cppulong8    cppulong8;
-    Cppulonglong cppulonglong;
-    Cppushort    cppushort;
-    CppBool      cppBool;
-
-    public enum Ccc {
-        TT,
-        CC,
-        ;
-    }
 
 }
