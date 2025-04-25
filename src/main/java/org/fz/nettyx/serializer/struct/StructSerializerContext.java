@@ -168,7 +168,7 @@ public class StructSerializerContext {
                                       Pair<Annotation, Supplier<? extends StructFieldHandler<? extends Annotation>>>
                                               handlerMapping = getHandlerMapping(field);
 
-                                      return new StructField(field, handlerMapping.getKey(), handlerMapping.getValue());
+                                      return new StructField(clazz, field, handlerMapping.getKey(), handlerMapping.getValue());
                                   })
                                   .toArray(StructField[]::new);
 

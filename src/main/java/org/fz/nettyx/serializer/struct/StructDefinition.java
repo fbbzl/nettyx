@@ -1,6 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.TypeUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,11 +8,13 @@ import lombok.experimental.FieldDefaults;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import static org.fz.nettyx.serializer.struct.StructHelper.lambdaGetter;
 import static org.fz.nettyx.serializer.struct.StructHelper.lambdaSetter;
@@ -37,27 +39,47 @@ public record StructDefinition(
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     public static class StructField {
 
-        Field            wrapped;
-        Function<?, ?>   getter;
-        BiConsumer<?, ?> setter;
+        Type                declaringClass;
+        Field               wrapped;
+        /**
+         * struct field type
+         */
+        @Getter(AccessLevel.NONE)
+        UnaryOperator<Type> type;
+
+        Function<?, ?>      getter;
+        BiConsumer<?, ?>    setter;
         /**
          * struct field handler annotation
          */
-        Annotation       annotation;
+        Annotation          annotation;
         /**
          * struct field handler supplier
          */
         @Getter(AccessLevel.NONE)
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
-        public StructField(Field wrapped,
+        public StructField(Type declaringClass,
+                           Field wrapped,
                            Annotation annotation,
                            Supplier<? extends StructFieldHandler<? extends Annotation>> handler) {
-            this.wrapped    = wrapped;
-            this.getter     = lambdaGetter(wrapped);
-            this.setter     = lambdaSetter(wrapped);
-            this.annotation = annotation;
-            this.handler    = handler;
+            this.declaringClass = declaringClass;
+            this.wrapped        = wrapped;
+            this.type           = typeSupplier(wrapped);
+            this.getter         = lambdaGetter(wrapped);
+            this.setter         = lambdaSetter(wrapped);
+            this.annotation     = annotation;
+            this.handler        = handler;
+        }
+
+        private UnaryOperator<Type> typeSupplier(Field field) {
+            Type fieldType = field.getGenericType();
+            return fieldType instanceof Class<?> ? root -> (Class<?>) fieldType :
+                   root -> TypeUtil.getActualType(root, fieldType);
+        }
+
+        public Type getActualType(Type root) {
+            return type.apply(root);
         }
 
         public <A extends Annotation> A getAnnotation() {
@@ -75,8 +97,6 @@ public record StructDefinition(
         public <O, P> BiConsumer<O, P> getSetter() {
             return (BiConsumer<O, P>) setter;
         }
-
-        public static final Pair<Annotation, Supplier<? extends StructFieldHandler<? extends Annotation>>> NO_HANDLER = Pair.of(null, null);
 
         @Override
         public String toString() {
