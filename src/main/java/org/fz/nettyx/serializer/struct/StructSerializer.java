@@ -150,7 +150,7 @@ public final class StructSerializer implements Serializer {
         for (StructField structField : structDef.fields()) {
             Field                 field           = structField.getWrapped();
             StructFieldHandler<?> handler         = structField.getStructFieldHandler();
-            Type                  fieldActualType = TypeUtil.getActualType(rootType, field);
+            Type                  fieldActualType = structField.getActualType(rootType);
 
             try {
                 handler.beforeRead(    this, fieldActualType, structField, structField.getAnnotation());
@@ -177,7 +177,7 @@ public final class StructSerializer implements Serializer {
             Field                 field           = structField.getWrapped();
             StructFieldHandler<?> handler         = structField.getStructFieldHandler();
             Object                fieldValue      = structField.getGetter().apply(struct);
-            Type                  fieldActualType = TypeUtil.getActualType(rootType, field);
+            Type                  fieldActualType = structField.getActualType(rootType);
 
             try {
                 handler.beforeWrite(   this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
