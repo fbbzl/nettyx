@@ -37,15 +37,15 @@ public class SerializerTest {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[64];
+        byte[] bytes = new byte[6411];
         Arrays.fill(bytes, (byte) 67);
         Map<Type, Type> typeMap = TypeUtil.getTypeMap(TEST_USER.getClass());
 
         TypeTable lassTypeTable = youCLass.getTypeTable();
         StopWatch stopWatch = StopWatch.create("反序列");
         stopWatch.start();
-        for (int i = 0; i < 1_000_000; i++) {
-            StructSerializer.toStruct(youCLass, lassTypeTable, bytes);
+        for (int i = 0; i < 1; i++) {
+            StructSerializer.toStruct(userTypeRefer, bytes);
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
