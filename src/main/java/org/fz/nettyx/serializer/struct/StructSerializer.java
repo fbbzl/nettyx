@@ -22,6 +22,7 @@ import java.lang.reflect.*;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
@@ -149,19 +150,14 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(getRawType(rootType));
 
         for (StructField structField : structDef.fields()) {
-            Field field = null;
-            StructFieldHandler<?> handler         = structField.getStructFieldHandler();
-            Type                  fieldActualType = structField.actualType(rootType);
+            Field field           = structField.wrapped(); StructFieldHandler<?> handler = structField.handler();
+            Type  fieldActualType = structField.actualType(rootType);
 
             try {
-                handler.beforeRead(    this, fieldActualType, structField, structField.getAnnotation());
-                Object fieldValue =
-                        handler.doRead(this, fieldActualType, structField, structField.getAnnotation());
-                handler.afterRead(     this, fieldActualType, structField, structField.getAnnotation());
-                structField.getSetter().accept(struct, fieldValue);
+                Object fieldValue = handler.doRead(this, fieldActualType, structField, structField.annotation());
+                structField.setter().accept(struct, fieldValue);
             }
             catch (Exception exception) {
-                handler.whenReadThrow( this, fieldActualType, structField, structField.getAnnotation(), exception);
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
@@ -175,18 +171,16 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(getRawType(rootType));
 
         for (StructField structField : structDef.fields()) {
-            Field                 field           = null;
-            StructFieldHandler<?> handler         = structField.getStructFieldHandler();
-            Object                fieldValue      = structField.getGetter().apply(struct);
+            Supplier<?>           constructor     = structDef.constructor();
+            Field                 field           = structField.wrapped();
+            StructFieldHandler<?> handler         = structField.handler();
+            Object                fieldValue      = structField.getter().apply(struct);
             Type                  fieldActualType = structField.actualType(rootType);
 
             try {
-                handler.beforeWrite(   this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
-                handler.doWrite(       this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
-                handler.afterWrite(    this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);
+                handler.doWrite(this, fieldActualType, structField, structField.annotation(), fieldValue, writing);
             }
             catch (Exception exception) {
-                handler.whenWriteThrow(this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing, exception);
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);
             }
         }

@@ -76,6 +76,10 @@ public record StructDefinition(
             return type.apply(root);
         }
 
+        public <A extends Annotation> A annotation() {
+            return (A) annotation;
+        }
+
         public <A extends Annotation, H extends StructFieldHandler<A>> H handler() {
             return (H) handler.get();
         }
