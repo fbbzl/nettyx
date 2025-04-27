@@ -48,19 +48,6 @@ public interface StructFieldHandler<A extends Annotation> {
         throw new TypeJudgmentException(field);
     }
 
-    default void beforeRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
-        // default is no nothing
-    }
-
-    default void afterRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
-        // default is no nothing
-    }
-
-    default void whenReadThrow(StructSerializer serializer, Type fieldType, StructField structField, A annotation,
-                               Throwable throwable) {
-        // default is no nothing
-    }
-
     default void doWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
                          ByteBuf writing) {
         Field field = structField.wrapped();
@@ -75,21 +62,6 @@ public interface StructFieldHandler<A extends Annotation> {
         }
 
         throw new TypeJudgmentException(field);
-    }
-
-    default void beforeWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
-                             ByteBuf writing) {
-        // default is no nothing
-    }
-
-    default void afterWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
-                            ByteBuf writing) {
-        // default is no nothing
-    }
-
-    default void whenWriteThrow(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
-                                ByteBuf writing, Throwable throwable) {
-        // default is no nothing
     }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {

@@ -137,13 +137,10 @@ public class StructSerializerContext {
 
                 if (isBasic) {
                     // cache basics constructor
-                    BASIC_BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                                lambdaConstructor(clazz,
-                                                                                  ByteBuf.class));
+                    BASIC_BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, lambdaConstructor(clazz, ByteBuf.class));
 
                     // cache bytes size
-                    BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                 StructHelper.reflectForSize((Class<? extends Basic<?>>) clazz));
+                    BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, StructHelper.reflectForSize((Class<? extends Basic<?>>) clazz));
                 }
             }
             catch (Throwable throwable) {
