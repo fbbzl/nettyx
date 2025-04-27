@@ -11,21 +11,12 @@ import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.util.lambda.Try.LambdasException;
 
-import java.lang.invoke.*;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
-import static cn.hutool.core.text.CharSequenceUtil.upperFirstAndAddPre;
-import static java.lang.invoke.MethodType.methodType;
-import static org.fz.nettyx.serializer.struct.StructDefinition.STRUCT_DEFINITION_CACHE;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -113,91 +104,4 @@ public class StructHelper {
         return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static <T> Supplier<T> constructor(Type clazz) {
-        try {
-            Lookup       lookup            = MethodHandles.lookup();
-            MethodHandle constructorHandle = lookup.findConstructor((Class<T>) clazz, methodType(void.class));
-
-            CallSite site = LambdaMetafactory.metafactory(
-                    lookup,
-                    "get",
-                    MethodType.methodType(Supplier.class),
-                    constructorHandle.type().generic(),
-                    constructorHandle,
-                    constructorHandle.type());
-
-            return (Supplier<T>) site.getTarget().invokeExact();
-        } catch (Throwable throwable) {
-            throw new LambdasException("can not generate lambda constructor for class [" + clazz + "]");
-        }
-    }
-
-    public static <P, T> Function<P, T> constructor(Type clazz, Class<P> paramType) {
-        try {
-            Lookup       lookup            = MethodHandles.lookup();
-            MethodHandle constructorHandle = lookup.findConstructor((Class<T>) clazz, methodType(void.class, paramType));
-
-            CallSite site = LambdaMetafactory.metafactory(
-                    lookup,
-                    "apply",
-                    MethodType.methodType(Function.class),
-                    constructorHandle.type().generic(),
-                    constructorHandle,
-                    constructorHandle.type());
-
-            return (Function<P, T>) site.getTarget().invokeExact();
-        } catch (Throwable throwable) {
-            throw new LambdasException("can not generate lambda constructor for class [" + clazz + "], param type: [" + paramType + "]");
-        }
-    }
-
-    public static <T, R> Function<T, R> getter(Type clazz, Class<R> returnType, String methodName) {
-        try {
-            Lookup       lookup       = MethodHandles.lookup();
-            MethodHandle getterHandle = lookup.findVirtual((Class<T>) clazz, methodName, methodType(returnType));
-
-            CallSite site = LambdaMetafactory.metafactory(
-                    lookup,
-                    "apply",
-                    methodType(Function.class),
-                    methodType(Object.class, Object.class),
-                    getterHandle,
-                    getterHandle.type());
-
-            return (Function<T, R>) site.getTarget().invokeExact();
-        } catch (Throwable throwable) {
-            throw new IllegalArgumentException("can not generate lambda getter, class [" + clazz + "], method: [" + methodName + "], return type: [" + returnType + "]");
-        }
-    }
-
-    public static <A, P> BiConsumer<A, P> setter(Class<A> clazz, Class<P> paramType, String methodName) {
-        try {
-            Lookup       lookup       = MethodHandles.lookup();
-            MethodHandle setterHandle = lookup.findVirtual(clazz, methodName, methodType(void.class, paramType));
-
-            CallSite site = LambdaMetafactory.metafactory(
-                    lookup,
-                    "accept",
-                    methodType(BiConsumer.class),
-                    methodType(void.class, Object.class, Object.class),
-                    setterHandle,
-                    setterHandle.type());
-
-            return (BiConsumer<A, P>) site.getTarget().invokeExact();
-        } catch (Throwable throwable) {
-            throw new IllegalArgumentException("can not generate lambda setter, class [" + clazz + "], method: [" + methodName + "], param type: [" + paramType + "]");
-        }
-    }
-
-    public static <A, R> Function<A, R> lambdaGetter(Field field) {
-        return (Function<A, R>) getter(field.getDeclaringClass(), field.getType(), upperFirstAndAddPre(field.getName(), "get"));
-    }
-
-    public static <A, P> BiConsumer<A, P> lambdaSetter(Field field) {
-        return (BiConsumer<A, P>) setter(field.getDeclaringClass(), field.getType(), upperFirstAndAddPre(field.getName(), "set"));
-    }
-
-    public static StructDefinition getStructDefinition(Class<?> clazz) {
-        return STRUCT_DEFINITION_CACHE.get(clazz);
-    }
 }

@@ -40,7 +40,7 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default Object doRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
-        Field field = structField.getWrapped();
+        Field field = structField.wrapped();
 
         if (serializer.isBasic(fieldType)) return serializer.readBasic(fieldType);
         if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType);
@@ -63,7 +63,7 @@ public interface StructFieldHandler<A extends Annotation> {
 
     default void doWrite(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object value,
                          ByteBuf writing) {
-        Field field = structField.getWrapped();
+        Field field = structField.wrapped();
 
         if (serializer.isBasic(field)) {
             serializer.writeBasic((Basic<?>) basicNullDefault(value, fieldType), writing);

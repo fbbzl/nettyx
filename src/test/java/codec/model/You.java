@@ -27,6 +27,19 @@ public class You {
     List<Clong8> description;
     Culong8 interest;
     Hit     c;
+    Cchar   uname1;
+    Cint    isMarried1;
+    Cchar   sex1;
+    Cfloat  address1;
+    Cdouble platformId1;
+    Cchar   uname2;
+    Cint    isMarried2;
+    Cchar   sex2;
+    Cfloat  address2;
+    Cdouble platformId2;
+    Cchar   uname3;
+    Cint    isMarried3;
+    Cchar   sex3;
 
 
     @Data

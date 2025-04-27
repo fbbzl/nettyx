@@ -25,8 +25,9 @@ import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructDefinition.STRUCT_DEFINITION_CACHE;
 import static org.fz.nettyx.serializer.struct.StructHelper.*;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEFINITION_CACHE;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
 
 /**
  * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
@@ -148,9 +149,9 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(getRawType(rootType));
 
         for (StructField structField : structDef.fields()) {
-            Field                 field           = structField.getWrapped();
+            Field field = null;
             StructFieldHandler<?> handler         = structField.getStructFieldHandler();
-            Type                  fieldActualType = structField.getActualType(rootType);
+            Type                  fieldActualType = structField.actualType(rootType);
 
             try {
                 handler.beforeRead(    this, fieldActualType, structField, structField.getAnnotation());
@@ -174,10 +175,10 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(getRawType(rootType));
 
         for (StructField structField : structDef.fields()) {
-            Field                 field           = structField.getWrapped();
+            Field                 field           = null;
             StructFieldHandler<?> handler         = structField.getStructFieldHandler();
             Object                fieldValue      = structField.getGetter().apply(struct);
-            Type                  fieldActualType = structField.getActualType(rootType);
+            Type                  fieldActualType = structField.actualType(rootType);
 
             try {
                 handler.beforeWrite(   this, fieldActualType, structField, structField.getAnnotation(), fieldValue, writing);

@@ -9,16 +9,12 @@ import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
 import org.fz.nettyx.util.TypeRefer;
-import org.fz.nettyx.util.TypeRefer.TypeTable;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import static codec.UserCodec.TEST_USER;
 
 
 /**
@@ -39,13 +35,11 @@ public class SerializerTest {
     public void testStructSerializer() {
         byte[] bytes = new byte[6411];
         Arrays.fill(bytes, (byte) 67);
-        Map<Type, Type> typeMap = TypeUtil.getTypeMap(TEST_USER.getClass());
 
-        TypeTable lassTypeTable = youCLass.getTypeTable();
-        StopWatch stopWatch = StopWatch.create("反序列");
+        StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
-        for (int i = 0; i < 1; i++) {
-            StructSerializer.toStruct(userTypeRefer, bytes);
+        for (int i = 0; i < 1_000_000; i++) {
+            StructSerializer.toStruct(youCLass, bytes);
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
