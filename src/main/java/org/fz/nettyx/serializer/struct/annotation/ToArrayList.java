@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
@@ -48,25 +48,24 @@ public @interface ToArrayList {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList,
-                             Object earlyObject) {
-            Type elementType = serializer.getElementType(fieldType);
+        public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
+                             ToArrayList toArrayList) {
+            Type elementType = StructHelper.getElementType(root, structField.forActual(root));
 
-            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
+            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(structField));
 
-            return serializer.readList(elementType, toArrayList.size());
+            return readList(root, elementType, reading, toArrayList.size());
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList,
-                            Object value,
-                            ByteBuf writing) {
-            Type elementType = serializer.getElementType(fieldType);
+        public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
+                            ToArrayList toArrayList) {
+            Type elementType = StructHelper.getElementType(root, structField.forActual(root));
 
-            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
+            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(structField));
 
-            serializer.writeList(defaultIfNull((List<?>) value, Collections::emptyList), elementType,
-                                 toArrayList.size(), writing);
+            writeList(root, defaultIfNull((List<?>) fieldVal, Collections::emptyList), elementType,
+                      toArrayList.size(), writing);
         }
     }
 }
