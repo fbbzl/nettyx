@@ -3,32 +3,30 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Filter;
-import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.ReflectUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.util.lambda.LambdaMetas;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ArrayUtil.*;
-import static org.fz.nettyx.serializer.struct.StructDefinition.STRUCT_DEFINITION_CACHE;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_READ_WRITE_HANDLER;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
-import static org.fz.nettyx.serializer.struct.StructHelper.constructor;
+import static org.fz.util.lambda.LambdaMetas.lambdaConstructor;
 
 /**
  * The type Struct cache.
@@ -45,10 +43,10 @@ public class StructSerializerContext {
     @Getter
     private final String[] basePackages;
 
-    static final Map<Type, Integer>              BASIC_SIZE_CACHE                = new HashMap<>(64);
-    static final Map<Type, Function<ByteBuf, ?>> BASIC_BYTEBUF_CONSTRUCTOR_CACHE = new HashMap<>(64);
-    static final Map<Type, Supplier<?>>          NO_ARGS_CONSTRUCTOR_CACHE       = new HashMap<>(128);
-
+    static final Map<Type, Integer>                                                                          BASIC_SIZE_CACHE                 = new HashMap<>(64);
+    static final Map<Type, Function<ByteBuf, ?>>                                                             BASIC_BYTEBUF_CONSTRUCTOR_CACHE  = new HashMap<>(64);
+    static final Map<Type, Supplier<?>>                                                                      NO_ARGS_CONSTRUCTOR_CACHE        = new HashMap<>(128);
+    static final Map<Class<?>, StructDefinition>                                                             STRUCT_DEFINITION_CACHE          = new ConcurrentHashMap<>(512);
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE =
             new HashMap<>(32);
 
@@ -116,7 +114,7 @@ public class StructSerializerContext {
                 if (isFieldHandler) {
                     Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
                     if (annotationType != null) {
-                        Supplier<?> constructorSupplier = constructor(clazz);
+                        Supplier<?> constructorSupplier = LambdaMetas.lambdaConstructor(clazz);
                         // cache field handler constructor
                         NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
 
@@ -139,8 +137,9 @@ public class StructSerializerContext {
 
                 if (isBasic) {
                     // cache basics constructor
-                    BASIC_BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz, constructor(clazz,
-                                                                                                               ByteBuf.class));
+                    BASIC_BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
+                                                                lambdaConstructor(clazz,
+                                                                                  ByteBuf.class));
 
                     // cache bytes size
                     BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
@@ -157,22 +156,7 @@ public class StructSerializerContext {
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
-                    // constructor
-                    Supplier<?> constructor = constructor(clazz);
-                    NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructor);
-
-                    // struct fields
-                    final StructField[] structFields =
-                            Stream.of(ReflectUtil.getFields(clazz, StructHelper::legalStructField))
-                                  .map(field -> {
-                                      Pair<Annotation, Supplier<? extends StructFieldHandler<? extends Annotation>>>
-                                              handlerMapping = getHandlerMapping(field);
-
-                                      return new StructField(clazz, field, handlerMapping.getKey(), handlerMapping.getValue());
-                                  })
-                                  .toArray(StructField[]::new);
-
-                    STRUCT_DEFINITION_CACHE.put(clazz, new StructDefinition(constructor, structFields));
+                    STRUCT_DEFINITION_CACHE.put(clazz, new StructDefinition(clazz));
                 }
             }
             catch (Throwable throwable) {
@@ -181,29 +165,33 @@ public class StructSerializerContext {
         }
     }
 
-    private static Pair<Annotation, Supplier<? extends StructFieldHandler<? extends Annotation>>> getHandlerMapping(Field field) {
+    static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandler(Field field) {
+        Annotation handlerAnnotation         = getHandlerAnnotation(field);
+        boolean    handlerAnnotationAssigned = handlerAnnotation != null;
+
+        if (handlerAnnotationAssigned) {
+            Supplier<H> handlerSupplier =
+                    LambdaMetas.lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
+
+            StructFieldHandler handler = (StructFieldHandler) handlerSupplier.get();
+            if (handler.isSingleton()) Singleton.put(handler);
+
+            return handler.isSingleton() ? () -> (H) handler : (Supplier<H>) handlerSupplier;
+        }
+        else return () -> (H) DEFAULT_READ_WRITE_HANDLER;
+    }
+
+    static <A extends Annotation> A getHandlerAnnotation(Field field) {
         Iterator<Annotation> iterator =
                 Stream.of(AnnotationUtil.getAnnotations(field, false))
                       .filter(annotation -> ANNOTATION_HANDLER_MAPPING_CACHE.containsKey(annotation.annotationType()))
                       .iterator();
         // means will use handler to handle this field
-        boolean useHandler = iterator.hasNext();
+        return iterator.hasNext() ? (A) iterator.next() : null;
+    }
 
-        if (useHandler) {
-            Annotation annotation = iterator.next();
-            Supplier<? extends StructFieldHandler<? extends Annotation>>
-                    handlerConstructorSupplier =
-                    StructHelper.constructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(annotation.annotationType()));
-
-            StructFieldHandler handler = (StructFieldHandler) handlerConstructorSupplier.get();
-            if (handler.isSingleton()) Singleton.put(handler);
-
-            Supplier<? extends StructFieldHandler<? extends Annotation>>
-                    handlerSupplier = handler.isSingleton() ? () -> handler : handlerConstructorSupplier;
-
-            return Pair.of(annotation, handlerSupplier);
-        }
-        else return Pair.of(null, () -> DEFAULT_READ_WRITE_HANDLER);
+    public static StructDefinition getStructDefinition(Class<?> clazz) {
+        return STRUCT_DEFINITION_CACHE.get(clazz);
     }
 
 }
