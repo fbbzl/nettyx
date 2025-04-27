@@ -41,7 +41,8 @@ public @interface ToArray {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation,
+                             Object earlyObject) {
             Type componentType = serializer.getComponentType(fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
@@ -50,13 +51,15 @@ public @interface ToArray {
 
             try {
                 return serializer.readArray(componentType, length);
-            } catch (TypeJudgmentException typeJudgmentException) {
+            }
+            catch (TypeJudgmentException typeJudgmentException) {
                 throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation, Object arrayValue, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation,
+                            Object arrayValue, ByteBuf writing) {
             Type componentType = serializer.getComponentType(fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
@@ -65,7 +68,8 @@ public @interface ToArray {
 
             try {
                 serializer.writeArray(arrayValue, componentType, length, writing);
-            } catch (TypeJudgmentException typeJudgmentException) {
+            }
+            catch (TypeJudgmentException typeJudgmentException) {
                 throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
         }

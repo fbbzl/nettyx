@@ -22,7 +22,6 @@ import java.lang.reflect.*;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
@@ -154,7 +153,7 @@ public final class StructSerializer implements Serializer {
             Type  fieldActualType = structField.actualType(rootType);
 
             try {
-                Object fieldValue = handler.doRead(this, fieldActualType, structField, structField.annotation());
+                Object fieldValue = handler.doRead(this, fieldActualType, structField, structField.annotation(), struct);
                 structField.setter().accept(struct, fieldValue);
             }
             catch (Exception exception) {
@@ -171,7 +170,6 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(getRawType(rootType));
 
         for (StructField structField : structDef.fields()) {
-            Supplier<?>           constructor     = structDef.constructor();
             Field                 field           = structField.wrapped();
             StructFieldHandler<?> handler         = structField.handler();
             Object                fieldValue      = structField.getter().apply(struct);
@@ -372,17 +370,6 @@ public final class StructSerializer implements Serializer {
         if (type instanceof TypeVariable<?> typeVariable)        return isStruct(TypeUtil.getActualType(rootType, typeVariable));
 
         return false;
-    }
-
-    /**
-     * this is a  useful method that sometimes you may read the field value before current field value, if so you can
-     * get the serializing struct object by this method
-     *
-     * @param <T> the type parameter
-     * @return the t
-     */
-    public <T> T earlyStruct() {
-        return (T) this.struct;
     }
 
     //******************************************      public end       ***********************************************//
