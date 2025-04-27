@@ -39,7 +39,7 @@ public interface StructFieldHandler<A extends Annotation> {
         return false;
     }
 
-    default Object doRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation) {
+    default Object doRead(StructSerializer serializer, Type fieldType, StructField structField, A annotation, Object earlyObject) {
         Field field = structField.wrapped();
 
         if (serializer.isBasic(fieldType)) return serializer.readBasic(fieldType);

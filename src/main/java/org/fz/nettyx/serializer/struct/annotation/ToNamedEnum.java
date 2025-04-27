@@ -57,7 +57,8 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToNamedEnum toNamedEnum) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToNamedEnum toNamedEnum,
+                             Object earlyObject) {
             Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
             String enumName = serializer.getByteBuf()
                                         .readCharSequence(toNamedEnum.bufferLength(),
@@ -67,7 +68,8 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToNamedEnum toNamedEnum, Object value,
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToNamedEnum toNamedEnum,
+                            Object value,
                             ByteBuf writing) {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();

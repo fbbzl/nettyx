@@ -48,7 +48,8 @@ public @interface ToArrayList {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList,
+                             Object earlyObject) {
             Type elementType = serializer.getElementType(fieldType);
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
@@ -57,7 +58,8 @@ public @interface ToArrayList {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList, Object value,
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArrayList toArrayList,
+                            Object value,
                             ByteBuf writing) {
             Type elementType = serializer.getElementType(fieldType);
 

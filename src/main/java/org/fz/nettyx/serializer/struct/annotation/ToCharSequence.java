@@ -51,7 +51,9 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToCharSequence toCharSequence) {
+        public Object doRead(StructSerializer serializer, Type fieldType, StructField field,
+                             ToCharSequence toCharSequence,
+                             Object earlyObject) {
             String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
@@ -68,12 +70,13 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToCharSequence toCharSequence, Object value, ByteBuf writing) {
+        public void doWrite(StructSerializer serializer, Type fieldType, StructField field,
+                            ToCharSequence toCharSequence, Object value, ByteBuf writing) {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
 
             if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else               writing.writeBytes(new byte[bufferLength]);
+            else writing.writeBytes(new byte[bufferLength]);
         }
     }
 }
