@@ -144,12 +144,12 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(getRawType(root));
 
         for (StructField structField : structDef.fields()) {
-            Field                 field           = structField.wrapped();
-            StructFieldHandler<?> handler         = structField.handler();
-            Object                fieldValue      = structField.getter().apply(struct);
+            Field                 field      = structField.wrapped();
+            StructFieldHandler<?> handler    = structField.handler();
+            Object                fieldValue = structField.getter().apply(struct);
 
             try {
-                handler.doWrite(root, structField, structField.annotation(), fieldValue, writing);
+                handler.doWrite(root, struct, structField, fieldValue, writing, structField.annotation());
             }
             catch (Exception exception) {
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);
