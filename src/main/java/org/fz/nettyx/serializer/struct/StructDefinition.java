@@ -6,11 +6,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.util.lambda.LambdaMetas;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -18,8 +21,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandler;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandlerAnnotation;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 /**
  * reference Schema
@@ -70,6 +72,32 @@ public record StructDefinition(
             Type fieldType = field.getGenericType();
             return fieldType instanceof Class<?> clazz ? root -> clazz :
                    root -> TypeUtil.getActualType(root, fieldType);
+        }
+
+        public boolean isBasic(Type root) {
+            return isBasic(root, wrapped.getGenericType());
+        }
+
+        public boolean isBasic(Type root, Type type) {
+            if (type instanceof Class<?> clazz) return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+            if (type instanceof TypeVariable<?> typeVariable)
+                return isBasic(TypeUtil.getActualType(root, typeVariable));
+
+            return false;
+        }
+
+        public boolean isStruct(Type root) {
+            return isStruct(root, wrapped.getGenericType());
+        }
+
+        public boolean isStruct(Type root, Type type) {
+            if (type instanceof Class<?> clazz) return STRUCT_DEFINITION_CACHE.containsKey(clazz);
+            if (type instanceof ParameterizedType parameterizedType)
+                return isStruct(parameterizedType.getRawType());
+            if (type instanceof TypeVariable<?> typeVariable)
+                return isStruct(TypeUtil.getActualType(root, typeVariable));
+
+            return false;
         }
 
         public Type actualType(Type root) {

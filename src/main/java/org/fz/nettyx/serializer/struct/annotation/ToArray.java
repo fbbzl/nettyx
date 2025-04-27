@@ -41,7 +41,7 @@ public @interface ToArray {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation,
+        public Object doRead(Type root, Type fieldType, StructField field, ToArray annotation,
                              Object earlyObject) {
             Type componentType = serializer.getComponentType(fieldType);
 
