@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
-import org.fz.nettyx.serializer.struct.annotation.ToLinkedList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
@@ -24,7 +23,7 @@ public class User<T, W, G> {
     Clong4 uid;
     @ToArray(length = 5)
     Cppushort[]     qqNames;
-    @ToLinkedList(size = 5)
+    @ToArrayList(size = 5)
     List<Cppushort> ss;
     @ToArrayList(size = 5)
     List<Cppushort> tts;

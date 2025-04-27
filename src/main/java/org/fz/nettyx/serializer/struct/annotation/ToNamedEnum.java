@@ -4,7 +4,6 @@ import cn.hutool.core.util.EnumUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -57,24 +56,23 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToNamedEnum toNamedEnum,
-                             Object earlyObject) {
+        public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
+                             ToNamedEnum toNamedEnum) {
             Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
-            String enumName = serializer.getByteBuf()
-                                        .readCharSequence(toNamedEnum.bufferLength(),
-                                                          Charset.forName(toNamedEnum.charset())).toString();
+            String enumName = reading
+                    .readCharSequence(toNamedEnum.bufferLength(),
+                                      Charset.forName(toNamedEnum.charset())).toString();
 
             return EnumUtil.fromString(enumClass, enumName);
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToNamedEnum toNamedEnum,
-                            Object value,
-                            ByteBuf writing) {
+        public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
+                            ToNamedEnum toNamedEnum) {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();
 
-            if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
+            if (fieldVal != null) writing.writeBytes(fieldVal.toString().getBytes(Charset.forName(charset)));
             else writing.writeBytes(new byte[bufferLength]);
         }
     }
