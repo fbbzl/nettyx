@@ -204,11 +204,12 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default void writeStructList(List<?> list, Type elementType, int length, ByteBuf writing) {
-        Iterator<?> iterator = list.iterator(); for (int i = 0; i < length; i++) {
-            if (iterator.hasNext()) writing.writeBytes(StructSerializer.toByteBuf(elementType,
-                                                                                  structNullDefault(iterator.next(),
-                                                                                                    elementType)));
-            else writing.writeBytes(StructSerializer.toByteBuf(elementType, newStruct(elementType)));
+        Iterator<?> iterator = list.iterator();
+        for (int i = 0; i < length; i++) {
+            if (iterator.hasNext())
+                writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(iterator.next(), elementType)));
+            else
+                writing.writeBytes(StructSerializer.toByteBuf(elementType, newStruct(elementType)));
         }
     }
 
