@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -55,37 +54,15 @@ public interface StructFieldHandler<A extends Annotation> {
         throw new TypeJudgmentException(structField);
     }
 
-    default void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing, A annotation) {
-        Field wrapped      = structField.wrapped();
-        Type  actualType = structField.type(root);
-        if (isBasic(root, wrapped)) {
-            writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) actualType), writing);
-            return;
-        }
-        if (isStruct(root, wrapped)) {
-            writeStruct(actualType, structNullDefault(fieldVal, actualType), writing);
-            return;
+    default void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
+                         A annotation) {
+        Field wrapped = structField.wrapped(); Type actualType = structField.type(root); if (isBasic(root, wrapped)) {
+            writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) actualType), writing); return;
+        } if (isStruct(root, wrapped)) {
+            writeStruct(actualType, structNullDefault(fieldVal, actualType), writing); return;
         }
 
         throw new TypeJudgmentException(structField);
-    }
-
-    static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
-        if (!ClassUtil.isNormalClass(clazz)) {
-            return null;
-        }
-
-        Type[] genericInterfaces = clazz.getGenericInterfaces();
-
-        for (Type genericInterface : genericInterfaces) {
-            if (genericInterface instanceof ParameterizedType parameterizedType) {
-                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                if (actualTypeArguments.length > 0) {
-                    return (Class<A>) actualTypeArguments[0];
-                }
-            }
-        }
-        return null;
     }
 
     default boolean isBasic(Type root, Field field) {
@@ -110,8 +87,7 @@ public interface StructFieldHandler<A extends Annotation> {
 
     public static boolean isStruct(Type root, Type type) {
         if (type instanceof Class<?> clazz) return STRUCT_DEFINITION_CACHE.containsKey(clazz);
-        if (type instanceof ParameterizedType parameterizedType)
-            return isStruct(root, parameterizedType.getRawType());
+        if (type instanceof ParameterizedType parameterizedType) return isStruct(root, parameterizedType.getRawType());
         if (type instanceof TypeVariable<?> typeVariable)
             return isStruct(root, TypeUtil.getActualType(root, typeVariable));
 
@@ -123,12 +99,14 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default <T> T[] readArray(Type root, Type elementType, ByteBuf byteBuf, int length) {
-        if (isBasic(root, elementType)) return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length);
+        if (isBasic(root, elementType))
+            return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length);
         else if (isStruct(root, elementType)) return readStructArray(root, elementType, byteBuf, length);
         else throw new TypeJudgmentException();
     }
 
-    default <B extends Basic<?>> B[] readBasicArray(Class<?  extends Basic<?>> elementType, ByteBuf byteBuf, int length) {
+    default <B extends Basic<?>> B[] readBasicArray(Class<? extends Basic<?>> elementType, ByteBuf byteBuf,
+                                                    int length) {
         B[] basics = newArray(elementType, length);
 
         for (int i = 0; i < basics.length; i++) basics[i] = newBasic(elementType, byteBuf);
@@ -137,8 +115,7 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default <S> S[] readStructArray(Type root, Type elementType, ByteBuf byteBuf, int length) {
-        S[]  structs           = newArray(elementType, length);
-        Type elementActualType = TypeUtil.getActualType(root, elementType);
+        S[] structs = newArray(elementType, length); Type elementActualType = TypeUtil.getActualType(root, elementType);
 
         for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementActualType, byteBuf);
 
@@ -146,12 +123,14 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default <T> List<T> readList(Type root, Type elementType, ByteBuf byteBuf, int length) {
-        if (isBasic(root, elementType)) return (List<T>) readBasicList(root, (Class<? extends Basic<?>>) elementType, byteBuf, length);
+        if (isBasic(root, elementType))
+            return (List<T>) readBasicList(root, (Class<? extends Basic<?>>) elementType, byteBuf, length);
         else if (isStruct(root, elementType)) return readStructList(root, elementType, byteBuf, length);
         else throw new TypeJudgmentException();
     }
 
-    default <B extends Basic<?>> List<B> readBasicList(Type root, Class<? extends Basic<?>> elementType, ByteBuf byteBuf, int length) {
+    default <B extends Basic<?>> List<B> readBasicList(Type root, Class<? extends Basic<?>> elementType,
+                                                       ByteBuf byteBuf, int length) {
         return CollUtil.newArrayList(readBasicArray(elementType, byteBuf, length));
     }
 
@@ -173,8 +152,7 @@ public interface StructFieldHandler<A extends Annotation> {
             Basic<?>[] basicArray       = (Basic<?>[]) arrayValue;
 
             if (basicArray == null) {
-                writing.writeBytes(new byte[basicElementSize * length]);
-                return;
+                writing.writeBytes(new byte[basicElementSize * length]); return;
             }
 
             writeBasicArray(basicArray, basicElementSize, length, writing);
@@ -188,22 +166,18 @@ public interface StructFieldHandler<A extends Annotation> {
     default void writeBasicArray(Basic<?>[] basicArray, int elementBytesSize, int length, ByteBuf writing) {
         for (int i = 0; i < length; i++) {
             if (i < basicArray.length) {
-                Basic<?> basic = basicArray[i];
-                if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
+                Basic<?> basic = basicArray[i]; if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
                 else writing.writeBytes(basicArray[i].getBytes());
             }
-            else
-                writing.writeBytes(new byte[elementBytesSize]);
+            else writing.writeBytes(new byte[elementBytesSize]);
         }
     }
 
     default <T> void writeStructArray(T[] structArray, Type elementType, int length, ByteBuf writing) {
         for (int i = 0; i < length; i++) {
-            if (i < structArray.length)
-                writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(structArray[i],
-                                                                                             elementType)));
-            else
-                writing.writeBytes(StructSerializer.toByteBuf(newStruct(elementType)));
+            if (i < structArray.length) writing.writeBytes(StructSerializer.toByteBuf(elementType,
+                                                                                      structNullDefault(structArray[i], elementType)));
+            else writing.writeBytes(StructSerializer.toByteBuf(newStruct(elementType)));
         }
     }
 
@@ -214,8 +188,7 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default void writeBasicList(List<?> list, int elementBytesSize, int length, ByteBuf writing) {
-        Iterator<?> iterator = list.iterator();
-        for (int i = 0; i < length; i++) {
+        Iterator<?> iterator = list.iterator(); for (int i = 0; i < length; i++) {
             if (iterator.hasNext()) {
                 Basic<?> basic = (Basic<?>) iterator.next();
                 if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
@@ -226,13 +199,11 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default void writeStructList(List<?> list, Type elementType, int length, ByteBuf writing) {
-        Iterator<?> iterator = list.iterator();
-        for (int i = 0; i < length; i++) {
-            if (iterator.hasNext())
-                writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(iterator.next(),
-                                                                                             elementType)));
-            else
-                writing.writeBytes(StructSerializer.toByteBuf(elementType, newStruct(elementType)));
+        Iterator<?> iterator = list.iterator(); for (int i = 0; i < length; i++) {
+            if (iterator.hasNext()) writing.writeBytes(StructSerializer.toByteBuf(elementType,
+                                                                                  structNullDefault(iterator.next(),
+                                                                                                    elementType)));
+            else writing.writeBytes(StructSerializer.toByteBuf(elementType, newStruct(elementType)));
         }
     }
 

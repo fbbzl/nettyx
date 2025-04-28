@@ -30,8 +30,9 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 public class StructHelper {
 
     public static <T> Class<T> getRawType(Type type) {
-        if (type instanceof Class<?> clazz) return (Class<T>) clazz;
-        else if (type instanceof ParameterizedType parameterizedType) return (Class<T>) parameterizedType.getRawType();
+        if (type instanceof Class<?> clazz)                      return (Class<T>) clazz;
+        else
+        if (type instanceof ParameterizedType parameterizedType) return (Class<T>) parameterizedType.getRawType();
 
         throw new TypeJudgmentException(type);
     }
