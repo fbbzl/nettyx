@@ -72,15 +72,7 @@ public record StructDefinition(
                    root -> TypeUtil.getActualType(root, fieldType);
         }
 
-        public boolean isBasic(Type root) {
-            return StructHelper.isBasic(root, wrapped.getGenericType());
-        }
-
-        public boolean isStruct(Type root) {
-            return StructHelper.isStruct(root, wrapped.getGenericType());
-        }
-
-        public Type forActual(Type root) {
+        public Type type(Type root) {
             return type.apply(root);
         }
 
