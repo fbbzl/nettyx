@@ -131,8 +131,7 @@ public interface StructFieldHandler<A extends Annotation> {
         else                             throw new TypeJudgmentException();
     }
 
-    default <B extends Basic<?>> List<B> readBasicList(Type root, Class<? extends Basic<?>> elementType,
-                                                       ByteBuf byteBuf, int length) {
+    default <B extends Basic<?>> List<B> readBasicList(Type root, Class<? extends Basic<?>> elementType, ByteBuf byteBuf, int length) {
         return CollUtil.newArrayList(readBasicArray(elementType, byteBuf, length));
     }
 
