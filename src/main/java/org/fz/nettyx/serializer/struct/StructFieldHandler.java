@@ -59,13 +59,14 @@ public interface StructFieldHandler<A extends Annotation> {
         Field wrapped = structField.wrapped();
         Type actualType = structField.type(root);
         if (isBasic(root, wrapped)) {
-            writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) actualType), writing); return;
-        }
-        else
-        if (isStruct(root, wrapped)) {
-            writeStruct(actualType, structNullDefault(fieldVal, actualType), writing); return;
+            writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) actualType), writing);
+            return;
         }
 
+        if (isStruct(root, wrapped)) {
+            writeStruct(actualType, structNullDefault(fieldVal, actualType), writing);
+            return;
+        }
         throw new TypeJudgmentException(structField);
     }
 
