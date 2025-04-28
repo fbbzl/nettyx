@@ -6,12 +6,12 @@ import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.util.TypeRefer;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_FIELD_HANDLER;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.isBasic;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.isStruct;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
 
 /**
@@ -34,19 +34,21 @@ public class StructSchema {
         return schema;
     }
 
-    protected void getSchema(Type root, StructField structField, Map<StructField, Type> cumulative) {
-        Field wrapped = structField.wrapped();
+    protected void getSchema(Type root, StructField structField, Map<StructField, Type> cumulate) {
+        Type type = structField.type(root);
 
-        if (DEFAULT_STRUCT_FIELD_HANDLER.isBasic(root, wrapped)) {
-            cumulative.put(structField, structField.type(root));
+        if (isBasic(root, type)) {
+            cumulate.put(structField, type);
         }
-        if (DEFAULT_STRUCT_FIELD_HANDLER.isStruct(root, wrapped)) {
-            StructDefinition structDef = getStructDefinition(structField.type(root));
-            if (structDef == null) return;
+        if (isStruct(root, type)) {
+            StructDefinition structDef = getStructDefinition(type);
+            if (structDef == null) {
+                cumulate.put(structField, null);
+            }
 
             for (StructField sf : structDef.fields()) {
                 this.warmup(sf);
-                this.getSchema(root, sf, cumulative);
+                this.getSchema(root, sf, cumulate);
             }
         }
     }

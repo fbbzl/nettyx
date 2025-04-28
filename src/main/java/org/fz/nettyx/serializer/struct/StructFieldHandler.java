@@ -74,19 +74,24 @@ public interface StructFieldHandler<A extends Annotation> {
         return isBasic(root, field.getGenericType());
     }
 
+    public static boolean isBasic(Type type) {
+        
+        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+    }
+
+    public static boolean isBasic(Type root, Type type) {
+        if (type instanceof Class<?>        clazz)        return isBasic(clazz);
+        if (type instanceof TypeVariable<?> typeVariable) return isBasic(root, TypeUtil.getActualType(root, typeVariable));
+
+        return false;
+    }
+
     default boolean isStruct(Type root, Field field) {
         return isStruct(root, field.getGenericType());
     }
 
-    default <B extends Basic<?>> B readBasic(Class<? extends Basic<?>> basicType, ByteBuf byteBuf) {
-        return newBasic(basicType, byteBuf);
-    }
-
-    public static boolean isBasic(Type root, Type type) {
-        if (type instanceof Class<?>        clazz)        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-        if (type instanceof TypeVariable<?> typeVariable) return isBasic(root, TypeUtil.getActualType(root, typeVariable));
-
-        return false;
+    public static boolean isStruct(Class<?> clazz) {
+        return STRUCT_DEFINITION_CACHE.containsKey(clazz);
     }
 
     public static boolean isStruct(Type root, Type type) {
@@ -95,6 +100,10 @@ public interface StructFieldHandler<A extends Annotation> {
         if (type instanceof TypeVariable<?>   typeVariable)      return isStruct(root, TypeUtil.getActualType(root, typeVariable));
 
         return false;
+    }
+
+    default <B extends Basic<?>> B readBasic(Class<? extends Basic<?>> basicType, ByteBuf byteBuf) {
+        return newBasic(basicType, byteBuf);
     }
 
     default <S> S readStruct(Type structType, ByteBuf byteBuf) {
