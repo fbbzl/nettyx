@@ -107,8 +107,7 @@ public interface StructFieldHandler<A extends Annotation> {
         else                             throw new TypeJudgmentException();
     }
 
-    default <B extends Basic<?>> B[] readBasicArray(Class<? extends Basic<?>> elementType, ByteBuf byteBuf,
-                                                    int length) {
+    default <B extends Basic<?>> B[] readBasicArray(Class<? extends Basic<?>> elementType, ByteBuf byteBuf, int length) {
         B[] basics = newArray(elementType, length);
 
         for (int i = 0; i < basics.length; i++) basics[i] = newBasic(elementType, byteBuf);
