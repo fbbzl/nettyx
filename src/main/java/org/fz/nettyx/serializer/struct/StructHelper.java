@@ -106,24 +106,6 @@ public class StructHelper {
                                                                                              ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static boolean isBasic(Type root, Type type) {
-        if (type instanceof Class<?> clazz) return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-        if (type instanceof TypeVariable<?> typeVariable)
-            return isBasic(root, TypeUtil.getActualType(root, typeVariable));
-
-        return false;
-    }
-
-    public static boolean isStruct(Type root, Type type) {
-        if (type instanceof Class<?> clazz) return STRUCT_DEFINITION_CACHE.containsKey(clazz);
-        if (type instanceof ParameterizedType parameterizedType)
-            return isStruct(root, parameterizedType.getRawType());
-        if (type instanceof TypeVariable<?> typeVariable)
-            return isStruct(root, TypeUtil.getActualType(root, typeVariable));
-
-        return false;
-    }
-
     public static <T> T[] newArray(Type componentType, int length) {
         if (componentType instanceof Class<?> clazz)
             return (T[]) Array.newInstance(clazz, length);

@@ -12,11 +12,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Iterator;
 import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static org.fz.nettyx.serializer.struct.StructHelper.*;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEFINITION_CACHE;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -44,28 +46,28 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading, A annotation) {
-        Field field      = structField.wrapped();
-        Type  actualType = structField.forActual(root);
+        Field wrapped    = structField.wrapped();
+        Type  actualType = structField.type(root);
 
-        if (structField.isBasic(root)) return readBasic(actualType, reading);
-        if (structField.isStruct(root)) return readStruct(actualType, reading);
+        if (isBasic(root, wrapped)) return readBasic(actualType, reading);
+        if (isStruct(root, wrapped)) return readStruct(actualType, reading);
 
-        throw new TypeJudgmentException(field);
+        throw new TypeJudgmentException(structField);
     }
 
     default void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing, A annotation) {
-        Field field      = structField.wrapped();
-        Type  actualType = structField.forActual(root);
-        if (structField.isBasic(root)) {
+        Field wrapped      = structField.wrapped();
+        Type  actualType = structField.type(root);
+        if (isBasic(root, wrapped)) {
             writeBasic((Basic<?>) basicNullDefault(fieldVal, actualType), writing);
             return;
         }
-        if (structField.isStruct(root)) {
+        if (isStruct(root, wrapped)) {
             writeStruct(actualType, structNullDefault(fieldVal, actualType), writing);
             return;
         }
 
-        throw new TypeJudgmentException(field);
+        throw new TypeJudgmentException(structField);
     }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
@@ -86,9 +88,36 @@ public interface StructFieldHandler<A extends Annotation> {
         return null;
     }
 
+    default boolean isBasic(Type root, Field field) {
+        return isBasic(root, field.getGenericType());
+    }
+
+    default boolean isStruct(Type root, Field field) {
+        return isStruct(root, field.getGenericType());
+    }
+
     default <B extends Basic<?>> B readBasic(Type basicType, ByteBuf byteBuf) {
         return newBasic(basicType, byteBuf);
     }
+
+    public static boolean isBasic(Type root, Type type) {
+        if (type instanceof Class<?> clazz) return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+        if (type instanceof TypeVariable<?> typeVariable)
+            return isBasic(root, TypeUtil.getActualType(root, typeVariable));
+
+        return false;
+    }
+
+    public static boolean isStruct(Type root, Type type) {
+        if (type instanceof Class<?> clazz) return STRUCT_DEFINITION_CACHE.containsKey(clazz);
+        if (type instanceof ParameterizedType parameterizedType)
+            return isStruct(root, parameterizedType.getRawType());
+        if (type instanceof TypeVariable<?> typeVariable)
+            return isStruct(root, TypeUtil.getActualType(root, typeVariable));
+
+        return false;
+    }
+
 
     default <S> S readStruct(Type structType, ByteBuf byteBuf) {
         return StructSerializer.toStruct(structType, byteBuf);

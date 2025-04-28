@@ -50,7 +50,7 @@ public @interface ToArrayList {
         @Override
         public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
                              ToArrayList toArrayList) {
-            Type elementType = StructHelper.getElementType(root, structField.forActual(root));
+            Type elementType = StructHelper.getElementType(root, structField.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(structField));
 
@@ -60,7 +60,7 @@ public @interface ToArrayList {
         @Override
         public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
                             ToArrayList toArrayList) {
-            Type elementType = StructHelper.getElementType(root, structField.forActual(root));
+            Type elementType = StructHelper.getElementType(root, structField.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(structField));
 

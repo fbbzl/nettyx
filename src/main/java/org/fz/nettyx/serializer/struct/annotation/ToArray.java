@@ -43,7 +43,7 @@ public @interface ToArray {
         @Override
         public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
                              ToArray annotation) {
-            Type componentType = StructHelper.getComponentType(root, structField.forActual(root));
+            Type componentType = StructHelper.getComponentType(root, structField.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(structField));
 
@@ -60,7 +60,7 @@ public @interface ToArray {
         @Override
         public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
                             ToArray annotation) {
-            Type componentType = StructHelper.getComponentType(root, structField.forActual(root));
+            Type componentType = StructHelper.getComponentType(root, structField.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(structField));
 

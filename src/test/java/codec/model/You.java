@@ -36,10 +36,6 @@ public class You {
     Cint    isMarried2;
     Cchar   sex2;
     Cfloat  address2;
-    Cdouble platformId2;
-    Cchar   uname3;
-    Cint    isMarried3;
-    Cchar   sex3;
 
 
     @Data
