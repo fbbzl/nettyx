@@ -28,7 +28,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEF
 @SuppressWarnings("all")
 public interface StructFieldHandler<A extends Annotation> {
 
-    StructFieldHandler<? extends Annotation> DEFAULT_READ_WRITE_HANDLER = new StructFieldHandler() {
+    StructFieldHandler<? extends Annotation> DEFAULT_STRUCT_FIELD_HANDLER = new StructFieldHandler() {
         @Override
         public boolean isSingleton() {
             return true;

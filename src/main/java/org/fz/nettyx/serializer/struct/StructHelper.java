@@ -9,7 +9,6 @@ import io.netty.buffer.Unpooled;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
@@ -28,14 +27,6 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 @SuppressWarnings("unchecked")
 @UtilityClass
 public class StructHelper {
-
-    public static <T> Class<T> getRawType(Type type) {
-        if (type instanceof Class<?> clazz)                      return (Class<T>) clazz;
-        else
-        if (type instanceof ParameterizedType parameterizedType) return (Class<T>) parameterizedType.getRawType();
-
-        throw new TypeJudgmentException(type);
-    }
 
     public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
         return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
