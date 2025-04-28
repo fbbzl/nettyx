@@ -56,9 +56,13 @@ public interface StructFieldHandler<A extends Annotation> {
 
     default void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
                          A annotation) {
-        Field wrapped = structField.wrapped(); Type actualType = structField.type(root); if (isBasic(root, wrapped)) {
+        Field wrapped = structField.wrapped();
+        Type actualType = structField.type(root);
+        if (isBasic(root, wrapped)) {
             writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) actualType), writing); return;
-        } if (isStruct(root, wrapped)) {
+        }
+        else
+        if (isStruct(root, wrapped)) {
             writeStruct(actualType, structNullDefault(fieldVal, actualType), writing); return;
         }
 
