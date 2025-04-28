@@ -112,7 +112,8 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default <S> S[] readStructArray(Type root, Type elementType, ByteBuf byteBuf, int length) {
-        S[] structs = newArray(elementType, length); Type elementActualType = TypeUtil.getActualType(root, elementType);
+        S[] structs = newArray(elementType, length);
+        Type elementActualType = TypeUtil.getActualType(root, elementType);
 
         for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementActualType, byteBuf);
 
