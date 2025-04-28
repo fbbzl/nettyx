@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ArrayUtil.*;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_READ_WRITE_HANDLER;
+import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_FIELD_HANDLER;
 import static org.fz.util.lambda.LambdaMetas.lambdaConstructor;
 
 /**
@@ -174,7 +174,7 @@ public class StructSerializerContext {
 
             return handler.isSingleton() ? () -> (H) handler : (Supplier<H>) handlerSupplier;
         }
-        else return () -> (H) DEFAULT_READ_WRITE_HANDLER;
+        else return () -> (H) DEFAULT_STRUCT_FIELD_HANDLER;
     }
 
     static <A extends Annotation> A getHandlerAnnotation(Field field) {
@@ -186,8 +186,12 @@ public class StructSerializerContext {
         return iterator.hasNext() ? (A) iterator.next() : null;
     }
 
-    public static StructDefinition getStructDefinition(Class<?> clazz) {
-        return STRUCT_DEFINITION_CACHE.get(clazz);
+    public static StructDefinition getStructDefinition(Type type) {
+        if (type instanceof Class<?>         clazz)              return STRUCT_DEFINITION_CACHE.get(clazz);
+        else
+        if (type instanceof ParameterizedType parameterizedType) return getStructDefinition(parameterizedType.getRawType());
+
+        throw new IllegalArgumentException("can not get struct definition for type: " + type);
     }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {

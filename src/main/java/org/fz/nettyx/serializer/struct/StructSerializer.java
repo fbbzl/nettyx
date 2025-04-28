@@ -21,7 +21,6 @@ import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 
 import static io.netty.buffer.Unpooled.buffer;
-import static org.fz.nettyx.serializer.struct.StructHelper.getRawType;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
 
 /**
@@ -48,7 +47,7 @@ public final class StructSerializer implements Serializer {
 
     public static <T> T toStruct(Type root, ByteBuf byteBuf) {
         if (root instanceof TypeRefer<?> typeRefer) return toStruct(typeRefer.getTypeValue(), byteBuf);
-        else return new StructSerializer(root).doDeserialize(byteBuf);
+        else                                        return new StructSerializer(root).doDeserialize(byteBuf);
     }
 
     public static <T> T toStruct(Type type, byte[] bytes) {
@@ -75,12 +74,12 @@ public final class StructSerializer implements Serializer {
     public static <T> ByteBuf toByteBuf(Type root, T struct) {
         Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + root + "]");
 
-        if (root instanceof Class<?> || root instanceof ParameterizedType)
-            return new StructSerializer(root).doSerialize(struct);
-        else if (root instanceof TypeRefer<?> typeRefer) return toByteBuf(typeRefer.getTypeValue(), struct);
-        else if (root instanceof TypeReference<?> typeReference) return toByteBuf(typeReference.getType(), struct);
+        if (root instanceof Class<?> || root instanceof ParameterizedType) return new StructSerializer(root).doSerialize(struct);
         else
-            throw new TypeJudgmentException(root);
+        if (root instanceof TypeRefer<?> typeRefer)                        return toByteBuf(typeRefer.getTypeValue(), struct);
+        else
+        if (root instanceof TypeReference<?> typeReference)                return toByteBuf(typeReference.getType(), struct);
+        else throw new TypeJudgmentException(root);
     }
 
     public static <T> byte[] toBytes(T struct) {
@@ -119,7 +118,7 @@ public final class StructSerializer implements Serializer {
 
     @Override
     public <T> T doDeserialize(ByteBuf byteBuf) {
-        StructDefinition structDef = getStructDefinition(getRawType(root));
+        StructDefinition structDef = getStructDefinition(root);
         Object           struct    = structDef.constructor().get();
 
         for (StructField structField : structDef.fields()) {
@@ -140,7 +139,7 @@ public final class StructSerializer implements Serializer {
     @Override
     public ByteBuf doSerialize(Object struct) {
         ByteBuf          writing   = buffer();
-        StructDefinition structDef = getStructDefinition(getRawType(root));
+        StructDefinition structDef = getStructDefinition(root);
 
         for (StructField structField : structDef.fields()) {
             Field                 field      = structField.wrapped();
