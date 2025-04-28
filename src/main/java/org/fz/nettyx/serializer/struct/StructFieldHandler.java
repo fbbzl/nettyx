@@ -74,8 +74,7 @@ public interface StructFieldHandler<A extends Annotation> {
         return isBasic(root, field.getGenericType());
     }
 
-    public static boolean isBasic(Type type) {
-        
+    public static boolean isBasic(Class<?> clazz) {
         return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
     }
 
@@ -88,10 +87,6 @@ public interface StructFieldHandler<A extends Annotation> {
 
     default boolean isStruct(Type root, Field field) {
         return isStruct(root, field.getGenericType());
-    }
-
-    public static boolean isStruct(Class<?> clazz) {
-        return STRUCT_DEFINITION_CACHE.containsKey(clazz);
     }
 
     public static boolean isStruct(Type root, Type type) {
