@@ -40,7 +40,6 @@ public class SerializerTest {
         stopWatch.start();
         for (int i = 0; i < 1_000_000; i++) {
             Object struct = StructSerializer.toStruct(youCLass, bytes);
-            System.err.println();
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
