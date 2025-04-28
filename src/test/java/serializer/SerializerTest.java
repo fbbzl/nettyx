@@ -38,7 +38,7 @@ public class SerializerTest {
 
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
-        for (int i = 0; i < 100_000; i++) {
+        for (int i = 0; i < 1_000_000; i++) {
             StructSerializer.toStruct(youCLass, bytes);
         }
         stopWatch.stop();
