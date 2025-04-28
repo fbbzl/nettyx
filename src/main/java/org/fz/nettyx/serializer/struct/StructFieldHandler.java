@@ -128,7 +128,7 @@ public interface StructFieldHandler<A extends Annotation> {
         if (isBasic(root, elementType))  return (List<T>) readBasicList(root, (Class<? extends Basic<?>>) elementType, byteBuf, length);
         else
         if (isStruct(root, elementType)) return readStructList(root, elementType, byteBuf, length);
-        else throw new TypeJudgmentException();
+        else                             throw new TypeJudgmentException();
     }
 
     default <B extends Basic<?>> List<B> readBasicList(Type root, Class<? extends Basic<?>> elementType,
