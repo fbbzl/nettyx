@@ -48,7 +48,7 @@ public interface StructFieldHandler<A extends Annotation> {
         Field wrapped    = structField.wrapped();
         Type  actualType = structField.type(root);
 
-        if (isBasic(root, wrapped)) return readBasic((Class<? extends Basic<?>>) actualType, reading);
+        if (isBasic(root, wrapped))  return readBasic((Class<? extends Basic<?>>) actualType, reading);
         if (isStruct(root, wrapped)) return readStruct(actualType, reading);
 
         throw new TypeJudgmentException(structField);
