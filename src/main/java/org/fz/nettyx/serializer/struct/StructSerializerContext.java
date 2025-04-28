@@ -15,6 +15,7 @@ import org.fz.util.lambda.LambdaMetas;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,6 @@ import java.util.stream.Stream;
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ArrayUtil.*;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_READ_WRITE_HANDLER;
-import static org.fz.nettyx.serializer.struct.StructFieldHandler.getTargetAnnotationType;
 import static org.fz.util.lambda.LambdaMetas.lambdaConstructor;
 
 /**
@@ -47,8 +47,7 @@ public class StructSerializerContext {
     static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>>                                        BASIC_BYTEBUF_CONSTRUCTOR_CACHE  = new HashMap<>(64);
     static final Map<Type, Supplier<?>>                                                                      NO_ARGS_CONSTRUCTOR_CACHE        = new HashMap<>(128);
     static final Map<Class<?>, StructDefinition>                                                             STRUCT_DEFINITION_CACHE          = new ConcurrentHashMap<>(512);
-    static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE =
-            new HashMap<>(32);
+    static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
 
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
@@ -190,5 +189,23 @@ public class StructSerializerContext {
     public static StructDefinition getStructDefinition(Class<?> clazz) {
         return STRUCT_DEFINITION_CACHE.get(clazz);
     }
+
+    static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
+        if (!ClassUtil.isNormalClass(clazz)) {
+            return null;
+        }
+
+        Type[] genericInterfaces = clazz.getGenericInterfaces();
+
+        for (Type genericInterface : genericInterfaces) {
+            if (genericInterface instanceof ParameterizedType parameterizedType) {
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                if (actualTypeArguments.length > 0) {
+                    return (Class<A>) actualTypeArguments[0];
+                }
+            }
+        } return null;
+    }
+
 
 }
