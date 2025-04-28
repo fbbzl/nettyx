@@ -127,8 +127,8 @@ public final class StructSerializer implements Serializer {
             Field                 field   = structField.wrapped();
             StructFieldHandler<?> handler = structField.handler();
             try {
-                Object fieldValue = handler.doRead(root, struct, structField, byteBuf, structField.annotation());
-                structField.setter().accept(struct, fieldValue);
+                Object fieldVal = handler.doRead(root, struct, structField, byteBuf, structField.annotation());
+                structField.setter().accept(struct, fieldVal);
             }
             catch (Exception exception) {
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
@@ -145,11 +145,11 @@ public final class StructSerializer implements Serializer {
 
         for (StructField structField : structDef.fields()) {
             Field                 field      = structField.wrapped();
-            StructFieldHandler<?> handler    = structField.handler();
-            Object                fieldValue = structField.getter().apply(struct);
+            StructFieldHandler<?> handler  = structField.handler();
+            Object                fieldVal = structField.getter().apply(struct);
 
             try {
-                handler.doWrite(root, struct, structField, fieldValue, writing, structField.annotation());
+                handler.doWrite(root, struct, structField, fieldVal, writing, structField.annotation());
             }
             catch (Exception exception) {
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);

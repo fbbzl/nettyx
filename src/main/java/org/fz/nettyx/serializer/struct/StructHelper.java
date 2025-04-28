@@ -36,7 +36,7 @@ public class StructHelper {
         throw new TypeJudgmentException(type);
     }
 
-    public static <B extends Basic<?>> B newEmptyBasic(Type basicClass) {
+    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
         return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
@@ -44,7 +44,7 @@ public class StructHelper {
         return BASIC_SIZE_CACHE.get(basicClass);
     }
 
-    public static int reflectForSize(Type basicClass) {
+    public static int reflectForSize(Class<? extends Basic<?>> basicClass) {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try {
             return newBasic(basicClass, fillingBuf).getSize();
@@ -62,7 +62,7 @@ public class StructHelper {
      * @param buf        the buf
      * @return the t
      */
-    public static <B extends Basic<?>> B newBasic(Type basicClass, ByteBuf buf) {
+    public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
         try {
             return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
         }

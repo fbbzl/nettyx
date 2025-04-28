@@ -44,7 +44,7 @@ public class StructSerializerContext {
     private final String[] basePackages;
 
     static final Map<Type, Integer>                                                                          BASIC_SIZE_CACHE                 = new HashMap<>(64);
-    static final Map<Type, Function<ByteBuf, ?>>                                                             BASIC_BYTEBUF_CONSTRUCTOR_CACHE  = new HashMap<>(64);
+    static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>>                                        BASIC_BYTEBUF_CONSTRUCTOR_CACHE  = new HashMap<>(64);
     static final Map<Type, Supplier<?>>                                                                      NO_ARGS_CONSTRUCTOR_CACHE        = new HashMap<>(128);
     static final Map<Class<?>, StructDefinition>                                                             STRUCT_DEFINITION_CACHE          = new ConcurrentHashMap<>(512);
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE =
