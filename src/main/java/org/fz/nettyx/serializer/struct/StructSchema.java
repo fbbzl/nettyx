@@ -9,6 +9,7 @@ import org.fz.nettyx.util.TypeRefer;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.isBasic;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.isStruct;
@@ -23,18 +24,21 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructD
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class StructSchema {
 
-    final Map<StructField, Class<?>> schema;
+    final Map<StructField, Class<?>> fields;
 
     public static <T> StructSchema of(TypeRefer<T> type) {
         Type         root   = type.getTypeValue();
         StructSchema schema = new StructSchema(new HashMap<>(16));
 
-        StructDefinition structDef = getStructDefinition(type);
+        StructDefinition structDef = getStructDefinition(root);
+        if (structDef != null) {
+            Stream.of(structDef.fields()).forEach(sf -> getSchema(root, sf, schema.getFields()));
+        }
 
         return schema;
     }
 
-    protected void getSchema(Type root, StructField structField, Map<StructField, Class<?>> cumulate) {
+    static void getSchema(final Type root, final StructField structField, Map<StructField, Class<?>> cumulate) {
         Type type = structField.type(root);
 
         if (isBasic(root, type)) {
@@ -47,19 +51,7 @@ public class StructSchema {
                 return;
             }
 
-            for (StructField sf : structDef.fields()) {
-                this.warmup(sf);
-                this.getSchema(root, sf, cumulate);
-            }
+            Stream.of(structDef.fields()).forEach(sf -> getSchema(root, sf, cumulate));
         }
     }
-
-    private void warmup(StructField sf) {
-        sf.wrapped();
-        sf.getter();
-        sf.setter();
-        sf.annotation();
-        sf.handler();
-    }
-
 }
