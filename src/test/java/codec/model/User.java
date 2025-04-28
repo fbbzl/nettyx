@@ -18,8 +18,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User<T, W, G> {
 
-
-
     Clong4 uid;
     @ToArray(length = 5)
     Cppushort[]     qqNames;
