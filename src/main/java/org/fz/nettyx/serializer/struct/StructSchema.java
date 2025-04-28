@@ -23,7 +23,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructD
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class StructSchema {
 
-    final Map<StructField, Type> schema;
+    final Map<StructField, Class<?>> schema;
 
     public static <T> StructSchema of(TypeRefer<T> type) {
         Type         root   = type.getTypeValue();
@@ -34,16 +34,17 @@ public class StructSchema {
         return schema;
     }
 
-    protected void getSchema(Type root, StructField structField, Map<StructField, Type> cumulate) {
+    protected void getSchema(Type root, StructField structField, Map<StructField, Class<?>> cumulate) {
         Type type = structField.type(root);
 
         if (isBasic(root, type)) {
-            cumulate.put(structField, type);
+            cumulate.put(structField, (Class<?>) type);
         }
         if (isStruct(root, type)) {
             StructDefinition structDef = getStructDefinition(type);
             if (structDef == null) {
                 cumulate.put(structField, null);
+                return;
             }
 
             for (StructField sf : structDef.fields()) {

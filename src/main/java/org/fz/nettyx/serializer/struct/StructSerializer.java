@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
@@ -118,7 +119,8 @@ public final class StructSerializer implements Serializer {
 
     @Override
     public <T> T doDeserialize(ByteBuf byteBuf) {
-        StructDefinition structDef = getStructDefinition(root);
+        StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
+
         Object           struct    = structDef.constructor().get();
 
         for (StructField structField : structDef.fields()) {
@@ -139,7 +141,7 @@ public final class StructSerializer implements Serializer {
     @Override
     public ByteBuf doSerialize(Object struct) {
         ByteBuf          writing   = buffer();
-        StructDefinition structDef = getStructDefinition(root);
+        StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
 
         for (StructField structField : structDef.fields()) {
             Field                 field      = structField.wrapped();

@@ -191,7 +191,7 @@ public class StructSerializerContext {
         else
         if (type instanceof ParameterizedType parameterizedType) return getStructDefinition(parameterizedType.getRawType());
 
-        throw new IllegalArgumentException("can not get struct definition for type: " + type);
+        return null;
     }
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
