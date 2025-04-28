@@ -48,7 +48,6 @@ public final class StructSerializer implements Serializer {
 
     public static <T> T toStruct(Type root, ByteBuf byteBuf) {
         if (root instanceof TypeRefer<?> typeRefer) return toStruct(typeRefer.getTypeValue(), byteBuf);
-        else if (root instanceof TypeReference<?> typeReference) return toStruct(typeReference.getType(), byteBuf);
         else return new StructSerializer(root).doDeserialize(byteBuf);
     }
 
