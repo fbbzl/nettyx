@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2023/5/23 21:35
  */
 public class SerializerTest {
-    static final TypeRefer<User<Bill, Wife<GirlFriend, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
+    static final TypeRefer<User<Bill, Wife<Son<Clong4, Bill>, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
             new TypeRefer<>() {};
 
     static final TypeRefer<You> youCLass = new TypeRefer<>() {};
@@ -39,7 +39,8 @@ public class SerializerTest {
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 1_000_000; i++) {
-            StructSerializer.toStruct(youCLass, bytes);
+            Object struct = StructSerializer.toStruct(youCLass, bytes);
+            System.err.println();
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
