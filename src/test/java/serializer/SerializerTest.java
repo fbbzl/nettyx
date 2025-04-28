@@ -4,6 +4,7 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.TypeUtil;
 import codec.model.*;
+import org.fz.nettyx.serializer.struct.StructSchema;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
@@ -35,6 +36,8 @@ public class SerializerTest {
     public void testStructSerializer() {
         byte[] bytes = new byte[6411];
         Arrays.fill(bytes, (byte) 67);
+
+        StructSchema structSchema = StructSchema.of(youCLass);
 
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
