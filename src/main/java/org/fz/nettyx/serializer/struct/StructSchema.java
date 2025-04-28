@@ -24,11 +24,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructD
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class StructSchema {
 
-    final Map<StructField, Class<?>> fields;
+    private final Type                       root;
+    private final Map<StructField, Class<?>> fields;
 
-    public static <T> StructSchema of(TypeRefer<T> type) {
-        Type         root   = type.getTypeValue();
-        StructSchema schema = new StructSchema(new HashMap<>(16));
+    public static <T> StructSchema of(TypeRefer<T> typeRefer) {
+        Type root = typeRefer.getTypeValue();
+
+        StructSchema schema = new StructSchema(root, new HashMap<>(16));
 
         StructDefinition structDef = getStructDefinition(root);
         if (structDef != null) {
