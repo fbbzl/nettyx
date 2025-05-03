@@ -48,8 +48,12 @@ public @interface ToArrayList {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
-                             ToArrayList toArrayList) {
+        public Object doRead(
+                Type        root,
+                Object      earlyObject,
+                StructField field,
+                ByteBuf     reading,
+                ToArrayList toArrayList) {
             Type elementType = StructHelper.getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
@@ -58,11 +62,16 @@ public @interface ToArrayList {
         }
 
         @Override
-        public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
-                            ToArrayList toArrayList) {
-            Type elementType = StructHelper.getElementType(root, structField.type(root));
+        public void doWrite(
+                Type        root,
+                Object      struct,
+                StructField field,
+                Object      fieldVal,
+                ByteBuf     writing,
+                ToArrayList toArrayList) {
+            Type elementType = StructHelper.getElementType(root, field.type(root));
 
-            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(structField));
+            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
             writeList(root, defaultIfNull((List<?>) fieldVal, Collections::emptyList), elementType,
                       toArrayList.size(), writing);
