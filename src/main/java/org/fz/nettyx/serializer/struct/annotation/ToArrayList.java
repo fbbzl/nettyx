@@ -53,7 +53,8 @@ public @interface ToArrayList {
                 Object      earlyObject,
                 StructField field,
                 ByteBuf     reading,
-                ToArrayList toArrayList) {
+                ToArrayList toArrayList)
+        {
             Type elementType = StructHelper.getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
@@ -68,7 +69,8 @@ public @interface ToArrayList {
                 StructField field,
                 Object      fieldVal,
                 ByteBuf     writing,
-                ToArrayList toArrayList) {
+                ToArrayList toArrayList)
+        {
             Type elementType = StructHelper.getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
