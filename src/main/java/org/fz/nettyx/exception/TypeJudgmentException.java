@@ -25,7 +25,7 @@ public class TypeJudgmentException extends RuntimeException {
 
 
     public TypeJudgmentException(StructField field) {
-        this(field.getWrapped());
+        this(field.wrapped());
     }
 
     public TypeJudgmentException(Type type) {
