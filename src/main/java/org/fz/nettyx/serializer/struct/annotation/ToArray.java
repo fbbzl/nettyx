@@ -41,8 +41,13 @@ public @interface ToArray {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
-                             ToArray annotation) {
+        public Object doRead(
+                Type        root,
+                Object      earlyObject,
+                StructField field,
+                ByteBuf     reading,
+                ToArray     annotation)
+        {
             Type componentType = StructHelper.getComponentType(root, field.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
@@ -58,11 +63,17 @@ public @interface ToArray {
         }
 
         @Override
-        public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
-                            ToArray annotation) {
-            Type componentType = StructHelper.getComponentType(root, structField.type(root));
+        public void doWrite(
+                Type        root,
+                Object      struct,
+                StructField field,
+                Object      fieldVal,
+                ByteBuf     writing,
+                ToArray annotation)
+        {
+            Type componentType = StructHelper.getComponentType(root, field.type(root));
 
-            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(structField));
+            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
@@ -73,8 +84,6 @@ public @interface ToArray {
                 throw new UnsupportedOperationException("can not determine the type of field [" + fieldVal + "]");
             }
         }
-
-        //**************************************         private end           ***************************************//
 
     }
 
