@@ -38,11 +38,13 @@ public final class StructSerializer implements Serializer {
      */
     private final Type root;
 
-    public Type getType() {
+    public Type getType()
+    {
         return root;
     }
 
-    StructSerializer(Type root) {
+    StructSerializer(Type root)
+    {
         this.root = root;
     }
 
@@ -148,7 +150,8 @@ public final class StructSerializer implements Serializer {
     //*************************************      working code splitter      ******************************************//
 
     @Override
-    public <T> T doDeserialize(ByteBuf byteBuf) {
+    public <T> T doDeserialize(ByteBuf byteBuf)
+    {
         StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
         Object           struct    = structDef.constructor().get();
         for (StructField structField : structDef.fields()) {
@@ -166,7 +169,8 @@ public final class StructSerializer implements Serializer {
     }
 
     @Override
-    public ByteBuf doSerialize(Object struct) {
+    public ByteBuf doSerialize(Object struct)
+    {
         ByteBuf          writing   = buffer();
         StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
         for (StructField structField : structDef.fields()) {
