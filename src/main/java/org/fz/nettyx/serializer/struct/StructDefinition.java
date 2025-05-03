@@ -1,21 +1,25 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.lang.Pair;
+import cn.hutool.core.util.TypeUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.fz.util.lambda.LambdaMetas;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.Type;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
-import static org.fz.nettyx.serializer.struct.StructHelper.lambdaGetter;
-import static org.fz.nettyx.serializer.struct.StructHelper.lambdaSetter;
+import static cn.hutool.core.util.ReflectUtil.getFields;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandler;
+import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandlerAnnotation;
 
 /**
  * reference Schema
@@ -25,58 +29,67 @@ import static org.fz.nettyx.serializer.struct.StructHelper.lambdaSetter;
  * @since 2025/4/22 10:36
  */
 
+@SuppressWarnings("unchecked")
 public record StructDefinition(
+        Class<?> type,
         Supplier<?> constructor,
         StructField[] fields) {
 
-    static final Map<Class<?>, StructDefinition> STRUCT_DEFINITION_CACHE = new ConcurrentHashMap<>(512);
+    public StructDefinition(Class<?> clazz) {
+        this(clazz, LambdaMetas.lambdaConstructor(clazz), Stream.of(getFields(clazz, StructHelper::legalStructField))
+                                                                .map(field -> new StructField(clazz, field))
+                                                                .toArray(StructField[]::new));
+    }
 
     @Getter
     @RequiredArgsConstructor
     @SuppressWarnings("unchecked")
-    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+    @Accessors(fluent = true)
+    @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
     public static class StructField {
-
-        Field            wrapped;
-        Function<?, ?>   getter;
-        BiConsumer<?, ?> setter;
-        /**
-         * struct field handler annotation
-         */
-        Annotation       annotation;
-        /**
-         * struct field handler supplier
-         */
-        @Getter(AccessLevel.NONE)
+        Class<?>                                                     declaringClass;
+        Field                                                        wrapped;
+        UnaryOperator<Type>                                          type;
+        Function<?, ?>                                               getter;
+        BiConsumer<?, ?>                                             setter;
+        Annotation                                                   annotation;
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
-        public StructField(Field wrapped,
-                           Annotation annotation,
-                           Supplier<? extends StructFieldHandler<? extends Annotation>> handler) {
-            this.wrapped    = wrapped;
-            this.getter     = lambdaGetter(wrapped);
-            this.setter     = lambdaSetter(wrapped);
-            this.annotation = annotation;
-            this.handler    = handler;
+        public StructField(Class<?> declaringClass, Field field) {
+            this(declaringClass,
+                 field,
+                 typeSupplier(field),
+                 LambdaMetas.lambdaGetter(field),
+                 LambdaMetas.lambdaSetter(field),
+                 getHandlerAnnotation(field),
+                 getHandler(field));
         }
 
-        public <A extends Annotation> A getAnnotation() {
+        static UnaryOperator<Type> typeSupplier(Field field) {
+            Type fieldType = field.getGenericType();
+            return fieldType instanceof Class<?> clazz ? root -> clazz :
+                   root -> TypeUtil.getActualType(root, fieldType);
+        }
+
+        public Type type(Type root) {
+            return type.apply(root);
+        }
+
+        public <A extends Annotation> A annotation() {
             return (A) annotation;
         }
 
-        public <H extends StructFieldHandler<?>> H getStructFieldHandler() {
+        public <A extends Annotation, H extends StructFieldHandler<A>> H handler() {
             return (H) handler.get();
         }
 
-        public <O, R> Function<O, R> getGetter() {
+        public <O, R> Function<O, R> getter() {
             return (Function<O, R>) getter;
         }
 
-        public <O, P> BiConsumer<O, P> getSetter() {
+        public <O, P> BiConsumer<O, P> setter() {
             return (BiConsumer<O, P>) setter;
         }
-
-        public static final Pair<Annotation, Supplier<? extends StructFieldHandler<? extends Annotation>>> NO_HANDLER = Pair.of(null, null);
 
         @Override
         public String toString() {
