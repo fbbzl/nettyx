@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -51,29 +50,41 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToCharSequence toCharSequence) {
+        public Object doRead(
+                Type           root,
+                Object         earlyObject,
+                StructField    field,
+                ByteBuf        reading,
+                ToCharSequence toCharSequence)
+        {
             String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
-            ByteBuf byteBuf = serializer.getByteBuf();
-            if (!byteBuf.isReadable()) {
+            if (!reading.isReadable()) {
                 throw new IllegalArgumentException(
-                        "buffer is not readable please check [" + ByteBufUtil.hexDump(byteBuf) + "], field is [" + field
+                        "buffer is not readable please check [" + ByteBufUtil.hexDump(reading) + "], field is [" + field
                         + "]");
             }
             byte[] bytes = new byte[toCharSequence.bufferLength()];
-            byteBuf.readBytes(bytes);
+            reading.readBytes(bytes);
             return new String(bytes, Charset.forName(charset));
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToCharSequence toCharSequence, Object value, ByteBuf writing) {
+        public void doWrite(
+                Type           root,
+                Object         struct,
+                StructField    field,
+                Object         fieldVal,
+                ByteBuf        writing,
+                ToCharSequence toCharSequence)
+        {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
 
-            if (value != null) writing.writeBytes(value.toString().getBytes(Charset.forName(charset)));
-            else               writing.writeBytes(new byte[bufferLength]);
+            if (fieldVal != null) writing.writeBytes(fieldVal.toString().getBytes(Charset.forName(charset)));
+            else writing.writeBytes(new byte[bufferLength]);
         }
     }
 }
