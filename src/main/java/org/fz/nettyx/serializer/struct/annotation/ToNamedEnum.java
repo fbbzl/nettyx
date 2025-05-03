@@ -56,7 +56,7 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
+        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
                              ToNamedEnum toNamedEnum) {
             Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
             String enumName = reading
