@@ -51,13 +51,19 @@ public @interface ToNamedEnum {
      */
     class ToNamedEnumHandler implements StructFieldHandler<ToNamedEnum> {
         @Override
-        public boolean isSingleton() {
+        public boolean isSingleton()
+        {
             return true;
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
-                             ToNamedEnum toNamedEnum) {
+        public Object doRead(
+                Type        root,
+                Object      earlyObject,
+                StructField field,
+                ByteBuf     reading,
+                ToNamedEnum toNamedEnum)
+        {
             Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
             String enumName = reading
                     .readCharSequence(toNamedEnum.bufferLength(),
@@ -67,8 +73,14 @@ public @interface ToNamedEnum {
         }
 
         @Override
-        public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
-                            ToNamedEnum toNamedEnum) {
+        public void doWrite(
+                Type        root,
+                Object      struct,
+                StructField field,
+                Object      fieldVal,
+                ByteBuf     writing,
+                ToNamedEnum toNamedEnum)
+        {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();
 
