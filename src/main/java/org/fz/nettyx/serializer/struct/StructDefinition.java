@@ -33,8 +33,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandler
 public record StructDefinition(
         Class<?> type,
         Supplier<?> constructor,
-        StructField[] fields
-) {
+        StructField[] fields) {
 
     public StructDefinition(Class<?> clazz) {
         this(clazz, LambdaMetas.lambdaConstructor(clazz), Stream.of(getFields(clazz, StructHelper::legalStructField))
