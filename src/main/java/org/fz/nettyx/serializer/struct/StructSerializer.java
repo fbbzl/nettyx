@@ -150,9 +150,7 @@ public final class StructSerializer implements Serializer {
     @Override
     public <T> T doDeserialize(ByteBuf byteBuf) {
         StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
-
         Object           struct    = structDef.constructor().get();
-
         for (StructField structField : structDef.fields()) {
             Field                 field   = structField.wrapped();
             StructFieldHandler<?> handler = structField.handler();
@@ -164,7 +162,6 @@ public final class StructSerializer implements Serializer {
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
-
         return (T) struct;
     }
 
@@ -172,7 +169,6 @@ public final class StructSerializer implements Serializer {
     public ByteBuf doSerialize(Object struct) {
         ByteBuf          writing   = buffer();
         StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
-
         for (StructField structField : structDef.fields()) {
             Field                 field    = structField.wrapped();
             StructFieldHandler<?> handler  = structField.handler();
