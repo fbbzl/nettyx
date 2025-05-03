@@ -28,7 +28,8 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 @UtilityClass
 public class StructHelper {
 
-    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass) {
+    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass)
+    {
         return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
@@ -36,7 +37,8 @@ public class StructHelper {
         return BASIC_SIZE_CACHE.get(basicClass);
     }
 
-    public static int reflectForSize(Class<? extends Basic<?>> basicClass) {
+    public static int reflectForSize(Class<? extends Basic<?>> basicClass)
+    {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try {
             return newBasic(basicClass, fillingBuf).getSize();
@@ -54,7 +56,10 @@ public class StructHelper {
      * @param buf        the buf
      * @return the t
      */
-    public static <B extends Basic<?>> B newBasic(Class<?> basicClass, ByteBuf buf) {
+    public static <B extends Basic<?>> B newBasic(
+            Class<?> basicClass,
+            ByteBuf  buf)
+    {
         try {
             return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
         }
@@ -74,7 +79,8 @@ public class StructHelper {
      * @param structClass the struct class
      * @return the t
      */
-    public static <S> S newStruct(Type structClass) {
+    public static <S> S newStruct(Type structClass)
+    {
         try {
             if (structClass instanceof Class<?> clazz)
                 return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(clazz).get();
@@ -89,28 +95,39 @@ public class StructHelper {
         }
     }
 
-    public static boolean legalStructField(Field field) {
+    public static boolean legalStructField(Field field)
+    {
         return !Modifier.isStatic(field.getModifiers()) && !isIgnore(field);
     }
 
-    public static boolean isIgnore(Field field) {
+    public static boolean isIgnore(Field field)
+    {
         return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field,
                                                                                              ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static <T> T[] newArray(Type componentType, int length) {
+    public static <T> T[] newArray(
+            Type componentType,
+            int  length)
+    {
         if (componentType instanceof Class<?>          clazz)             return (T[]) Array.newInstance(clazz, length);
         if (componentType instanceof ParameterizedType parameterizedType) return (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
         else                                                              return (T[]) Array.newInstance(Object.class, length);
     }
 
-    public static Type getComponentType(Type root, Type type) {
+    public static Type getComponentType(
+            Type root,
+            Type type)
+    {
         if (type instanceof Class<?>         clazz)            return clazz.getComponentType();
         if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
         else return type;
     }
 
-    public static Type getElementType(Type root, Type type) {
+    public static Type getElementType(
+            Type root,
+            Type type)
+    {
         if (type instanceof Class<?>          clazz)             return clazz.getComponentType();
         if (type instanceof ParameterizedType parameterizedType) return TypeUtil.getActualType(root, parameterizedType.getActualTypeArguments()[0]);
         else return type;
