@@ -16,7 +16,7 @@ public class ParameterizedTypeException extends RuntimeException {
         return "can not determine field [" + entry + "] parameterized type";
     }
     public ParameterizedTypeException(StructField field) {
-        this(field.getWrapped());
+        this(field.wrapped());
     }
 
     public ParameterizedTypeException(Field field) {
