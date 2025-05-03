@@ -50,8 +50,13 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
-                             ToCharSequence toCharSequence) {
+        public Object doRead(
+                Type           root,
+                Object         earlyObject,
+                StructField    field,
+                ByteBuf        reading,
+                ToCharSequence toCharSequence)
+        {
             String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
@@ -67,8 +72,14 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public void doWrite(Type root, Object struct, StructField structField, Object fieldVal, ByteBuf writing,
-                            ToCharSequence toCharSequence) {
+        public void doWrite(
+                Type           root,
+                Object         struct,
+                StructField    field,
+                Object         fieldVal,
+                ByteBuf        writing,
+                ToCharSequence toCharSequence)
+        {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
 
