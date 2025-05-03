@@ -48,11 +48,11 @@ public @interface ToArrayList {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
+        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
                              ToArrayList toArrayList) {
-            Type elementType = StructHelper.getElementType(root, structField.type(root));
+            Type elementType = StructHelper.getElementType(root, field.type(root));
 
-            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(structField));
+            Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
             return readList(root, elementType, reading, toArrayList.size());
         }

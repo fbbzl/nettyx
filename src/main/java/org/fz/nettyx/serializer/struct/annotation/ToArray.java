@@ -41,11 +41,11 @@ public @interface ToArray {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
+        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
                              ToArray annotation) {
-            Type componentType = StructHelper.getComponentType(root, structField.type(root));
+            Type componentType = StructHelper.getComponentType(root, field.type(root));
 
-            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(structField));
+            Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
@@ -53,7 +53,7 @@ public @interface ToArray {
                 return readArray(root, componentType, reading, length);
             }
             catch (TypeJudgmentException typeJudgmentException) {
-                throw new UnsupportedOperationException("can not determine the type of field [" + structField + "]");
+                throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
         }
 

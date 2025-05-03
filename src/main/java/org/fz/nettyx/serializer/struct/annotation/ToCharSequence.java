@@ -50,7 +50,7 @@ public @interface ToCharSequence {
         }
 
         @Override
-        public Object doRead(Type root, Object earlyObject, StructField structField, ByteBuf reading,
+        public Object doRead(Type root, Object earlyObject, StructField field, ByteBuf reading,
                              ToCharSequence toCharSequence) {
             String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
@@ -58,7 +58,7 @@ public @interface ToCharSequence {
 
             if (!reading.isReadable()) {
                 throw new IllegalArgumentException(
-                        "buffer is not readable please check [" + ByteBufUtil.hexDump(reading) + "], field is [" + structField
+                        "buffer is not readable please check [" + ByteBufUtil.hexDump(reading) + "], field is [" + field
                         + "]");
             }
             byte[] bytes = new byte[toCharSequence.bufferLength()];

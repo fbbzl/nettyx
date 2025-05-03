@@ -144,7 +144,7 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = Objects.requireNonNull(getStructDefinition(root));
 
         for (StructField structField : structDef.fields()) {
-            Field                 field      = structField.wrapped();
+            Field                 field    = structField.wrapped();
             StructFieldHandler<?> handler  = structField.handler();
             Object                fieldVal = structField.getter().apply(struct);
 
