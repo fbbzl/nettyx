@@ -11,24 +11,17 @@ import io.netty.buffer.ByteBuf;
 public interface Serializer {
 
     /**
-     * get byte buf.
-     *
-     * @return the byte buf
-     */
-    ByteBuf getByteBuf();
-
-    /**
      * Do deserialize t.
      *
      * @param <T> the type parameter
      * @return the t
      */
-    <T> T doDeserialize();
+    <T> T doDeserialize(ByteBuf byteBuf);
 
     /**
      * Do serialize byte buf.
      *
      * @return the byte buf
      */
-    ByteBuf doSerialize();
+    <T> ByteBuf doSerialize(T object);
 }

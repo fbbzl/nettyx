@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
@@ -41,36 +41,49 @@ public @interface ToArray {
         }
 
         @Override
-        public Object doRead(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation) {
-            Type componentType = serializer.getComponentType(fieldType);
+        public Object doRead(
+                Type        root,
+                Object      earlyObject,
+                StructField field,
+                ByteBuf     reading,
+                ToArray     annotation)
+        {
+            Type componentType = StructHelper.getComponentType(root, field.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
             try {
-                return serializer.readArray(componentType, length);
-            } catch (TypeJudgmentException typeJudgmentException) {
+                return readArray(root, componentType, reading, length);
+            }
+            catch (TypeJudgmentException typeJudgmentException) {
                 throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
         }
 
         @Override
-        public void doWrite(StructSerializer serializer, Type fieldType, StructField field, ToArray annotation, Object arrayValue, ByteBuf writing) {
-            Type componentType = serializer.getComponentType(fieldType);
+        public void doWrite(
+                Type        root,
+                Object      struct,
+                StructField field,
+                Object      fieldVal,
+                ByteBuf     writing,
+                ToArray annotation)
+        {
+            Type componentType = StructHelper.getComponentType(root, field.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
             int length = annotation.length();
 
             try {
-                serializer.writeArray(arrayValue, componentType, length, writing);
-            } catch (TypeJudgmentException typeJudgmentException) {
-                throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
+                writeArray(root, fieldVal, componentType, length, writing);
+            }
+            catch (TypeJudgmentException typeJudgmentException) {
+                throw new UnsupportedOperationException("can not determine the type of field [" + fieldVal + "]");
             }
         }
-
-        //**************************************         private end           ***************************************//
 
     }
 
