@@ -25,7 +25,7 @@ import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
 
 /**
- * the basic serializer of byte-work Provides a protocol based on byte offset partitioning fields
+ * the struct serializer
  *
  * @author fengbinbin
  * @version 1.0
