@@ -2,7 +2,6 @@ package org.fz.nettyx.util;
 
 import cn.hutool.core.util.TypeUtil;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Type;
 
@@ -15,13 +14,12 @@ import java.lang.reflect.Type;
  * @since 2024 /1/15 11:24
  */
 @Getter
-@NoArgsConstructor
 public abstract class TypeRefer<T> implements Type {
 
-	private final Type typeValue = TypeUtil.getTypeArgument(this.getClass());
+    private final Type typeValue = TypeUtil.getTypeArgument(this.getClass());
 
-	@Override
-	public String toString() {
-		return "TypeRefer(typeValue=" + this.getTypeValue() + ")";
-	}
+    @Override
+    public String toString() {
+        return "TypeRefer(typeValue=" + this.getTypeValue() + ")";
+    }
 }
