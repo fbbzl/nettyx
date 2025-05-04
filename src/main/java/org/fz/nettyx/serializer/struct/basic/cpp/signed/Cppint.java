@@ -10,16 +10,9 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Cint;
  */
 public class Cppint extends Cint {
 
-
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppint MIN_VALUE = new Cppint(Integer.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppint MAX_VALUE = new Cppint(Integer.MAX_VALUE);
+    public static final Cppint
+            MIN_VALUE = new Cppint(Integer.MIN_VALUE),
+            MAX_VALUE = new Cppint(Integer.MAX_VALUE);
 
     public Cppint(Integer value) {
         super(value);

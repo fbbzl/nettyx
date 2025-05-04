@@ -11,15 +11,9 @@ import io.netty.buffer.ByteBuf;
  */
 public class Culong4 extends Cuint {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Culong4 MIN_VALUE = new Culong4(0L);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Culong4 MAX_VALUE = new Culong4(Integer.MAX_VALUE * 2L + 1);
+    public static final Culong4
+            MIN_VALUE = new Culong4(0L),
+            MAX_VALUE = new Culong4(Integer.MAX_VALUE * 2L + 1);
 
     /**
      * Instantiates a new Culong 4.
