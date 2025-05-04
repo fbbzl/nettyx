@@ -193,17 +193,14 @@ public interface StructFieldHandler<A extends Annotation> {
             int        basicElementSize = StructHelper.findBasicSize(componentType);
             Basic<?>[] basicArray       = (Basic<?>[]) arrayValue;
 
-            if (basicArray == null) {
-                writing.writeBytes(new byte[basicElementSize * length]); return;
-            }
-
-            writeBasicArray(basicArray, basicElementSize, length, writing);
+            if (basicArray == null) writing.writeBytes(new byte[basicElementSize * length]);
+            else                    writeBasicArray(basicArray, basicElementSize, length, writing);
         }
         else
-        if (isStruct(root, componentType)) {
+        if (isStruct(root, componentType))
             writeStructArray(arrayNullDefault(arrayValue, componentType, length), componentType, length, writing);
-        }
-        else throw new TypeJudgmentException();
+        else
+            throw new TypeJudgmentException();
     }
 
     default void writeBasicArray(
