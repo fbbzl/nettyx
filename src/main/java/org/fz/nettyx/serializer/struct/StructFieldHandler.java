@@ -229,8 +229,10 @@ public interface StructFieldHandler<A extends Annotation> {
             ByteBuf writing)
     {
         for (int i = 0; i < length; i++) {
-            if (i < structArray.length) writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(structArray[i], elementType)));
-            else writing.writeBytes(StructSerializer.toByteBuf(newStruct(elementType)));
+            if (i < structArray.length)
+                writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(structArray[i], elementType)));
+            else
+                writing.writeBytes(StructSerializer.toByteBuf(newStruct(elementType)));
         }
     }
 
