@@ -14,12 +14,15 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import static cn.hutool.core.collection.CollUtil.newArrayList;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.fz.nettyx.serializer.struct.StructHelper.findBasicSize;
 import static org.fz.nettyx.serializer.struct.StructHelper.newStruct;
 
 
@@ -79,25 +82,21 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
-            writeList(root, (List<?>) fieldVal, elementType, toArrayList.size(), writing);
+            writeList(root, defaultIfNull((List<?>) fieldVal, Collections::emptyList), elementType, toArrayList.size(), writing);
         }
 
         void writeList(
                 Type    root,
                 List<?> list,
                 Type    elementType,
-                int     size,
+                int     length,
                 ByteBuf writing)
         {
-            if (isBasic(root, elementType)) {
-                int basicElementSize = StructHelper.findBasicSize(elementType);
-
-                if (list == null) writing.writeBytes(new byte[basicElementSize * size]);
-                else              writeBasicList(list, basicElementSize, size, writing);
-            }
+            if (isBasic(root, elementType))
+                writeBasicList(list, findBasicSize(elementType), length, writing);
             else
             if (isStruct(root, elementType))
-                writeStructList(newArrayList(arrayNullDefault(list, elementType, size)), elementType, size, writing);
+                writeStructList(list, elementType, length, writing);
             else
                 throw new TypeJudgmentException();
         }
