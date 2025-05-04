@@ -1,10 +1,13 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
+import cn.hutool.core.collection.CollUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructHelper;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
@@ -77,6 +80,35 @@ public @interface ToArrayList {
 
             writeList(root, defaultIfNull((List<?>) fieldVal, Collections::emptyList), elementType,
                       toArrayList.size(), writing);
+        }
+
+        <T> List<T> readList(
+                Type    root,
+                Type    elementType,
+                ByteBuf byteBuf,
+                int     length)
+        {
+            if (isBasic(root, elementType))  return (List<T>) readBasicList(root, (Class<? extends Basic<?>>) elementType, byteBuf, length);
+            if (isStruct(root, elementType)) return readStructList(root, elementType, byteBuf, length);
+            else                             throw new TypeJudgmentException();
+        }
+
+        <B extends Basic<?>> List<B> readBasicList(
+                Type     root,
+                Class<?> elementType,
+                ByteBuf  byteBuf,
+                int      length)
+        {
+            return CollUtil.newArrayList(readBasicArray(elementType, byteBuf, length));
+        }
+
+        <T> List<T> readStructList(
+                Type    root,
+                Type    elementType,
+                ByteBuf byteBuf,
+                int     length)
+        {
+            return CollUtil.newArrayList(readStructArray(root, elementType, byteBuf, length));
         }
     }
 }
