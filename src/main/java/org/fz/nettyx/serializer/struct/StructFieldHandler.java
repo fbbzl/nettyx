@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -88,12 +87,12 @@ public interface StructFieldHandler<A extends Annotation> {
         return isBasic(root, field.getGenericType());
     }
 
-    public static boolean isBasic(Class<?> clazz)
+    default boolean isBasic(Class<?> clazz)
     {
         return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
     }
 
-    public static boolean isBasic(
+    default boolean isBasic(
             Type root,
             Type type)
     {
@@ -110,7 +109,7 @@ public interface StructFieldHandler<A extends Annotation> {
         return isStruct(root, field.getGenericType());
     }
 
-    public static boolean isStruct(
+    default boolean isStruct(
             Type root,
             Type type)
     {
@@ -168,35 +167,6 @@ public interface StructFieldHandler<A extends Annotation> {
         for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementActualType, byteBuf);
 
         return structs;
-    }
-
-    default <T> List<T> readList(
-            Type    root,
-            Type    elementType,
-            ByteBuf byteBuf,
-            int     length)
-    {
-        if (isBasic(root, elementType))  return (List<T>) readBasicList(root, (Class<? extends Basic<?>>) elementType, byteBuf, length);
-        if (isStruct(root, elementType)) return readStructList(root, elementType, byteBuf, length);
-        else                             throw new TypeJudgmentException();
-    }
-
-    default <B extends Basic<?>> List<B> readBasicList(
-            Type     root,
-            Class<?> elementType,
-            ByteBuf  byteBuf,
-            int      length)
-    {
-        return CollUtil.newArrayList(readBasicArray(elementType, byteBuf, length));
-    }
-
-    default <T> List<T> readStructList(
-            Type    root,
-            Type    elementType,
-            ByteBuf byteBuf,
-            int     length)
-    {
-        return CollUtil.newArrayList(readStructArray(root, elementType, byteBuf, length));
     }
 
     default <B extends Basic<?>> void writeBasic(
