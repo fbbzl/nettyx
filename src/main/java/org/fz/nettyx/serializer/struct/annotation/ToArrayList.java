@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
-import cn.hutool.core.collection.CollUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -19,10 +18,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fz.nettyx.serializer.struct.StructHelper.findBasicSize;
 import static org.fz.nettyx.serializer.struct.StructHelper.newStruct;
 
 
@@ -66,7 +65,7 @@ public @interface ToArrayList {
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
-            return CollUtil.newArrayList(readArray(root, elementType, reading, toArrayList.size()));
+            return newArrayList(readArray(root, elementType, reading, toArrayList.size()));
         }
 
         @Override
@@ -93,12 +92,21 @@ public @interface ToArrayList {
                 int     length,
                 ByteBuf writing)
         {
-            writeArray(root, list, elementType, length, writing);
-            if (isBasic(root, elementType))  writeBasicList(list, findBasicSize(elementType), length, writing);
+            if (isBasic(root, elementType)) {
+                int            basicElementSize = StructHelper.findBasicSize(elementType);
+                List<Basic<?>> basicArray       = (List<Basic<?>>) list;
+
+                if (basicArray == null) {
+                    writing.writeBytes(new byte[basicElementSize * length]); return;
+                }
+
+                writeBasicList(basicArray, basicElementSize, length, writing);
+            }
             else
-            if (isStruct(root, elementType)) writeStructList(list, elementType, length, writing);
-            else
-                throw new TypeJudgmentException();
+            if (isStruct(root, elementType)) {
+                writeStructList(newArrayList(arrayNullDefault(list, elementType, length)), elementType, length, writing);
+            }
+            else throw new TypeJudgmentException();
         }
 
         void writeBasicList(
