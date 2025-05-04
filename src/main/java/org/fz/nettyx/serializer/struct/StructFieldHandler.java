@@ -11,8 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Iterator;
-import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static org.fz.nettyx.serializer.struct.StructHelper.*;
@@ -179,7 +177,8 @@ public interface StructFieldHandler<A extends Annotation> {
     default <S> void writeStruct(
             Type    root,
             S       structValue,
-            ByteBuf writing) {
+            ByteBuf writing)
+    {
         writing.writeBytes(StructSerializer.toByteBuf(root, structValue));
     }
 
@@ -232,52 +231,6 @@ public interface StructFieldHandler<A extends Annotation> {
         for (int i = 0; i < length; i++) {
             if (i < structArray.length) writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(structArray[i], elementType)));
             else writing.writeBytes(StructSerializer.toByteBuf(newStruct(elementType)));
-        }
-    }
-
-    default void writeList(
-            Type    root,
-            List<?> list,
-            Type    elementType,
-            int     length,
-            ByteBuf writing)
-    {
-        if (isBasic(root, elementType))  writeBasicList(list, findBasicSize(elementType), length, writing);
-        else
-        if (isStruct(root, elementType)) writeStructList(list, elementType, length, writing);
-        else
-        throw new TypeJudgmentException();
-    }
-
-    default void writeBasicList(
-            List<?> list,
-            int     elementBytesSize,
-            int     length,
-            ByteBuf writing)
-    {
-        Iterator<?> iterator = list.iterator();
-        for (int i = 0; i < length; i++) {
-            if (iterator.hasNext()) {
-                Basic<?> basic = (Basic<?>) iterator.next();
-                if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
-                else writing.writeBytes(basic.getBytes());
-            }
-            else writing.writeBytes(new byte[elementBytesSize]);
-        }
-    }
-
-    default void writeStructList(
-            List<?> list,
-            Type    elementType,
-            int     length,
-            ByteBuf writing)
-    {
-        Iterator<?> iterator = list.iterator();
-        for (int i = 0; i < length; i++) {
-            if (iterator.hasNext())
-                writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(iterator.next(), elementType)));
-            else
-                writing.writeBytes(StructSerializer.toByteBuf(elementType, newStruct(elementType)));
         }
     }
 
