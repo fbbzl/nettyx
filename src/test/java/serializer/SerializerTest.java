@@ -4,6 +4,7 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.TypeUtil;
 import codec.model.*;
+import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
@@ -40,6 +41,7 @@ public class SerializerTest {
         stopWatch.start();
         for (int i = 0; i < 1_000_000; i++) {
             Object struct = StructSerializer.toStruct(youCLass, bytes);
+            ByteBuf byteBuf = StructSerializer.toByteBuf(youCLass, struct);
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
