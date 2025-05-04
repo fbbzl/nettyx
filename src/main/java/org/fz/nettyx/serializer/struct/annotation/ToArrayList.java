@@ -93,20 +93,16 @@ public @interface ToArrayList {
                 ByteBuf writing)
         {
             if (isBasic(root, elementType)) {
-                int            basicElementSize = StructHelper.findBasicSize(elementType);
-                List<Basic<?>> basicArray       = (List<Basic<?>>) list;
+                int basicElementSize = StructHelper.findBasicSize(elementType);
 
-                if (basicArray == null) {
-                    writing.writeBytes(new byte[basicElementSize * length]); return;
-                }
-
-                writeBasicList(basicArray, basicElementSize, length, writing);
+                if (list == null) writing.writeBytes(new byte[basicElementSize * length]);
+                else              writeBasicList(list, basicElementSize, length, writing);
             }
             else
-            if (isStruct(root, elementType)) {
+            if (isStruct(root, elementType))
                 writeStructList(newArrayList(arrayNullDefault(list, elementType, length)), elementType, length, writing);
-            }
-            else throw new TypeJudgmentException();
+            else
+                throw new TypeJudgmentException();
         }
 
         void writeBasicList(
