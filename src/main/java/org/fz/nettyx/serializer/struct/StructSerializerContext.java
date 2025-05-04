@@ -153,6 +153,8 @@ public class StructSerializerContext {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                     STRUCT_DEFINITION_CACHE.put(clazz, new StructDefinition(clazz));
+                    Supplier<?> constructorSupplier = LambdaMetas.lambdaConstructor(clazz);
+                    NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
                 }
             }
             catch (Throwable throwable) {
