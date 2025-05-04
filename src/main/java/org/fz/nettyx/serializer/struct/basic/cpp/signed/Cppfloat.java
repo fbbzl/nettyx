@@ -10,15 +10,9 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Cfloat;
  */
 public class Cppfloat extends Cfloat {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppfloat MIN_VALUE = new Cppfloat(Float.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppfloat MAX_VALUE = new Cppfloat(Float.MAX_VALUE);
+    public static final Cppfloat
+            MIN_VALUE = new Cppfloat(Float.MIN_VALUE),
+            MAX_VALUE = new Cppfloat(Float.MAX_VALUE);
 
     public Cppfloat(Float value) {
         super(value);

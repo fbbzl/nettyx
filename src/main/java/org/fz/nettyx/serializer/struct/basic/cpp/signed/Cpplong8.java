@@ -10,15 +10,9 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
  */
 public class Cpplong8 extends Clong8 {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cpplong8 MIN_VALUE = new Cpplong8(Long.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cpplong8 MAX_VALUE = new Cpplong8(Long.MAX_VALUE);
+    public static final Cpplong8
+            MIN_VALUE = new Cpplong8(Long.MIN_VALUE),
+            MAX_VALUE = new Cpplong8(Long.MAX_VALUE);
 
     public Cpplong8(Long value) {
         super(value);

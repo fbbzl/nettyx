@@ -14,15 +14,9 @@ import java.math.BigInteger;
  */
 public class Cppulong8 extends Culong8 {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppulong8 MIN_VALUE = new Cppulong8(BigInteger.ZERO);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppulong8 MAX_VALUE = new Cppulong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
+    public static final Cppulong8
+            MIN_VALUE = new Cppulong8(BigInteger.ZERO),
+            MAX_VALUE = new Cppulong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
     public Cppulong8(BigInteger value) {
         super(value);

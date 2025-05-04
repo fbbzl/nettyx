@@ -2,9 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-
-import java.nio.ByteOrder;
+import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
 /**
  * The type Cuint16.
@@ -13,10 +11,11 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023/12/15 14:38
  */
-public class Cuint16T extends Basic<Short> {
+public class Cuint16T extends CBasic<Short> {
 
-    public static final Cuint16T MIN_VALUE = new Cuint16T((short) 0);
-    public static final Cuint16T MAX_VALUE = new Cuint16T((short) 0xFFFF);
+    public static final Cuint16T
+            MIN_VALUE = new Cuint16T((short) 0),
+            MAX_VALUE = new Cuint16T((short) 0xFFFF);
 
     public Cuint16T(Short value) {
         super(value, 2);
@@ -32,16 +31,8 @@ public class Cuint16T extends Basic<Short> {
     }
 
     @Override
-    public ByteOrder order() {
-        return ByteOrder.LITTLE_ENDIAN;
-    }
-
-    @Override
     protected ByteBuf toByteBuf(Short value, int size) {
-        ByteBuf buffer = Unpooled.buffer(size);
-        buffer.order(order());
-        buffer.writeShort(value);
-        return buffer;
+        return Unpooled.buffer(size).writeShortLE(value);
     }
 
     @Override
