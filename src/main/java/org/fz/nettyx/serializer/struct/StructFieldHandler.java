@@ -141,7 +141,7 @@ public interface StructFieldHandler<A extends Annotation> {
     {
         if (isBasic(root, elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length);
         if (isStruct(root, elementType)) return readStructArray(root, elementType, byteBuf, length);
-        else                             throw new TypeJudgmentException();
+        else                             throw new TypeJudgmentException(elementType);
     }
 
     default <B extends Basic<?>> B[] readBasicArray(
@@ -178,7 +178,7 @@ public interface StructFieldHandler<A extends Annotation> {
     {
         if (isBasic(root, elementType))  return (List<T>) readBasicList(root, (Class<? extends Basic<?>>) elementType, byteBuf, length);
         if (isStruct(root, elementType)) return readStructList(root, elementType, byteBuf, length);
-        else                             throw new TypeJudgmentException();
+        else                             throw new TypeJudgmentException(elementType);
     }
 
     default <B extends Basic<?>> List<B> readBasicList(
@@ -232,7 +232,7 @@ public interface StructFieldHandler<A extends Annotation> {
         if (isStruct(root, componentType))
             writeStructArray(arrayNullDefault(arrayValue, componentType, length), componentType, length, writing);
         else
-            throw new TypeJudgmentException();
+            throw new TypeJudgmentException(componentType);
     }
 
     default void writeBasicArray(
@@ -274,7 +274,7 @@ public interface StructFieldHandler<A extends Annotation> {
         else
         if (isStruct(root, elementType)) writeStructList(list, elementType, length, writing);
         else
-        throw new TypeJudgmentException();
+        throw new TypeJudgmentException(elementType);
     }
 
     default void writeBasicList(
