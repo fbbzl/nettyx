@@ -1,8 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cushort;
 
 /**
  * The type Cuint16.
@@ -11,32 +10,17 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023/12/15 14:38
  */
-public class Cuint16T extends CBasic<Short> {
+public class Cuint16T extends Cushort {
 
     public static final Cuint16T
-            MIN_VALUE = new Cuint16T((short) 0),
-            MAX_VALUE = new Cuint16T((short) 0xFFFF);
+            MIN_VALUE = new Cuint16T(0),
+            MAX_VALUE = new Cuint16T(Short.MAX_VALUE * 2 + 1);
 
-    public Cuint16T(Short value) {
-        super(value, 2);
+    public Cuint16T(Integer value) {
+        super(value);
     }
 
     public Cuint16T(ByteBuf buf) {
-        super(buf, 2);
-    }
-
-    @Override
-    public boolean hasSinged() {
-        return false;
-    }
-
-    @Override
-    protected ByteBuf toByteBuf(Short value, int size) {
-        return Unpooled.buffer(size).writeShortLE(value);
-    }
-
-    @Override
-    protected Short toValue(ByteBuf byteBuf) {
-        return byteBuf.readShort();
+        super(buf);
     }
 }
