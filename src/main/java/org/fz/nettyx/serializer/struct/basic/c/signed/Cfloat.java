@@ -13,15 +13,9 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  */
 public class Cfloat extends CBasic<Float> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cfloat MIN_VALUE = new Cfloat(Float.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cfloat MAX_VALUE = new Cfloat(Float.MAX_VALUE);
+    public static final Cfloat
+            MIN_VALUE = new Cfloat(Float.MIN_VALUE),
+            MAX_VALUE = new Cfloat(Float.MAX_VALUE);
 
     /**
      * Instantiates a new Cfloat.
