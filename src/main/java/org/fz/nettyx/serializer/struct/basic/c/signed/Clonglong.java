@@ -11,15 +11,9 @@ import io.netty.buffer.ByteBuf;
  */
 public class Clonglong extends Clong8 {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Clonglong MIN_VALUE = new Clonglong(Long.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Clonglong MAX_VALUE = new Clonglong(Long.MAX_VALUE);
+    public static final Clonglong
+            MIN_VALUE = new Clonglong(Long.MIN_VALUE),
+            MAX_VALUE = new Clonglong(Long.MAX_VALUE);
 
     /**
      * Instantiates a new Clonglong.
