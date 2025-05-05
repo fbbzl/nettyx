@@ -10,15 +10,10 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Cdouble;
  */
 public class Cppdouble extends Cdouble {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppdouble MIN_VALUE = new Cppdouble(Double.MIN_VALUE);
 
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppdouble MAX_VALUE = new Cppdouble(Double.MAX_VALUE);
+    public static final Cppdouble
+            MIN_VALUE = new Cppdouble(Double.MIN_VALUE),
+            MAX_VALUE = new Cppdouble(Double.MAX_VALUE);
 
     public Cppdouble(Double value) {
         super(value);

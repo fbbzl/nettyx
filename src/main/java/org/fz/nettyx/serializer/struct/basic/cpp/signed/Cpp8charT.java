@@ -8,13 +8,13 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
  * @version 1.0
  * @since 2023/12/27 13:12
  */
-public class Cpp8tchar extends Cchar {
+public class Cpp8charT extends Cchar {
 
-    public Cpp8tchar(Integer value) {
+    public Cpp8charT(Integer value) {
         super(value);
     }
 
-    public Cpp8tchar(ByteBuf buf) {
+    public Cpp8charT(ByteBuf buf) {
         super(buf);
     }
 

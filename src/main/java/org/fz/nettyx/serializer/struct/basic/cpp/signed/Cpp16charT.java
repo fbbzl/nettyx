@@ -12,13 +12,13 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since 2023/12/27 13:31
  */
-public class Cpp16tchar extends CppBasic<Character> {
+public class Cpp16charT extends CppBasic<Character> {
 
-    public Cpp16tchar(Character value) {
+    public Cpp16charT(Character value) {
         super(value, 2);
     }
 
-    public Cpp16tchar(ByteBuf buf) {
+    public Cpp16charT(ByteBuf buf) {
         super(buf, 2);
     }
 
