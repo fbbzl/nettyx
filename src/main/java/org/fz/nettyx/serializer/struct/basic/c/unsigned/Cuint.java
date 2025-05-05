@@ -13,15 +13,9 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  */
 public class Cuint extends CBasic<Long> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cuint MIN_VALUE = new Cuint(0L);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cuint MAX_VALUE = new Cuint(Integer.MAX_VALUE * 2L + 1);
+    public static final Cuint
+            MIN_VALUE = new Cuint(0L),
+            MAX_VALUE = new Cuint(Integer.MAX_VALUE * 2L + 1);
 
     /**
      * Instantiates a new Cuint.

@@ -11,15 +11,9 @@ import io.netty.buffer.ByteBuf;
  */
 public class Clong4 extends Cint {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Clong4 MIN_VALUE = new Clong4(Integer.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Clong4 MAX_VALUE = new Clong4(Integer.MAX_VALUE);
+    public static final Clong4
+            MIN_VALUE = new Clong4(Integer.MIN_VALUE),
+            MAX_VALUE = new Clong4(Integer.MAX_VALUE);
 
     /**
      * Instantiates a new Clong 4.

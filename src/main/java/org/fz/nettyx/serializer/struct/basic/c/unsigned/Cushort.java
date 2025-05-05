@@ -13,15 +13,9 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  */
 public class Cushort extends CBasic<Integer> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cushort MIN_VALUE = new Cushort(0);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cushort MAX_VALUE = new Cushort(Short.MAX_VALUE * 2 + 1);
+    public static final Cushort
+            MIN_VALUE = new Cushort(0),
+            MAX_VALUE = new Cushort(Short.MAX_VALUE * 2 + 1);
 
     /**
      * Instantiates a new Cushort.

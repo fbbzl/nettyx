@@ -13,15 +13,9 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  */
 public class Cdouble extends CBasic<Double> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cdouble MIN_VALUE = new Cdouble(Double.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cdouble MAX_VALUE = new Cdouble(Double.MAX_VALUE);
+    public static final Cdouble
+            MIN_VALUE = new Cdouble(Double.MIN_VALUE),
+            MAX_VALUE = new Cdouble(Double.MAX_VALUE);
 
     /**
      * Instantiates a new Cdouble.

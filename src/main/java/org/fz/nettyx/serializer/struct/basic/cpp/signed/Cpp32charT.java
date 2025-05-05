@@ -11,15 +11,15 @@ import java.nio.charset.Charset;
  * @version 1.0
  * @since 2023/12/27 13:31
  */
-public class Cpp32tchar extends CppBasic<Integer> {
+public class Cpp32charT extends CppBasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 
-    public Cpp32tchar(Integer value) {
+    public Cpp32charT(Integer value) {
         super(value, 4);
     }
 
-    public Cpp32tchar(ByteBuf buf) {
+    public Cpp32charT(ByteBuf buf) {
         super(buf, 4);
     }
 

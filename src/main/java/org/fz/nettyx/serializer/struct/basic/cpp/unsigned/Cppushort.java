@@ -12,15 +12,9 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cushort;
  */
 public class Cppushort extends Cushort {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppushort MIN_VALUE = new Cppushort(0);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppushort MAX_VALUE = new Cppushort(Short.MAX_VALUE * 2 + 1);
+    public static final Cppushort
+            MIN_VALUE = new Cppushort(0),
+            MAX_VALUE = new Cppushort(Short.MAX_VALUE * 2 + 1);
 
     public Cppushort(Integer value) {
         super(value);
