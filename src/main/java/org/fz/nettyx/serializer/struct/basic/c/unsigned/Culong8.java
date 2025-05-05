@@ -16,16 +16,9 @@ import java.math.BigInteger;
  */
 public class Culong8 extends CBasic<BigInteger> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Culong8 MIN_VALUE = new Culong8(BigInteger.ZERO);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Culong8 MAX_VALUE =
-        new Culong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
+    public static final Culong8
+            MIN_VALUE = new Culong8(BigInteger.ZERO),
+            MAX_VALUE = new Culong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
     /**
      * Instantiates a new Culong 8.
