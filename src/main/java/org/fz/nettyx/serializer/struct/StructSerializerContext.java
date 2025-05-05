@@ -43,10 +43,10 @@ public class StructSerializerContext {
     @Getter
     private final String[] basePackages;
 
-    static final Map<Type, Integer>                                                                          BASIC_SIZE_CACHE                 = new HashMap<>(64);
-    static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>>                                        BASIC_BYTEBUF_CONSTRUCTOR_CACHE  = new HashMap<>(64);
-    static final Map<Type, Supplier<?>>                                                                      NO_ARGS_CONSTRUCTOR_CACHE        = new HashMap<>(128);
-    static final Map<Class<?>, StructDefinition>                                                             STRUCT_DEFINITION_CACHE          = new HashMap<>(512);
+    static final Map<Type, Integer>                                   BASIC_SIZE_CACHE                = new HashMap<>(64);
+    static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>> BASIC_BYTEBUF_CONSTRUCTOR_CACHE = new HashMap<>(64);
+    static final Map<Class<?>, StructDefinition>                      STRUCT_DEFINITION_CACHE         = new HashMap<>(512);
+
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
 
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
@@ -117,10 +117,6 @@ public class StructSerializerContext {
                 if (isFieldHandler) {
                     Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
                     if (annotationType != null) {
-                        Supplier<?> constructorSupplier = LambdaMetas.lambdaConstructor(clazz);
-                        // cache field handler constructor
-                        NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
-
                         // cache annotation handler mapping relation
                         ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(annotationType, (Class<?
                                 extends StructFieldHandler<? extends Annotation>>) clazz);
