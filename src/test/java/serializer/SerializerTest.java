@@ -38,10 +38,10 @@ public class SerializerTest {
 
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
-        for (int i = 0; i < 111; i++) {
-            Object user = StructSerializer.toStruct(userTypeRefer, bytes);
-            byte[] byteBuf = StructSerializer.toBytes(userTypeRefer, user);
-            byte[] byteBufa = StructSerializer.toBytes(userTypeRefer, new User<>());
+        for (int i = 0; i < 1_000_000; i++) {
+            Object user = StructSerializer.toStruct(youTypeRefer, bytes);
+//            byte[] byteBuf = StructSerializer.toBytes(youTypeRefer, user);
+//            byte[] byteBufa = StructSerializer.toBytes(youTypeRefer, new You());
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
