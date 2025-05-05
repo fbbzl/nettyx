@@ -9,6 +9,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.util.lambda.LambdaMetas;
@@ -18,7 +19,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -46,12 +46,13 @@ public class StructSerializerContext {
     static final Map<Type, Integer>                                                                          BASIC_SIZE_CACHE                 = new HashMap<>(64);
     static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>>                                        BASIC_BYTEBUF_CONSTRUCTOR_CACHE  = new HashMap<>(64);
     static final Map<Type, Supplier<?>>                                                                      NO_ARGS_CONSTRUCTOR_CACHE        = new HashMap<>(128);
-    static final Map<Class<?>, StructDefinition>                                                             STRUCT_DEFINITION_CACHE          = new ConcurrentHashMap<>(512);
+    static final Map<Class<?>, StructDefinition>                                                             STRUCT_DEFINITION_CACHE          = new HashMap<>(512);
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
 
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
-    public StructSerializerContext(String... basePackages) {
+    public StructSerializerContext(String... basePackages)
+    {
         // will scan all packages if user do not assigned
         this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);
 
@@ -68,7 +69,8 @@ public class StructSerializerContext {
     /**
      * start package scan
      */
-    protected void scan() {
+    protected void scan()
+    {
         Set<Class<?>> classes = this.classForScan();
 
         // 1 scan field handler
@@ -86,7 +88,8 @@ public class StructSerializerContext {
      *
      * @return the classes can be scanned
      */
-    protected Set<Class<?>> classForScan() {
+    protected Set<Class<?>> classForScan()
+    {
         Set<Class<?>> forScan = new HashSet<>(256);
 
         Filter<Class<?>> scanCondition = clazz ->
@@ -105,7 +108,8 @@ public class StructSerializerContext {
         return forScan;
     }
 
-    protected void scanHandler(Set<Class<?>> classes) {
+    protected void scanHandler(Set<Class<?>> classes)
+    {
         for (Class<?> clazz : classes) {
             try {
                 boolean isFieldHandler = StructFieldHandler.class.isAssignableFrom(clazz);
@@ -129,7 +133,8 @@ public class StructSerializerContext {
         }
     }
 
-    protected void scanBasic(Set<Class<?>> classes) {
+    protected void scanBasic(Set<Class<?>> classes)
+    {
         for (Class<?> clazz : classes) {
             try {
                 boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
@@ -148,13 +153,12 @@ public class StructSerializerContext {
         }
     }
 
-    protected void scanStruct(Set<Class<?>> classes) {
+    protected void scanStruct(Set<Class<?>> classes)
+    {
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
                     STRUCT_DEFINITION_CACHE.put(clazz, new StructDefinition(clazz));
-                    Supplier<?> constructorSupplier = LambdaMetas.lambdaConstructor(clazz);
-                    NO_ARGS_CONSTRUCTOR_CACHE.putIfAbsent(clazz, constructorSupplier);
                 }
             }
             catch (Throwable throwable) {
@@ -163,7 +167,8 @@ public class StructSerializerContext {
         }
     }
 
-    static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandler(Field field) {
+    static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandler(Field field)
+    {
         Annotation handlerAnnotation         = getHandlerAnnotation(field);
         boolean    handlerAnnotationAssigned = handlerAnnotation != null;
 
@@ -179,7 +184,8 @@ public class StructSerializerContext {
         else return () -> (H) DEFAULT_STRUCT_FIELD_HANDLER;
     }
 
-    static <A extends Annotation> A getHandlerAnnotation(Field field) {
+    static <A extends Annotation> A getHandlerAnnotation(Field field)
+    {
         Iterator<Annotation> iterator =
                 Stream.of(AnnotationUtil.getAnnotations(field, false))
                       .filter(annotation -> ANNOTATION_HANDLER_MAPPING_CACHE.containsKey(annotation.annotationType()))
@@ -188,15 +194,17 @@ public class StructSerializerContext {
         return iterator.hasNext() ? (A) iterator.next() : null;
     }
 
-    public static StructDefinition getStructDefinition(Type type) {
+    public static StructDefinition getStructDefinition(Type type)
+    {
         if (type instanceof Class<?>         clazz)              return STRUCT_DEFINITION_CACHE.get(clazz);
         else
         if (type instanceof ParameterizedType parameterizedType) return getStructDefinition(parameterizedType.getRawType());
 
-        return null;
+        throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
     }
 
-    static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz) {
+    static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz)
+    {
         if (!ClassUtil.isNormalClass(clazz)) {
             return null;
         }
@@ -212,6 +220,5 @@ public class StructSerializerContext {
             }
         } return null;
     }
-
 
 }
