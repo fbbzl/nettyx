@@ -35,11 +35,13 @@ public class SerializerTest {
     public void testStructSerializer() {
         byte[] bytes = new byte[6411];
         Arrays.fill(bytes, (byte) 67);
-        Object user = StructSerializer.toStruct(youTypeRefer, bytes);
+
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 111; i++) {
-            byte[] byteBuf = StructSerializer.toBytes(youTypeRefer, user);
+            Object user = StructSerializer.toStruct(userTypeRefer, bytes);
+            byte[] byteBuf = StructSerializer.toBytes(userTypeRefer, user);
+            byte[] byteBufa = StructSerializer.toBytes(userTypeRefer, new User<>());
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
