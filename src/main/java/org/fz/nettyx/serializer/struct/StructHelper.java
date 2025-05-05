@@ -75,23 +75,17 @@ public class StructHelper {
     /**
      * New struct instance t.
      *
-     * @param <S>         the type parameter
-     * @param structClass the struct class
+     * @param <S>        the type parameter
+     * @param structType the struct type
      * @return the t
      */
-    public static <S> S newStruct(Type structClass)
+    public static <S> S newStruct(Type structType)
     {
         try {
-            if (structClass instanceof Class<?> clazz)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(clazz).get();
-            if (structClass instanceof ParameterizedType parameterizedType)
-                return (S) NO_ARGS_CONSTRUCTOR_CACHE.get(parameterizedType.getRawType()).get();
-
-            throw new UnsupportedOperationException("can not create instance of type [" + structClass + "], can not "
-                                                    + "find @Struct annotation on class");
+            return (S) getStructDefinition(structType).constructor().get();
         }
         catch (Exception instanceError) {
-            throw new SerializeException("struct [" + structClass + "] instantiate failed...", instanceError);
+            throw new SerializeException("struct [" + structType + "] instantiate failed...", instanceError);
         }
     }
 

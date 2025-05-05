@@ -26,7 +26,7 @@ public class SerializerTest {
     static final TypeRefer<User<Bill, Wife<Son<Clong4, Bill>, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
             new TypeRefer<>() {};
 
-    static final TypeRefer<You> youCLass = new TypeRefer<>() {};
+    static final TypeRefer<You> youTypeRefer = new TypeRefer<>() {};
 
     private static final StructSerializerContext context =
             new StructSerializerContext("codec.model");
@@ -35,11 +35,11 @@ public class SerializerTest {
     public void testStructSerializer() {
         byte[] bytes = new byte[6411];
         Arrays.fill(bytes, (byte) 67);
-        Object user = StructSerializer.toStruct(userTypeRefer, bytes);
+        Object user = StructSerializer.toStruct(youTypeRefer, bytes);
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 111; i++) {
-            StructSerializer.toByteBuf(userTypeRefer, new User<>());
+            byte[] byteBuf = StructSerializer.toBytes(youTypeRefer, user);
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
