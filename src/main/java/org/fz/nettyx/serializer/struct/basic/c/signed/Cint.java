@@ -13,15 +13,9 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  */
 public class Cint extends CBasic<Integer> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cint MIN_VALUE = new Cint(Integer.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cint MAX_VALUE = new Cint(Integer.MAX_VALUE);
+    public static final Cint
+            MIN_VALUE = new Cint(Integer.MIN_VALUE),
+            MAX_VALUE = new Cint(Integer.MAX_VALUE);
 
     /**
      * Instantiates a new Cint.

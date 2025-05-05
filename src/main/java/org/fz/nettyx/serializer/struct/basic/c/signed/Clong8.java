@@ -13,15 +13,9 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  */
 public class Clong8 extends CBasic<Long> {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Clong8 MIN_VALUE = new Clong8(Long.MIN_VALUE);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Clong8 MAX_VALUE = new Clong8(Long.MAX_VALUE);
+    public static final Clong8
+            MIN_VALUE = new Clong8(Long.MIN_VALUE),
+            MAX_VALUE = new Clong8(Long.MAX_VALUE);
 
     /**
      * Instantiates a new Clong 8.

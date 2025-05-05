@@ -11,15 +11,9 @@ import io.netty.buffer.ByteBuf;
  */
 public class Cppulong4 extends Cppuint {
 
-    /**
-     * The constant MIN_VALUE.
-     */
-    public static final Cppulong4 MIN_VALUE = new Cppulong4(0L);
-
-    /**
-     * The constant MAX_VALUE.
-     */
-    public static final Cppulong4 MAX_VALUE = new Cppulong4(Integer.MAX_VALUE * 2L + 1);
+    public static final Cppulong4
+            MIN_VALUE = new Cppulong4(0L),
+            MAX_VALUE = new Cppulong4(Integer.MAX_VALUE * 2L + 1);
 
     public Cppulong4(Long value) {
         super(value);
