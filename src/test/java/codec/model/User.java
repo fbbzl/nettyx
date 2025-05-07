@@ -3,12 +3,14 @@ package codec.model;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
+import org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned.Cuint8T;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
 
 import java.util.List;
@@ -44,6 +46,8 @@ public class User<T, W, G> {
     @ToArray(length = 5)
     W[]     wives121212;
 
-    Cchar        uname;
+    transient Cuint8T uname;
 
+    @Ignore
+    Culong8 deviceS;
 }
