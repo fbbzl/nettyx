@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
@@ -92,12 +91,13 @@ public final class StructSerializer implements Serializer {
     {
         Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + root + "]");
 
-        if (root instanceof Class<?> || root instanceof ParameterizedType) return new StructSerializer(root).doSerialize(struct);
+        if (root instanceof Class<?> || root instanceof ParameterizedType)
+            return new StructSerializer(root).doSerialize(struct);
         else
-        if (root instanceof TypeRefer<?> typeRefer)                        return toByteBuf(typeRefer.getTypeValue(), struct);
+        if (root instanceof TypeRefer<?> typeRefer)
+            return toByteBuf(typeRefer.getTypeValue(), struct);
         else
-        if (root instanceof TypeReference<?> typeReference)                return toByteBuf(typeReference.getType(), struct);
-        else throw new TypeJudgmentException(root);
+            throw new TypeJudgmentException(root);
     }
 
     public static <T> byte[] toBytes(T struct)
