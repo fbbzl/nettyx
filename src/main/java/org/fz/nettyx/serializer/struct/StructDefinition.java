@@ -36,9 +36,11 @@ public record StructDefinition(
         StructField[] fields) {
 
     public StructDefinition(Class<?> clazz) {
-        this(clazz, LambdaMetas.lambdaConstructor(clazz), Stream.of(getFields(clazz, StructHelper::legalStructField))
-                                                                .map(field -> new StructField(clazz, field))
-                                                                .toArray(StructField[]::new));
+        this(clazz,
+             LambdaMetas.lambdaConstructor(clazz),
+             Stream.of(getFields(clazz, StructHelper::legalStructField))
+                   .map(field -> new StructField(clazz, field))
+                   .toArray(StructField[]::new));
     }
 
     @Getter
@@ -55,7 +57,10 @@ public record StructDefinition(
         Annotation                                                   annotation;
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
-        public StructField(Class<?> declaringClass, Field field) {
+        public StructField(
+                Class<?> declaringClass,
+                Field    field)
+        {
             this(declaringClass,
                  field,
                  typeSupplier(field),

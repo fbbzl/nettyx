@@ -46,7 +46,7 @@ public interface StructFieldHandler<A extends Annotation> {
 
     default Object doRead(
             Type        root,
-            Object      earlyObject,
+            Object      earlyStruct,
             StructField field,
             ByteBuf     reading,
             A           annotation)
