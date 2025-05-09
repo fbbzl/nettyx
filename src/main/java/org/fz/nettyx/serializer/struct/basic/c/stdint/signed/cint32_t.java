@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 
 /**
- * The type Cint32.
+ * this type in C language is int32_t
  *
  * @author fengbinbin
  * @version 1.0

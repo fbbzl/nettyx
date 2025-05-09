@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
 
 /**
- * The type Cint16.
+ * this type in C language is int16_t
  *
  * @author fengbinbin
  * @version 1.0

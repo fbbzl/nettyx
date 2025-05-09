@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * The type Cchar.
+ * this type in C language is char
  *
  * @author fengbinbin
  * @version 1.0

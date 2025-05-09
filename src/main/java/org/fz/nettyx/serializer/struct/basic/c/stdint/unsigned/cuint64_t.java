@@ -6,7 +6,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 import java.math.BigInteger;
 
 /**
- * The type Cuint64.
+ * this type in C language is unit64_t
  *
  * @author fengbinbin
  * @version 1.0

@@ -6,7 +6,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 import java.math.BigInteger;
 
 /**
- * The type Culong 8.
+ * this type in Cpp language is unsigned long8
  *
  * @author fengbinbin
  * @version 1.0

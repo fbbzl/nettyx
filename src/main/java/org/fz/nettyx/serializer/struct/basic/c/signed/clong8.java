@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
 /**
- * The type Clong 8.
+ * this type in C language is long8
  *
  * @author fengbinbin
  * @version 1.0

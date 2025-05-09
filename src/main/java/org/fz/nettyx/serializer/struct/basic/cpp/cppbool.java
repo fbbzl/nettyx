@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 /**
- * The type Cpp bool.
+ * this type in Cpp language is boolean
  *
  * @author fengbinbin
  * @version 1.0

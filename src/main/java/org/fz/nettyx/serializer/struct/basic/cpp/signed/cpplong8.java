@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
 
 /**
+ * this type in Cpp language is long8
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2023/12/27 13:16
