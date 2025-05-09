@@ -8,6 +8,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * this type in Cpp language is char16_t
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2023/12/27 13:31

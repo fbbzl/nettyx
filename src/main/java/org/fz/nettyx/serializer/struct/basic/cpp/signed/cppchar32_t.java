@@ -7,6 +7,8 @@ import org.fz.nettyx.serializer.struct.basic.cpp.CppBasic;
 import java.nio.charset.Charset;
 
 /**
+ * this type in Cpp language is char32_t
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2023/12/27 13:31

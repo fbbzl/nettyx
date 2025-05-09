@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import java.math.BigInteger;
 
 /**
- * The type Culonglong.
+ * this type in C language is unsigned longlong
  *
  * @author fengbinbin
  * @version 1.0

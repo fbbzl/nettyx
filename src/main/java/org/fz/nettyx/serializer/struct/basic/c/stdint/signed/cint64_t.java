@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
 
 /**
- * The type Cint64.
+ * this type in C language is int64_t
  *
  * @author fengbinbin
  * @version 1.0

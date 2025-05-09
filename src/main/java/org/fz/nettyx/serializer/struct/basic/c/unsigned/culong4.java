@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 import io.netty.buffer.ByteBuf;
 
 /**
- * The type Culong 4.
+ * this type in C language is unsigned long4
  *
  * @author fengbinbin
  * @version 1.0

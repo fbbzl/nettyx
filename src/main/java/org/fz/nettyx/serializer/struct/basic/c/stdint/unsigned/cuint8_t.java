@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
 /**
- * The type Cuint8.
+ * this type in C language is unit8_t
  *
  * @author fengbinbin
  * @version 1.0

@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
- * C uchar mush use Java short
+ * this type in C language is unsigned char
  *
  * @author fengbinbin
  * @version 1.0

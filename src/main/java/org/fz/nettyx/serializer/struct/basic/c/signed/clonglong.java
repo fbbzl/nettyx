@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 import io.netty.buffer.ByteBuf;
 
 /**
- * The type Clonglong.
+ * this type in C language is longlong
  *
  * @author fengbinbin
  * @version 1.0

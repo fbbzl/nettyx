@@ -6,6 +6,8 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * this type in Cpp language is unsigned char
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2023/12/27 14:07

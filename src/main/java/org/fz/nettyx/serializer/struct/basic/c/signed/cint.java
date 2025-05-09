@@ -5,7 +5,7 @@ import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
 /**
- * The type Cint.
+ * this type in C language is int
  *
  * @author fengbinbin
  * @version 1.0

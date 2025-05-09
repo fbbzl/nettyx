@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 
 /**
- * The type Cint8.
+ * this type in C language is int8_t
  *
  * @author fengbinbin
  * @version 1.0
