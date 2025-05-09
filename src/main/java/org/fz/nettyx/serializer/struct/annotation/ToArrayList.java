@@ -50,7 +50,7 @@ public @interface ToArrayList {
         @Override
         public Object doRead(
                 Type        root,
-                Object      earlyObject,
+                Object      earlyStruct,
                 StructField field,
                 ByteBuf     reading,
                 ToArrayList toArrayList)

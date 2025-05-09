@@ -59,7 +59,7 @@ public @interface ToNamedEnum {
         @Override
         public Object doRead(
                 Type        root,
-                Object      earlyObject,
+                Object      earlyStruct,
                 StructField field,
                 ByteBuf     reading,
                 ToNamedEnum toNamedEnum)
