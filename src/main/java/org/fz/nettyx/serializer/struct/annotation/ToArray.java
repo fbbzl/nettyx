@@ -43,7 +43,7 @@ public @interface ToArray {
         @Override
         public Object doRead(
                 Type        root,
-                Object      earlyObject,
+                Object      earlyStruct,
                 StructField field,
                 ByteBuf     reading,
                 ToArray     annotation)
