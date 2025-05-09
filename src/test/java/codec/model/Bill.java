@@ -4,14 +4,14 @@ import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
 import org.fz.nettyx.serializer.struct.annotation.ToNamedEnum;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
 
 @Data
 @Struct
 public class Bill {
 
-    private Cuchar bid;
+    private cuchar bid;
 
     @ToCharSequence(bufferLength = 4)
     private String orgName;

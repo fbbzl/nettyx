@@ -4,7 +4,7 @@ import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
 import org.fz.nettyx.serializer.struct.basic.c.signed.*;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 
 import java.util.List;
 
@@ -18,29 +18,29 @@ import java.util.List;
 @Struct
 public class You {
 
-    Cchar   uname;
-    Cint    isMarried;
-    Cchar   sex;
-    Cfloat  address;
-    Cdouble platformId;
+    cchar uname;
+    cint  isMarried;
+    cchar sex;
+    cfloat  address;
+    cdouble platformId;
     @ToArrayList(size = 1)
-    List<Clong8> description;
-    Culong8 interest;
+    List<clong8> description;
+    culong8 interest;
     Hit     c;
-    Cchar   uname1;
-    Cint    isMarried1;
-    Cchar   sex1;
-    Cfloat  address1;
-    Cdouble platformId1;
-    Cchar   uname2;
-    Cint    isMarried2;
-    Cchar   sex2;
-    Cfloat  address2;
+    cchar uname1;
+    cint  isMarried1;
+    cchar sex1;
+    cfloat  address1;
+    cdouble platformId1;
+    cchar uname2;
+    cint  isMarried2;
+    cchar sex2;
+    cfloat  address2;
 
 
     @Data
     @Struct
     public static class Hit {
-        Culong8 interest;
+        culong8 interest;
     }
 }

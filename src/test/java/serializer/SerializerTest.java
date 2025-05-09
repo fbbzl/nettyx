@@ -6,8 +6,8 @@ import cn.hutool.core.util.TypeUtil;
 import codec.model.*;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong8;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
 import org.fz.nettyx.util.TypeRefer;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2023/5/23 21:35
  */
 public class SerializerTest {
-    static final TypeRefer<User<Bill, Wife<Son<Clong4, Bill>, Son<Clong4, Bill>>, Clong8>> userTypeRefer =
+    static final TypeRefer<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, clong8>> userTypeRefer =
             new TypeRefer<>() {};
 
     static final TypeRefer<You> youTypeRefer = new TypeRefer<>() {};

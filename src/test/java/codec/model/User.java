@@ -7,11 +7,11 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
-import org.fz.nettyx.serializer.struct.basic.c.signed.Clong4;
-import org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned.Cuint8T;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Cuchar;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.Culong8;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.Cppushort;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned.cuint8_t;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
+import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.cppushort;
 
 import java.util.List;
 
@@ -20,19 +20,19 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User<T, W, G> {
 
-    Clong4 uid;
+    clong4 uid;
     @ToArray(length = 5)
-    Cppushort[]     qqNames;
+    cppushort[]     qqNames;
     @ToArrayList(size = 5)
-    List<Cppushort> ss;
+    List<cppushort> ss;
     @ToArrayList(size = 5)
-    List<Cppushort> tts;
+    List<cppushort> tts;
 
     Bom<T, W, G> b;
     @ToArray(length = 5)
-    Bom<T, W, Clong4>[]                         g111fs;
+    Bom<T, W, clong4>[]                         g111fs;
     @ToArrayList(size = 5)
-    List<Bom<T, Son<Cuchar, Bill>, GirlFriend>> bs2d;
+    List<Bom<T, Son<cuchar, Bill>, GirlFriend>> bs2d;
 
     T sonsbaba;
     @ToArray(length = 5)
@@ -46,8 +46,8 @@ public class User<T, W, G> {
     @ToArray(length = 5)
     W[]     wives121212;
 
-    transient Cuint8T uname;
+    transient cuint8_t uname;
 
     @Ignore
-    Culong8 deviceS;
+    culong8 deviceS;
 }
