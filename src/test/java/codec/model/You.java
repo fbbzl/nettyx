@@ -18,23 +18,23 @@ import java.util.List;
 @Struct
 public class You {
 
-    cchar uname;
-    cint  isMarried;
-    cchar sex;
+    cchar   uname;
+    cint    isMarried;
+    cchar   sex;
     cfloat  address;
     cdouble platformId;
     @ToArrayList(size = 1)
     List<clong8> description;
     culong8 interest;
     Hit     c;
-    cchar uname1;
-    cint  isMarried1;
-    cchar sex1;
+    cchar   uname1;
+    cint    isMarried1;
+    cchar   sex1;
     cfloat  address1;
     cdouble platformId1;
-    cchar uname2;
-    cint  isMarried2;
-    cchar sex2;
+    cchar   uname2;
+    cint    isMarried2;
+    cchar   sex2;
     cfloat  address2;
 
 
