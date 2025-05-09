@@ -19,7 +19,7 @@ Based on [netty4.1.X. Final], ultra-lightweight packaging has been carried out, 
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.4.3-RELEASE</version>
+    <version>2.5.1-RELEASE</version>
 </dependency>
 ```
 ## api

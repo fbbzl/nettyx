@@ -52,7 +52,7 @@ public @interface ToCharSequence {
         @Override
         public Object doRead(
                 Type           root,
-                Object         earlyObject,
+                Object         earlyStruct,
                 StructField    field,
                 ByteBuf        reading,
                 ToCharSequence toCharSequence)
