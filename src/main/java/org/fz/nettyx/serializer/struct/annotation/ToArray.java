@@ -82,7 +82,7 @@ public @interface ToArray {
         {
             if (type instanceof Class<?>         clazz)            return clazz.getComponentType();
             if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
-            else return type;
+            else                                                   return type;
         }
 
     }
