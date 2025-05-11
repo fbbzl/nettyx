@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -15,6 +14,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.Iterator;
 import java.util.List;
 
+import static cn.hutool.core.collection.CollUtil.newArrayList;
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static org.fz.nettyx.serializer.struct.StructHelper.*;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEFINITION_CACHE;
@@ -187,7 +187,7 @@ public interface StructFieldHandler<A extends Annotation> {
             ByteBuf  byteBuf,
             int      length)
     {
-        return CollUtil.newArrayList(readBasicArray(elementType, byteBuf, length));
+        return newArrayList(readBasicArray(elementType, byteBuf, length));
     }
 
     default <T> List<T> readStructList(
@@ -196,7 +196,7 @@ public interface StructFieldHandler<A extends Annotation> {
             ByteBuf byteBuf,
             int     length)
     {
-        return CollUtil.newArrayList(readStructArray(root, elementType, byteBuf, length));
+        return newArrayList(readStructArray(root, elementType, byteBuf, length));
     }
 
     default <B extends Basic<?>> void writeBasic(
