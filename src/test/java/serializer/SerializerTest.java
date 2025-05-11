@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class SerializerTest {
 
-
     static final TypeRefer<You> youTypeRefer = new TypeRefer<>() {};
 
     private static final StructSerializerContext context =
