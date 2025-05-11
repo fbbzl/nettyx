@@ -38,8 +38,8 @@ public class SerializerTest {
 
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
-        for (int i = 0; i < 1; i++) {
-             StructSerializer.toStruct(userTypeRefer, bytes);
+        for (int i = 0; i < 1000000; i++) {
+             StructSerializer.toStruct(youTypeRefer, bytes);
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
