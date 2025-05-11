@@ -60,10 +60,12 @@ public class StructHelper {
             Class<?> basicClass,
             ByteBuf  buf)
     {
-        try {
+        try
+        {
             return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
         }
-        catch (Exception instanceError) {
+        catch (Exception instanceError)
+        {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException)
                 throw new SerializeException(instanceError);
