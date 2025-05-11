@@ -1,15 +1,16 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.ParameterizedTypeException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +56,7 @@ public @interface ToArrayList {
                 ByteBuf     reading,
                 ToArrayList toArrayList)
         {
-            Type elementType = StructHelper.getElementType(root, field.type(root));
+            Type elementType = getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
@@ -71,12 +72,22 @@ public @interface ToArrayList {
                 ByteBuf     writing,
                 ToArrayList toArrayList)
         {
-            Type elementType = StructHelper.getElementType(root, field.type(root));
+            Type elementType = getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
             writeList(root, defaultIfNull((List<?>) fieldVal, Collections::emptyList), elementType,
                       toArrayList.size(), writing);
         }
+
+        public static Type getElementType(
+                Type root,
+                Type type)
+        {
+            if (type instanceof Class<?>          clazz)             return clazz.getComponentType();
+            if (type instanceof ParameterizedType parameterizedType) return TypeUtil.getActualType(root, parameterizedType.getActualTypeArguments()[0]);
+            else return type;
+        }
+
     }
 }
