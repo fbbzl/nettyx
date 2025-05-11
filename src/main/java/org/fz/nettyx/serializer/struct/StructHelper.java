@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.util.ModifierUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -113,14 +112,5 @@ public class StructHelper {
         if (componentType instanceof Class<?>          clazz)             return (T[]) Array.newInstance(clazz, length);
         if (componentType instanceof ParameterizedType parameterizedType) return (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
         else                                                              return (T[]) Array.newInstance(Object.class, length);
-    }
-
-    public static Type getComponentType(
-            Type root,
-            Type type)
-    {
-        if (type instanceof Class<?>         clazz)            return clazz.getComponentType();
-        if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
-        else return type;
     }
 }
