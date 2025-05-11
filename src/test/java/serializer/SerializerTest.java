@@ -3,7 +3,6 @@ package serializer;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
 import codec.model.*;
-import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
@@ -13,6 +12,9 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.serializer.struct.StructSerializer.toBytes;
+import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 
 
 /**
@@ -34,9 +36,7 @@ public class SerializerTest {
         byte[] bytes = new byte[900];
         Arrays.fill(bytes, (byte) 67);
 
-        User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, clong8> user = StructSerializer.toStruct(userTypeRefer
-                , bytes);
-        byte[] buffer = StructSerializer.toBytes(userTypeRefer, user);
+        toBytes(userTypeRefer, toStruct(userTypeRefer, bytes));
         Console.log("correctness test passed!!!!!!!!");
     }
 
@@ -48,7 +48,7 @@ public class SerializerTest {
         StopWatch stopWatch = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 1000000; i++) {
-            You you = StructSerializer.toStruct(youTypeRefer, bytes);
+            You you = toStruct(youTypeRefer, bytes);
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
