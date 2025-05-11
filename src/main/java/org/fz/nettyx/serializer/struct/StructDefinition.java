@@ -39,7 +39,7 @@ public record StructDefinition(
         this(clazz,
              LambdaMetas.lambdaConstructor(clazz),
              Stream.of(getFields(clazz, StructHelper::legalStructField))
-                   .map(field -> new StructField(clazz, field))
+                   .map(StructField::new)
                    .toArray(StructField[]::new));
     }
 
@@ -49,7 +49,7 @@ public record StructDefinition(
     @Accessors(fluent = true)
     @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
     public static class StructField {
-        Class<?>                                                     declaringClass;
+
         Field                                                        wrapped;
         UnaryOperator<Type>                                          type;
         Function<?, ?>                                               getter;
@@ -58,11 +58,9 @@ public record StructDefinition(
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
         public StructField(
-                Class<?> declaringClass,
                 Field    field)
         {
-            this(declaringClass,
-                 field,
+            this(field,
                  typeSupplier(field),
                  LambdaMetas.lambdaGetter(field),
                  LambdaMetas.lambdaSetter(field),
