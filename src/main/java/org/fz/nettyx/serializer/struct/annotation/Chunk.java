@@ -8,6 +8,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * chunk only support for [byte[]/ByteBuf] type field
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/5/11 13:05
