@@ -117,14 +117,4 @@ public class StructHelper {
         if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
         else return type;
     }
-
-    public static Type getElementType(
-            Type root,
-            Type type)
-    {
-        if (type instanceof Class<?>          clazz)             return clazz.getComponentType();
-        if (type instanceof ParameterizedType parameterizedType) return TypeUtil.getActualType(root, parameterizedType.getActualTypeArguments()[0]);
-        else return type;
-    }
-
 }
