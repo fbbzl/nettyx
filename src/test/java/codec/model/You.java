@@ -2,11 +2,9 @@ package codec.model;
 
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArrayList;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.basic.c.signed.*;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
-
-import java.util.List;
 
 /**
  * @author fengbinbin
@@ -23,8 +21,8 @@ public class You {
     cchar   sex;
     cfloat  address;
     cdouble platformId;
-    @ToArrayList(size = 1)
-    List<clong8> description;
+    @ToArray(length = 1)
+    clong8[] description;
     culong8 interest;
     Hit     c;
     cchar   uname1;
