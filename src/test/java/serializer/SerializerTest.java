@@ -37,7 +37,8 @@ public class SerializerTest {
         Arrays.fill(bytes, (byte) 67);
 
         toBytes(userTypeRefer, toStruct(userTypeRefer, bytes));
-        Console.log("correctness test passed!!!!!!!!");
+        Console.log(">correctness test passed!!!!!!!!<");
+        Console.log("");
     }
 
     @Test
