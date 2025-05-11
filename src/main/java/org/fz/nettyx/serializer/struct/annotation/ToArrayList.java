@@ -10,6 +10,7 @@ import org.fz.util.exception.Throws;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +56,7 @@ public @interface ToArrayList {
                 ByteBuf     reading,
                 ToArrayList toArrayList)
         {
-            Type elementType = TypeUtil.getTypeArgument(field.type(root));
+            Type elementType = getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
@@ -71,12 +72,21 @@ public @interface ToArrayList {
                 ByteBuf     writing,
                 ToArrayList toArrayList)
         {
-            Type elementType = TypeUtil.getTypeArgument(field.type(root));
+            Type elementType = getElementType(root, field.type(root));
 
             Throws.ifTrue(elementType == Object.class, () -> new ParameterizedTypeException(field));
 
             writeList(root, defaultIfNull((List<?>) fieldVal, Collections::emptyList), elementType,
                       toArrayList.size(), writing);
+        }
+
+        static Type getElementType(
+                Type root,
+                Type type)
+        {
+            if (type instanceof Class<?>          clazz)             return clazz.getComponentType();
+            if (type instanceof ParameterizedType parameterizedType) return TypeUtil.getActualType(root, parameterizedType.getActualTypeArguments()[0]);
+            else return type;
         }
     }
 }
