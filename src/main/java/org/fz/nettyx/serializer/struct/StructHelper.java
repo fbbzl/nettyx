@@ -40,10 +40,12 @@ public class StructHelper {
     public static int reflectForSize(Class<? extends Basic<?>> basicClass)
     {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
-        try {
+        try
+        {
             return newBasic(basicClass, fillingBuf).getSize();
         }
-        finally {
+        finally
+        {
             fillingBuf.skipBytes(fillingBuf.readableBytes()).release();
         }
     }
@@ -83,10 +85,12 @@ public class StructHelper {
      */
     public static <S> S newStruct(Type structType)
     {
-        try {
+        try
+        {
             return (S) getStructDefinition(structType).constructor().get();
         }
-        catch (Exception instanceError) {
+        catch (Exception instanceError)
+        {
             throw new SerializeException("struct [" + structType + "] instantiate failed...", instanceError);
         }
     }
