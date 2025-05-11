@@ -55,10 +55,12 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            try {
+            try
+            {
                 return readArray(root, componentType, reading, length);
             }
-            catch (TypeJudgmentException typeJudgmentException) {
+            catch (TypeJudgmentException typeJudgmentException)
+            {
                 throw new UnsupportedOperationException("can not determine the type of field [" + field + "]");
             }
         }
@@ -78,10 +80,12 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            try {
+            try
+            {
                 writeArray(root, fieldVal, componentType, length, writing);
             }
-            catch (TypeJudgmentException typeJudgmentException) {
+            catch (TypeJudgmentException typeJudgmentException)
+            {
                 throw new UnsupportedOperationException("can not determine the type of field [" + fieldVal + "]");
             }
         }
