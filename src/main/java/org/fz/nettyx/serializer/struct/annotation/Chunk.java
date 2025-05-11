@@ -15,6 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * chunk only support for [byte[]/ByteBuf] type field
+ * Chunks can be used as placeholders directly, when you don't need to parse certain fields, but have to maintain an offset
  *
  * @author fengbinbin
  * @version 1.0
