@@ -1,6 +1,7 @@
 package codec.model;
 
 import lombok.Data;
+import org.fz.nettyx.serializer.struct.annotation.Chunk;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.basic.c.signed.*;
@@ -15,7 +16,8 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 @Data
 @Struct
 public class You {
-
+    @Chunk(size = 20)
+    byte[]  chunk;
     cchar   uname;
     cint    isMarried;
     cchar   sex;

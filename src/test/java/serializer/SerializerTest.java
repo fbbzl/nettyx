@@ -41,7 +41,7 @@ public class SerializerTest {
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 1000000; i++) {
-             StructSerializer.toStruct(youTypeRefer, bytes);
+            You you = StructSerializer.toStruct(youTypeRefer, bytes);
         }
 
         Object struct = StructSerializer.toStruct(youTypeRefer, bytes);
