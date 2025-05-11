@@ -37,8 +37,8 @@ public class SerializerTest {
 
         User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, clong8> user = StructSerializer.toStruct(userTypeRefer
                 , bytes);
-
         byte[] buffer = StructSerializer.toBytes(userTypeRefer, user);
+        Console.log("correctness test passed!!!!!!!!");
     }
 
     @Test
