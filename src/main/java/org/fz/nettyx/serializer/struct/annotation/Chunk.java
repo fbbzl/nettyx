@@ -80,7 +80,7 @@ public @interface Chunk {
         static void checkChunk(Class<?> fieldType) {
             Throws.ifTrue(
                     !byte[].class.isAssignableFrom(fieldType) && !ByteBuf.class.isAssignableFrom(fieldType),
-                    () -> new TypeJudgmentException(fieldType));
+                    () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
         }
     }
 
