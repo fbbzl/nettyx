@@ -1,8 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ModifierUtil;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -14,6 +12,8 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.reflect.*;
 
+import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
+import static cn.hutool.core.util.ModifierUtil.hasModifier;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -40,10 +40,12 @@ public class StructHelper {
     public static int reflectForSize(Class<? extends Basic<?>> basicClass)
     {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
-        try {
+        try
+        {
             return newBasic(basicClass, fillingBuf).getSize();
         }
-        finally {
+        finally
+        {
             fillingBuf.skipBytes(fillingBuf.readableBytes()).release();
         }
     }
@@ -60,10 +62,12 @@ public class StructHelper {
             Class<?> basicClass,
             ByteBuf  buf)
     {
-        try {
+        try
+        {
             return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
         }
-        catch (Exception instanceError) {
+        catch (Exception instanceError)
+        {
             Throwable cause = instanceError.getCause();
             if (cause instanceof TooLessBytesException)
                 throw new SerializeException(instanceError);
@@ -81,10 +85,12 @@ public class StructHelper {
      */
     public static <S> S newStruct(Type structType)
     {
-        try {
+        try
+        {
             return (S) getStructDefinition(structType).constructor().get();
         }
-        catch (Exception instanceError) {
+        catch (Exception instanceError)
+        {
             throw new SerializeException("struct [" + structType + "] instantiate failed...", instanceError);
         }
     }
@@ -96,8 +102,7 @@ public class StructHelper {
 
     public static boolean isIgnore(Field field)
     {
-        return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field,
-                                                                                             ModifierUtil.ModifierType.TRANSIENT);
+        return hasAnnotation(field, Ignore.class) || hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
     public static <T> T[] newArray(
@@ -108,23 +113,4 @@ public class StructHelper {
         if (componentType instanceof ParameterizedType parameterizedType) return (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
         else                                                              return (T[]) Array.newInstance(Object.class, length);
     }
-
-    public static Type getComponentType(
-            Type root,
-            Type type)
-    {
-        if (type instanceof Class<?>         clazz)            return clazz.getComponentType();
-        if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
-        else return type;
-    }
-
-    public static Type getElementType(
-            Type root,
-            Type type)
-    {
-        if (type instanceof Class<?>          clazz)             return clazz.getComponentType();
-        if (type instanceof ParameterizedType parameterizedType) return TypeUtil.getActualType(root, parameterizedType.getActualTypeArguments()[0]);
-        else return type;
-    }
-
 }
