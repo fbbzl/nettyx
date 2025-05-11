@@ -36,6 +36,8 @@ public class SerializerTest {
         byte[] bytes = new byte[900];
         Arrays.fill(bytes, (byte) 67);
 
+        Object struct1 = StructSerializer.toStruct(userTypeRefer, bytes);
+
         StopWatch stopWatch  = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 1000000; i++) {
