@@ -1,6 +1,5 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ModifierUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -14,6 +13,8 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.reflect.*;
 
+import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
+import static cn.hutool.core.util.ModifierUtil.hasModifier;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -102,8 +103,7 @@ public class StructHelper {
 
     public static boolean isIgnore(Field field)
     {
-        return AnnotationUtil.hasAnnotation(field, Ignore.class) || ModifierUtil.hasModifier(field,
-                                                                                             ModifierUtil.ModifierType.TRANSIENT);
+        return hasAnnotation(field, Ignore.class) || hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
     public static <T> T[] newArray(
