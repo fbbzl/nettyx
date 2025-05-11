@@ -1,15 +1,16 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
+import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -48,7 +49,7 @@ public @interface ToArray {
                 ByteBuf     reading,
                 ToArray     annotation)
         {
-            Type componentType = StructHelper.getComponentType(root, field.type(root));
+            Type componentType = getComponentType(root, field.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
@@ -71,7 +72,7 @@ public @interface ToArray {
                 ByteBuf     writing,
                 ToArray annotation)
         {
-            Type componentType = StructHelper.getComponentType(root, field.type(root));
+            Type componentType = getComponentType(root, field.type(root));
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
@@ -83,6 +84,15 @@ public @interface ToArray {
             catch (TypeJudgmentException typeJudgmentException) {
                 throw new UnsupportedOperationException("can not determine the type of field [" + fieldVal + "]");
             }
+        }
+
+        static Type getComponentType(
+                Type root,
+                Type type)
+        {
+            if (type instanceof Class<?>         clazz)            return clazz.getComponentType();
+            if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
+            else return type;
         }
 
     }
