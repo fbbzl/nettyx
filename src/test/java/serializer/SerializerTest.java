@@ -41,6 +41,9 @@ public class SerializerTest {
         for (int i = 0; i < 1000000; i++) {
              StructSerializer.toStruct(youTypeRefer, bytes);
         }
+
+        Object struct = StructSerializer.toStruct(youTypeRefer, bytes);
+        byte[] bytes1 = StructSerializer.toBytes(youTypeRefer, struct);
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
     }
