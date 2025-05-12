@@ -14,6 +14,7 @@ import java.lang.reflect.*;
 
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -112,5 +113,27 @@ public class StructHelper {
         if (componentType instanceof Class<?>          clazz)             return (T[]) Array.newInstance(clazz, length);
         if (componentType instanceof ParameterizedType parameterizedType) return (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
         else                                                              return (T[]) Array.newInstance(Object.class, length);
+    }
+
+    public static <T> T basicNullDefault(
+            Object   fieldValue,
+            Class<?> fieldActualType)
+    {
+        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
+    }
+
+    public static <T> T structNullDefault(
+            Object fieldValue,
+            Type   fieldActualType)
+    {
+        return (T) defaultIfNull(fieldValue, () -> newStruct(fieldActualType));
+    }
+
+    public static <T> T[] arrayNullDefault(
+            Object arrayValue,
+            Type   componentType,
+            int    length)
+    {
+        return (T[]) defaultIfNull(arrayValue, () -> newArray(componentType, length));
     }
 }
