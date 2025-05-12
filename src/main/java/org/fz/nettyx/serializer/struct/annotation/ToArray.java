@@ -52,7 +52,7 @@ public @interface ToArray {
                 ByteBuf          reading,
                 ToArray          annotation)
         {
-            Type componentType = getComponentType(root, field.type(root));
+            Type componentType = getComponentType(root, fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
@@ -72,7 +72,7 @@ public @interface ToArray {
                 ByteBuf          writing,
                 ToArray          annotation)
         {
-            Type componentType = getComponentType(root, field.type(root));
+            Type componentType = getComponentType(root, fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
