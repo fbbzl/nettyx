@@ -45,11 +45,13 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default Object doRead(
-            Type        root,
-            Object      earlyStruct,
-            StructField field,
-            ByteBuf     reading,
-            A           annotation)
+            StructSerializer serializer,
+            Type             root,
+            Object           earlyStruct,
+            StructField      field,
+            Type             fieldType,
+            ByteBuf          reading,
+            A                annotation)
     {
         Field wrapped    = field.wrapped();
         Type  actualType = field.type(root);
@@ -61,12 +63,14 @@ public interface StructFieldHandler<A extends Annotation> {
     }
 
     default void doWrite(
-            Type        root,
-            Object      struct,
-            StructField field,
-            Object      fieldVal,
-            ByteBuf     writing,
-            A           annotation)
+            StructSerializer serializer,
+            Type             root,
+            Object           struct,
+            StructField      field,
+            Type             fieldType,
+            Object           fieldVal,
+            ByteBuf          writing,
+            A                annotation)
     {
         Field wrapped = field.wrapped();
         Type actualType = field.type(root);
