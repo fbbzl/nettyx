@@ -4,6 +4,7 @@ import cn.hutool.core.util.EnumUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -58,11 +59,13 @@ public @interface ToNamedEnum {
 
         @Override
         public Object doRead(
-                Type        root,
-                Object      earlyStruct,
-                StructField field,
-                ByteBuf     reading,
-                ToNamedEnum toNamedEnum)
+                StructSerializer serializer,
+                Type             root,
+                Object           earlyStruct,
+                StructField      field,
+                Type             fieldType,
+                ByteBuf          reading,
+                ToNamedEnum      toNamedEnum)
         {
             Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
             String enumName = reading
@@ -74,12 +77,14 @@ public @interface ToNamedEnum {
 
         @Override
         public void doWrite(
-                Type        root,
-                Object      struct,
-                StructField field,
-                Object      fieldVal,
-                ByteBuf     writing,
-                ToNamedEnum toNamedEnum)
+                StructSerializer serializer,
+                Type             root,
+                Object           struct,
+                StructField      field,
+                Type             fieldType,
+                Object           fieldVal,
+                ByteBuf          writing,
+                ToNamedEnum      toNamedEnum)
         {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();
