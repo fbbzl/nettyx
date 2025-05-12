@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
 
 @Data
 @Struct
@@ -23,6 +24,7 @@ public class User<T, W, G> {
 //    Bom<T, W, G> b;
 //    @ToArray(length = 5)
 //    Bom<T, W, clong4>[]                         g111fs;
+    @ToArray(length = 2)
     Bom<T, Son<W, Bill>, GirlFriend>[] bs2d;
 
 //    T sonsbaba;
