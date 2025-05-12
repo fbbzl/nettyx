@@ -196,13 +196,12 @@ public final class StructSerializer implements Serializer {
     }
 
     public  <T> T[] readArray(
-            Type    root,
             Type    elementType,
             ByteBuf byteBuf,
             int     length)
     {
         if (isBasic(elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length);
-        if (isStruct(elementType)) return readStructArray(root, elementType, byteBuf, length);
+        if (isStruct(elementType)) return readStructArray(elementType, byteBuf, length);
         else                       throw new TypeJudgmentException(elementType);
     }
 
@@ -219,15 +218,13 @@ public final class StructSerializer implements Serializer {
     }
 
     public <S> S[] readStructArray(
-            Type    root,
             Type    elementType,
             ByteBuf byteBuf,
             int     length)
     {
         S[] structs = newArray(elementType, length);
-        Type elementActualType = TypeUtil.getActualType(root, elementType);
 
-        for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementActualType, byteBuf);
+        for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementType, byteBuf);
 
         return structs;
     }
