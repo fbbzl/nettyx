@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -51,11 +52,13 @@ public @interface ToCharSequence {
 
         @Override
         public Object doRead(
-                Type           root,
-                Object         earlyStruct,
-                StructField    field,
-                ByteBuf        reading,
-                ToCharSequence toCharSequence)
+                StructSerializer serializer,
+                Type             root,
+                Object           earlyStruct,
+                StructField      field,
+                Type             fieldType,
+                ByteBuf          reading,
+                ToCharSequence   toCharSequence)
         {
             String charset = toCharSequence.charset();
             if (!Charset.isSupported(charset))
@@ -73,12 +76,14 @@ public @interface ToCharSequence {
 
         @Override
         public void doWrite(
-                Type           root,
-                Object         struct,
-                StructField    field,
-                Object         fieldVal,
-                ByteBuf        writing,
-                ToCharSequence toCharSequence)
+                StructSerializer serializer,
+                Type             root,
+                Object           struct,
+                StructField      field,
+                Type             fieldType,
+                Object           fieldVal,
+                ByteBuf          writing,
+                ToCharSequence   toCharSequence)
         {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
