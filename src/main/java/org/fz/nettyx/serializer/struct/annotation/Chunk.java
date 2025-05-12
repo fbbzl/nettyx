@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Retention;
@@ -40,11 +41,13 @@ public @interface Chunk {
 
         @Override
         public Object doRead(
-                Type        root,
-                Object      earlyStruct,
-                StructField field,
-                ByteBuf     reading,
-                Chunk       chunk)
+                StructSerializer serializer,
+                Type             root,
+                Object           earlyStruct,
+                StructField      field,
+                Type             fieldType,
+                ByteBuf          reading,
+                Chunk            chunk)
         {
             Class<?> chunkType = field.wrapped().getType();
 
@@ -65,12 +68,14 @@ public @interface Chunk {
 
         @Override
         public void doWrite(
-                Type        root,
-                Object      struct,
-                StructField field,
-                Object      fieldVal,
-                ByteBuf     writing,
-                Chunk       chunk)
+                StructSerializer serializer,
+                Type             root,
+                Object           struct,
+                StructField      field,
+                Type             fieldType,
+                Object           fieldVal,
+                ByteBuf          writing,
+                Chunk            chunk)
         {
             if (fieldVal instanceof byte[]  bytes)   writing.writeBytes(bytes);
             else

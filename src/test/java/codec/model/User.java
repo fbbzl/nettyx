@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
 @Data
 @Struct
@@ -25,7 +26,7 @@ public class User<T, W, G> {
 //    @ToArray(length = 5)
 //    Bom<T, W, clong4>[]                         g111fs;
     @ToArray(length = 2)
-    Bom<T, Son<W, Bill>, GirlFriend>[] bs2d;
+    Bom<T, Son<cuchar, Bill>, GirlFriend>[] bs2d;
 
 //    T sonsbaba;
 //    @ToArray(length = 5)
