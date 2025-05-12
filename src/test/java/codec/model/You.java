@@ -4,7 +4,10 @@ import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Chunk;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.c.signed.*;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 
 /**
@@ -23,8 +26,8 @@ public class You {
     cchar   sex;
     cfloat  address;
     cdouble platformId;
-    @ToArray(length = 5)
-    clong8[] description;
+    @ToArray(length = 2)
+    Hit[] description;
     culong8 interest;
     Hit     c;
     cchar   uname1;
