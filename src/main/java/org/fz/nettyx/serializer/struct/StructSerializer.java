@@ -16,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -179,9 +178,10 @@ public final class StructSerializer implements Serializer {
     public <S> S readStruct(Type structType, ByteBuf byteBuf)
     {
         StructDefinition structDef = getStructDefinition(structType);
-        Object           struct    = structDef.constructor().get();
+        Object struct           = structDef.constructor().get();
+        Type   actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
-            Type fieldType = field.type(TypeUtil.getActualType(root, structType));
+            Type fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
             try
             {
@@ -244,9 +244,10 @@ public final class StructSerializer implements Serializer {
             S       struct,
             ByteBuf writing)
     {
-        StructDefinition structDef = getStructDefinition(structType);
+        StructDefinition structDef        = getStructDefinition(structType);
+        Type             actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
-            Type                  fieldType = field.type(TypeUtil.getActualType(root, structType));
+            Type                  fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
             Object                fieldVal  = field.getter().apply(struct);
 
@@ -261,7 +262,6 @@ public final class StructSerializer implements Serializer {
     }
 
     public void writeArray(
-            Type    root,
             Object  arrayValue,
             Type    componentType,
             int     length,
@@ -311,25 +311,12 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public boolean isBasic(
-            Field field)
-    {
-        return isBasic(field.getGenericType());
-    }
-
-    public boolean isBasic(
-            Type type)
+    public boolean isBasic(Type type)
     {
         if (type instanceof Class<?>        clazz)        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
         if (type instanceof TypeVariable<?> typeVariable) return isBasic(TypeUtil.getActualType(root, typeVariable));
 
         return false;
-    }
-
-    public boolean isStruct(
-            Field field)
-    {
-        return isStruct(field.getGenericType());
     }
 
     public boolean isStruct(
