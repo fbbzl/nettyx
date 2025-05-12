@@ -216,7 +216,7 @@ public final class StructSerializer implements Serializer {
     {
         if (isBasic(elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length);
         if (isStruct(elementType)) return readStructArray(root, elementType, byteBuf, length);
-        else                             throw new TypeJudgmentException(elementType);
+        else                       throw new TypeJudgmentException(elementType);
     }
 
     public <B extends Basic<?>> B[] readBasicArray(
