@@ -78,7 +78,7 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            serializer.writeArray(root, fieldVal, componentType, length, writing);
+            serializer.writeArray(fieldVal, componentType, length, writing);
         }
 
         static Type getComponentType(
