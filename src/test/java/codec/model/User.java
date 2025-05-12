@@ -17,24 +17,27 @@ import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.cppushort;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User<T, W, G> {
 
-    @ToCharSequence(bufferLength = 2)
+        @ToCharSequence(bufferLength = 2)
     String xname;
     clong4 uid;
-
+    @ToArray(length = 5)
+    cppushort[]     qqNames;
+    @ToArray(length = 5)
+    cppushort[] ss;
     @ToArray(length = 5)
     cppushort[] tts;
 
     Bom<T, W, G> b;
-    @ToArray(length = 5)
-    Bom<T, W, clong4>[] g111fs;
+    @ToArray(length = 2)
+    Bom<T, Son<W, Bill>, GirlFriend>[] bs2d;
 
     T sonsbaba;
     @ToArray(length = 5)
-    T[] sonff;
+    T[]     sonff;
 
     W wwife;
     @ToArray(length = 5)
-    W[] wives121212;
+    W[]     wives121212;
 
     transient cuint8_t uname;
 
