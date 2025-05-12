@@ -35,8 +35,8 @@ public class SerializerTest {
                 new TypeRefer<>() {};
         byte[] bytes = new byte[900];
         Arrays.fill(bytes, (byte) 67);
-
-        toBytes(userTypeRefer, toStruct(userTypeRefer, bytes));
+        Object struct = toStruct(userTypeRefer, bytes);
+        byte[] buf = toBytes(userTypeRefer, struct);
         Console.log(">correctness test passed!!!!!!!!<");
         Console.log("");
     }
