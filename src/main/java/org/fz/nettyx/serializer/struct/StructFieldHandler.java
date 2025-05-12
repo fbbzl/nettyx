@@ -45,7 +45,6 @@ public interface StructFieldHandler<A extends Annotation> {
             ByteBuf          reading,
             A                annotation)
     {
-
         if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, reading);
         if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType, reading);
 
