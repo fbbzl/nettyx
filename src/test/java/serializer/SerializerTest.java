@@ -2,6 +2,7 @@ package serializer;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.lang.reflect.ActualTypeMapperPool;
 import codec.model.*;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
@@ -10,7 +11,9 @@ import org.fz.nettyx.util.TypeRefer;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.fz.nettyx.serializer.struct.StructSerializer.toBytes;
@@ -33,6 +36,9 @@ public class SerializerTest {
     public void correctnessTest() {
         TypeRefer<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, clong8>> userTypeRefer =
                 new TypeRefer<>() {};
+
+        Map<Type, Type> typeTypeMap = ActualTypeMapperPool.get(userTypeRefer.getTypeValue());
+
         byte[] bytes = new byte[900];
         Arrays.fill(bytes, (byte) 67);
         Object struct = toStruct(userTypeRefer, bytes);
