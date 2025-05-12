@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Documented;
@@ -43,11 +44,13 @@ public @interface ToArray {
 
         @Override
         public Object doRead(
-                Type        root,
-                Object      earlyStruct,
-                StructField field,
-                ByteBuf     reading,
-                ToArray     annotation)
+                StructSerializer serializer,
+                Type             root,
+                Object           earlyStruct,
+                StructField      field,
+                Type             fieldType,
+                ByteBuf          reading,
+                ToArray          annotation)
         {
             Type componentType = getComponentType(root, field.type(root));
 
@@ -55,17 +58,19 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            return readArray(root, componentType, reading, length);
+            return serializer.readArray(root, componentType, reading, length);
         }
 
         @Override
         public void doWrite(
-                Type        root,
-                Object      struct,
-                StructField field,
-                Object      fieldVal,
-                ByteBuf     writing,
-                ToArray annotation)
+                StructSerializer serializer,
+                Type             root,
+                Object           struct,
+                StructField      field,
+                Type             fieldType,
+                Object           fieldVal,
+                ByteBuf          writing,
+                ToArray          annotation)
         {
             Type componentType = getComponentType(root, field.type(root));
 
@@ -73,7 +78,7 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            writeArray(root, fieldVal, componentType, length, writing);
+            serializer.writeArray(root, fieldVal, componentType, length, writing);
         }
 
         static Type getComponentType(
@@ -84,7 +89,6 @@ public @interface ToArray {
             if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
             else                                                   return type;
         }
-
     }
 
 }
