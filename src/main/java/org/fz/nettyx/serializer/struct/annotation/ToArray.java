@@ -58,7 +58,7 @@ public @interface ToArray {
 
             int length = annotation.length();
 
-            return serializer.readArray(root, componentType, reading, length);
+            return serializer.readArray(componentType, reading, length);
         }
 
         @Override

@@ -33,7 +33,7 @@ public class SerializerTest {
         TypeRefer<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, GirlFriend>> userTypeRefer =
                 new TypeRefer<>() {};
 
-        byte[] bytes = new byte[900];
+        byte[] bytes = new byte[1200];
         Arrays.fill(bytes, (byte) 67);
         User struct = toStruct(userTypeRefer, bytes);
         byte[] buf = toBytes(userTypeRefer, struct);
