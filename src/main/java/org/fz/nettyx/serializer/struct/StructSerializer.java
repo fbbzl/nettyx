@@ -158,41 +158,14 @@ public final class StructSerializer implements Serializer {
     @Override
     public <T> T doDeserialize(ByteBuf byteBuf)
     {
-        StructDefinition structDef = getStructDefinition(root);
-        Object           struct    = structDef.constructor().get();
-        for (StructField field : structDef.fields()) {
-            Type                  fieldType = field.type(root);
-            StructFieldHandler<?> handler   = field.handler();
-            try
-            {
-                Object fieldVal = handler.doRead(this, root, struct, field, fieldType, byteBuf, field.annotation());
-                field.setter().accept(struct, fieldVal);
-            }
-            catch (Exception exception) {
-                throw new SerializeException("read exception occur, field is [" + field + "]", exception);
-            }
-        }
-        return (T) struct;
+        return (T) readStruct(root, byteBuf);
     }
 
     @Override
     public ByteBuf doSerialize(Object struct)
     {
-        ByteBuf          writing   = buffer();
-        StructDefinition structDef = getStructDefinition(root);
-        for (StructField field : structDef.fields()) {
-            Type                  fieldType = field.type(root);
-            StructFieldHandler<?> handler   = field.handler();
-            Object                fieldVal  = field.getter().apply(struct);
-
-            try
-            {
-                handler.doWrite(this, root, struct, field, fieldType, fieldVal, writing, field.annotation());
-            }
-            catch (Exception exception) {
-                throw new SerializeException("write exception occur, field [" + field + "]", exception);
-            }
-        }
+        ByteBuf writing;
+        writeStruct(root, struct, writing = buffer());
         return writing;
     }
 
@@ -205,7 +178,21 @@ public final class StructSerializer implements Serializer {
 
     public <S> S readStruct(Type structType, ByteBuf byteBuf)
     {
-        return StructSerializer.toStruct(structType, byteBuf);
+        StructDefinition structDef = getStructDefinition(structType);
+        Object           struct    = structDef.constructor().get();
+        for (StructField field : structDef.fields()) {
+            Type fieldType = field.type(TypeUtil.getActualType(root, structType));
+            StructFieldHandler<?> handler   = field.handler();
+            try
+            {
+                Object fieldVal = handler.doRead(this, root, struct, field, fieldType, byteBuf, field.annotation());
+                field.setter().accept(struct, fieldVal);
+            }
+            catch (Exception exception) {
+                throw new SerializeException("read exception occur, field is [" + field + "]", exception);
+            }
+        }
+        return (S) struct;
     }
 
     public  <T> T[] readArray(
@@ -253,11 +240,24 @@ public final class StructSerializer implements Serializer {
     }
 
     public <S> void writeStruct(
-            Type    root,
-            S       structValue,
+            Type    structType,
+            S       struct,
             ByteBuf writing)
     {
-        writing.writeBytes(StructSerializer.toByteBuf(root, structValue));
+        StructDefinition structDef = getStructDefinition(structType);
+        for (StructField field : structDef.fields()) {
+            Type                  fieldType = field.type(TypeUtil.getActualType(root, structType));
+            StructFieldHandler<?> handler   = field.handler();
+            Object                fieldVal  = field.getter().apply(struct);
+
+            try
+            {
+                handler.doWrite(this, root, struct, field, fieldType, fieldVal, writing, field.annotation());
+            }
+            catch (Exception exception) {
+                throw new SerializeException("write exception occur, field [" + field + "]", exception);
+            }
+        }
     }
 
     public void writeArray(
@@ -304,8 +304,10 @@ public final class StructSerializer implements Serializer {
             ByteBuf writing)
     {
         for (int i = 0; i < length; i++) {
-            if (i < structArray.length) writing.writeBytes(StructSerializer.toByteBuf(elementType, structNullDefault(structArray[i], elementType)));
-            else writing.writeBytes(StructSerializer.toByteBuf(newStruct(elementType)));
+            if (i < structArray.length)
+                writeStruct(elementType, structNullDefault(structArray[i], elementType), writing);
+            else
+                writeStruct(elementType, newStruct(elementType), writing);
         }
     }
 
