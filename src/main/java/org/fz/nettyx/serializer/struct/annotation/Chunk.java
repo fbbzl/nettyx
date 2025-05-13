@@ -11,11 +11,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * chunk only support for [byte[]/ByteBuf] type field
+ * chunk only support for byte[] type field
  * Chunks can be used as placeholders directly, when you don't need to parse certain fields, but have to maintain an offset
  *
  * @author fengbinbin
@@ -76,15 +77,18 @@ public @interface Chunk {
                 ByteBuf          writing,
                 Chunk            chunk)
         {
-            checkChunk(field.wrapped().getType());
-            if (fieldVal instanceof byte[] bytes) {
-                int padding = computePadding(chunk, bytes.length);
+            Class<?> chunkType = field.wrapped().getType();
+            checkChunk(chunkType);
+            if (chunkType == byte[].class) {
+                byte[] bytes   = fieldVal == null ? new byte[chunk.length()] : (byte[]) fieldVal;
+                int    padding = computePadding(chunk, bytes.length);
                 writing.writeBytes(bytes);
                 if (padding > 0) writing.writeBytes(new byte[padding]);
             }
             else
-            if (fieldVal instanceof ByteBuf byteBuf) {
-                int padding = computePadding(chunk, byteBuf.readableBytes());
+            if (chunkType == ByteBuf.class) {
+                ByteBuf byteBuf = fieldVal == null ? wrappedBuffer(new byte[chunk.length()]) : (ByteBuf) fieldVal;
+                int     padding = computePadding(chunk, byteBuf.readableBytes());
                 writing.writeBytes(byteBuf);
                 if (padding > 0) writing.writeBytes(new byte[padding]);
             }
