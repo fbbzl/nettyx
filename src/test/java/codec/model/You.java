@@ -19,7 +19,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 @Data
 @Struct
 public class You {
-    @Chunk(size = 20)
+    @Chunk(length = 20)
     byte[]  chunk;
     cchar   uname;
     cint    isMarried;
