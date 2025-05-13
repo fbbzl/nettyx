@@ -30,7 +30,7 @@ public @interface Chunk {
     /**
      * the number of bytes that need to be occupied
      */
-    int size();
+    int length();
 
     class ChunkHandler implements StructFieldHandler<Chunk> {
 
@@ -50,18 +50,17 @@ public @interface Chunk {
                 Chunk            chunk)
         {
             Class<?> chunkType = field.wrapped().getType();
-
             checkChunk(chunkType);
 
-            int chunkSize = chunk.size();
+            int chunkLength = chunk.length();
 
             if (chunkType == byte[].class) {
-                byte[] chunkBytes = new byte[chunkSize];
+                byte[] chunkBytes = new byte[chunkLength];
                 reading.readBytes(chunkBytes);
                 return chunkBytes;
             }
             else
-            if (chunkType == ByteBuf.class) return reading.readBytes(chunkSize);
+            if (chunkType == ByteBuf.class) return reading.readBytes(chunkLength);
 
             throw new TypeJudgmentException(field);
         }
@@ -77,13 +76,32 @@ public @interface Chunk {
                 ByteBuf          writing,
                 Chunk            chunk)
         {
-            writing.writeBytes(new byte[chunk.size()]);
+            Class<?> chunkType = field.wrapped().getType();
+            checkChunk(chunkType);
+            if (fieldVal instanceof byte[] bytes) {
+                int padding = computePadding(chunk, bytes.length);
+                writing.writeBytes(bytes);
+                if (padding > 0) writing.writeBytes(new byte[padding]);
+            }
+            else
+            if (fieldVal instanceof ByteBuf byteBuf) {
+                int padding = computePadding(chunk, byteBuf.readableBytes());
+                writing.writeBytes(byteBuf);
+                if (padding > 0) writing.writeBytes(new byte[padding]);
+            }
         }
 
         static void checkChunk(Class<?> fieldType) {
-            Throws.ifTrue(
-                    !byte[].class.isAssignableFrom(fieldType) && !ByteBuf.class.isAssignableFrom(fieldType),
-                    () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
+            Throws.ifTrue(!byte[].class.isAssignableFrom(fieldType) && !ByteBuf.class.isAssignableFrom(fieldType),
+                          () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
+        }
+
+        static int computePadding(Chunk chunk, int valueLength) {
+            int chunkLength = chunk.length(), padding = chunkLength - valueLength;
+            Throws.ifTrue(padding < 0,
+                          () -> new IllegalArgumentException("chunk buffer length is: [" + chunkLength + "], but got "
+                                                             + "length: [" + valueLength + "]"));
+            return padding;
         }
     }
 
