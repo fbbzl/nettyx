@@ -77,9 +77,7 @@ public @interface Chunk {
                 ByteBuf          writing,
                 Chunk            chunk)
         {
-            if (fieldVal instanceof byte[]  bytes)   writing.writeBytes(bytes);
-            else
-            if (fieldVal instanceof ByteBuf byteBuf) writing.writeBytes(byteBuf);
+            writing.writeBytes(new byte[chunk.size()]);
         }
 
         static void checkChunk(Class<?> fieldType) {
