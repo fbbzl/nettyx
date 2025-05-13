@@ -76,8 +76,7 @@ public @interface Chunk {
                 ByteBuf          writing,
                 Chunk            chunk)
         {
-            Class<?> chunkType = field.wrapped().getType();
-            checkChunk(chunkType);
+            checkChunk(field.wrapped().getType());
             if (fieldVal instanceof byte[] bytes) {
                 int padding = computePadding(chunk, bytes.length);
                 writing.writeBytes(bytes);
