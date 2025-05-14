@@ -53,7 +53,6 @@ public class SerializerTest {
             You you = toStruct(youTypeRefer, bytes);
             byte[] bytes1 = toBytes(you);
             byte[] bytes2 = toBytes(new You());
-            System.err.println();
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
