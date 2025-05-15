@@ -31,18 +31,21 @@ public abstract class TcpServerTemplate {
 
     private final ServerBootstrap serverBootstrap;
 
-    protected TcpServerTemplate(int bindPort) {
+    protected TcpServerTemplate(int bindPort)
+    {
         InetSocketAddress bindAddress = new InetSocketAddress(bindPort);
         this.childEventLoopGroup  = childEventLoopGroup();
         this.parentEventLoopGroup = parentEventLoopGroup();
         this.serverBootstrap      = newServerBootstrap(bindAddress);
     }
 
-    protected EventLoopGroup parentEventLoopGroup() {
+    protected EventLoopGroup parentEventLoopGroup()
+    {
         return new NioEventLoopGroup();
     }
 
-    protected EventLoopGroup childEventLoopGroup() {
+    protected EventLoopGroup childEventLoopGroup()
+    {
         return new NioEventLoopGroup();
     }
 
@@ -50,13 +53,15 @@ public abstract class TcpServerTemplate {
         // default is nothing
     }
 
-    public ChannelFuture bind() {
+    public ChannelFuture bind()
+    {
         ChannelFuture bindFuture = this.getServerBootstrap().clone().bind();
         log.debug("already finish bind, bind future is [{}]", bindFuture);
         return bindFuture;
     }
 
-    protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress) {
+    protected ServerBootstrap newServerBootstrap(SocketAddress bindAddress)
+    {
         return new ServerBootstrap()
                 .group(parentEventLoopGroup, childEventLoopGroup)
                 .localAddress(bindAddress)
@@ -70,12 +75,14 @@ public abstract class TcpServerTemplate {
 
     protected abstract ChannelInitializer<? extends Channel> childChannelInitializer();
 
-    protected void shutdownGracefully() {
+    protected void shutdownGracefully()
+    {
         childEventLoopGroup.shutdownGracefully();
         parentEventLoopGroup.shutdownGracefully();
     }
 
-    protected void syncShutdownGracefully() throws InterruptedException {
+    protected void syncShutdownGracefully() throws InterruptedException
+    {
         childEventLoopGroup.shutdownGracefully().sync();
         parentEventLoopGroup.shutdownGracefully().sync();
         log.debug("has already successfully shutdown, child-event-loop-group is [{}], parent-event-loop-group is [{}]", childEventLoopGroup, parentEventLoopGroup);

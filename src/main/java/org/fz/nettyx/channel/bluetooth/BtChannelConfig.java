@@ -65,7 +65,8 @@ public interface BtChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public DefaultBtChannelConfig setConnectTimeoutMillis(int connectTimeoutMillis) {
+        public DefaultBtChannelConfig setConnectTimeoutMillis(int connectTimeoutMillis)
+        {
             checkPositiveOrZero(connectTimeoutMillis, "connectTimeoutMillis");
             this.connectTimeoutMillis = connectTimeoutMillis;
             return this;

@@ -26,7 +26,8 @@ public class MessageFilter extends ChannelHandlerAdapter {
         private final Predicate<M> fireCondition;
 
         @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
+        {
             if (fireCondition.test((M) msg)) super.channelRead(ctx, msg);
             else {
                 ReferenceCountUtil.release(msg);
@@ -41,7 +42,11 @@ public class MessageFilter extends ChannelHandlerAdapter {
         private final Predicate<M> fireCondition;
 
         @Override
-        public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        public void write(
+                ChannelHandlerContext ctx,
+                Object                msg,
+                ChannelPromise        promise) throws Exception
+        {
             if (fireCondition.test((M) msg)) super.write(ctx, msg, promise);
             else {
                 ReferenceCountUtil.release(msg);

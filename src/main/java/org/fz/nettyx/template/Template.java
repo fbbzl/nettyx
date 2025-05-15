@@ -19,12 +19,14 @@ abstract class Template<C extends Channel> {
     private final        Class<C>       channelClass;
     private final        EventLoopGroup eventLoopGroup;
 
-    protected Template() {
+    protected Template()
+    {
         this.eventLoopGroup = this.newEventLoopGroup();
         this.channelClass   = this.findChannelClass();
     }
 
-    public static boolean gracefullyCloseable(Channel channel) {
+    public static boolean gracefullyCloseable(Channel channel)
+    {
         return
                 channel != null
                 &&
@@ -35,7 +37,8 @@ abstract class Template<C extends Channel> {
                 !channel.isWritable();
     }
 
-    protected Class<C> findChannelClass() {
+    protected Class<C> findChannelClass()
+    {
         Type     supperType;
         Class<?> supperClass = this.getClass();
         do {
@@ -53,47 +56,58 @@ abstract class Template<C extends Channel> {
 
     protected abstract ChannelInitializer<C> channelInitializer();
 
-    protected boolean isRegistered(Channel channel) {
+    protected boolean isRegistered(Channel channel)
+    {
         return channel != null && channel.isRegistered();
     }
 
-    protected boolean isOpen(Channel channel) {
+    protected boolean isOpen(Channel channel)
+    {
         return channel != null && channel.isOpen();
     }
 
-    protected boolean isActive(Channel channel) {
+    protected boolean isActive(Channel channel)
+    {
         return channel != null && channel.isActive();
     }
 
-    protected boolean isWritable(Channel channel) {
+    protected boolean isWritable(Channel channel)
+    {
         return channel != null && channel.isWritable();
     }
 
-    protected boolean notRegistered(Channel channel) {
+    protected boolean notRegistered(Channel channel)
+    {
         return !isRegistered(channel);
     }
 
-    protected boolean notOpen(Channel channel) {
+    protected boolean notOpen(Channel channel)
+    {
         return !isOpen(channel);
     }
 
-    protected boolean notActive(Channel channel) {
+    protected boolean notActive(Channel channel)
+    {
         return !isActive(channel);
     }
 
-    protected boolean notWritable(Channel channel) {
+    protected boolean notWritable(Channel channel)
+    {
         return !isWritable(channel);
     }
 
-    protected ChannelPromise failurePromise(Channel channel) {
+    protected ChannelPromise failurePromise(Channel channel)
+    {
         return failurePromise(channel, "channel failure promise occur, channel: [" + channel + "]");
     }
 
-    protected ChannelPromise failurePromise(Channel channel, String message) {
+    protected ChannelPromise failurePromise(Channel channel, String message)
+    {
         return channel == null ? null : new DefaultChannelPromise(channel).setFailure(new ChannelException(message));
     }
 
-    protected void shutdownGracefully() {
+    protected void shutdownGracefully()
+    {
         getEventLoopGroup().shutdownGracefully();
     }
 
