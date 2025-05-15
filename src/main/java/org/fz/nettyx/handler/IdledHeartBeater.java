@@ -24,7 +24,8 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
     private static final InternalLogger              log = InternalLoggerFactory.getInstance(IdledHeartBeater.class);
     private final        ChannelHandlerContextAction idledHeartBeatAction;
 
-    protected IdledHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction) {
+    protected IdledHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+    {
         super(readIdleSeconds, 0, 0, SECONDS);
         this.idledHeartBeatAction = readIdleHeartBeatAction;
     }
@@ -34,7 +35,8 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
     abstract String stateName();
 
     @Override
-    protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+    protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception
+    {
         if (condition(evt)) {
             log.warn(
                     "start [" + stateName() + "] heartbeat on address [{}], next round will after [{}] seconds",
@@ -56,34 +58,40 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
 
         @Override
-        boolean condition(IdleStateEvent evt) {
+        boolean condition(IdleStateEvent evt)
+        {
             return ChannelEvents.isReadIdle(evt);
         }
 
-        public ReadIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction) {
+        public ReadIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+        {
             super(readIdleSeconds, readIdleHeartBeatAction);
         }
     }
 
     public static class WriteIdleHeartBeater extends IdledHeartBeater {
         @Override
-        boolean condition(IdleStateEvent evt) {
+        boolean condition(IdleStateEvent evt)
+        {
             return ChannelEvents.isWriteIdle(evt);
         }
 
         @Override
-        String stateName() {
+        String stateName()
+        {
             return "write-idle";
         }
 
-        public WriteIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction) {
+        public WriteIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+        {
             super(readIdleSeconds, readIdleHeartBeatAction);
         }
     }
 
     public static class AllIdleHeartBeater extends IdledHeartBeater {
         @Override
-        boolean condition(IdleStateEvent evt) {
+        boolean condition(IdleStateEvent evt)
+        {
             return ChannelEvents.isAllIdle(evt);
         }
 
@@ -92,7 +100,8 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
             return "all-idle";
         }
 
-        public AllIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction) {
+        public AllIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+        {
             super(readIdleSeconds, readIdleHeartBeatAction);
         }
     }

@@ -42,7 +42,8 @@ public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
     }
 
     @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
+    protected ChannelInitializer<NioSocketChannel> channelInitializer()
+    {
         return new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) {
@@ -65,7 +66,8 @@ public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
      * @return if is the correct server
      * @throws InterruptedException
      */
-    public boolean doDetect() throws InterruptedException, ConnectException {
+    public boolean doDetect() throws InterruptedException, ConnectException
+    {
         try {
             this.responseState.set(false);
             // 1. do connect sync
@@ -94,7 +96,11 @@ public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
      * @param retryTimes         re-try times
      * @param waitResponseMillis wait the server response
      */
-    public void trySend(M detectMsg, int retryTimes, int waitResponseMillis) throws InterruptedException {
+    public void trySend(
+            M   detectMsg,
+            int retryTimes,
+            int waitResponseMillis) throws InterruptedException
+    {
         do {
             try {
                 ChannelPromise promise = super.writeAndFlush(detectMsg).await();

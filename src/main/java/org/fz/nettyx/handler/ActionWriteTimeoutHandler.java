@@ -33,7 +33,10 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param timeoutSeconds the timeout seconds
      * @param timeoutAction  the timeout action
      */
-    public ActionWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
+    public ActionWriteTimeoutHandler(
+            int                    timeoutSeconds,
+            ChannelExceptionAction timeoutAction)
+    {
         this(timeoutSeconds, timeoutAction, true);
     }
 
@@ -44,7 +47,11 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param unit          the unit
      * @param timeoutAction the timeout action
      */
-    public ActionWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction) {
+    public ActionWriteTimeoutHandler(
+            long                   timeout,
+            TimeUnit               unit,
+            ChannelExceptionAction timeoutAction)
+    {
         this(timeout, unit, timeoutAction, true);
     }
 
@@ -55,7 +62,11 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param timeoutAction  the timeout action
      * @param fireNext       the fire next
      */
-    public ActionWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionWriteTimeoutHandler(
+            int                    timeoutSeconds,
+            ChannelExceptionAction timeoutAction,
+            boolean                fireNext)
+    {
         this(timeoutSeconds, TimeUnit.SECONDS, timeoutAction, fireNext);
     }
 
@@ -67,15 +78,20 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param timeoutAction the timeout action
      * @param fireNext      the fire next
      */
-    public ActionWriteTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction,
-                                     boolean fireNext) {
+    public ActionWriteTimeoutHandler(
+            long                   timeout,
+            TimeUnit               unit,
+            ChannelExceptionAction timeoutAction,
+            boolean                fireNext)
+    {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
         this.fireNext      = fireNext;
     }
 
     @Override
-    protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception {
+    protected void writeTimedOut(ChannelHandlerContext ctx) throws Exception
+    {
         invokeAction(timeoutAction, ctx,
                      new WriteTimeoutException("has got write-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.writeTimedOut(ctx);

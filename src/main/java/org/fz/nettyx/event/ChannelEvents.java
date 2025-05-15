@@ -22,7 +22,8 @@ public class ChannelEvents {
      * @param evt the evt
      * @return the boolean
      */
-    public static boolean isReadIdle(Object evt) {
+    public static boolean isReadIdle(Object evt)
+    {
         return isAssignedState(evt, READER_IDLE);
     }
 
@@ -32,7 +33,8 @@ public class ChannelEvents {
      * @param evt the evt
      * @return the boolean
      */
-    public static boolean isWriteIdle(Object evt) {
+    public static boolean isWriteIdle(Object evt)
+    {
         return isAssignedState(evt, WRITER_IDLE);
     }
 
@@ -42,7 +44,8 @@ public class ChannelEvents {
      * @param evt the evt
      * @return the boolean
      */
-    public static boolean isAllIdle(Object evt) {
+    public static boolean isAllIdle(Object evt)
+    {
         return isAssignedState(evt, ALL_IDLE);
     }
 
@@ -52,7 +55,8 @@ public class ChannelEvents {
      * @param evt the evt
      * @return the boolean
      */
-    public static boolean isReadIdle(IdleStateEvent evt) {
+    public static boolean isReadIdle(IdleStateEvent evt)
+    {
         return isAssignedState(evt, READER_IDLE);
     }
 
@@ -62,7 +66,8 @@ public class ChannelEvents {
      * @param evt the evt
      * @return the boolean
      */
-    public static boolean isWriteIdle(IdleStateEvent evt) {
+    public static boolean isWriteIdle(IdleStateEvent evt)
+    {
         return isAssignedState(evt, WRITER_IDLE);
     }
 
@@ -72,7 +77,8 @@ public class ChannelEvents {
      * @param evt the evt
      * @return the boolean
      */
-    public static boolean isAllIdle(IdleStateEvent evt) {
+    public static boolean isAllIdle(IdleStateEvent evt)
+    {
         return isAssignedState(evt, ALL_IDLE);
     }
 
@@ -82,7 +88,8 @@ public class ChannelEvents {
      * @param state the state
      * @return the boolean
      */
-    public static boolean isReadIdle(IdleState state) {
+    public static boolean isReadIdle(IdleState state)
+    {
         return state == READER_IDLE;
     }
 
@@ -92,7 +99,8 @@ public class ChannelEvents {
      * @param state the state
      * @return the boolean
      */
-    public static boolean isWriteIdle(IdleState state) {
+    public static boolean isWriteIdle(IdleState state)
+    {
         return state == WRITER_IDLE;
     }
 
@@ -102,7 +110,8 @@ public class ChannelEvents {
      * @param state the state
      * @return the boolean
      */
-    public static boolean isAllIdle(IdleState state) {
+    public static boolean isAllIdle(IdleState state)
+    {
         return state == ALL_IDLE;
     }
 
@@ -113,10 +122,14 @@ public class ChannelEvents {
      * @param state the state
      * @return the boolean
      */
-    public static boolean isAssignedState(Object obj, IdleState state) {
+    public static boolean isAssignedState(
+            Object    obj,
+            IdleState state)
+    {
         if (obj instanceof IdleStateEvent idleStateEvent) return idleStateEvent.state() == state;
-        else if (obj instanceof IdleState idleState) return idleState == state;
-        else return false;
+        if (obj instanceof IdleState idleState)           return idleState == state;
+
+        return false;
     }
 
 }
