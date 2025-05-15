@@ -32,7 +32,8 @@ public class RxtxChannel extends SerialCommChannel {
     }
 
     @Override
-    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception
+    {
         // always check before do connect
         if (this.serialPort != null) this.doClose();
 
@@ -51,17 +52,20 @@ public class RxtxChannel extends SerialCommChannel {
     }
 
     @Override
-    protected InputStream getInputStream() throws IOException {
+    protected InputStream getInputStream() throws IOException
+    {
         return serialPort.getInputStream();
     }
 
     @Override
-    protected OutputStream getOutputStream() throws IOException {
+    protected OutputStream getOutputStream() throws IOException
+    {
         return serialPort.getOutputStream();
     }
 
     @Override
-    protected void doClose() throws Exception {
+    protected void doClose() throws Exception
+    {
         try {
             super.doClose();
         } finally {

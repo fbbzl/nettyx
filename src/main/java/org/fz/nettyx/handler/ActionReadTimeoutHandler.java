@@ -33,7 +33,10 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
      * @param timeoutSeconds the timeout seconds
      * @param timeoutAction  the timeout action
      */
-    public ActionReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
+    public ActionReadTimeoutHandler(
+            int                    timeoutSeconds,
+            ChannelExceptionAction timeoutAction)
+    {
         this(timeoutSeconds, timeoutAction, true);
     }
 
@@ -44,7 +47,11 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
      * @param unit          the unit
      * @param timeoutAction the timeout action
      */
-    public ActionReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction) {
+    public ActionReadTimeoutHandler(
+            long                   timeout,
+            TimeUnit               unit,
+            ChannelExceptionAction timeoutAction)
+    {
         this(timeout, unit, timeoutAction, true);
     }
 
@@ -55,7 +62,11 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
      * @param timeoutAction  the timeout action
      * @param fireNext       the fire next
      */
-    public ActionReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionReadTimeoutHandler(
+            int                    timeoutSeconds,
+            ChannelExceptionAction timeoutAction,
+            boolean                fireNext)
+    {
         this(timeoutSeconds, TimeUnit.SECONDS, timeoutAction, fireNext);
     }
 
@@ -67,14 +78,20 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
      * @param timeoutAction the timeout action
      * @param fireNext      the fire next
      */
-    public ActionReadTimeoutHandler(long timeout, TimeUnit unit, ChannelExceptionAction timeoutAction, boolean fireNext) {
+    public ActionReadTimeoutHandler(
+            long                   timeout,
+            TimeUnit               unit,
+            ChannelExceptionAction timeoutAction,
+            boolean                fireNext)
+    {
         super(timeout, unit);
         this.timeoutAction = timeoutAction;
         this.fireNext      = fireNext;
     }
 
     @Override
-    protected void readTimedOut(ChannelHandlerContext ctx) throws Exception {
+    protected void readTimedOut(ChannelHandlerContext ctx) throws Exception
+    {
         invokeAction(timeoutAction, ctx, new ReadTimeoutException("has got read-time-out on remote-address: [" + ctx.channel().remoteAddress() + "]"));
         if (fireNext) super.readTimedOut(ctx);
     }

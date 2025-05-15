@@ -35,7 +35,8 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      *
      * @return the reader idle seconds
      */
-    public long getReaderIdleSeconds() {
+    public long getReaderIdleSeconds()
+    {
         return super.getReaderIdleTimeInMillis() / 1000;
     }
 
@@ -44,7 +45,8 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      *
      * @return the writer idle seconds
      */
-    public long getWriterIdleSeconds() {
+    public long getWriterIdleSeconds()
+    {
         return super.getWriterIdleTimeInMillis() / 1000;
     }
 
@@ -53,7 +55,8 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      *
      * @return the all idle seconds
      */
-    public long getAllIdleSeconds() {
+    public long getAllIdleSeconds()
+    {
         return super.getAllIdleTimeInMillis() / 1000;
     }
 
@@ -64,7 +67,10 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionIdleStateHandler newReadIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
+    public static ActionIdleStateHandler newReadIdleHandler(
+            int                         seconds,
+            ChannelHandlerContextAction idleAction)
+    {
         return new ActionIdleStateHandler(seconds, 0, 0).readIdleAction(idleAction);
     }
 
@@ -75,7 +81,10 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionIdleStateHandler newWriteIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
+    public static ActionIdleStateHandler newWriteIdleHandler(
+            int                         seconds,
+            ChannelHandlerContextAction idleAction)
+    {
         return new ActionIdleStateHandler(0, seconds, 0).writeIdleAction(idleAction);
     }
 
@@ -86,12 +95,18 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionIdleStateHandler newAllIdleHandler(int seconds, ChannelHandlerContextAction idleAction) {
+    public static ActionIdleStateHandler newAllIdleHandler(
+            int                         seconds,
+            ChannelHandlerContextAction idleAction)
+    {
         return new ActionIdleStateHandler(0, 0, seconds).allIdleAction(idleAction);
     }
 
     @Override
-    protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+    protected void channelIdle(
+            ChannelHandlerContext ctx,
+            IdleStateEvent        evt) throws Exception
+    {
         if (ChannelEvents.isReadIdle(evt)) {
             log.warn("have been in read-idle state for [{}] seconds on [{}]", getReaderIdleSeconds(), ctx.channel().remoteAddress());
             invokeAction(readIdleAction, ctx);
@@ -112,7 +127,11 @@ public class ActionIdleStateHandler extends IdleStateHandler {
 
     //********************************************        constructor start          **********************************************//
 
-    public ActionIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
+    public ActionIdleStateHandler(
+            int readerIdleTimeSeconds,
+            int writerIdleTimeSeconds,
+            int allIdleTimeSeconds)
+    {
         this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, true);
     }
 
@@ -124,7 +143,12 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param allIdleTime    the all idle time
      * @param unit           the unit
      */
-    public ActionIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+    public ActionIdleStateHandler(
+            long     readerIdleTime,
+            long     writerIdleTime,
+            long     allIdleTime,
+            TimeUnit unit)
+    {
         this(false, readerIdleTime, writerIdleTime, allIdleTime, unit, true);
     }
 
@@ -136,7 +160,12 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param allIdleTimeSeconds    the all idle time seconds
      * @param fireNext              the fire next
      */
-    public ActionIdleStateHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds, boolean fireNext) {
+    public ActionIdleStateHandler(
+            int     readerIdleTimeSeconds,
+            int     writerIdleTimeSeconds,
+            int     allIdleTimeSeconds,
+            boolean fireNext)
+    {
         this(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds, TimeUnit.SECONDS, fireNext);
     }
 
@@ -149,7 +178,13 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param unit           the unit
      * @param fireNext       the fire next
      */
-    public ActionIdleStateHandler(long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
+    public ActionIdleStateHandler(
+            long     readerIdleTime,
+            long     writerIdleTime,
+            long     allIdleTime,
+            TimeUnit unit,
+            boolean  fireNext)
+    {
         this(false, readerIdleTime, writerIdleTime, allIdleTime, unit, fireNext);
     }
 
@@ -162,7 +197,13 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param allIdleTime    the all idle time
      * @param unit           the unit
      */
-    public ActionIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit) {
+    public ActionIdleStateHandler(
+            boolean  observeOutput,
+            long     readerIdleTime,
+            long     writerIdleTime,
+            long     allIdleTime,
+            TimeUnit unit)
+    {
         this(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit, true);
     }
 
@@ -176,7 +217,14 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param unit           the unit
      * @param fireNext       the fire next
      */
-    public ActionIdleStateHandler(boolean observeOutput, long readerIdleTime, long writerIdleTime, long allIdleTime, TimeUnit unit, boolean fireNext) {
+    public ActionIdleStateHandler(
+            boolean  observeOutput,
+            long     readerIdleTime,
+            long     writerIdleTime,
+            long     allIdleTime,
+            TimeUnit unit,
+            boolean  fireNext)
+    {
         super(observeOutput, readerIdleTime, writerIdleTime, allIdleTime, unit);
         this.fireNext = fireNext;
     }

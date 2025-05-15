@@ -31,16 +31,19 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
 
     private final boolean skipLeftBytes;
 
-    protected StructCodec() {
+    protected StructCodec()
+    {
         this.skipLeftBytes = DEFAULT_SKIP_LEFT_BYTES;
     }
 
-    protected StructCodec(boolean skipLeftBytes) {
+    protected StructCodec(boolean skipLeftBytes)
+    {
         this.skipLeftBytes = skipLeftBytes;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out)
+    {
         try {
             out.add(StructSerializer.toStruct(type, msg));
         } finally {
@@ -54,7 +57,8 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
+    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out)
+    {
         out.writeBytes(StructSerializer.toByteBuf(type, struct));
     }
 }
