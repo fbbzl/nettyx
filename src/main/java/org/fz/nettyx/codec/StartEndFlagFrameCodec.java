@@ -20,16 +20,19 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
  */
 public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEndFlagFrameDecoder, StartEndFlagFrameEncoder> {
 
-    public StartEndFlagFrameCodec(int maxFrameLength, boolean strip, ByteBuf startFlag, ByteBuf endFlag) {
+    public StartEndFlagFrameCodec(int maxFrameLength, boolean strip, ByteBuf startFlag, ByteBuf endFlag)
+    {
         super(new StartEndFlagFrameDecoder(maxFrameLength, strip, startFlag, endFlag), new StartEndFlagFrameEncoder(startFlag, endFlag));
     }
 
-    public StartEndFlagFrameCodec(int maxFrameLength, boolean strip, ByteBuf startEndSameFlag) {
+    public StartEndFlagFrameCodec(int maxFrameLength, boolean strip, ByteBuf startEndSameFlag)
+    {
         super(new StartEndFlagFrameDecoder(maxFrameLength, strip, startEndSameFlag),
               new StartEndFlagFrameEncoder(startEndSameFlag));
     }
 
-    public StartEndFlagFrameCodec(StartEndFlagFrameDecoder decoder, StartEndFlagFrameEncoder encoder) {
+    public StartEndFlagFrameCodec(StartEndFlagFrameDecoder decoder, StartEndFlagFrameEncoder encoder)
+    {
         super(decoder, encoder);
     }
 
@@ -41,14 +44,16 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         private final ByteBuf startFlag, endFlag;
         private final boolean stripStartEndDelimiter;
 
-        public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag) {
+        public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startEndSameFlag)
+        {
             super(maxFrameLength, true, startEndSameFlag);
 
             this.stripStartEndDelimiter = stripDelimiter;
             this.startFlag              = this.endFlag = startEndSameFlag;
         }
 
-        public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag) {
+        public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, ByteBuf startFlag, ByteBuf endFlag)
+        {
             super(maxFrameLength, true, startFlag, endFlag);
 
             this.stripStartEndDelimiter = stripDelimiter;
@@ -57,7 +62,8 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
         }
 
         @Override
-        public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+        public Object decode(ChannelHandlerContext ctx, ByteBuf buf) throws Exception
+        {
             ByteBuf decodedByteBuf = (ByteBuf) super.decode(ctx, buf);
             if (decodedByteBuf != null) {
                 if (decodedByteBuf.readableBytes() > 0) {
@@ -78,15 +84,15 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
      */
     public static class StartEndFlagFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
-        private final ByteBuf startFlag;
-        private final ByteBuf endFlag;
+        private final ByteBuf startFlag, endFlag;
 
         /**
          * Instantiates a new Start end flag frame encoder.
          *
          * @param startEndSameFlag the start end same flag
          */
-        public StartEndFlagFrameEncoder(ByteBuf startEndSameFlag) {
+        public StartEndFlagFrameEncoder(ByteBuf startEndSameFlag)
+        {
             this.startFlag = this.endFlag = startEndSameFlag;
         }
 
@@ -96,13 +102,15 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
          * @param startFlag the start flag
          * @param endFlag   the end flag
          */
-        public StartEndFlagFrameEncoder(ByteBuf startFlag, ByteBuf endFlag) {
+        public StartEndFlagFrameEncoder(ByteBuf startFlag, ByteBuf endFlag)
+        {
             this.startFlag = startFlag;
             this.endFlag   = endFlag;
         }
 
         @Override
-        public void encode(ChannelHandlerContext ctx, ByteBuf applicationDataBytes, ByteBuf byteBuf) {
+        public void encode(ChannelHandlerContext ctx, ByteBuf applicationDataBytes, ByteBuf byteBuf)
+        {
             byteBuf.writeBytes(Unpooled.wrappedBuffer(startFlag.duplicate(), applicationDataBytes, endFlag.duplicate()));
         }
     }
