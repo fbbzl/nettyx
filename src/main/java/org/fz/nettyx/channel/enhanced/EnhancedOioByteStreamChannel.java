@@ -27,7 +27,8 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
     }
 
     @Override
-    protected int doReadBytes(ByteBuf buf) {
+    protected int doReadBytes(ByteBuf buf)
+    {
         try {
             // check before use, it will avoid blocking
             if (available() > 0) return super.doReadBytes(buf);
@@ -38,7 +39,8 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
     }
 
     @Override
-    protected void doDisconnect() throws Exception {
+    protected void doDisconnect() throws Exception
+    {
         doClose();
     }
 

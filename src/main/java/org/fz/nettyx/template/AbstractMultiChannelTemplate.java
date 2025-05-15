@@ -43,16 +43,19 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     private final Map<K, SocketAddress>       addressMap;
     private final ConcurrentMap<K, Bootstrap> bootstrapMap;
 
-    protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap) {
+    protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap)
+    {
         this.addressMap   = (Map<K, SocketAddress>) addressMap;
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
     }
 
-    public Map<K, ChannelFuture> connectAll() {
+    public Map<K, ChannelFuture> connectAll()
+    {
         return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
-    public ChannelFuture connect(K key) {
+    public ChannelFuture connect(K key)
+    {
         Bootstrap bootstrap = getBootstrapMap().get(key);
         Throws.ifNull(bootstrap, () -> "can not find config by key [" + key + "]");
         ChannelFuture channelFuture = bootstrap.clone().connect();
@@ -60,15 +63,18 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         return channelFuture;
     }
 
-    public Channel getChannel(K key) {
+    public Channel getChannel(K key)
+    {
         return this.channelStorage.get(key);
     }
 
-    protected void storeChannel(K channelKey, ChannelFuture future) {
+    protected void storeChannel(K channelKey, ChannelFuture future)
+    {
         storeChannel(channelKey, future.channel());
     }
 
-    protected void storeChannel(K key, Channel channel) {
+    protected void storeChannel(K key, Channel channel)
+    {
         channelStorage.compute(key, Try.apply((k, old) -> {
             if (isActive(old)) {
                 old.close().sync();
@@ -78,23 +84,27 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         }));
     }
 
-    protected void storeChannel(ChannelFuture cf) {
+    protected void storeChannel(ChannelFuture cf)
+    {
         this.storeChannel(channelKey(cf), cf.channel());
     }
 
-    public void closeChannelGracefully(K key) {
+    public void closeChannelGracefully(K key)
+    {
         if (gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close();
         }
     }
 
-    public void closeChannelGracefully(K key, ChannelPromise promise) {
+    public void closeChannelGracefully(K key, ChannelPromise promise)
+    {
         if (gracefullyCloseable(getChannel(key))) {
             this.getChannel(key).close(promise);
         }
     }
 
-    public ChannelPromise write(K channelKey, Object message) {
+    public ChannelPromise write(K channelKey, Object message)
+    {
         Channel channel = channelStorage.get(channelKey);
 
         if (notActive(channel) || notWritable(channel)) {
@@ -112,7 +122,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         }
     }
 
-    public ChannelPromise writeAndFlush(K channelKey, Object message) {
+    public ChannelPromise writeAndFlush(K channelKey, Object message)
+    {
         Channel channel = channelStorage.get(channelKey);
 
         if (notActive(channel) || notWritable(channel)) {
@@ -130,15 +141,18 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         }
     }
 
-    protected void clear() {
+    protected void clear()
+    {
         channelStorage.clear();
     }
 
-    protected void doChannelConfig(K channelKey, F channelConfig) {
+    protected void doChannelConfig(K channelKey, F channelConfig)
+    {
         // default is nothing
     }
 
-    protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap(K key, SocketAddress remoteAddress)
+    {
         return new Bootstrap()
                 .attr((AttributeKey<? super K>) MULTI_CHANNEL_KEY, key)
                 .attr(CHANNEL_STATE_KEY, new ChannelState())
@@ -152,15 +166,18 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
                 .handler(channelInitializer());
     }
 
-    public static <T> T channelKey(ChannelHandlerContext ctx) {
+    public static <T> T channelKey(ChannelHandlerContext ctx)
+    {
         return channelKey(ctx.channel());
     }
 
-    public static <T> T channelKey(ChannelFuture cf) {
+    public static <T> T channelKey(ChannelFuture cf)
+    {
         return channelKey(cf.channel());
     }
 
-    public static <T> T channelKey(Channel channel) {
+    public static <T> T channelKey(Channel channel)
+    {
         return (T) channel.attr(MULTI_CHANNEL_KEY).get();
     }
 
@@ -180,7 +197,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
         /**
          * Instantiates a new Channel storage.
          */
-        public ChannelStorage() {
+        public ChannelStorage()
+        {
             this.storage = new SafeConcurrentHashMap<>(8);
         }
 
@@ -189,7 +207,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @param initialCapacity the initial capacity
          */
-        public ChannelStorage(int initialCapacity) {
+        public ChannelStorage(int initialCapacity)
+        {
             this.storage = new SafeConcurrentHashMap<>(initialCapacity);
         }
 
@@ -198,7 +217,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @param channelMap the channel map
          */
-        public ChannelStorage(Map<K, Channel> channelMap) {
+        public ChannelStorage(Map<K, Channel> channelMap)
+        {
             this.storage = new SafeConcurrentHashMap<>(channelMap);
         }
 
@@ -208,7 +228,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          * @param initialCapacity the initial capacity
          * @param loadFactor      the load factor
          */
-        public ChannelStorage(int initialCapacity, float loadFactor) {
+        public ChannelStorage(int initialCapacity, float loadFactor)
+        {
             this(initialCapacity, loadFactor, 1);
         }
 
@@ -219,7 +240,11 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          * @param loadFactor       the load factor
          * @param concurrencyLevel the concurrency level
          */
-        public ChannelStorage(int initialCapacity, float loadFactor, int concurrencyLevel) {
+        public ChannelStorage(
+                int   initialCapacity,
+                float loadFactor,
+                int   concurrencyLevel)
+        {
             this.storage = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
         }
 
@@ -228,7 +253,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the boolean
          */
-        public boolean isAllActive() {
+        public boolean isAllActive()
+        {
             return isAll(Channel::isActive);
         }
 
@@ -237,7 +263,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the boolean
          */
-        public boolean isAllWritable() {
+        public boolean isAllWritable()
+        {
             return isAll(Channel::isWritable);
         }
 
@@ -246,7 +273,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the boolean
          */
-        public boolean isAllRegistered() {
+        public boolean isAllRegistered()
+        {
             return isAll(Channel::isRegistered);
         }
 
@@ -255,7 +283,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the boolean
          */
-        public boolean isAllOpen() {
+        public boolean isAllOpen()
+        {
             return isAll(Channel::isOpen);
         }
 
@@ -264,7 +293,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the list
          */
-        public List<Channel> findAllActive() {
+        public List<Channel> findAllActive()
+        {
             return findAll(Channel::isActive);
         }
 
@@ -273,7 +303,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the list
          */
-        public List<Channel> findAllWritable() {
+        public List<Channel> findAllWritable()
+        {
             return findAll(Channel::isWritable);
         }
 
@@ -282,7 +313,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the list
          */
-        public List<Channel> findAllRegistered() {
+        public List<Channel> findAllRegistered()
+        {
             return findAll(Channel::isRegistered);
         }
 
@@ -291,7 +323,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          *
          * @return the list
          */
-        public List<Channel> findAllOpen() {
+        public List<Channel> findAllOpen()
+        {
             return findAll(Channel::isOpen);
         }
 
@@ -301,7 +334,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          * @param channelPredicate the channel predicate
          * @return the list
          */
-        public List<Channel> findAll(Predicate<Channel> channelPredicate) {
+        public List<Channel> findAll(Predicate<Channel> channelPredicate)
+        {
             List<Channel> channels = new ArrayList<>(10);
             for (Channel channel : storage.values()) {
                 if (channelPredicate.test(channel)) channels.add(channel);
@@ -315,7 +349,8 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
          * @param channelPredicate the channel predicate
          * @return the boolean
          */
-        public boolean isAll(Predicate<Channel> channelPredicate) {
+        public boolean isAll(Predicate<Channel> channelPredicate)
+        {
             for (Channel channel : storage.values()) {
                 if (channelPredicate.negate().test(channel)) {
                     return false;

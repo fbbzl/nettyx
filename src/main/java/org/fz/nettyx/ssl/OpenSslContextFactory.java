@@ -27,38 +27,56 @@ public class OpenSslContextFactory {
     private static final InternalLogger log = InternalLoggerFactory.getInstance(OpenSslContextFactory.class);
     private final        OpenSslConfig  openSslConfig;
 
-    public SslContext getServerSslContext() throws SSLException {
+    public SslContext getServerSslContext() throws SSLException
+    {
         return getServerSslContext(Paths.get(openSslConfig.cert()), Paths.get(openSslConfig.key()),
                                    Paths.get(openSslConfig.root()));
     }
 
-    public SslContext getClientSslContext() throws SSLException {
+    public SslContext getClientSslContext() throws SSLException
+    {
         return getClientSslContext(Paths.get(openSslConfig.cert()), Paths.get(openSslConfig.key()),
                                    Paths.get(openSslConfig.root()));
     }
 
     //****************************************************************************************************************//
 
-    protected SslContext getServerSslContext(Path certChainPath, Path keyPath, Path rootPath) throws SSLException {
+    protected SslContext getServerSslContext(
+            Path certChainPath,
+            Path keyPath,
+            Path rootPath) throws SSLException
+    {
         return SslContextBuilder.forServer(certChainPath.toFile(), keyPath.toFile()).trustManager(rootPath.toFile())
                                 .clientAuth(ClientAuth.REQUIRE).build();
     }
 
-    protected SslContext getServerSslContext(Path certChainPath, Path keyPath, String keypass, Path rootPath)
-            throws SSLException {
+    protected SslContext getServerSslContext(
+            Path   certChainPath,
+            Path   keyPath,
+            String keypass,
+            Path   rootPath) throws SSLException
+    {
         return SslContextBuilder.forServer(certChainPath.toFile(), keyPath.toFile(), keypass)
                                 .trustManager(rootPath.toFile()).clientAuth(ClientAuth.REQUIRE).build();
     }
 
     //****************************************************************************************************************//
 
-    protected SslContext getClientSslContext(Path certChainPath, Path keyPath, Path rootPath) throws SSLException {
+    protected SslContext getClientSslContext(
+            Path certChainPath,
+            Path keyPath,
+            Path rootPath) throws SSLException
+    {
         return SslContextBuilder.forClient().keyManager(certChainPath.toFile(), keyPath.toFile())
                                 .trustManager(rootPath.toFile()).build();
     }
 
-    protected SslContext getClientSslContext(Path certChainPath, Path keyPath, String keypass, Path rootPath)
-            throws SSLException {
+    protected SslContext getClientSslContext(
+            Path   certChainPath,
+            Path   keyPath,
+            String keypass,
+            Path   rootPath) throws SSLException
+    {
         return SslContextBuilder.forClient().keyManager(certChainPath.toFile(), keyPath.toFile(), keypass)
                                 .trustManager(rootPath.toFile()).build();
     }

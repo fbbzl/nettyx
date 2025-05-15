@@ -11,7 +11,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 
-import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -53,17 +52,10 @@ public @interface Chunk {
             Class<?> chunkType = field.wrapped().getType();
             checkChunk(chunkType);
 
-            int chunkLength = chunk.length();
+            byte[] chunkBytes = new byte[chunk.length()];
+            reading.readBytes(chunkBytes);
 
-            if (chunkType == byte[].class) {
-                byte[] chunkBytes = new byte[chunkLength];
-                reading.readBytes(chunkBytes);
-                return chunkBytes;
-            }
-            else
-            if (chunkType == ByteBuf.class) return reading.readBytes(chunkLength);
-
-            throw new TypeJudgmentException(field);
+            return chunkBytes;
         }
 
         @Override
@@ -79,23 +71,15 @@ public @interface Chunk {
         {
             Class<?> chunkType = field.wrapped().getType();
             checkChunk(chunkType);
-            if (chunkType == byte[].class) {
-                byte[] bytes   = fieldVal == null ? new byte[chunk.length()] : (byte[]) fieldVal;
-                int    padding = computePadding(chunk, bytes.length);
-                writing.writeBytes(bytes);
-                if (padding > 0) writing.writeBytes(new byte[padding]);
-            }
-            else
-            if (chunkType == ByteBuf.class) {
-                ByteBuf byteBuf = fieldVal == null ? wrappedBuffer(new byte[chunk.length()]) : (ByteBuf) fieldVal;
-                int     padding = computePadding(chunk, byteBuf.readableBytes());
-                writing.writeBytes(byteBuf);
-                if (padding > 0) writing.writeBytes(new byte[padding]);
-            }
+
+            byte[] bytes   = (fieldVal == null) ? new byte[chunk.length()] : (byte[]) fieldVal;
+            int    padding = computePadding(chunk, bytes.length);
+            writing.writeBytes(bytes);
+            if (padding > 0) writing.writeBytes(new byte[padding]);
         }
 
         static void checkChunk(Class<?> fieldType) {
-            Throws.ifTrue(!byte[].class.isAssignableFrom(fieldType) && !ByteBuf.class.isAssignableFrom(fieldType),
+            Throws.ifFalse(byte[].class.isAssignableFrom(fieldType),
                           () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
         }
 
