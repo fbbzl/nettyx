@@ -77,7 +77,8 @@ public class SslContextFactory {
          * @param pwd  the pwd
          * @return the server context
          */
-        public SSLContext getServerContext(String path, String pwd) {
+        public SSLContext getServerContext(String path, String pwd)
+        {
             // here will be no string constant pool security issues
             return getServerContext(path, pwd.toCharArray());
         }
@@ -89,7 +90,8 @@ public class SslContextFactory {
          * @param pwd  the pwd witch be used to generate the keystore
          * @return the server context
          */
-        public SSLContext getServerContext(String path, char[] pwd) {
+        public SSLContext getServerContext(String path, char[] pwd)
+        {
             try (InputStream in = Files.newInputStream(Paths.get(path))) {
 
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -114,7 +116,8 @@ public class SslContextFactory {
          * @param pwd  the pwd
          * @return the client context
          */
-        public SSLContext getClientContext(String path, String pwd) {
+        public SSLContext getClientContext(String path, String pwd)
+        {
             // here will be no string constant pool security issues
             return getClientContext(path, pwd.toCharArray());
         }
@@ -126,7 +129,8 @@ public class SslContextFactory {
          * @param pwd  the pwd witch be used to generate the keystore
          * @return the client context
          */
-        public SSLContext getClientContext(String path, char[] pwd) {
+        public SSLContext getClientContext(String path, char[] pwd)
+        {
             try (InputStream in = Files.newInputStream(Paths.get(path))) {
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
@@ -159,7 +163,8 @@ public class SslContextFactory {
          * @param pwd  the pwd
          * @return the server context
          */
-        public SSLContext getServerContext(String path, String pwd) {
+        public SSLContext getServerContext(String path, String pwd)
+        {
             return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
@@ -170,7 +175,8 @@ public class SslContextFactory {
          * @param pwd  the pwd
          * @return the client context
          */
-        public SSLContext getClientContext(String path, String pwd) {
+        public SSLContext getClientContext(String path, String pwd)
+        {
             return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
@@ -183,7 +189,12 @@ public class SslContextFactory {
          * @param trustPwd  the trust pwd
          * @return the server context
          */
-        public SSLContext getServerContext(String path, String pwd, String trustPath, String trustPwd) {
+        public SSLContext getServerContext(
+                String path,
+                String pwd,
+                String trustPath,
+                String trustPwd)
+        {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
             } catch (Exception serverSslContextException) {
@@ -200,7 +211,12 @@ public class SslContextFactory {
          * @param trustPwd  the trust pwd
          * @return the client context
          */
-        public SSLContext getClientContext(String path, String pwd, String trustPath, String trustPwd) {
+        public SSLContext getClientContext(
+                String path,
+                String pwd,
+                String trustPath,
+                String trustPwd)
+        {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
             } catch (Exception clientSslContextException) {
@@ -215,7 +231,8 @@ public class SslContextFactory {
          * @param pwd  the pwd
          * @return the context
          */
-        SSLContext getContext(String path, String pwd) {
+        SSLContext getContext(String path, String pwd)
+        {
             return getContext(path, pwd.toCharArray(), path, pwd.toCharArray());
         }
 
@@ -226,7 +243,8 @@ public class SslContextFactory {
          * @param pwd  the pwd
          * @return the context
          */
-        SSLContext getContext(String path, char[] pwd) {
+        SSLContext getContext(String path, char[] pwd)
+        {
             return getContext(path, pwd, path, pwd);
         }
 
@@ -239,10 +257,14 @@ public class SslContextFactory {
          * @param trustPwd  the trust pwd
          * @return the context
          */
-        public SSLContext getContext(String path, char[] pwd, String trustPath, char[] trustPwd) {
-            try (
-                    InputStream in = Files.newInputStream(Paths.get(path));
-                    InputStream trustIn = Files.newInputStream(Paths.get(trustPath))) {
+        public SSLContext getContext(
+                String path,
+                char[] pwd,
+                String trustPath,
+                char[] trustPwd)
+        {
+            try (InputStream in = Files.newInputStream(Paths.get(path));
+                 InputStream trustIn = Files.newInputStream(Paths.get(trustPath))) {
 
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 keyStore.load(in, pwd);
