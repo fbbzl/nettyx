@@ -52,7 +52,7 @@
         <lombok.version>1.18.34</lombok.version>
 
         <!--transport-->
-        <netty-all.version>4.1.113.Final</netty-all.version>
+        <netty-all.version>4.1.121.Final</netty-all.version>
 
         <!--comm-->
         <jSerialComm.version>2.11.0</jSerialComm.version>
