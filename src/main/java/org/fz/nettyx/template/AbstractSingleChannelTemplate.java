@@ -30,47 +30,55 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
     private final        Bootstrap      bootstrap;
     private              C              channel;
 
-    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
+    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress)
+    {
         this.remoteAddress = remoteAddress;
         this.bootstrap     = newBootstrap(remoteAddress);
     }
 
-    public ChannelFuture connect() {
+    public ChannelFuture connect()
+    {
         ChannelFuture channelFuture = this.getBootstrap().clone().connect();
         channelFuture.addListeners(new ActionChannelFutureListener().whenSuccess((l, cf) -> this.storeChannel(cf)));
 
         return channelFuture;
     }
 
-    protected void storeChannel(ChannelFuture cf) {
+    protected void storeChannel(ChannelFuture cf)
+    {
         storeChannel((C) cf.channel());
     }
 
-    protected void storeChannel(C channel) {
+    protected void storeChannel(C channel)
+    {
         if (isActive(this.channel)) closeChannelDirectly(true);
 
         this.channel = channel;
     }
 
     @SneakyThrows(InterruptedException.class)
-    public void closeChannelDirectly(boolean sync) {
+    public void closeChannelDirectly(boolean sync)
+    {
         if (sync) this.channel.close().sync();
         else this.channel.close();
     }
 
-    public void closeChannelGracefully() {
+    public void closeChannelGracefully()
+    {
         if (gracefullyCloseable(channel)) {
             this.getChannel().close();
         }
     }
 
-    public void closeChannelGracefully(ChannelPromise promise) {
+    public void closeChannelGracefully(ChannelPromise promise)
+    {
         if (gracefullyCloseable(channel)) {
             this.getChannel().close(promise);
         }
     }
 
-    public ChannelPromise write(Object message) {
+    public ChannelPromise write(Object message)
+    {
         if (this.notActive(channel) || notWritable(channel)) {
             log.debug("channel not in usable status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
@@ -85,7 +93,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         }
     }
 
-    public ChannelPromise writeAndFlush(Object message) {
+    public ChannelPromise writeAndFlush(Object message)
+    {
         if (this.notActive(channel) || notWritable(channel)) {
             log.debug("channel not in usable status, message will be discard: {}", message);
             ReferenceCountUtil.safeRelease(message);
@@ -100,7 +109,8 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         }
     }
 
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress) {
+    protected Bootstrap newBootstrap(SocketAddress remoteAddress)
+    {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)
                 .group(getEventLoopGroup())

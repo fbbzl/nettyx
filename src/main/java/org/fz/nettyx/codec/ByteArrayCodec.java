@@ -18,12 +18,20 @@ import java.util.List;
 public class ByteArrayCodec extends ByteToMessageCodec<byte[]> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, byte[] msg, ByteBuf out) {
+    protected void encode(
+            ChannelHandlerContext ctx,
+            byte[]                msg,
+            ByteBuf               out)
+    {
         out.writeBytes(Unpooled.wrappedBuffer(msg));
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(
+            ChannelHandlerContext ctx,
+            ByteBuf               in,
+            List<Object>          out)
+    {
         try {
             out.add(ByteBufUtil.getBytes(in));
         } finally {

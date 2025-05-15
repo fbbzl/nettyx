@@ -19,19 +19,23 @@ import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
 public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<DelimiterBasedFrameDecoder,
         DelimiterBasedFrameEncoder> {
 
-    public DelimiterBasedFrameCodec(DelimiterBasedFrameDecoder decoder, DelimiterBasedFrameEncoder encoder) {
+    public DelimiterBasedFrameCodec(DelimiterBasedFrameDecoder decoder, DelimiterBasedFrameEncoder encoder)
+    {
         super(decoder, encoder);
     }
 
-    public DelimiterBasedFrameCodec(int maxFrameLength, ByteBuf delimiter) {
+    public DelimiterBasedFrameCodec(int maxFrameLength, ByteBuf delimiter)
+    {
         this(new DelimiterBasedFrameDecoder(maxFrameLength, delimiter), new DelimiterBasedFrameEncoder(delimiter));
     }
 
-    public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, ByteBuf delimiter) {
+    public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, ByteBuf delimiter)
+    {
         this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, true, delimiter), new DelimiterBasedFrameEncoder(delimiter));
     }
 
-    public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, boolean failFast, ByteBuf delimiter) {
+    public DelimiterBasedFrameCodec(int maxFrameLength, boolean stripDelimiter, boolean failFast, ByteBuf delimiter)
+    {
         this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, failFast, delimiter.slice(delimiter.readerIndex(), delimiter.readableBytes())), new DelimiterBasedFrameEncoder(delimiter));
     }
 
@@ -39,12 +43,14 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
 
         private final ByteBuf delimiter;
 
-        public DelimiterBasedFrameEncoder(ByteBuf delimiter) {
+        public DelimiterBasedFrameEncoder(ByteBuf delimiter)
+        {
             this.delimiter = delimiter;
         }
 
         @Override
-        public void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
+        public void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out)
+        {
             out.writeBytes(Unpooled.wrappedBuffer(msg, delimiter.duplicate()));
         }
 
