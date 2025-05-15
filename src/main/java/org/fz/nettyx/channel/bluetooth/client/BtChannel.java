@@ -55,7 +55,8 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected ChannelFuture shutdownInput() {
+    protected ChannelFuture shutdownInput()
+    {
         ChannelPromise pro = newPromise();
 
         try {
@@ -74,7 +75,10 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception {
+    protected void doConnect(
+            SocketAddress remoteAddress,
+            SocketAddress localAddress) throws Exception
+    {
         this.remoteAddress = (BtDeviceAddress) remoteAddress;
 
         config().getOptions().forEach((co, val) -> BlueCoveImpl.setConfigProperty(co.name(), String.valueOf(val)));
@@ -100,7 +104,8 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected void doClose() throws Exception {
+    protected void doClose() throws Exception
+    {
         open = false;
 
         try {
@@ -121,11 +126,11 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     protected final class BluetoothUnsafe extends AbstractUnsafe {
         @Override
         public void connect(
-                final SocketAddress remoteAddress,
-                final SocketAddress localAddress, final ChannelPromise promise) {
-            if (!promise.setUncancellable() || !ensureOpen(promise)) {
-                return;
-            }
+                final SocketAddress  remoteAddress,
+                final SocketAddress  localAddress,
+                final ChannelPromise promise)
+        {
+            if (!promise.setUncancellable() || !ensureOpen(promise)) return;
 
             try {
                 final boolean wasActive = isActive();
@@ -133,9 +138,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
                 doConnect(remoteAddress, localAddress);
                 promise.setSuccess();
 
-                if (!wasActive && isActive()) {
-                    pipeline().fireChannelActive();
-                }
+                if (!wasActive && isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {
                 promise.setFailure(t);
                 closeIfClosed();

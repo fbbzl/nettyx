@@ -22,23 +22,38 @@ public interface ListenerAction {
 
     void act(ActionChannelFutureListener listener, ChannelFuture cf);
 
-    static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit) {
+    static ListenerAction redo(
+            Supplier<ChannelFuture> did,
+            long                    delay,
+            TimeUnit                unit)
+    {
         return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.get().addListener(ls), delay, unit);
     }
 
-    static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit) {
+    static ListenerAction redo(
+            UnaryOperator<ChannelFuture> did,
+            long                         delay,
+            TimeUnit                     unit)
+    {
         return (ls, cf) -> cf.channel().eventLoop().schedule(() -> did.apply(cf).addListener(ls), delay, unit);
     }
 
-    static ListenerAction redo(Supplier<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes) {
+    static ListenerAction redo(
+            Supplier<ChannelFuture> did,
+            long                    delay,
+            TimeUnit                unit,
+            int                     maxRedoTimes)
+    {
         return redo(did, delay, unit, maxRedoTimes, null);
     }
 
     static ListenerAction redo(
             Supplier<ChannelFuture> did,
-            long delay, TimeUnit unit,
-            int maxRedoTimes,
-            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
+            long                    delay,
+            TimeUnit                unit,
+            int                     maxRedoTimes,
+            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
+    {
         return (ls, cf) -> {
             try {
                 checkState(ls, cf, maxRedoTimes, afterMaxRedoTimes);
@@ -49,16 +64,22 @@ public interface ListenerAction {
         };
     }
 
-    static ListenerAction redo(UnaryOperator<ChannelFuture> did, long delay, TimeUnit unit, int maxRedoTimes) {
+    static ListenerAction redo(
+            UnaryOperator<ChannelFuture> did,
+            long                         delay,
+            TimeUnit                     unit,
+            int                          maxRedoTimes)
+    {
         return redo(did, delay, unit, maxRedoTimes, null);
     }
 
     static ListenerAction redo(
             UnaryOperator<ChannelFuture> did,
-            long delay,
-            TimeUnit unit,
-            int maxRedoTimes,
-            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes) {
+            long                         delay,
+            TimeUnit                     unit,
+            int                          maxRedoTimes,
+            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
+    {
         return (ls, cf) -> {
             try {
                 checkState(ls, cf, maxRedoTimes, afterMaxRedoTimes);
@@ -71,10 +92,11 @@ public interface ListenerAction {
 
     static void checkState(
             ChannelFutureListener ls,
-            ChannelFuture cf,
-            int maxRedoTimes,
+            ChannelFuture         cf,
+            int                   maxRedoTimes,
             BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
-            throws StopRedoException {
+            throws StopRedoException
+    {
         ChannelState state = getChannelState(cf);
         if (state != null) {
             // the first connect-action is also the redo type
@@ -83,7 +105,6 @@ public interface ListenerAction {
                 throw new StopRedoException();
             } else state.increase(cf);
         }
-
     }
 
 }
