@@ -50,9 +50,8 @@ public class SerializerTest {
         StopWatch stopWatch = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 1_000_000; i++) {
-            You you = toStruct(youTypeRefer, bytes);
-            byte[] bytes1 = toBytes(you);
-            byte[] bytes2 = toBytes(new You());
+            toStruct(youTypeRefer, bytes);
+
         }
         stopWatch.stop();
         Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
