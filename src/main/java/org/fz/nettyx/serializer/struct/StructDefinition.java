@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import org.fz.util.lambda.LambdaMetas;
+import org.fz.erwin.lambda.LambdaMetas;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

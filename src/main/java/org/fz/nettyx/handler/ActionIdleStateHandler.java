@@ -67,7 +67,9 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionIdleStateHandler newReadIdleHandler(int seconds, ChannelHandlerContextAction idleAction)
+    public static ActionIdleStateHandler newReadIdleHandler(
+            int                         seconds,
+            ChannelHandlerContextAction idleAction)
     {
         return new ActionIdleStateHandler(seconds, 0, 0).readIdleAction(idleAction);
     }
@@ -79,7 +81,9 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionIdleStateHandler newWriteIdleHandler(int seconds, ChannelHandlerContextAction idleAction)
+    public static ActionIdleStateHandler newWriteIdleHandler(
+            int                         seconds,
+            ChannelHandlerContextAction idleAction)
     {
         return new ActionIdleStateHandler(0, seconds, 0).writeIdleAction(idleAction);
     }
@@ -91,13 +95,18 @@ public class ActionIdleStateHandler extends IdleStateHandler {
      * @param idleAction the idle action
      * @return the actionable idle state handler
      */
-    public static ActionIdleStateHandler newAllIdleHandler(int seconds, ChannelHandlerContextAction idleAction)
+    public static ActionIdleStateHandler newAllIdleHandler(
+            int                         seconds,
+            ChannelHandlerContextAction idleAction)
     {
         return new ActionIdleStateHandler(0, 0, seconds).allIdleAction(idleAction);
     }
 
     @Override
-    protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+    protected void channelIdle(
+            ChannelHandlerContext ctx,
+            IdleStateEvent        evt) throws Exception
+    {
         if (ChannelEvents.isReadIdle(evt)) {
             log.warn("have been in read-idle state for [{}] seconds on [{}]", getReaderIdleSeconds(), ctx.channel().remoteAddress());
             invokeAction(readIdleAction, ctx);

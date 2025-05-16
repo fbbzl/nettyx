@@ -1,11 +1,11 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
+import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.util.exception.Throws;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -80,7 +80,7 @@ public @interface Chunk {
 
         static void checkChunk(Class<?> fieldType) {
             Throws.ifFalse(byte[].class.isAssignableFrom(fieldType),
-                          () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
+                           () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
         }
 
         static int computePadding(Chunk chunk, int valueLength) {

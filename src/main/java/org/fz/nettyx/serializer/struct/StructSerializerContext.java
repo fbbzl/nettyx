@@ -12,7 +12,6 @@ import lombok.Getter;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.util.lambda.LambdaMetas;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -25,8 +24,8 @@ import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ArrayUtil.*;
+import static org.fz.erwin.lambda.LambdaMetas.lambdaConstructor;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_FIELD_HANDLER;
-import static org.fz.util.lambda.LambdaMetas.lambdaConstructor;
 
 /**
  * The type Struct cache.
@@ -170,7 +169,7 @@ public class StructSerializerContext {
 
         if (handlerAnnotationAssigned) {
             Supplier<H> handlerSupplier =
-                    LambdaMetas.lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
+                    lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
 
             StructFieldHandler handler = (StructFieldHandler) handlerSupplier.get();
             if (handler.isSingleton()) Singleton.put(handler);

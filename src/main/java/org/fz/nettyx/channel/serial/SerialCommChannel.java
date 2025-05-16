@@ -87,9 +87,8 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
     protected final class SerialCommUnsafe extends AbstractUnsafe {
         @Override
         public void connect(
-                final SocketAddress  remoteAddress,
-                final SocketAddress  localAddress,
-                final ChannelPromise promise)
+                final SocketAddress remoteAddress,
+                final SocketAddress localAddress, final ChannelPromise promise)
         {
             if (!promise.setUncancellable() || !ensureOpen(promise)) return;
 
@@ -97,6 +96,7 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
                 SerialCommChannel.this.doConnect(remoteAddress, localAddress);
                 SerialCommChannel.super.activate(getInputStream(), getOutputStream());
                 safeSetSuccess(promise);
+
                 if (isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {
                 safeSetFailure(promise, t);

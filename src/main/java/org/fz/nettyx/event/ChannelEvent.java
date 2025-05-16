@@ -33,7 +33,9 @@ public abstract class ChannelEvent<S> {
      * @param source the source
      * @param ctx    the ctx
      */
-    protected ChannelEvent(S source, ChannelHandlerContext ctx)
+    protected ChannelEvent(
+            S                     source,
+            ChannelHandlerContext ctx)
     {
         this.source = source;
         this.ctx    = ctx;
@@ -94,7 +96,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public ChannelRegister(T source, ChannelHandlerContext ctx)
+        public ChannelRegister(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -123,7 +127,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public ChannelUnRegister(T source, ChannelHandlerContext ctx)
+        public ChannelUnRegister(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -213,7 +219,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx the ctx
          * @param msg the msg
          */
-        public ChannelRead(ChannelHandlerContext ctx, Object msg)
+        public ChannelRead(
+                ChannelHandlerContext ctx,
+                Object                msg)
         {
             super(ctx);
             this.msg = msg;
@@ -259,7 +267,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public ChannelReadComplete(T source, ChannelHandlerContext ctx)
+        public ChannelReadComplete(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -291,7 +301,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public UserEventTriggered(T source, ChannelHandlerContext ctx)
+        public UserEventTriggered(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -302,7 +314,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx   the ctx
          * @param event the event
          */
-        public UserEventTriggered(ChannelHandlerContext ctx, Object event)
+        public UserEventTriggered(
+                ChannelHandlerContext ctx,
+                Object                event)
         {
             super(ctx);
             this.event = event;
@@ -348,7 +362,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public WritabilityChanged(T source, ChannelHandlerContext ctx)
+        public WritabilityChanged(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -380,7 +396,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx       the ctx
          * @param throwable the throwable
          */
-        public ExceptionCaught(ChannelHandlerContext ctx, Throwable throwable)
+        public ExceptionCaught(
+                ChannelHandlerContext ctx,
+                Throwable             throwable)
         {
             super(ctx);
             this.throwable = throwable;
@@ -426,7 +444,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public ReadIdle(T source, ChannelHandlerContext ctx)
+        public ReadIdle(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -478,7 +498,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx           the ctx
          * @param socketAddress the socket address
          */
-        public Bind(ChannelHandlerContext ctx, SocketAddress socketAddress)
+        public Bind(
+                ChannelHandlerContext ctx,
+                SocketAddress         socketAddress)
         {
             super(ctx);
             this.socketAddress = socketAddress;
@@ -526,7 +548,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx            the ctx
          * @param channelPromise the channel promise
          */
-        public Bind(ChannelHandlerContext ctx, ChannelPromise channelPromise)
+        public Bind(
+                ChannelHandlerContext ctx,
+                ChannelPromise        channelPromise)
         {
             super(ctx);
             this.channelPromise = channelPromise;
@@ -618,7 +642,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx            the ctx
          * @param channelPromise the channel promise
          */
-        public Connect(ChannelHandlerContext ctx, ChannelPromise channelPromise)
+        public Connect(
+                ChannelHandlerContext ctx,
+                ChannelPromise        channelPromise)
         {
             super(ctx);
             this.channelPromise = channelPromise;
@@ -699,7 +725,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx            the ctx
          * @param channelPromise the channel promise
          */
-        public Disconnect(ChannelHandlerContext ctx, ChannelPromise channelPromise)
+        public Disconnect(
+                ChannelHandlerContext ctx,
+                ChannelPromise        channelPromise)
         {
             super(ctx);
             this.channelPromise = channelPromise;
@@ -737,7 +765,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public Disconnect(T source, ChannelHandlerContext ctx)
+        public Disconnect(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -759,7 +789,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx            the ctx
          * @param channelPromise the channel promise
          */
-        public Close(ChannelHandlerContext ctx, ChannelPromise channelPromise)
+        public Close(
+                ChannelHandlerContext ctx,
+                ChannelPromise        channelPromise)
         {
             super(ctx);
             this.channelPromise = channelPromise;
@@ -819,7 +851,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx            the ctx
          * @param channelPromise the channel promise
          */
-        public Deregister(ChannelHandlerContext ctx, ChannelPromise channelPromise)
+        public Deregister(
+                ChannelHandlerContext ctx,
+                ChannelPromise        channelPromise)
         {
             super(ctx);
             this.channelPromise = channelPromise;
@@ -857,7 +891,9 @@ public abstract class ChannelEvent<S> {
          * @param source the source
          * @param ctx    the ctx
          */
-        public Deregister(T source, ChannelHandlerContext ctx)
+        public Deregister(
+                T                     source,
+                ChannelHandlerContext ctx)
         {
             super(source, ctx);
         }
@@ -909,7 +945,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx the ctx
          * @param msg the msg
          */
-        public Write(ChannelHandlerContext ctx, Object msg)
+        public Write(
+                ChannelHandlerContext ctx,
+                Object                msg)
         {
             super(ctx);
             this.msg = msg;
@@ -937,7 +975,9 @@ public abstract class ChannelEvent<S> {
          * @param ctx            the ctx
          * @param channelPromise the channel promise
          */
-        public Write(ChannelHandlerContext ctx, ChannelPromise channelPromise)
+        public Write(
+                ChannelHandlerContext ctx,
+                ChannelPromise        channelPromise)
         {
             super(ctx);
             this.channelPromise = channelPromise;
