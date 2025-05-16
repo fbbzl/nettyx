@@ -8,6 +8,7 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 
 /**
@@ -22,9 +23,9 @@ public class You {
     @Chunk(length = 20)
     byte[]  chunk;
     cchar   uname;
-    cint    isMarried;
-    cchar   sex;
-    cfloat  address;
+    cint   isMarried;
+    cuchar sex;
+    cfloat address;
     cdouble platformId;
     @ToArray(length = 2)
     Hit[] description;
