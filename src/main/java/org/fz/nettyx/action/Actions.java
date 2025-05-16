@@ -18,7 +18,9 @@ public interface Actions {
      * @param channelAction the channel action
      * @param ctx           the ctx
      */
-    static void invokeAction(ChannelHandlerContextAction channelAction, ChannelHandlerContext ctx)
+    static void invokeAction(
+            ChannelHandlerContextAction channelAction,
+            ChannelHandlerContext       ctx)
     {
         if (channelAction != null) channelAction.act(ctx);
     }
@@ -91,7 +93,9 @@ public interface Actions {
         if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
     }
 
-    static void invokeAction(ChannelFutureAction channelFutureAction, ChannelFuture cf)
+    static void invokeAction(
+            ChannelFutureAction channelFutureAction,
+            ChannelFuture       cf)
     {
         if (channelFutureAction != null) channelFutureAction.act(cf);
     }
