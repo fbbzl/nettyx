@@ -3,9 +3,9 @@ package serializer;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
 import codec.model.*;
+import org.fz.erwin.lang.TypeRefer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
-import org.fz.nettyx.util.TypeRefer;
 import org.junit.Before;
 import org.junit.Test;
 
