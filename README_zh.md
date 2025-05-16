@@ -84,11 +84,10 @@ listener
 serializer                             序列化工具
   struct
      annotation
+        ---Chunk                       用来进行字节数组占位
         ---Ignore                      序列化时忽略此字段
         ---Struct                      在序列化中，需要对域类型进行注释，类似于 JPA 中的 @Entity
         ---ToArray                     数组序列化器
-        ---ToArrayList                 ArrayList序列化器
-        ---ToLinkedList                ToLinkedList序列化器
         ---ToNamedEnum                 Named Enum序列化器
         ---ToString                    String序列化器
      basic
@@ -111,12 +110,12 @@ template
       ---SingleJscChannelTemplate       单通道java serial comm客户端模板
     ---rxtx
       ---MultiRxtxChannelTemplate       多通道rxtx客户端模板
-      ---SingleRxtxChannelCTemplate     单通道rxtx客户端模板
+      ---SingleRxtxChannelTemplate     单通道rxtx客户端模板
   ---tcp
     ---client
       ---MultiTcpChannelTemplate        多通道tcp客户端模板
       ---ServerDetector                 远程服务探测器
-      ---SingleTcpChannelCTemplate      单通道tcp客户端模板
+      ---SingleTcpChannelTemplate      单通道tcp客户端模板
     ---server
       ---TcpServer                      服务单模板
   ---AbstractMultiChannelTemplate      抽象多通道模板       
@@ -127,7 +126,6 @@ util                                 基础工具
   ---EndianKit                       字节工具  
   ---Exceptions                      异常工具
   ---HexKit                          16进制工具
-  ---TypeRefer                      结构泛型类型应用
   
 ```
 

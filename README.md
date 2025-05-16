@@ -36,7 +36,7 @@ action                              Contains sufficient functional interfaces to
   ---ChannelPromiseAction
   ---ChannelReadAction
   ---ChannelWriteAction
-channel                               channel extention
+channel                            Channel extention
   ---bluetooth
     ---client
       ---BtChannel                    blue tooth channel   
@@ -62,7 +62,7 @@ codec                               Provided some basic codecs
   ---StartEndFlagFrameCodec            Start End Flag Codec, use to decoe message based on start and end flag
   ---StringMessageCodec                String Codec
   ---StructCodec                       Struct Codec
-envet                                Provide support for netty events
+envet                               Provide support for netty events
   ---ChannelEvent                      Channel event object, recommended to be used in conjunction with Spring container events
   ---ChannelEvents                     Channel Event Object Tool
 exception                           Abnormal extension
@@ -82,15 +82,14 @@ handler                             Provided some basic channel handler implemen
   ---MessageFilter                     use to filter message
 
 listener
-  ---ActionableChannelFutureListener   Actionable channel future listener
+  ---ActionableChannelFutureListener Actionable channel future listener
 serializer                             Serialization tool
   struct
      annotation
+        ---Chunk                       used for byte array placeholding
         ---Ignore                      ignore this field when serializing
         ---Struct                      In serialization, the domain type needs to be annotated, something like @Entity in JPA
         ---ToArray                     Array serializer
-        ---ToArrayList                 ArrayList serializer
-        ---ToLinkedList                ToLinkedList serializer
         ---ToNamedEnum                 Named Enum serializer
         ---ToString                    String serializer
      basic
@@ -123,13 +122,12 @@ template
       ---TcpServer
   ---AbstractMultiChannelTemplate      Abstract parent class for multi-channel client       
   ---AbstractSingleChannelTemplate     Abstract parent class for single channel client
-util                              nettyx tool class
+util                               nettyx tool class
   ---Bins                            binary util
   ---BtFinder                        bluetooth device search util. [Sorry, im not your Lou, Sam]
   ---CommPorts                       commport util
   ---EndianKit                       bytes tool
   ---Exceptions                      exceptioin util
-  ---HexKit                          Hexadecimal tool
-  ---TypeRefer                      struct serializer generic-type util     
+  ---HexKit                          Hexadecimal tool 
   
 ```
