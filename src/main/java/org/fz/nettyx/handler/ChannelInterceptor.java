@@ -2,7 +2,7 @@ package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
-import org.fz.util.exception.Throws;
+import org.fz.erwin.exception.Throws;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
@@ -129,7 +129,9 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void userEventTriggered(ChannelHandlerContext ctx, Object evt)
+        public final void userEventTriggered(
+                ChannelHandlerContext ctx,
+                Object                evt)
         {
             if (isFreed()) ctx.fireUserEventTriggered(evt);
             else           this.preUserEventTriggered(ctx, evt);
@@ -330,21 +332,27 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise)
+        public final void disconnect(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise)
         {
             if (isFreed()) ctx.disconnect(promise);
             else           this.preDisconnect(ctx, promise);
         }
 
         @Override
-        public final void close(ChannelHandlerContext ctx, ChannelPromise promise)
+        public final void close(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise)
         {
             if (isFreed()) ctx.close(promise);
             else           this.preClose(ctx, promise);
         }
 
         @Override
-        public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise)
+        public final void deregister(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise)
         {
             if (isFreed()) ctx.deregister(promise);
             else           this.preDeregister(ctx, promise);
@@ -391,7 +399,9 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             if (!defaultInterceptAll) ctx.connect(remoteAddress, localAddress, promise);
         }
 
-        public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise)
+        public final void preDisconnect(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise)
         {
             if (!defaultInterceptAll) ctx.disconnect(promise);
         }
@@ -544,7 +554,9 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     //***************************************    public static start   ***********************************************//
 
-    public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, String interceptorName)
+    public static <T extends ChannelInterceptor> T getInterceptor(
+            ChannelPipeline pipeline,
+            String          interceptorName)
     {
         for (Map.Entry<String, ChannelHandler> entry : pipeline) {
             boolean isTargetInterceptor =
@@ -558,7 +570,9 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         return null;
     }
 
-    public static <T extends ChannelInterceptor> T getInterceptor(ChannelPipeline pipeline, Class<?> interceptorClass)
+    public static <T extends ChannelInterceptor> T getInterceptor(
+            ChannelPipeline pipeline,
+            Class<?>        interceptorClass)
     {
         Throws.ifNotAssignable(ChannelInterceptor.class, interceptorClass,
                                () -> "class [" + interceptorClass + "] is not assignable to ChannelInterceptor");
