@@ -6,9 +6,9 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
-import org.fz.util.exception.Throws;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

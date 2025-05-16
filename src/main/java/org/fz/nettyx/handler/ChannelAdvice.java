@@ -56,14 +56,18 @@ public class ChannelAdvice {
          * @param readIdleAct the read idle action
          * @return the inbound advice
          */
-        public final InboundAdvice whenReadIdle(int idleSeconds, ChannelHandlerContextAction readIdleAct)
+        public final InboundAdvice whenReadIdle(
+                int                         idleSeconds,
+                ChannelHandlerContextAction readIdleAct)
         {
             this.readIdleStateHandler = ActionIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
             this.channel.pipeline().addFirst(this.readIdleStateHandler);
             return this;
         }
 
-        public final InboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction)
+        public final InboundAdvice whenReadTimeout(
+                int                    timeoutSeconds,
+                ChannelExceptionAction timeoutAction)
         {
             return whenReadTimeout(timeoutSeconds, true, timeoutAction);
         }
@@ -185,14 +189,18 @@ public class ChannelAdvice {
          * @param writeIdleAct the write idle action
          * @return the outbound advice
          */
-        public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct)
+        public final OutboundAdvice whenWriteIdle(
+                int                         idleSeconds,
+                ChannelHandlerContextAction writeIdleAct)
         {
             this.writeIdleStateHandler = ActionIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
             this.channel.pipeline().addFirst(this.writeIdleStateHandler);
             return this;
         }
 
-        public final OutboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction)
+        public final OutboundAdvice whenReadTimeout(
+                int                    timeoutSeconds,
+                ChannelExceptionAction timeoutAction)
         {
             return whenWriteTimeout(timeoutSeconds, true, timeoutAction);
         }
@@ -232,7 +240,9 @@ public class ChannelAdvice {
         }
 
         @Override
-        public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+        public final void disconnect(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise) throws Exception
         {
             log.debug("channel disconnect, remote-address is [{}], local-address is [{}]",
                       ctx.channel().remoteAddress(),
@@ -242,7 +252,9 @@ public class ChannelAdvice {
         }
 
         @Override
-        public final void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+        public final void close(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise) throws Exception
         {
             log.debug("channel close, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                       ctx.channel().localAddress());
@@ -251,7 +263,9 @@ public class ChannelAdvice {
         }
 
         @Override
-        public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+        public final void deregister(
+                ChannelHandlerContext ctx,
+                ChannelPromise        promise) throws Exception
         {
             log.debug("channel deregister, remote-address is [{}], local-address is [{}]",
                       ctx.channel().remoteAddress(),
@@ -309,21 +323,27 @@ public class ChannelAdvice {
             }
 
             @Override
-            public void disconnect(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+            public void disconnect(
+                    ChannelHandlerContext ctx,
+                    ChannelPromise        promise) throws Exception
             {
                 promise.addListener(failureListener(ctx, this.whenExceptionCaught));
                 super.disconnect(ctx, promise);
             }
 
             @Override
-            public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+            public void close(
+                    ChannelHandlerContext ctx,
+                    ChannelPromise        promise) throws Exception
             {
                 promise.addListener(failureListener(ctx, this.whenExceptionCaught));
                 super.close(ctx, promise);
             }
 
             @Override
-            public void deregister(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
+            public void deregister(
+                    ChannelHandlerContext ctx,
+                    ChannelPromise        promise) throws Exception
             {
                 promise.addListener(failureListener(ctx, this.whenExceptionCaught));
                 super.deregister(ctx, promise);
@@ -346,7 +366,8 @@ public class ChannelAdvice {
 
             static ChannelFutureListener failureListener(
                     ChannelHandlerContext  ctx,
-                    ChannelExceptionAction whenExceptionCaught) {
+                    ChannelExceptionAction whenExceptionCaught)
+            {
                 return cf -> {
                     if (cf.cause() != null) {
                         log.error(cf.cause().getMessage());
