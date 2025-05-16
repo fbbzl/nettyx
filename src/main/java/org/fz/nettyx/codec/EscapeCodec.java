@@ -10,10 +10,10 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
-import org.fz.util.exception.Throws;
 
 import java.util.Arrays;
 import java.util.Collection;

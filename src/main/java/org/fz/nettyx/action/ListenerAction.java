@@ -94,7 +94,8 @@ public interface ListenerAction {
             ChannelFutureListener ls,
             ChannelFuture         cf,
             int                   maxRedoTimes,
-            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes) throws StopRedoException
+            BiConsumer<? super ChannelFutureListener, ChannelFuture> afterMaxRedoTimes)
+            throws StopRedoException
     {
         ChannelState state = getChannelState(cf);
         if (state != null) {
