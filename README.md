@@ -118,7 +118,7 @@ template
     ---client
       ---MultiTcpChannelTemplate        Client with multiple channels, using key to retrieve corresponding channels
       ---ServerDetector                 remote server detector     
-      ---SingleTcpChannelCTemplate      Single Channel Client
+      ---SingleTcpChannelTemplate      Single Channel Client
     ---server
       ---TcpServer
   ---AbstractMultiChannelTemplate      Abstract parent class for multi-channel client       
