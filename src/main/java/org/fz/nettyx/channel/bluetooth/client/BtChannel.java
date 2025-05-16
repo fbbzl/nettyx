@@ -75,7 +75,9 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception
+    protected void doConnect(
+            SocketAddress remoteAddress,
+            SocketAddress localAddress) throws Exception
     {
         this.remoteAddress = (BtDeviceAddress) remoteAddress;
 

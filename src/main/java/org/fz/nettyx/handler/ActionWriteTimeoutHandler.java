@@ -33,7 +33,9 @@ public class ActionWriteTimeoutHandler extends WriteTimeoutHandler {
      * @param timeoutSeconds the timeout seconds
      * @param timeoutAction  the timeout action
      */
-    public ActionWriteTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction)
+    public ActionWriteTimeoutHandler(
+            int                    timeoutSeconds,
+            ChannelExceptionAction timeoutAction)
     {
         this(timeoutSeconds, timeoutAction, true);
     }
