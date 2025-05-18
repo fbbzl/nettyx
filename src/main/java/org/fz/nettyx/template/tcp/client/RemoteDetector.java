@@ -37,7 +37,8 @@ public abstract class RemoteDetector<M> extends SingleTcpChannelClientTemplate {
      */
     private final AtomicBoolean responseState = new AtomicBoolean(false);
 
-    protected RemoteDetector(InetSocketAddress address) {
+    protected RemoteDetector(InetSocketAddress address)
+    {
         super(address);
     }
 

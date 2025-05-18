@@ -126,9 +126,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     }
 
-    static boolean equalsContent(
-            byte[]  bytes,
-            ByteBuf buf)
+    static boolean equalsContent(byte[]  bytes, ByteBuf buf)
     {
         if (bytes.length != buf.readableBytes()) {
             return false;
@@ -154,9 +152,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      * @param buf the source buf
      * @param part the part buf
      */
-    static boolean containsContent(
-            ByteBuf buf,
-            ByteBuf part)
+    static boolean containsContent(ByteBuf buf, ByteBuf part)
     {
         if (buf.readableBytes() < part.readableBytes()) {
             return false;
@@ -219,9 +215,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
 
-    private static boolean hasSimilar(
-            ByteBuf msgBuf,
-            ByteBuf target)
+    private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target)
     {
         int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
 
@@ -249,7 +243,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             return mapping.getValue();
         }
 
-        public static EscapeMapping map(ByteBuf real, ByteBuf replacement) {
+        public static EscapeMapping map(ByteBuf real, ByteBuf replacement)
+        {
             return new EscapeMapping(Pair.of(real, replacement));
         }
 

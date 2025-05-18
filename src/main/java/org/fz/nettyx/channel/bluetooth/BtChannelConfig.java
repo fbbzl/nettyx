@@ -55,12 +55,14 @@ public interface BtChannelConfig extends ChannelConfig {
         private boolean encrypt;
         private boolean master;
 
-        public DefaultBtChannelConfig(BtChannel channel) {
+        public DefaultBtChannelConfig(BtChannel channel)
+        {
             super(channel);
         }
 
         @Override
-        public int getConnectTimeoutMillis() {
+        public int getConnectTimeoutMillis()
+        {
             return connectTimeoutMillis;
         }
 

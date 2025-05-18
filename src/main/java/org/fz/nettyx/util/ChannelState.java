@@ -37,15 +37,18 @@ public class ChannelState {
      */
     private long connectCancelledTimes;
 
-    public static ChannelState getChannelState(ChannelFuture cf) {
+    public static ChannelState getChannelState(ChannelFuture cf)
+    {
         return getChannelState(cf.channel());
     }
 
-    public static ChannelState getChannelState(Channel chl) {
+    public static ChannelState getChannelState(Channel chl)
+    {
         return chl.hasAttr(CHANNEL_STATE_KEY) ? chl.attr(CHANNEL_STATE_KEY).get() : null;
     }
 
-    public void increase(ChannelFuture cf) {
+    public void increase(ChannelFuture cf)
+    {
         this.connectTimes++;
 
         if (cf.isSuccess())     connectSuccessTimes++;
@@ -54,7 +57,8 @@ public class ChannelState {
         if (cf.isCancelled())   connectCancelledTimes++;
     }
 
-    public void reset() {
+    public void reset()
+    {
         this.connectTimes          = 0;
 
         this.connectSuccessTimes   = 0;

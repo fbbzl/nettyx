@@ -129,9 +129,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void userEventTriggered(
-                ChannelHandlerContext ctx,
-                Object                evt)
+        public final void userEventTriggered(ChannelHandlerContext ctx, Object evt)
         {
             if (isFreed()) ctx.fireUserEventTriggered(evt);
             else           this.preUserEventTriggered(ctx, evt);
@@ -146,9 +144,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
         @Override
         @SuppressWarnings("deprecation")
-        public final void exceptionCaught(
-                ChannelHandlerContext ctx,
-                Throwable             cause)
+        public final void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
         {
             if (isFreed()) ctx.fireExceptionCaught(cause);
             else           this.preExceptionCaught(ctx, cause);
@@ -332,27 +328,21 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
 
         @Override
-        public final void disconnect(
-                ChannelHandlerContext ctx,
-                ChannelPromise        promise)
+        public final void disconnect(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (isFreed()) ctx.disconnect(promise);
             else           this.preDisconnect(ctx, promise);
         }
 
         @Override
-        public final void close(
-                ChannelHandlerContext ctx,
-                ChannelPromise        promise)
+        public final void close(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (isFreed()) ctx.close(promise);
             else           this.preClose(ctx, promise);
         }
 
         @Override
-        public final void deregister(
-                ChannelHandlerContext ctx,
-                ChannelPromise        promise)
+        public final void deregister(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (isFreed()) ctx.deregister(promise);
             else           this.preDeregister(ctx, promise);
@@ -399,9 +389,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             if (!defaultInterceptAll) ctx.connect(remoteAddress, localAddress, promise);
         }
 
-        public final void preDisconnect(
-                ChannelHandlerContext ctx,
-                ChannelPromise        promise)
+        public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (!defaultInterceptAll) ctx.disconnect(promise);
         }
