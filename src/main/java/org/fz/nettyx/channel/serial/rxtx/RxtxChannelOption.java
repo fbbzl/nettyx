@@ -37,12 +37,14 @@ public final class RxtxChannelOption<T> extends ChannelOption<T> {
     public static final ChannelOption<ParityBit> PARITY_BIT   = option("PARITY_BIT");
     public static final ChannelOption<Integer>   READ_TIMEOUT = option("READ_TIMEOUT");
 
-    private static <O> ChannelOption<O> option(String secondNameComponent) {
+    private static <O> ChannelOption<O> option(String secondNameComponent)
+    {
         return valueOf(RxtxChannelOption.class, secondNameComponent);
     }
 
     @SuppressWarnings("deprecation")
-    private RxtxChannelOption() {
+    private RxtxChannelOption()
+    {
         super("rxtx-config");
     }
 }
