@@ -126,20 +126,17 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public static <T> ByteBuffer toNioBuffer(T struct) {
+    public static <T> ByteBuffer toNioBuffer(T struct)
+    {
         return toNioBuffer(struct.getClass(), struct);
     }
 
-    public static <T> ByteBuffer toNioBuffer(
-            Type root,
-            T    struct)
+    public static <T> ByteBuffer toNioBuffer(Type root, T struct)
     {
         return ByteBuffer.wrap(toBytes(root, struct));
     }
 
-    public static <T> void writeStream(
-            T            struct,
-            OutputStream outputStream) throws IOException
+    public static <T> void writeStream(T struct, OutputStream outputStream) throws IOException
     {
         outputStream.write(toBytes(struct.getClass(), struct));
     }
@@ -229,9 +226,7 @@ public final class StructSerializer implements Serializer {
         return structs;
     }
 
-    public <B extends Basic<?>> void writeBasic(
-            Object  basicValue,
-            ByteBuf writingBuf)
+    public <B extends Basic<?>> void writeBasic(Object  basicValue, ByteBuf writingBuf)
     {
         writingBuf.writeBytes(((B) (basicValue)).getBytes());
     }
