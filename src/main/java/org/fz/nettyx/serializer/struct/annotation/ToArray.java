@@ -38,7 +38,8 @@ public @interface ToArray {
 
     class ToArrayHandler implements StructFieldHandler<ToArray> {
         @Override
-        public boolean isSingleton() {
+        public boolean isSingleton()
+        {
             return true;
         }
 

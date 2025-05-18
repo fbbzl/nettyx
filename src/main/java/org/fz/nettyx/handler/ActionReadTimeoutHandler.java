@@ -33,10 +33,7 @@ public class ActionReadTimeoutHandler extends ReadTimeoutHandler {
      * @param timeoutSeconds the timeout seconds
      * @param timeoutAction  the timeout action
      */
-    public ActionReadTimeoutHandler(
-            int                    timeoutSeconds,
-            ChannelExceptionAction timeoutAction)
-    {
+    public ActionReadTimeoutHandler(int timeoutSeconds, ChannelExceptionAction timeoutAction) {
         this(timeoutSeconds, timeoutAction, true);
     }
 

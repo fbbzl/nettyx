@@ -20,12 +20,14 @@ import java.util.Map;
 @SuppressWarnings("deprecation")
 public abstract class MultiBtChannelTemplate<K> extends AbstractMultiChannelTemplate<K, BtChannel, BtChannelConfig> {
 
-    protected MultiBtChannelTemplate(Map<K, BtDeviceAddress> addressMap) {
+    protected MultiBtChannelTemplate(Map<K, BtDeviceAddress> addressMap)
+    {
         super(addressMap);
     }
 
     @Override
-    protected EventLoopGroup newEventLoopGroup() {
+    protected EventLoopGroup newEventLoopGroup()
+    {
         return new OioEventLoopGroup();
     }
 
