@@ -16,16 +16,19 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 @SuppressWarnings("deprecation")
 public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTemplate<BtChannel, BtChannelConfig> {
 
-    protected SingleBtChannelTemplate(String address) {
+    protected SingleBtChannelTemplate(String address)
+    {
         super(new BtDeviceAddress(address));
     }
 
-    protected SingleBtChannelTemplate(BtDeviceAddress address) {
+    protected SingleBtChannelTemplate(BtDeviceAddress address)
+    {
         super(address);
     }
 
     @Override
-    protected EventLoopGroup newEventLoopGroup() {
+    protected EventLoopGroup newEventLoopGroup()
+    {
         return new OioEventLoopGroup();
     }
 }

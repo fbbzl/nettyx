@@ -40,11 +40,13 @@ public final class CommPorts {
         }
     }
 
-    public static List<String> getLocalComPorts() {
+    public static List<String> getLocalComPorts()
+    {
         return getLocalComPorts(false);
     }
 
-    public static List<String> getLocalComPorts(boolean usbOnly) {
+    public static List<String> getLocalComPorts(boolean usbOnly)
+    {
         List<String> commPorts = GET_COM_PORT.get();
         // windows
         if (OS_INFO.isWindows()) return commPorts;
@@ -56,7 +58,8 @@ public final class CommPorts {
     }
 
     @SneakyThrows(IOException.class)
-    public static List<String> getComPortsWindows() {
+    public static List<String> getComPortsWindows()
+    {
         List<String>   ports   = new ArrayList<>();
         String         command = "reg query HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM";
         Process        process = Runtime.getRuntime().exec(command);
@@ -83,7 +86,8 @@ public final class CommPorts {
         return ports;
     }
 
-    public static List<String> getComPortsLinux() {
+    public static List<String> getComPortsLinux()
+    {
         try {
             String cmd        = "dmesg";
             String execResult = executeLinuxCmd(cmd);
@@ -108,7 +112,8 @@ public final class CommPorts {
         }
     }
 
-    public static String executeLinuxCmd(String cmd) throws IOException {
+    public static String executeLinuxCmd(String cmd) throws IOException
+    {
         Runtime run = Runtime.getRuntime();
         Process process;
         process = run.exec(cmd);

@@ -8,7 +8,8 @@ package org.fz.nettyx.exception;
 
 public class UnknownConfigException extends IllegalArgumentException {
 
-    public UnknownConfigException(Object config, Object value) {
+    public UnknownConfigException(Object config, Object value)
+    {
         super("unknown config: [" + config + "], value: " + value);
     }
 }

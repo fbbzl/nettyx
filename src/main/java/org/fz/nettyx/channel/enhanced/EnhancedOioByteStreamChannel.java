@@ -18,11 +18,13 @@ import io.netty.channel.oio.OioByteStreamChannel;
 public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel {
 
     @Override
-    protected ChannelFuture shutdownInput() {
+    protected ChannelFuture shutdownInput()
+    {
         return newSucceededFuture();
     }
 
-    protected EnhancedOioByteStreamChannel() {
+    protected EnhancedOioByteStreamChannel()
+    {
         super(null);
     }
 

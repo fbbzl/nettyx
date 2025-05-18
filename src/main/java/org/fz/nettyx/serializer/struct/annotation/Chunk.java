@@ -78,12 +78,14 @@ public @interface Chunk {
             if (padding > 0) writing.writeBytes(new byte[padding]);
         }
 
-        static void checkChunk(Class<?> fieldType) {
+        static void checkChunk(Class<?> fieldType)
+        {
             Throws.ifFalse(byte[].class.isAssignableFrom(fieldType),
                            () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
         }
 
-        static int computePadding(Chunk chunk, int valueLength) {
+        static int computePadding(Chunk chunk, int valueLength)
+        {
             int chunkLength = chunk.length(), padding = chunkLength - valueLength;
             Throws.ifTrue(padding < 0,
                           () -> new IllegalArgumentException("chunk buffer length is: [" + chunkLength + "], but got "

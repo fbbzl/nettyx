@@ -26,7 +26,8 @@ public class HexKit {
         }
     }
 
-    public static String encode(byte... bytes) {
+    public static String encode(byte... bytes)
+    {
         if (bytes == null) return null;
 
         int    lengthData   = bytes.length;
@@ -44,19 +45,23 @@ public class HexKit {
         return new String(encodedData);
     }
 
-    public static String encode(ByteBuf buf) {
+    public static String encode(ByteBuf buf)
+    {
         return ByteBufUtil.hexDump(buf);
     }
 
-    public static byte toByte(String hex) {
+    public static byte toByte(String hex)
+    {
         return (byte) Integer.parseInt(hex, 16);
     }
 
-    public static ByteBuf decodeBuf(String hex) {
+    public static ByteBuf decodeBuf(String hex)
+    {
         return Unpooled.wrappedBuffer(decode(hex));
     }
 
-    public static byte[] decode(String hex) {
+    public static byte[] decode(String hex)
+    {
         int    hexLen = hex.length();
         byte[] result;
         if (hexLen % 2 == 1) {
