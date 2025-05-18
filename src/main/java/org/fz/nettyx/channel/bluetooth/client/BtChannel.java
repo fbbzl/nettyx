@@ -35,22 +35,26 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     private InputStream      inputStream;
     private StreamConnection streamConnection;
 
-    public BtChannel() {
+    public BtChannel()
+    {
         config = new BtChannelConfig.DefaultBtChannelConfig(this);
     }
 
     @Override
-    protected AbstractUnsafe newUnsafe() {
+    protected AbstractUnsafe newUnsafe()
+    {
         return new BluetoothUnsafe();
     }
 
     @Override
-    public boolean isOpen() {
+    public boolean isOpen()
+    {
         return open;
     }
 
     @Override
-    protected boolean isInputShutdown() {
+    protected boolean isInputShutdown()
+    {
         return !isOpen();
     }
 
@@ -70,14 +74,13 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected void doBind(SocketAddress localAddress) {
+    protected void doBind(SocketAddress localAddress)
+    {
         throw new UnsupportedOperationException("doBind");
     }
 
     @Override
-    protected void doConnect(
-            SocketAddress remoteAddress,
-            SocketAddress localAddress) throws Exception
+    protected void doConnect(SocketAddress remoteAddress, SocketAddress localAddress) throws Exception
     {
         this.remoteAddress = (BtDeviceAddress) remoteAddress;
 
@@ -94,12 +97,14 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    protected SocketAddress localAddress0() {
+    protected SocketAddress localAddress0()
+    {
         return LOCAL_ADDRESS;
     }
 
     @Override
-    protected SocketAddress remoteAddress0() {
+    protected SocketAddress remoteAddress0()
+    {
         return remoteAddress;
     }
 
@@ -119,7 +124,8 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
     }
 
     @Override
-    public ChannelConfig config() {
+    public ChannelConfig config()
+    {
         return config;
     }
 

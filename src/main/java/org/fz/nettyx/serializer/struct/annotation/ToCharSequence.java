@@ -46,7 +46,8 @@ public @interface ToCharSequence {
 
     class ToStringHandler implements StructFieldHandler<ToCharSequence> {
         @Override
-        public boolean isSingleton() {
+        public boolean isSingleton()
+        {
             return true;
         }
 

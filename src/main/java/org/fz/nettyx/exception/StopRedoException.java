@@ -7,24 +7,32 @@ package org.fz.nettyx.exception;
  */
 public class StopRedoException extends RuntimeException {
 
-    public StopRedoException() {
+    public StopRedoException()
+    {
         super();
     }
 
-    public StopRedoException(String message) {
+    public StopRedoException(String message)
+    {
         super(message);
     }
 
-    public StopRedoException(String message, Throwable cause) {
+    public StopRedoException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public StopRedoException(Throwable cause) {
+    public StopRedoException(Throwable cause)
+    {
         super(cause);
     }
 
-    protected StopRedoException(String message, Throwable cause, boolean enableSuppression,
-                                boolean writableStackTrace) {
+    protected StopRedoException(
+            String    message,
+            Throwable cause,
+            boolean   enableSuppression,
+            boolean   writableStackTrace)
+    {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }
