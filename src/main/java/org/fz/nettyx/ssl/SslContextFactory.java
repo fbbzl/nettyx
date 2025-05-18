@@ -57,7 +57,7 @@ public class SslContextFactory {
      */
     public static final TwoWay TWOWAY;
 
-    static {
+    static{
         ONEWAY = new OneWay("TLS");
         TWOWAY = new TwoWay("TLS");
     }

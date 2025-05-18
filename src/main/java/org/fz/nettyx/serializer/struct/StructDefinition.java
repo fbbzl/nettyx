@@ -35,7 +35,8 @@ public record StructDefinition(
         Supplier<?> constructor,
         StructField[] fields) {
 
-    public StructDefinition(Class<?> clazz) {
+    public StructDefinition(Class<?> clazz)
+    {
         this(clazz,
              LambdaMetas.lambdaConstructor(clazz),
              Stream.of(getFields(clazz, StructHelper::legalStructField))
@@ -57,8 +58,7 @@ public record StructDefinition(
         Annotation                                                   annotation;
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
-        public StructField(
-                Field    field)
+        public StructField(Field field)
         {
             this(field,
                  typeSupplier(field),

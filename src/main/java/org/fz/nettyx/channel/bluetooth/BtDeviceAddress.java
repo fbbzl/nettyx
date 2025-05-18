@@ -12,21 +12,25 @@ public class BtDeviceAddress extends SocketAddress {
     private final String value;
     private final String friendlyName;
 
-    public BtDeviceAddress(String value, String friendlyName) {
+    public BtDeviceAddress(String value, String friendlyName)
+    {
         this.value        = value;
         this.friendlyName = friendlyName;
     }
 
-    public BtDeviceAddress(String value) {
+    public BtDeviceAddress(String value)
+    {
         this.value = this.friendlyName = value;
     }
 
-    public String value() {
+    public String value()
+    {
         return value;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return friendlyName;
     }
 

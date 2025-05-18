@@ -23,17 +23,20 @@ public class JscChannel extends SerialCommChannel {
     private final JscChannelConfig config;
     private       SerialPort       serialPort;
 
-    public JscChannel() {
+    public JscChannel()
+    {
         config = new JscChannelConfig.DefaultJscChannelConfig(this);
     }
 
     @Override
-    protected int available() {
+    protected int available()
+    {
         return serialPort.bytesAvailable();
     }
 
     @Override
-    public JscChannelConfig config() {
+    public JscChannelConfig config()
+    {
         return config;
     }
 

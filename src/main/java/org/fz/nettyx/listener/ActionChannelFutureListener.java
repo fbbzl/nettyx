@@ -26,7 +26,8 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
             whenDone;
 
     @Override
-    public final void operationComplete(ChannelFuture cf) {
+    public final void operationComplete(ChannelFuture cf)
+    {
         if (whenDone      != null && cf.isDone())        whenDone.act(this, cf);
         if (whenSuccess   != null && cf.isSuccess())     whenSuccess.act(this, cf);
         if (whenFailure   != null && cf.cause() != null) whenFailure.act(this, cf);
