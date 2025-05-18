@@ -14,7 +14,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class MessageEchoHandler extends ChannelInboundHandlerAdapter {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg)
+    {
         Channel channel = ctx.channel();
         if (channel.isWritable()) channel.writeAndFlush(msg);
     }

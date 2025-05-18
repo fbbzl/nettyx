@@ -45,16 +45,19 @@ public final class BtFinder {
             }
         };
 
-        public DeviceFinder(DiscoveryListener listener) {
+        public DeviceFinder(DiscoveryListener listener)
+        {
             this.listener = listener;
         }
 
-        public List<RemoteDevice> getDevices() {
+        public List<RemoteDevice> getDevices()
+        {
             return getDevices(device -> true);
         }
 
         @SneakyThrows({ InterruptedException.class })
-        public List<RemoteDevice> getDevices(Predicate<RemoteDevice> condition) {
+        public List<RemoteDevice> getDevices(Predicate<RemoteDevice> condition)
+        {
             try {
                 devices.clear();
 
@@ -85,7 +88,8 @@ public final class BtFinder {
         private final        List<String>      services        = new ArrayList<>(32);
         private              DiscoveryListener listener        = new DiscoveryListenerAdapter() {
             @Override
-            public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+            public void servicesDiscovered(int transID, ServiceRecord[] servRecord)
+            {
                 for (ServiceRecord serviceRecord : servRecord) {
                     String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
                     if (CharSequenceUtil.isEmpty(url)) {
@@ -96,22 +100,26 @@ public final class BtFinder {
             }
 
             @Override
-            public void serviceSearchCompleted(int transID, int respCode) {
+            public void serviceSearchCompleted(int transID, int respCode)
+            {
                 synchronized (completedTag) {
                     completedTag.notifyAll();
                 }
             }
         };
 
-        public ServiceFinder(DiscoveryListener listener) {
+        public ServiceFinder(DiscoveryListener listener)
+        {
             this.listener = listener;
         }
 
-        public List<String> getServices(RemoteDevice btDevice, String serviceUUID) throws IOException, InterruptedException {
+        public List<String> getServices(RemoteDevice btDevice, String serviceUUID) throws IOException, InterruptedException
+        {
             return getServices(btDevice, serviceUUID, s -> true);
         }
 
-        public List<String> getServices(RemoteDevice btDevice, String serviceUUID, Predicate<String> condition) throws IOException, InterruptedException {
+        public List<String> getServices(RemoteDevice btDevice, String serviceUUID, Predicate<String> condition) throws IOException, InterruptedException
+        {
             UUID[] searchUuidSet = new UUID[]{ new UUID(serviceUUID, false) };
 
             synchronized (completedTag) {

@@ -49,7 +49,10 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
         }
 
         @Override
-        public void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out)
+        public void encode(
+                ChannelHandlerContext ctx,
+                ByteBuf               msg,
+                ByteBuf               out)
         {
             out.writeBytes(Unpooled.wrappedBuffer(msg, delimiter.duplicate()));
         }

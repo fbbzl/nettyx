@@ -21,12 +21,14 @@ public final class JscChannelOption<T> extends ChannelOption<T> {
     public static final ChannelOption<JscChannelConfig.ParityBit> PARITY_BIT   = option("PARITY_BIT");
     public static final ChannelOption<Integer>                    READ_TIMEOUT = option("READ_TIMEOUT");
 
-    private static <O> ChannelOption<O> option(String secondNameComponent) {
+    private static <O> ChannelOption<O> option(String secondNameComponent)
+    {
         return valueOf(JscChannelOption.class, secondNameComponent);
     }
 
     @SuppressWarnings("deprecation")
-    private JscChannelOption() {
+    private JscChannelOption()
+    {
         super("jsc-config");
     }
 }
