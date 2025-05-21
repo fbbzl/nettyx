@@ -126,7 +126,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     }
 
-    static boolean equalsContent(byte[]  bytes, ByteBuf buf)
+    static boolean equalsContent(byte[] bytes, ByteBuf buf)
     {
         if (bytes.length != buf.readableBytes()) {
             return false;
