@@ -1,12 +1,17 @@
 package escape;
 
+import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMapping;
+import org.fz.nettyx.util.HexKit;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static io.netty.buffer.ByteBufUtil.getBytes;
+
 
 /**
  * @author fengbinbin
@@ -14,9 +19,28 @@ import static io.netty.buffer.ByteBufUtil.getBytes;
  * @since 2025/5/21 10:38
  */
 public class NettyxEscape {
+    static final Function<EscapeMapping, ByteBuf>
+            REAL        = EscapeMapping::getReal,
+            REPLACEMENT = EscapeMapping::getReplacement;
 
-    static boolean containsContent(ByteBuf buf, ByteBuf part)
-    {
+    public static void main(String[] args) {
+        ByteBuf in = HexKit.decodeBuf(
+                "41414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141417d5e4141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141417e41414141");
+
+        EscapeMapping[] escapeMappings = { EscapeMapping.mapHex("7e", "7d5e") };
+
+        StopWatch stopWatch = StopWatch.create("");
+        stopWatch.start("escape");
+        for (int i = 0; i < 5_000_000; i++) {
+            ByteBuf decode = doEscape(in.duplicate(), escapeMappings, EscapeMapping::getReal, EscapeMapping::getReplacement);
+            decode.release();
+        }
+        stopWatch.stop();
+
+        Console.log("Nettyx " + stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+    }
+
+    static boolean containsContent(ByteBuf buf, ByteBuf part) {
         if (buf.readableBytes() < part.readableBytes()) {
             return false;
         }
@@ -35,8 +59,7 @@ public class NettyxEscape {
         return false;
     }
 
-    static boolean equalsContent(byte[]  bytes, ByteBuf buf)
-    {
+    static boolean equalsContent(byte[] bytes, ByteBuf buf) {
         if (bytes.length != buf.readableBytes()) {
             return false;
         }
@@ -50,11 +73,10 @@ public class NettyxEscape {
         return true;
     }
 
-    static ByteBuf doEscape(ByteBuf                          msgBuf,
-                            EscapeMapping[]                  mappings,
+    static ByteBuf doEscape(ByteBuf msgBuf,
+                            EscapeMapping[] mappings,
                             Function<EscapeMapping, ByteBuf> targetFn,
-                            Function<EscapeMapping, ByteBuf> replacementFn)
-    {
+                            Function<EscapeMapping, ByteBuf> replacementFn) {
         if (ArrayUtil.isEmpty(mappings)) return msgBuf;
 
         final ByteBuf escaped = msgBuf.alloc().buffer();
@@ -82,24 +104,23 @@ public class NettyxEscape {
 
     private static boolean overlook(
             ByteBuf msgBuf,
-            int     tarLength,
-            ByteBuf target)
-    {
+            int tarLength,
+            ByteBuf target) {
 
         return switch (tarLength) {
             case 1, 2 -> hasSimilar(msgBuf, target);
-            default   -> hasSimilar(msgBuf, target) && equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
+            default -> hasSimilar(msgBuf, target) && equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength),
+                                                                   target);
         };
     }
 
 
-    private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target)
-    {
+    private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
         int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
 
         boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
         if (tarLength == 1 || !sameHead) return sameHead;
-        else                             return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
+        else return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
     }
 
 }
