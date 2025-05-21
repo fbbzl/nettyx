@@ -25,4 +25,8 @@ public class cppulong8 extends culong8 {
     public cppulong8(ByteBuf buf) {
         super(buf);
     }
+
+    public static cppulong8 of(BigInteger value) {
+        return new cppulong8(value);
+    }
 }

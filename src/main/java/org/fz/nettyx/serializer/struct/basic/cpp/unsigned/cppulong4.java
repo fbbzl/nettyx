@@ -22,4 +22,8 @@ public class cppulong4 extends cppuint {
     public cppulong4(ByteBuf buf) {
         super(buf);
     }
+
+    public static cppulong4 of(Long value) {
+        return new cppulong4(value);
+    }
 }

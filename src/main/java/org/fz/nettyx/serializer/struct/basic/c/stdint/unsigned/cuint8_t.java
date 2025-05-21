@@ -23,4 +23,8 @@ public class cuint8_t extends cuchar {
     public cuint8_t(ByteBuf buf) {
         super(buf);
     }
+
+    public static cuint8_t of(Integer value) {
+        return new cuint8_t(value);
+    }
 }
