@@ -2,13 +2,16 @@ package escape;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.fz.nettyx.util.HexKit;
+
+import java.util.Arrays;
 
 public class AiKimiEscape {
 
     // 定义分隔符（多字节）
-    private static final byte[] DELIMITER = new byte[]{0x01, 0x02};
+    private static final byte[] DELIMITER = new byte[]{0x7d, 0x5e};
     // 定义转义字符（多字节）
-    private static final byte[] ESCAPE_CHAR = new byte[]{0x02, 0x03};
+    private static final byte[] ESCAPE_CHAR = new byte[]{0x7e};
 
     // 检查当前索引位置是否匹配指定的字节序列
     private static boolean matches(ByteBuf buffer, int index, byte[] sequence) {
@@ -76,31 +79,28 @@ public class AiKimiEscape {
 
     public static void main(String[] args) {
         // 生成 200 字节的测试消息
-        byte[] testMessageBytes = new byte[200];
-        for (int i = 0; i < testMessageBytes.length; i++) {
-            testMessageBytes[i] = (byte) (i % 256); // 随机填充数据
-        }
+        byte[] testMessageBytes = new byte[105];
+        Arrays.fill(testMessageBytes, (byte)65);
 
         // 插入一些分隔符和转义字符
         System.arraycopy(DELIMITER, 0, testMessageBytes, 50, DELIMITER.length);
         System.arraycopy(ESCAPE_CHAR, 0, testMessageBytes, 100, ESCAPE_CHAR.length);
 
         ByteBuf testMessage = Unpooled.copiedBuffer(testMessageBytes);
+        String  encode      = HexKit.encode(testMessage);
 
         // 测试 100 万次转义和反转义的耗时
         long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < 1_000_000; i++) {
+        for (int i = 0; i < 5_000_000; i++) {
             ByteBuf escapedMessage = escape(testMessage.duplicate());
-            ByteBuf unescapedMessage = unescape(escapedMessage);
-            unescapedMessage.release();
             escapedMessage.release();
         }
 
         long endTime = System.currentTimeMillis();
         long duration = endTime - startTime;
 
-        System.out.println("Total time for 1,000,000 iterations: " + duration + " ms");
+        System.out.println("Ai Kimi Total time for 1,000,000 iterations: " + duration + " ms");
 
 
         // 释放 ByteBuf
