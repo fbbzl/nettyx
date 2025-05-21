@@ -23,4 +23,8 @@ public class cpplonglong extends cpplong8 {
         super(buf);
     }
 
+    public static cpplonglong of(Long value) {
+        return new cpplonglong(value);
+    }
+
 }

@@ -35,6 +35,10 @@ public class clong8 extends CBasic<Long> {
         super(buf, 8);
     }
 
+    public static clong8 of(Long value) {
+        return new clong8(value);
+    }
+
     @Override
     protected ByteBuf toByteBuf(Long value, int size) {
         return Unpooled.buffer(size).writeLongLE(value);
