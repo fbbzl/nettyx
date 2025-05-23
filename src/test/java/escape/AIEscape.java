@@ -120,8 +120,7 @@ public class AIEscape {
 
         for (int i = 0; i < 5_000_000; i++) {
             ByteBuf escapedMessage = escapeTool.escape(testMessage.duplicate());
-            ByteBuf unescapedMessage = escapeTool.unescape(escapedMessage);
-            unescapedMessage.release();
+
             escapedMessage.release();
         }
 
