@@ -41,16 +41,20 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     @Getter
-    @RequiredArgsConstructor
     @SuppressWarnings("all")
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
         private final EscapeMap map;
 
+        public EscapeDecoder(EscapeMap map)
+        {
+            this.map = map.getInverse();
+        }
+
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
         {
-            ByteBuf decode = doEscape(in, map.getInverse());
+            ByteBuf decode = doEscape(in, map);
             out.add(decode);
         }
     }
@@ -75,24 +79,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 encoded.release();
             }
         }
-    }
-
-    /**
-     * if buf contains part-buf
-     * @param buf the source buf
-     * @param part the part buf
-     */
-    static boolean containsContent(byte[] buf, byte[] part) {
-        if (part.length > buf.length) return false;
-
-        for (int i = 0; i <= buf.length - part.length; i++) {
-            int j;
-            for (j = 0; j < part.length; j++) {
-                if (buf[i + j] != part[j]) break;
-            }
-            if (j == part.length) return true;
-        }
-        return false;
     }
 
     static boolean equalsContent(byte[] bytes, byte[] buf)
@@ -165,7 +151,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      */
     public static class EscapeMap implements Map<byte[], byte[]> {
         @Delegate
-        private final BiMap<byte[], byte[]> biMap = new BiMap<>(new HashMap<>());
+        private final BiMap<byte[], byte[]> biMap;
+
+        public EscapeMap() {
+            this.biMap = new BiMap<>(new HashMap<>());
+        }
+
+        public EscapeMap(Map<byte[], byte[]> map) {
+            this.biMap = new BiMap<>(map);
+        }
 
         public void putHex(String realHex, String replacementHex) {
             putIfAbsent(HexKit.decode(realHex), HexKit.decode(replacementHex));
@@ -177,6 +171,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                    replacementBytes = new byte[replacement.readableBytes()];
             putIfAbsent(realBytes, replacementBytes);
             checkEscapeMap();
+        }
+
+        public EscapeMap getInverse() {
+            return new EscapeMap(biMap.getInverse());
         }
 
         void checkEscapeMap()
@@ -199,8 +197,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             // 3 check if replacements contains the reals
             for (byte[] real : reals) {
                 for (byte[] replacement : replacements) {
-                    Throws.ifTrue(containsContent(replacement, real),
-                                  () -> "do not let the replacements: [" + Arrays.toString(replacement) + "] contain the reals: [" + Arrays.toString(real) + "]");
+                    Throws.ifTrue(equalsContent(replacement, real),
+                                  () -> "do not let the replacements: " + Arrays.toString(replacement) + " same as the reals: " + Arrays.toString(real));
                 }
             }
         }
