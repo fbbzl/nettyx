@@ -8,6 +8,7 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
@@ -40,15 +41,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     @Getter
+    @RequiredArgsConstructor
     @SuppressWarnings("all")
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
         private final EscapeMap map;
-
-        protected EscapeDecoder(EscapeMap map)
-        {
-            this.map = map;
-        }
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
@@ -59,15 +56,11 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     @Getter
+    @RequiredArgsConstructor
     @SuppressWarnings("all")
     public static class EscapeEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final EscapeMap map;
-
-        protected EscapeEncoder(EscapeMap map)
-        {
-            this.map = map;
-        }
 
         @Override
         protected void encode(
