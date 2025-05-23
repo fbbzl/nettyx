@@ -23,15 +23,15 @@ import static io.netty.buffer.ByteBufUtil.getBytes;
 public class NettyxEscape {
 
     public static void main(String[] args) {
-        ByteBuf   in        = Unpooled.copiedBuffer(HexKit.decode("01027e047d5e0607"));
+        ByteBuf   in        = Unpooled.copiedBuffer(HexKit.decode("07e27e047d5e0607"));
         EscapeMap escapeMap =  new EscapeMap();
-        escapeMap.putHex("7e", "7e5e");
+        escapeMap.putHex("7e", "7d5e");
 
         StopWatch stopWatch = StopWatch.create("");
         stopWatch.start("escape");
-        for (int i = 0; i < 10_000_000; i++) {
-            ByteBuf decode = doEscape(in.duplicate(), escapeMap);
-
+        for (int i = 0; i < 1; i++) {
+            ByteBuf decode = doEscape(in.duplicate(), escapeMap.getInverse());
+            System.err.println(HexKit.encode(decode));
             decode.release();
         }
         stopWatch.stop();
