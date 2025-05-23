@@ -10,7 +10,6 @@ import org.fz.nettyx.codec.StartEndFlagFrameCodec;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.MessageEchoHandler;
 
-import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.logging.ByteBufFormat.HEX_DUMP;
 
 
@@ -31,7 +30,7 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
         EscapeMap escapeMap = new EscapeMap();
         escapeMap.putHex("7e", "7d5e");
         channel.pipeline().addLast(
-                new StartEndFlagFrameCodec(1024 * 1024, true, wrappedBuffer(new byte[]{ (byte) 0x7e }))
+                new StartEndFlagFrameCodec(1024 * 1024, true, "7e")
                 , new EscapeCodec(escapeMap)
                 , new UserCodec()
                 , new MessageEchoHandler()
