@@ -1,6 +1,7 @@
 package org.fz.nettyx.codec;
 
 import cn.hutool.core.map.BiMap;
+import cn.hutool.core.util.PrimitiveArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
@@ -46,7 +47,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         protected EscapeDecoder(EscapeMap map)
         {
-            checkEscapeMap(map);
             this.map = map;
         }
 
@@ -66,7 +66,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         protected EscapeEncoder(EscapeMap map)
         {
-            checkEscapeMap(map);
             this.map = map;
         }
 
@@ -83,33 +82,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 encoded.release();
             }
         }
-    }
-
-    static void checkEscapeMap(EscapeMap map)
-    {
-        // 1 check if byte buf is valid
-        for (Entry<byte[], byte[]> entry : map.entrySet()) {
-            byte[] real = entry.getKey(), replacement = entry.getKey();
-            Throws.ifTrue(isEmpty(real) || isEmpty(replacement),
-                          () -> "reals or replacements contains invalid buf, please check");
-        }
-
-        // 2 check if intersection is not empty
-        List<byte[]>
-                reals        = new ArrayList<>(map.keySet()),
-                replacements = new ArrayList<>(map.values());
-
-        Collection<byte[]> intersection = intersection(reals, replacements);
-        Throws.ifNotEmpty(intersection, () -> "do not let the reals intersect with the replacements, please check");
-
-        // 3 check if replacements contains the reals
-        for (byte[] real : reals) {
-            for (byte[] replacement : replacements) {
-                Throws.ifTrue(containsContent(replacement, real),
-                              () -> "do not let the replacements: [" + Arrays.toString(replacement) + "] contain the reals: [" + Arrays.toString(real) + "]");
-            }
-        }
-
     }
 
     /**
@@ -204,13 +176,40 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         public void putHex(String realHex, String replacementHex) {
             putIfAbsent(HexKit.decode(realHex), HexKit.decode(replacementHex));
+            checkEscapeMap();
         }
 
         public void putBuf(ByteBuf real, ByteBuf replacement) {
             byte[] realBytes        = new byte[real.readableBytes()],
                    replacementBytes = new byte[replacement.readableBytes()];
-
             putIfAbsent(realBytes, replacementBytes);
+            checkEscapeMap();
+        }
+
+        void checkEscapeMap()
+        {
+            // 1 check if byte buf is valid
+            for (Entry<byte[], byte[]> entry : this.entrySet()) {
+                byte[] real = entry.getKey(), replacement = entry.getKey();
+                Throws.ifTrue(PrimitiveArrayUtil.isEmpty(real) || PrimitiveArrayUtil.isEmpty(replacement),
+                              () -> "reals or replacements contains invalid buf, please check");
+            }
+
+            // 2 check if intersection is not empty
+            List<byte[]>
+                    reals        = new ArrayList<>(this.keySet()),
+                    replacements = new ArrayList<>(this.values());
+
+            Collection<byte[]> intersection = intersection(reals, replacements);
+            Throws.ifNotEmpty(intersection, () -> "do not let the reals intersect with the replacements, please check");
+
+            // 3 check if replacements contains the reals
+            for (byte[] real : reals) {
+                for (byte[] replacement : replacements) {
+                    Throws.ifTrue(containsContent(replacement, real),
+                                  () -> "do not let the replacements: [" + Arrays.toString(replacement) + "] contain the reals: [" + Arrays.toString(real) + "]");
+                }
+            }
         }
     }
 }
