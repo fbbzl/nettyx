@@ -38,6 +38,10 @@ public class culong8 extends CBasic<BigInteger> {
         super(buf, 8);
     }
 
+    public static culong8 of(BigInteger value) {
+        return new culong8(value);
+    }
+
     @Override
     public boolean hasSinged() {
         return false;

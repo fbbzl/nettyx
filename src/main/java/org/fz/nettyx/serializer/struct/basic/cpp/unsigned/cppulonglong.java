@@ -34,4 +34,9 @@ public class cppulonglong extends cppulong8 {
     public cppulonglong(ByteBuf buf) {
         super(buf);
     }
+
+    public static cppulonglong of(BigInteger value) {
+        return new cppulonglong(value);
+    }
+
 }

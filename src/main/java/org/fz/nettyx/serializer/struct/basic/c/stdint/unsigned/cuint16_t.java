@@ -23,4 +23,8 @@ public class cuint16_t extends cushort {
     public cuint16_t(ByteBuf buf) {
         super(buf);
     }
+
+    public static cuint16_t of(Integer value) {
+        return new cuint16_t(value);
+    }
 }

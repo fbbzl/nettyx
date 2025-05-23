@@ -23,4 +23,8 @@ public class cint64_t extends clong8 {
     public cint64_t(ByteBuf buf) {
         super(buf);
     }
+
+    public static cint64_t of(Long value) {
+        return new cint64_t(value);
+    }
 }

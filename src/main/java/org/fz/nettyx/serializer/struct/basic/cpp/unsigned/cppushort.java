@@ -23,4 +23,8 @@ public class cppushort extends cushort {
     public cppushort(ByteBuf buf) {
         super(buf);
     }
+
+    public static cppushort of(Integer value) {
+        return new cppushort(value);
+    }
 }

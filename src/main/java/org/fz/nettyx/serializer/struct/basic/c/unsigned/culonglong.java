@@ -34,4 +34,8 @@ public class culonglong extends culong8 {
     public culonglong(ByteBuf buf) {
         super(buf);
     }
+
+    public static culonglong of(BigInteger value) {
+        return new culonglong(value);
+    }
 }
