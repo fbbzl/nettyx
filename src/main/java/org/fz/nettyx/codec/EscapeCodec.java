@@ -41,16 +41,20 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     }
 
     @Getter
-    @RequiredArgsConstructor
     @SuppressWarnings("all")
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
         private final EscapeMap map;
 
+        public EscapeDecoder(EscapeMap map)
+        {
+            this.map = map.getInverse();
+        }
+
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
         {
-            ByteBuf decode = doEscape(in, map.getInverse());
+            ByteBuf decode = doEscape(in, map);
             out.add(decode);
         }
     }
@@ -165,7 +169,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
      */
     public static class EscapeMap implements Map<byte[], byte[]> {
         @Delegate
-        private final BiMap<byte[], byte[]> biMap = new BiMap<>(new HashMap<>());
+        private final BiMap<byte[], byte[]> biMap;
+
+        public EscapeMap() {
+            this.biMap = new BiMap<>(new HashMap<>());
+        }
+
+        public EscapeMap(Map<byte[], byte[]> map) {
+            this.biMap = new BiMap<>(map);
+        }
 
         public void putHex(String realHex, String replacementHex) {
             putIfAbsent(HexKit.decode(realHex), HexKit.decode(replacementHex));
@@ -177,6 +189,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                    replacementBytes = new byte[replacement.readableBytes()];
             putIfAbsent(realBytes, replacementBytes);
             checkEscapeMap();
+        }
+
+        public EscapeMap getInverse() {
+            return new EscapeMap(biMap.getInverse());
         }
 
         void checkEscapeMap()
