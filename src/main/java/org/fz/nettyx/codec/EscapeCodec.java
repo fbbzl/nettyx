@@ -81,24 +81,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    /**
-     * if buf contains part-buf
-     * @param buf the source buf
-     * @param part the part buf
-     */
-    static boolean containsContent(byte[] buf, byte[] part) {
-        if (part.length > buf.length) return false;
-
-        for (int i = 0; i <= buf.length - part.length; i++) {
-            int j;
-            for (j = 0; j < part.length; j++) {
-                if (buf[i + j] != part[j]) break;
-            }
-            if (j == part.length) return true;
-        }
-        return false;
-    }
-
     static boolean equalsContent(byte[] bytes, byte[] buf)
     {
         if (bytes.length != buf.length) {
@@ -215,8 +197,8 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             // 3 check if replacements contains the reals
             for (byte[] real : reals) {
                 for (byte[] replacement : replacements) {
-                    Throws.ifTrue(containsContent(replacement, real),
-                                  () -> "do not let the replacements: [" + Arrays.toString(replacement) + "] contain the reals: [" + Arrays.toString(real) + "]");
+                    Throws.ifTrue(equalsContent(replacement, real),
+                                  () -> "do not let the replacements: " + Arrays.toString(replacement) + " same as the reals: " + Arrays.toString(real));
                 }
             }
         }

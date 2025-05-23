@@ -26,7 +26,7 @@ public class NettyxEscape {
         ByteBuf   in        = Unpooled.copiedBuffer(HexKit.decode("7e27e04060707d"));
         EscapeMap escapeMap =  new EscapeMap();
         escapeMap.putHex("7e", "7d5e");
-        escapeMap.putHex("7d", "7d5d");
+        escapeMap.putHex("7d", "7e");
 
         StopWatch stopWatch = StopWatch.create("");
         stopWatch.start("escape");
