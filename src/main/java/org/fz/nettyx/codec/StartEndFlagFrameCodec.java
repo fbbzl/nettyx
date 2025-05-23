@@ -52,7 +52,8 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
             super(maxFrameLength, true, wrappedBuffer(startEndSameFlag));
 
             this.stripStartEndDelimiter = stripDelimiter;
-            this.startFlag              = this.endFlag = startEndSameFlag;
+
+            this.startFlag = this.endFlag = startEndSameFlag;
         }
 
         public StartEndFlagFrameDecoder(int maxFrameLength, boolean stripDelimiter, byte[] startFlag, byte[] endFlag) {
