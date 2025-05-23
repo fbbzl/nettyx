@@ -2,13 +2,16 @@ package escape;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
-import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
+import org.fz.nettyx.util.HexKit;
 
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import static cn.hutool.core.util.ArrayUtil.isEmpty;
 import static io.netty.buffer.ByteBufUtil.getBytes;
 
 
@@ -20,13 +23,15 @@ import static io.netty.buffer.ByteBufUtil.getBytes;
 public class NettyxEscape {
 
     public static void main(String[] args) {
-        ByteBuf   in        = Unpooled.copiedBuffer(new byte[]{ 0x01, 0x02, 0x7E, 0x04, 0x7D, 0x5E, 0x06, 0x07});
-        EscapeMap escapeMap =  EscapeMap.mapHex("7e", "7d5e") ;
+        ByteBuf   in        = Unpooled.copiedBuffer(HexKit.decode("01027e047d5e0607"));
+        EscapeMap escapeMap =  new EscapeMap();
+        escapeMap.putHex("7e", "7e5e");
 
         StopWatch stopWatch = StopWatch.create("");
         stopWatch.start("escape");
-        for (int i = 0; i < 5_000_000; i++) {
+        for (int i = 0; i < 10_000_000; i++) {
             ByteBuf decode = doEscape(in.duplicate(), escapeMap);
+
             decode.release();
         }
         stopWatch.stop();
@@ -34,32 +39,14 @@ public class NettyxEscape {
         Console.log("Nettyx " + stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
     }
 
-    static boolean containsContent(ByteBuf buf, ByteBuf part) {
-        if (buf.readableBytes() < part.readableBytes()) {
-            return false;
-        }
-
-        byte[] sample = new byte[part.readableBytes()];
-        for (int i = 0; i < buf.readableBytes(); i++) {
-            if (buf.readableBytes() - i < sample.length) {
-                return false;
-            }
-            buf.getBytes(i, sample);
-            if (equalsContent(sample, part)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    static boolean equalsContent(byte[] bytes, ByteBuf buf) {
-        if (bytes.length != buf.readableBytes()) {
+    static boolean equalsContent(byte[] bytes, byte[] buf)
+    {
+        if (bytes.length != buf.length) {
             return false;
         }
 
         for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] != buf.getByte(i)) {
+            if (bytes[i] != buf[i]) {
                 return false;
             }
         }
@@ -67,23 +54,23 @@ public class NettyxEscape {
         return true;
     }
 
-    static ByteBuf doEscape(ByteBuf msgBuf,
-                            EscapeMap[] mappings,) {
-        if (ArrayUtil.isEmpty(mappings)) return msgBuf;
+    static ByteBuf doEscape(ByteBuf msgBuf, Map<byte[], byte[]> map)
+    {
+        if (isEmpty(map)) return msgBuf;
 
-        final ByteBuf escaped = msgBuf.alloc().buffer();
+        final ByteBuf escaped = Unpooled.buffer();
         while (msgBuf.readableBytes() > 0) {
             boolean match = false;
-            for (EscapeMap mapping : mappings) {
-                ByteBuf target    = targetFn.apply(mapping);
-                int     tarLength = target.readableBytes();
+            for (Entry<byte[], byte[]> entry : map.entrySet()) {
+                byte[] target    = entry.getKey();
+                int    tarLength = target.length;
 
                 if (msgBuf.readableBytes() >= tarLength) {
-                    match = overlook(msgBuf, tarLength, target);
+                    match = overlook(msgBuf, target, tarLength);
 
                     if (match) {
                         msgBuf.skipBytes(tarLength);
-                        escaped.writeBytes(replacementFn.apply(mapping).duplicate());
+                        escaped.writeBytes(entry.getValue());
                         // only support one to one mapping
                         break;
                     }
@@ -96,23 +83,26 @@ public class NettyxEscape {
 
     private static boolean overlook(
             ByteBuf msgBuf,
-            int tarLength,
-            ByteBuf target) {
-
+            byte[]  target,
+            int     tarLength)
+    {
         return switch (tarLength) {
-            case 1, 2 -> hasSimilar(msgBuf, target);
-            default -> hasSimilar(msgBuf, target) && equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength),
-                                                                   target);
+            case 1, 2 -> hasSimilar(msgBuf, target, tarLength);
+            default   -> hasSimilar(msgBuf, target, tarLength) && equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
         };
     }
 
+    private static boolean hasSimilar(
+            ByteBuf msgBuf,
+            byte[]  target,
+            int     tarLength)
+    {
+        int readerIndex = msgBuf.readerIndex();
 
-    private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target) {
-        int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
-
-        boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
+        boolean sameHead = msgBuf.getByte(readerIndex) == target[0];
         if (tarLength == 1 || !sameHead) return sameHead;
-        else return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
+        else                             return msgBuf.getByte(readerIndex + tarLength - 1) == target[tarLength - 1];
     }
+
 
 }
