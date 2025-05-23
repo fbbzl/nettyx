@@ -1,6 +1,6 @@
 package org.fz.nettyx.codec;
 
-import cn.hutool.core.lang.Pair;
+import cn.hutool.core.map.BiMap;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -9,22 +9,19 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
 import org.fz.nettyx.util.HexKit;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import static cn.hutool.core.collection.CollUtil.intersection;
 import static io.netty.buffer.ByteBufUtil.getBytes;
-import static java.util.stream.Collectors.toList;
-import static org.fz.nettyx.codec.EscapeCodec.EscapeMapping.REAL;
-import static org.fz.nettyx.codec.EscapeCodec.EscapeMapping.REPLACEMENT;
 
 /**
  * used to escape messages some sensitive characters can be replaced
@@ -36,17 +33,17 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     public EscapeCodec(ByteBuf real, ByteBuf replacement)
     {
-        this(new EscapeDecoder(EscapeMapping.map(real, replacement)), new EscapeEncoder(EscapeMapping.map(real, replacement)));
+        this(new EscapeDecoder(EscapeMap.map(real, replacement)), new EscapeEncoder(EscapeMap.map(real, replacement)));
     }
 
     public EscapeCodec(String realHex, String replacementHex)
     {
-        this(new EscapeDecoder(EscapeMapping.mapHex(realHex, replacementHex)), new EscapeEncoder(EscapeMapping.mapHex(realHex, replacementHex)));
+        this(new EscapeDecoder(EscapeMap.mapHex(realHex, replacementHex)), new EscapeEncoder(EscapeMap.mapHex(realHex, replacementHex)));
     }
 
-    public EscapeCodec(EscapeMapping... realsReplacements)
+    public EscapeCodec(EscapeMap map)
     {
-        this(new EscapeDecoder(realsReplacements), new EscapeEncoder(realsReplacements));
+        this(new EscapeDecoder(map), new EscapeEncoder(map));
     }
 
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder)
@@ -58,18 +55,18 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     @SuppressWarnings("all")
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
-        private final EscapeMapping[] mappings;
+        private final EscapeMap map;
 
-        protected EscapeDecoder(EscapeMapping... mappings)
+        protected EscapeDecoder(EscapeMap map)
         {
-            checkMappings(mappings);
-            this.mappings = mappings;
+            checkEscapeMap(map);
+            this.map = map;
         }
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
         {
-            ByteBuf decode = doEscape(in, mappings, REPLACEMENT, REAL);
+            ByteBuf decode = doEscape(in, map.getInverse());
             out.add(decode);
         }
     }
@@ -78,12 +75,12 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     @SuppressWarnings("all")
     public static class EscapeEncoder extends MessageToByteEncoder<ByteBuf> {
 
-        private final EscapeMapping[] mappings;
+        private final EscapeMap map;
 
-        protected EscapeEncoder(EscapeMapping... mappings)
+        protected EscapeEncoder(EscapeMap map)
         {
-            checkMappings(mappings);
-            this.mappings = mappings;
+            checkEscapeMap(map);
+            this.map = map;
         }
 
         @Override
@@ -92,7 +89,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 ByteBuf               msg,
                 ByteBuf               out)
         {
-            ByteBuf encoded = doEscape(msg, mappings, REAL, REPLACEMENT);
+            ByteBuf encoded = doEscape(msg, map);
             try {
                 out.writeBytes(encoded);
             } finally {
@@ -101,18 +98,19 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    static void checkMappings(EscapeMapping[] mappings)
+    static void checkEscapeMap(EscapeMap map)
     {
         // 1 check if byte buf is valid
-        for (EscapeMapping mapping : mappings) {
-            ByteBuf real = mapping.getReal(), replacement = mapping.getReplacement();
+        for (Entry<ByteBuf, ByteBuf> entry : map.entrySet()) {
+            ByteBuf real = entry.getKey(), replacement = entry.getKey();
             Throws.ifTrue(invalid(real) || invalid(replacement),
                           () -> "reals or replacements contains invalid buf, please check");
         }
 
         // 2 check if intersection is not empty
-        List<ByteBuf> reals = Arrays.stream(mappings).map(REAL).collect(toList()),
-                replacements = Arrays.stream(mappings).map(REPLACEMENT).collect(toList());
+        List<ByteBuf>
+                reals        = new ArrayList<>(map.keySet()),
+                replacements = new ArrayList<>(map.values());
         Collection<ByteBuf> intersection = intersection(reals, replacements);
         Throws.ifNotEmpty(intersection, () -> "do not let the reals intersect with the replacements, please check");
 
@@ -140,7 +138,6 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         return true;
     }
-
 
     static boolean invalid(ByteBuf buffer)
     {
@@ -172,18 +169,15 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         return false;
     }
 
-    static ByteBuf doEscape(ByteBuf                          msgBuf,
-                            EscapeMapping[]                  mappings,
-                            Function<EscapeMapping, ByteBuf> targetFn,
-                            Function<EscapeMapping, ByteBuf> replacementFn)
+    static ByteBuf doEscape(ByteBuf msgBuf, Map<ByteBuf, ByteBuf> map)
     {
-        if (ArrayUtil.isEmpty(mappings)) return msgBuf;
+        if (ArrayUtil.isEmpty(map)) return msgBuf;
 
         final ByteBuf escaped = msgBuf.alloc().buffer();
         while (msgBuf.readableBytes() > 0) {
             boolean match = false;
-            for (EscapeMapping mapping : mappings) {
-                ByteBuf target    = targetFn.apply(mapping);
+            for (Entry<ByteBuf, ByteBuf> entry : map.entrySet()) {
+                ByteBuf target    = entry.getKey();
                 int     tarLength = target.readableBytes();
 
                 if (msgBuf.readableBytes() >= tarLength) {
@@ -191,7 +185,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
                     if (match) {
                         msgBuf.skipBytes(tarLength);
-                        escaped.writeBytes(replacementFn.apply(mapping).duplicate());
+                        escaped.writeBytes(entry.getValue().duplicate());
                         // only support one to one mapping
                         break;
                     }
@@ -225,39 +219,28 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         else                             return msgBuf.getByte(readerIndex + tarLength - 1) == target.getByte(tarLength - 1);
     }
 
-    @RequiredArgsConstructor
-    public static class EscapeMapping {
+    /**
+     * key is the real buf, and the value is the replacement buf
+     */
+    public static class EscapeMap extends BiMap<ByteBuf, ByteBuf> {
 
-        static final Function<EscapeMapping, ByteBuf>
-                REAL        = EscapeMapping::getReal,
-                REPLACEMENT = EscapeMapping::getReplacement;
-
-        private final Pair<ByteBuf, ByteBuf> mapping;
-
-        public ByteBuf getReal()
-        {
-            return mapping.getKey();
+        public EscapeMap(Map<ByteBuf, ByteBuf> raw) {
+            super(raw);
         }
 
-        public ByteBuf getReplacement()
+        public static EscapeMap map(ByteBuf real, ByteBuf replacement)
         {
-            return mapping.getValue();
+            return new EscapeMap(Map.of(real, replacement));
         }
 
-        public static EscapeMapping map(ByteBuf real, ByteBuf replacement)
-        {
-            return new EscapeMapping(Pair.of(real, replacement));
-        }
-
-        public static EscapeMapping mapHex(String realHex, String replacementHex)
+        public static EscapeMap mapHex(String realHex, String replacementHex)
         {
             return map(HexKit.decodeBuf(realHex), HexKit.decodeBuf(replacementHex));
         }
 
-        public static EscapeMapping mapBytes(byte[] real, byte[] replacement)
+        public static EscapeMap mapBytes(byte[] real, byte[] replacement)
         {
             return map(Unpooled.wrappedBuffer(real), Unpooled.wrappedBuffer(replacement));
         }
-
     }
 }

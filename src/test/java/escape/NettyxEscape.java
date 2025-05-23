@@ -5,10 +5,9 @@ import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.codec.EscapeCodec.EscapeMapping;
+import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static io.netty.buffer.ByteBufUtil.getBytes;
 
@@ -19,18 +18,15 @@ import static io.netty.buffer.ByteBufUtil.getBytes;
  * @since 2025/5/21 10:38
  */
 public class NettyxEscape {
-    static final Function<EscapeMapping, ByteBuf>
-            REAL        = EscapeMapping::getReal,
-            REPLACEMENT = EscapeMapping::getReplacement;
 
     public static void main(String[] args) {
-        ByteBuf in = Unpooled.copiedBuffer(new byte[]{ 0x01, 0x02, 0x7E, 0x04, 0x7D, 0x5E, 0x06, 0x07});
-        EscapeMapping[] escapeMappings = { EscapeMapping.mapHex("7e", "7d5e") };
+        ByteBuf   in        = Unpooled.copiedBuffer(new byte[]{ 0x01, 0x02, 0x7E, 0x04, 0x7D, 0x5E, 0x06, 0x07});
+        EscapeMap escapeMap =  EscapeMap.mapHex("7e", "7d5e") ;
 
         StopWatch stopWatch = StopWatch.create("");
         stopWatch.start("escape");
         for (int i = 0; i < 5_000_000; i++) {
-            ByteBuf decode = doEscape(in.duplicate(), escapeMappings, EscapeMapping::getReal, EscapeMapping::getReplacement);
+            ByteBuf decode = doEscape(in.duplicate(), escapeMap);
             decode.release();
         }
         stopWatch.stop();
@@ -72,15 +68,13 @@ public class NettyxEscape {
     }
 
     static ByteBuf doEscape(ByteBuf msgBuf,
-                            EscapeMapping[] mappings,
-                            Function<EscapeMapping, ByteBuf> targetFn,
-                            Function<EscapeMapping, ByteBuf> replacementFn) {
+                            EscapeMap[] mappings,) {
         if (ArrayUtil.isEmpty(mappings)) return msgBuf;
 
         final ByteBuf escaped = msgBuf.alloc().buffer();
         while (msgBuf.readableBytes() > 0) {
             boolean match = false;
-            for (EscapeMapping mapping : mappings) {
+            for (EscapeMap mapping : mappings) {
                 ByteBuf target    = targetFn.apply(mapping);
                 int     tarLength = target.readableBytes();
 
