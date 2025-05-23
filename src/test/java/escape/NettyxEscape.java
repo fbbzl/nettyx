@@ -4,8 +4,8 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.ArrayUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMapping;
-import org.fz.nettyx.util.HexKit;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -24,9 +24,7 @@ public class NettyxEscape {
             REPLACEMENT = EscapeMapping::getReplacement;
 
     public static void main(String[] args) {
-        ByteBuf in = HexKit.decodeBuf(
-                "41414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141417d5e4141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141417e41414141");
-
+        ByteBuf in = Unpooled.copiedBuffer(new byte[]{ 0x01, 0x02, 0x7E, 0x04, 0x7D, 0x5E, 0x06, 0x07});
         EscapeMapping[] escapeMappings = { EscapeMapping.mapHex("7e", "7d5e") };
 
         StopWatch stopWatch = StopWatch.create("");
