@@ -32,4 +32,8 @@ public class culong4 extends cuint {
     public culong4(ByteBuf buf) {
         super(buf);
     }
+
+    public static culong4 of(Long value) {
+        return new culong4(value);
+    }
 }

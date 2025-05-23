@@ -24,4 +24,8 @@ public class cppshort extends cshort {
         super(buf);
     }
 
+    public static cppshort of(Integer value) {
+        return new cppshort(value);
+    }
+
 }

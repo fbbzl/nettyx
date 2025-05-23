@@ -25,4 +25,8 @@ public class cppdouble extends cdouble {
         super(buf);
     }
 
+    public static cppdouble of(Double value) {
+        return new cppdouble(value);
+    }
+
 }

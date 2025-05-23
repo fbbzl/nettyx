@@ -34,6 +34,10 @@ public class cppchar16_t extends CppBasic<Character> {
         return byteBuf.readChar();
     }
 
+    public static cppchar16_t of(Character value) {
+        return new cppchar16_t(value);
+    }
+
     @Override
     public String toString() {
         return new String(this.getBytes(), StandardCharsets.UTF_16);

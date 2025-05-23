@@ -24,4 +24,8 @@ public class cppint extends cint {
         super(buf);
     }
 
+    public static cppint of(Integer value) {
+        return new cppint(value);
+    }
+
 }

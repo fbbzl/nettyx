@@ -35,6 +35,10 @@ public class cppchar32_t extends CppBasic<Integer> {
         return byteBuf.readIntLE();
     }
 
+    public static cppchar32_t of(Integer value) {
+        return new cppchar32_t(value);
+    }
+
     @Override
     public String toString() {
         return new String(this.getBytes(), UTF_32);

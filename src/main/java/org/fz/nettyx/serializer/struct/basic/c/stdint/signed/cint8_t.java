@@ -24,4 +24,8 @@ public class cint8_t extends cchar {
         super(buf);
     }
 
+    public static cint8_t of(Integer value) {
+        return new cint8_t(value);
+    }
+
 }
