@@ -23,4 +23,8 @@ public class cuint32_t extends cuint {
     public cuint32_t(ByteBuf buf) {
         super(buf);
     }
+
+    public static cuint32_t of(Long value) {
+        return new cuint32_t(value);
+    }
 }

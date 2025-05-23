@@ -24,4 +24,8 @@ public class cint16_t extends cshort {
         super(buf);
     }
 
+    public static cint16_t of(Integer value) {
+        return new cint16_t(value);
+    }
+
 }

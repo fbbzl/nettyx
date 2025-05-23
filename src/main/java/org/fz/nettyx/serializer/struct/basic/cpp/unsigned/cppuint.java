@@ -23,4 +23,8 @@ public class cppuint extends cuint {
     public cppuint(ByteBuf buf) {
         super(buf);
     }
+
+    public static cppuint of(Long value) {
+        return new cppuint(value);
+    }
 }

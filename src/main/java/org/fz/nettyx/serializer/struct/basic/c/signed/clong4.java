@@ -32,4 +32,8 @@ public class clong4 extends cint {
     public clong4(ByteBuf buf) {
         super(buf);
     }
+
+    public static clong4 of(Integer value) {
+        return new clong4(value);
+    }
 }

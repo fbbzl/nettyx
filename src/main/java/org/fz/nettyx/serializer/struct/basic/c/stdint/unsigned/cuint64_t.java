@@ -25,4 +25,8 @@ public class cuint64_t extends culong8 {
     public cuint64_t(ByteBuf buf) {
         super(buf);
     }
+
+    public static cuint64_t of(BigInteger value) {
+        return new cuint64_t(value);
+    }
 }

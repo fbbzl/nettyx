@@ -23,4 +23,8 @@ public class cint32_t extends cint {
     public cint32_t(ByteBuf buf) {
         super(buf);
     }
+
+    public static cint32_t of(Integer value) {
+        return new cint32_t(value);
+    }
 }

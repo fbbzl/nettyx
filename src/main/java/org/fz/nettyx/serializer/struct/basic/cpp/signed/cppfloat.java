@@ -24,4 +24,8 @@ public class cppfloat extends cfloat {
         super(buf);
     }
 
+    public static cppfloat of(Float value) {
+        return new cppfloat(value);
+    }
+
 }
