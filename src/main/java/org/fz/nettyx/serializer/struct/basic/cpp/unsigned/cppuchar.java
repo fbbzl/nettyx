@@ -31,4 +31,8 @@ public class cppuchar extends cuchar {
         return new String(this.getBytes(), StandardCharsets.UTF_8);
     }
 
+    public static cppuchar of(Integer value) {
+        return new cppuchar(value);
+    }
+
 }

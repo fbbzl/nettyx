@@ -38,6 +38,10 @@ public class cchar extends CBasic<Byte> {
         super(buf, 1);
     }
 
+    public static cchar of(Integer value) {
+        return new cchar(value);
+    }
+
     @Override
     protected ByteBuf toByteBuf(Byte value, int size) {
         return Unpooled.buffer(size).writeByte(value);

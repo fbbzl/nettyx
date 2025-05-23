@@ -35,6 +35,10 @@ public class cuint extends CBasic<Long> {
         super(buf, 4);
     }
 
+    public static cuint of(Long value) {
+        return new cuint(value);
+    }
+
     @Override
     public boolean hasSinged() {
         return false;

@@ -32,4 +32,8 @@ public class clonglong extends clong8 {
     public clonglong(ByteBuf buf) {
         super(buf);
     }
+
+    public static clonglong of(Long value) {
+        return new clonglong(value);
+    }
 }
