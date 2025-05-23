@@ -23,4 +23,8 @@ public class cpplong4 extends cppint {
         super(buf);
     }
 
+    public static cpplong4 of(Integer value) {
+        return new cpplong4(value);
+    }
+
 }

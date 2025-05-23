@@ -26,6 +26,10 @@ public class cint extends CBasic<Integer> {
         super(value, 4);
     }
 
+    public static cint of(Integer value) {
+        return new cint(value);
+    }
+
     /**
      * Instantiates a new Cint.
      *

@@ -38,6 +38,10 @@ public class cuchar extends CBasic<Short> {
         super(buf, 1);
     }
 
+    public static cuchar of(Integer value) {
+        return new cuchar(value);
+    }
+
     @Override
     public boolean hasSinged() {
         return false;

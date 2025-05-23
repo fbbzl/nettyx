@@ -40,6 +40,10 @@ public class cushort extends CBasic<Integer> {
         super(buf, 2);
     }
 
+    public static cushort of(Integer value) {
+        return new cushort(value);
+    }
+
     @Override
     protected ByteBuf toByteBuf(Integer value, int size) {
         return Unpooled.buffer(size).writeShortLE(value.shortValue());

@@ -26,6 +26,10 @@ public class cdouble extends CBasic<Double> {
         super(value, 8);
     }
 
+    public static cdouble of(Double value) {
+        return new cdouble(value);
+    }
+
     /**
      * Instantiates a new Cdouble.
      *

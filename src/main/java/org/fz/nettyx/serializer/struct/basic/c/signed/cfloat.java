@@ -26,6 +26,10 @@ public class cfloat extends CBasic<Float> {
         super(value, 4);
     }
 
+    public static cfloat of(Float value) {
+        return new cfloat(value);
+    }
+
     /**
      * Instantiates a new Cfloat.
      *
