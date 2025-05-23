@@ -187,7 +187,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 int     tarLength = target.readableBytes();
 
                 if (msgBuf.readableBytes() >= tarLength) {
-                    match = overlook(msgBuf, tarLength, target);
+                    match = overlook(msgBuf, target, tarLength);
 
                     if (match) {
                         msgBuf.skipBytes(tarLength);
@@ -204,19 +204,21 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     private static boolean overlook(
             ByteBuf msgBuf,
-            int     tarLength,
-            ByteBuf target)
+            ByteBuf target,
+            int     tarLength)
     {
         return switch (tarLength) {
-            case 1, 2 -> hasSimilar(msgBuf, target);
-            default   -> hasSimilar(msgBuf, target) && equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
+            case 1, 2 -> hasSimilar(msgBuf, target, tarLength);
+            default   -> hasSimilar(msgBuf, target, tarLength) && equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
         };
     }
 
-
-    private static boolean hasSimilar(ByteBuf msgBuf, ByteBuf target)
+    private static boolean hasSimilar(
+            ByteBuf msgBuf,
+            ByteBuf target,
+            int     tarLength)
     {
-        int tarLength = target.readableBytes(), readerIndex = msgBuf.readerIndex();
+        int readerIndex = msgBuf.readerIndex();
 
         boolean sameHead = msgBuf.getByte(readerIndex) == target.getByte(0);
         if (tarLength == 1 || !sameHead) return sameHead;
