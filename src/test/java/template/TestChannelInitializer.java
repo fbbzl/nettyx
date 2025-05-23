@@ -28,9 +28,11 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
                 .whenExceptionCaught((ctx, t) -> System.err.println(t))
                 .whenReadIdle(3, ctx -> System.err.println("read idle"));
 
+        EscapeMap escapeMap = new EscapeMap();
+        escapeMap.putHex("7e", "7d5e");
         channel.pipeline().addLast(
                 new StartEndFlagFrameCodec(1024 * 1024, true, wrappedBuffer(new byte[]{ (byte) 0x7e }))
-                , new EscapeCodec(EscapeMap.mapHex("7e", "7d5e"))
+                , new EscapeCodec(escapeMap)
                 , new UserCodec()
                 , new MessageEchoHandler()
                 , new LoggingHandler(HEX_DUMP)

@@ -62,47 +62,6 @@ public class AIEscape {
         return output;
     }
 
-    // 反转义方法
-    public ByteBuf unescape(ByteBuf message) {
-        ByteBuf output = Unpooled.buffer(message.readableBytes());
-        int readerIndex = message.readerIndex();
-        int writerIndex = message.writerIndex();
-
-        for (int i = readerIndex; i < writerIndex; i++) {
-            byte currentByte = message.getByte(i);
-            boolean matched = false;
-
-            for (Map.Entry<byte[], byte[]> entry : unescapeMappings.entrySet()) {
-                byte[] key = entry.getKey();
-                if (message.getByte(i) == key[0] && key.length == 1) {
-                    output.writeBytes(entry.getValue());
-                    matched = true;
-                    break;
-                } else if (message.getByte(i) == key[0] && i + key.length <= writerIndex) {
-                    boolean fullMatch = true;
-                    for (int j = 1; j < key.length; j++) {
-                        if (message.getByte(i + j) != key[j]) {
-                            fullMatch = false;
-                            break;
-                        }
-                    }
-                    if (fullMatch) {
-                        output.writeBytes(entry.getValue());
-                        i += key.length - 1; // 跳过已处理的字节
-                        matched = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!matched) {
-                output.writeByte(currentByte); // 写入原始字节
-            }
-        }
-
-        return output;
-    }
-
     public static void main(String[] args) {
         // 定义转义映射
         Map<byte[], byte[]> escapeMappings = new HashMap<>();
@@ -118,9 +77,8 @@ public class AIEscape {
         // 开始性能测试
         long startTime = System.currentTimeMillis();
 
-        for (int i = 0; i < 5_000_000; i++) {
+        for (int i = 0; i < 10_000_000; i++) {
             ByteBuf escapedMessage = escapeTool.escape(testMessage.duplicate());
-
             escapedMessage.release();
         }
 
