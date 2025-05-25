@@ -152,7 +152,7 @@ public final class StructSerializer implements Serializer {
     //*************************************      working code splitter      ******************************************//
 
     @Override
-    public <T> T doDeserialize(ByteBuf byteBuf)
+    public <S> S doDeserialize(ByteBuf byteBuf)
     {
         return readStruct(root, byteBuf);
     }
