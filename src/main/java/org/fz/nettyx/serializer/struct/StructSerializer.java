@@ -174,9 +174,9 @@ public final class StructSerializer implements Serializer {
 
     public <S> S readStruct(Type structType, ByteBuf byteBuf)
     {
-        StructDefinition structDef = getStructDefinition(structType);
-        Object struct           = structDef.constructor().get();
-        Type   actualStructType = TypeUtil.getActualType(root, structType);
+        StructDefinition structDef        = getStructDefinition(structType);
+        Object           struct           = structDef.constructor().get();
+        Type             actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
             Type fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
