@@ -154,7 +154,7 @@ public final class StructSerializer implements Serializer {
     @Override
     public <T> T doDeserialize(ByteBuf byteBuf)
     {
-        return (T) readStruct(root, byteBuf);
+        return readStruct(root, byteBuf);
     }
 
     @Override
