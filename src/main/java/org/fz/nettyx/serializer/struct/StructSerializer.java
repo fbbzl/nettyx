@@ -54,8 +54,8 @@ public final class StructSerializer implements Serializer {
             Type    root,
             ByteBuf byteBuf)
     {
-        if (root instanceof TypeRefer<?> typeRefer)
-            return toStruct(typeRefer.getTypeValue(), byteBuf);
+        if (root instanceof TypeRefer<?>)
+            return toStruct(((TypeRefer<?>) root).getTypeValue(), byteBuf);
         else
             return new StructSerializer(root).doDeserialize(byteBuf);
     }
@@ -100,8 +100,8 @@ public final class StructSerializer implements Serializer {
         if (root instanceof Class<?> || root instanceof ParameterizedType)
             return new StructSerializer(root).doSerialize(struct);
         else
-        if (root instanceof TypeRefer<?> typeRefer)
-            return toByteBuf(typeRefer.getTypeValue(), struct);
+        if (root instanceof TypeRefer<?>)
+            return toByteBuf(((TypeRefer<?>) root).getTypeValue(), struct);
         else
             throw new TypeJudgmentException(root);
     }
@@ -305,8 +305,8 @@ public final class StructSerializer implements Serializer {
 
     public boolean isBasic(Type type)
     {
-        if (type instanceof Class<?>        clazz)        return Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-        if (type instanceof TypeVariable<?> typeVariable) return isBasic(TypeUtil.getActualType(root, typeVariable));
+        if (type instanceof Class<?>)        return Basic.class.isAssignableFrom((Class<?>) type) && Basic.class != type;
+        if (type instanceof TypeVariable<?>) return isBasic(TypeUtil.getActualType(root, type));
 
         return false;
     }
@@ -314,9 +314,9 @@ public final class StructSerializer implements Serializer {
     public boolean isStruct(
             Type type)
     {
-        if (type instanceof Class<?>          clazz)             return STRUCT_DEFINITION_CACHE.containsKey(clazz);
-        if (type instanceof ParameterizedType parameterizedType) return isStruct(parameterizedType.getRawType());
-        if (type instanceof TypeVariable<?>   typeVariable)      return isStruct(TypeUtil.getActualType(root, typeVariable));
+        if (type instanceof Class<?>)          return STRUCT_DEFINITION_CACHE.containsKey((Class<?>) type);
+        if (type instanceof ParameterizedType) return isStruct(((ParameterizedType) type).getRawType());
+        if (type instanceof TypeVariable<?>)   return isStruct(TypeUtil.getActualType(root, type));
 
         return false;
     }

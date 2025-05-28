@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.util.TypeUtil;
 import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -29,11 +30,15 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandler
  * @since 2025/4/22 10:36
  */
 
+@Data
+@RequiredArgsConstructor
+@Accessors(fluent = true)
 @SuppressWarnings("unchecked")
-public record StructDefinition(
-        Class<?> type,
-        Supplier<?> constructor,
-        StructField[] fields) {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class StructDefinition {
+    Class<?> type;
+    Supplier<?> constructor;
+    StructField[] fields;
 
     public StructDefinition(Class<?> clazz)
     {
@@ -70,7 +75,7 @@ public record StructDefinition(
 
         static UnaryOperator<Type> typeSupplier(Field field) {
             Type fieldType = field.getGenericType();
-            return fieldType instanceof Class<?> clazz ? root -> clazz :
+            return fieldType instanceof Class<?> ? root -> (Class<?>) fieldType :
                    root -> TypeUtil.getActualType(root, fieldType);
         }
 
