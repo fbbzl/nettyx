@@ -9,7 +9,6 @@ import org.fz.nettyx.channel.enhanced.EnhancedOioByteStreamChannel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serial;
 import java.net.SocketAddress;
 
 
@@ -125,8 +124,8 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
     @RequiredArgsConstructor
     public static class SerialCommAddress extends SocketAddress {
 
-        @Serial private static final long   serialVersionUID = -870353013039000250L;
-        private final                String value;
+        private static final long   serialVersionUID = -870353013039000250L;
+        private final        String value;
 
         /**
          * @return The serial port address of the device (e.g. COM1, /dev/ttyUSB0, ...)
