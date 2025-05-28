@@ -126,8 +126,8 @@ public class ChannelEvents {
             Object    obj,
             IdleState state)
     {
-        if (obj instanceof IdleStateEvent idleStateEvent) return idleStateEvent.state() == state;
-        if (obj instanceof IdleState idleState)           return idleState == state;
+        if (obj instanceof IdleStateEvent) return ((IdleStateEvent) obj).state() == state;
+        if (obj instanceof IdleState)      return obj == state;
 
         return false;
     }
