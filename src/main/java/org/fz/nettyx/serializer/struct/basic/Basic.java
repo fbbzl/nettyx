@@ -137,16 +137,16 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public boolean equals(Object anotherObj) {
         if (anotherObj == null) return false;
 
-        if (anotherObj instanceof CBasic<?> anotherCBasic) {
-            if (this.getSize()   != anotherCBasic.getSize()
+        if (anotherObj instanceof CBasic<?>) {
+            if (this.getSize()   != ((CBasic<?>) anotherObj).getSize()
                 ||
-                this.hasSinged() != anotherCBasic.hasSinged()
+                this.hasSinged() != ((CBasic<?>) anotherObj).hasSinged()
                 ||
-                this.order()     != anotherCBasic.order()) {
+                this.order()     != ((CBasic<?>) anotherObj).order()) {
                 return false;
             }
 
-            return this.getValue().equals(anotherCBasic.getValue());
+            return this.getValue().equals(((CBasic<?>) anotherObj).getValue());
         }
         return false;
     }

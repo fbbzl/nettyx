@@ -6,7 +6,7 @@
 
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.0-RELEASE</version>
+    <version>2.6.1-RELEASE</version>
 
     <name>nettyx</name>
     <description>a tool about netty</description>
@@ -37,9 +37,9 @@
 
     <properties>
         <!--build-->
-        <java.version>17</java.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>8</java.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven-compiler-plugin-version>3.8.1</maven-compiler-plugin-version>
@@ -62,7 +62,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.1.6-RELEASE</erwin.version>
+        <erwin.version>1.1.7-RELEASE</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
