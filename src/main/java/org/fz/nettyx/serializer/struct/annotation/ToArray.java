@@ -51,13 +51,13 @@ public @interface ToArray {
                 StructField      field,
                 Type             fieldType,
                 ByteBuf          reading,
-                ToArray          annotation)
+                ToArray          toArray)
         {
             Type componentType = getComponentType(root, fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
-            int length = annotation.length();
+            int length = toArray.length();
 
             return serializer.readArray(componentType, reading, length);
         }
@@ -71,13 +71,13 @@ public @interface ToArray {
                 Type             fieldType,
                 Object           fieldVal,
                 ByteBuf          writing,
-                ToArray          annotation)
+                ToArray          toArray)
         {
             Type componentType = getComponentType(root, fieldType);
 
             Throws.ifTrue(componentType == Object.class, () -> new TypeJudgmentException(field));
 
-            int length = annotation.length();
+            int length = toArray.length();
 
             serializer.writeArray(fieldVal, componentType, length, writing);
         }
@@ -86,9 +86,9 @@ public @interface ToArray {
                 Type root,
                 Type type)
         {
-            if (type instanceof Class<?>         clazz)            return clazz.getComponentType();
-            if (type instanceof GenericArrayType genericArrayType) return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
-            else                                                   return type;
+            if (type instanceof Class<?>)         return ((Class<?>) type).getComponentType();
+            if (type instanceof GenericArrayType) return TypeUtil.getActualType(root, ((GenericArrayType) type).getGenericComponentType());
+            else                                  return type;
         }
     }
 

@@ -110,9 +110,9 @@ public class StructHelper {
             Type componentType,
             int  length)
     {
-        if (componentType instanceof Class<?>          clazz)             return (T[]) Array.newInstance(clazz, length);
-        if (componentType instanceof ParameterizedType parameterizedType) return (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
-        else                                                              return (T[]) Array.newInstance(Object.class, length);
+        if (componentType instanceof Class<?>)          return (T[]) Array.newInstance((Class<?>) componentType, length);
+        if (componentType instanceof ParameterizedType) return (T[]) Array.newInstance((Class<?>) ((ParameterizedType) componentType).getRawType(), length);
+        else                                            return (T[]) Array.newInstance(Object.class, length);
     }
 
     public static <T> T basicNullDefault(
