@@ -191,9 +191,9 @@ public class StructSerializerContext {
 
     public static StructDefinition getStructDefinition(Type type)
     {
-        if (type instanceof Class<?>         clazz)              return STRUCT_DEFINITION_CACHE.get(clazz);
+        if (type instanceof Class<?>)          return STRUCT_DEFINITION_CACHE.get((Class<?>) type);
         else
-        if (type instanceof ParameterizedType parameterizedType) return getStructDefinition(parameterizedType.getRawType());
+        if (type instanceof ParameterizedType) return getStructDefinition(((ParameterizedType) type).getRawType());
 
         throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
     }
@@ -207,8 +207,8 @@ public class StructSerializerContext {
         Type[] genericInterfaces = clazz.getGenericInterfaces();
 
         for (Type genericInterface : genericInterfaces) {
-            if (genericInterface instanceof ParameterizedType parameterizedType) {
-                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            if (genericInterface instanceof ParameterizedType) {
+                Type[] actualTypeArguments = ((ParameterizedType) genericInterface).getActualTypeArguments();
                 if (actualTypeArguments.length > 0) {
                     return (Class<A>) actualTypeArguments[0];
                 }
