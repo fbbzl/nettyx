@@ -36,8 +36,8 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.getHandler
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StructDefinition {
-    Class<?> type;
-    Supplier<?> constructor;
+    Class<?>      type;
+    Supplier<?>   constructor;
     StructField[] fields;
 
     public StructDefinition(Class<?> clazz)
@@ -56,11 +56,12 @@ public class StructDefinition {
     @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
     public static class StructField {
 
-        Field                                                        wrapped;
-        UnaryOperator<Type>                                          type;
-        Function<?, ?>                                               getter;
-        BiConsumer<?, ?>                                             setter;
-        Annotation                                                   annotation;
+        Field               wrapped;
+        UnaryOperator<Type> type;
+        Function<?, ?>      getter;
+        BiConsumer<?, ?>    setter;
+        Annotation          annotation;
+
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
         public StructField(Field field)
