@@ -49,7 +49,7 @@ public class ProtostuffDemo {
 //                buffer.clear();
 //            }
 //        }
-
+        System.err.println(data.length);
         StopWatch stopWatch = StopWatch.create("反序列");
         stopWatch.start();
         for (int i = 0; i < 1_000_000; i++) {
