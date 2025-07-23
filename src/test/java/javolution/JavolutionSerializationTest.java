@@ -1,5 +1,7 @@
 package javolution;
 
+import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.lang.Console;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -20,16 +22,16 @@ public class JavolutionSerializationTest {
         byte[] serializedData = baos.toByteArray();
 
         // 测试反序列化 100 万次
-        long startTime = System.nanoTime();
+        StopWatch stopWatch = StopWatch.create("反序列");
+        stopWatch.start("反序列化");
         for (int i = 0; i < 1_000_000; i++) {
             JavolutionDemo.Student deserializedStudent = new JavolutionDemo.Student();
             ByteArrayInputStream   bais                = new ByteArrayInputStream(serializedData);
             deserializedStudent.read(bais);
         }
-        long endTime = System.nanoTime();
+        stopWatch.stop();
 
         // 计算总耗时
-        long duration = TimeUnit.NANOSECONDS.toMillis(endTime - startTime);
-        System.out.println("反序列化 100 万次的总耗时： " + duration + " 毫秒");
+        Console.log(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
     }
 }
