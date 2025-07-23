@@ -20,7 +20,7 @@ public class JavolutionSerializationTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         student.write(baos);
         byte[] serializedData = baos.toByteArray();
-
+        Console.log("字节数组长度:" + serializedData.length);
         // 测试反序列化 100 万次
         StopWatch stopWatch = StopWatch.create("反序列");
         stopWatch.start("反序列化");
