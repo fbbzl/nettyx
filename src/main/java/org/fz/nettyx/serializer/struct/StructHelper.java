@@ -128,12 +128,4 @@ public class StructHelper {
     {
         return (T) defaultIfNull(fieldValue, () -> newStruct(fieldActualType));
     }
-
-    public static <T> T[] arrayNullDefault(
-            Object arrayValue,
-            Type   componentType,
-            int    length)
-    {
-        return (T[]) defaultIfNull(arrayValue, () -> newArray(componentType, length));
-    }
 }

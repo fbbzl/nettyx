@@ -2,10 +2,11 @@ package org.fz.nettyx.serializer.struct;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 import static org.fz.nettyx.serializer.struct.StructHelper.basicNullDefault;
@@ -35,6 +36,8 @@ public interface StructFieldHandler<A extends Annotation> {
     default boolean isSingleton() {
         return false;
     }
+
+    default void doAnnotationValid(A annotationm, Field field) {}
 
     default Object doRead(
             StructSerializer serializer,

@@ -6,7 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
-import org.fz.nettyx.template.tcp.client.MultiTcpChannelClientTemplate;
+import org.fz.nettyx.template.tcp.client.MultiChannelClientTemplate;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
@@ -23,7 +23,7 @@ import static org.fz.nettyx.action.ListenerAction.redo;
  * @version 1.0
  * @since 2024/2/29 14:58
  */
-public class TestMultiTcpClient extends MultiTcpChannelClientTemplate<String> {
+public class TestMultiTcpClient extends MultiChannelClientTemplate<String> {
 
     protected TestMultiTcpClient(Map<String, InetSocketAddress> inetSocketAddressMap) {
         super(inetSocketAddressMap);

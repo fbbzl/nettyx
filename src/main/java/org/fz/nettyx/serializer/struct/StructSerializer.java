@@ -7,9 +7,10 @@ import io.netty.util.ReferenceCountUtil;
 import org.fz.erwin.exception.Throws;
 import org.fz.erwin.lang.TypeRefer;
 import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.io.ByteArrayOutputStream;
@@ -20,7 +21,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static io.netty.buffer.Unpooled.buffer;
 import static org.fz.nettyx.serializer.struct.StructHelper.*;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEFINITION_CACHE;
@@ -174,11 +178,12 @@ public final class StructSerializer implements Serializer {
 
     public <S> S readStruct(Type structType, ByteBuf byteBuf)
     {
-        StructDefinition structDef        = getStructDefinition(structType);
-        Object           struct           = structDef.constructor().get();
-        Type             actualStructType = TypeUtil.getActualType(root, structType);
+        StructSerializerContext.StructDefinition structDef = getStructDefinition(structType);
+        Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when read, root type: [" + structType + "]"));
+        Object struct           = structDef.constructor().get();
+        Type   actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
-            Type fieldType = field.type(actualStructType);
+            Type                  fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
             try
             {
@@ -195,35 +200,48 @@ public final class StructSerializer implements Serializer {
     public  <T> T[] readArray(
             Type    elementType,
             ByteBuf byteBuf,
-            int     length)
+            int     length,
+            boolean flexible)
     {
-        if (isBasic(elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length);
-        if (isStruct(elementType)) return readStructArray(elementType, byteBuf, length);
+        if (isBasic(elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length, flexible);
+        if (isStruct(elementType)) return readStructArray(elementType, byteBuf, length, flexible);
         else                       throw new TypeJudgmentException(elementType);
     }
 
     public <B extends Basic<?>> B[] readBasicArray(
             Class<?> elementType,
             ByteBuf  byteBuf,
-            int      length)
+            int      length,
+            boolean  flexible)
     {
-        B[] basics = newArray(elementType, length);
-
-        for (int i = 0; i < basics.length; i++) basics[i] = newBasic(elementType, byteBuf);
-
-        return basics;
+        if (!flexible) {
+            B[] basics = newArray(elementType, length);
+            for (int i = 0; i < length; i++) basics[i] = newBasic(elementType, byteBuf);
+            return basics;
+        }
+        else {
+            List<B> flexibleBasics = new ArrayList<>(8);
+            while (byteBuf.isReadable()) flexibleBasics.add(newBasic(elementType, byteBuf));
+            return flexibleBasics.toArray(newArray(elementType, flexibleBasics.size()));
+        }
     }
 
     public <S> S[] readStructArray(
             Type    elementType,
             ByteBuf byteBuf,
-            int     length)
+            int     length,
+            boolean flexible)
     {
-        S[] structs = newArray(elementType, length);
-
-        for (int i = 0; i < structs.length; i++) structs[i] = readStruct(elementType, byteBuf);
-
-        return structs;
+        if (!flexible) {
+            S[] structs = newArray(elementType, length);
+            for (int i = 0; i < length; i++) structs[i] = readStruct(elementType, byteBuf);
+            return structs;
+        }
+        else {
+            List<S> flexibleStructs = new ArrayList<>(8);
+            while (byteBuf.isReadable()) flexibleStructs.add(readStruct(elementType, byteBuf));
+            return flexibleStructs.toArray(newArray(elementType, flexibleStructs.size()));
+        }
     }
 
     public <B extends Basic<?>> void writeBasic(Object  basicValue, ByteBuf writingBuf)
@@ -236,8 +254,8 @@ public final class StructSerializer implements Serializer {
             S       struct,
             ByteBuf writing)
     {
-        StructDefinition structDef        = getStructDefinition(structType);
-        Type             actualStructType = TypeUtil.getActualType(root, structType);
+        StructSerializerContext.StructDefinition structDef        = getStructDefinition(structType);
+        Type                                     actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
             Type                  fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
@@ -257,18 +275,15 @@ public final class StructSerializer implements Serializer {
             Object  arrayValue,
             Type    componentType,
             int     length,
-            ByteBuf writing)
+            ByteBuf writing,
+            boolean flexible)
     {
         if (isBasic(componentType)) {
-            int        basicElementSize = StructHelper.findBasicSize(componentType);
-            Basic<?>[] basicArray       = (Basic<?>[]) arrayValue;
-
-            if (basicArray == null) writing.writeBytes(new byte[basicElementSize * length]);
-            else                    writeBasicArray(basicArray, basicElementSize, length, writing);
+            writeBasicArray((Basic<?>[]) arrayValue, StructHelper.findBasicSize(componentType), length, writing, flexible);
         }
         else
         if (isStruct(componentType))
-            writeStructArray(arrayNullDefault(arrayValue, componentType, length), componentType, length, writing);
+            writeStructArray(arrayValue, componentType, length, writing, flexible);
         else
             throw new TypeJudgmentException(componentType);
     }
@@ -277,25 +292,34 @@ public final class StructSerializer implements Serializer {
             Basic<?>[] basicArray,
             int        elementBytesSize,
             int        length,
-            ByteBuf    writing)
+            ByteBuf    writing,
+            boolean    flexible)
     {
-        for (int i = 0; i < length; i++) {
+        if (basicArray == null) {
+            writing.writeBytes(new byte[elementBytesSize * (flexible ? 0 : length)]);
+            return;
+        }
+
+        for (int i = 0; i < (flexible ? basicArray.length : length); i++) {
             if (i < basicArray.length) {
                 Basic<?> basic = basicArray[i];
                 if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
-                else               writing.writeBytes(basicArray[i].getBytes());
+                else writing.writeBytes(basicArray[i].getBytes());
             }
             else writing.writeBytes(new byte[elementBytesSize]);
         }
     }
 
     public <T> void writeStructArray(
-            T[]     structArray,
+            Object  structArrayValue,
             Type    elementType,
             int     length,
-            ByteBuf writing)
+            ByteBuf writing,
+            boolean flexible)
     {
-        for (int i = 0; i < length; i++) {
+        T[] structArray = (T[]) defaultIfNull(structArrayValue, () -> newArray(elementType, (flexible ? 0 : length)));
+
+        for (int i = 0; i < (flexible ? structArray.length : length); i++) {
             if (i < structArray.length)
                 writeStruct(elementType, structNullDefault(structArray[i], elementType), writing);
             else

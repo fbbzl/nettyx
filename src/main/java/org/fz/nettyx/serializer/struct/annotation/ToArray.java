@@ -3,17 +3,21 @@ package org.fz.nettyx.serializer.struct.annotation;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.erwin.exception.Throws;
+import org.fz.nettyx.exception.StructFieldHandlerException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 
+import static cn.hutool.core.util.ReflectUtil.getFields;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -34,7 +38,12 @@ public @interface ToArray {
      *
      * @return the int
      */
-    int length();
+    int length() default -1;
+
+    /**
+     * flexible array, it must be placed in the last field
+     */
+    boolean flexible() default false;
 
     class ToArrayHandler implements StructFieldHandler<ToArray> {
         @Override
@@ -59,7 +68,9 @@ public @interface ToArray {
 
             int length = toArray.length();
 
-            return serializer.readArray(componentType, reading, length);
+            boolean flexible = toArray.flexible();
+
+            return serializer.readArray(componentType, reading, length, flexible);
         }
 
         @Override
@@ -79,7 +90,9 @@ public @interface ToArray {
 
             int length = toArray.length();
 
-            serializer.writeArray(fieldVal, componentType, length, writing);
+            boolean flexible = toArray.flexible();
+
+            serializer.writeArray(fieldVal, componentType, length, writing, flexible);
         }
 
         static Type getComponentType(
@@ -89,6 +102,19 @@ public @interface ToArray {
             if (type instanceof Class<?>)         return ((Class<?>) type).getComponentType();
             if (type instanceof GenericArrayType) return TypeUtil.getActualType(root, ((GenericArrayType) type).getGenericComponentType());
             else                                  return type;
+        }
+
+        @Override
+        public void doAnnotationValid(ToArray toArray, Field field) {
+            if (toArray.length() < 0 && !toArray.flexible())
+                throw new StructFieldHandlerException("array field must use @ToArray to assign array length or be flexible");
+            if (toArray.flexible()) {
+                Field[] structFields = getFields(field.getDeclaringClass(), StructHelper::legalStructField);
+
+                if (structFields[structFields.length - 1] != field) {
+                    throw new StructFieldHandlerException("flexible array field must be the last field");
+                }
+            }
         }
     }
 

@@ -24,7 +24,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 public class SerializerTest {
 
     static final TypeRefer<You> youTypeRefer = new TypeRefer<You>() {};
-
+    static final TypeRefer<Brother> brotherRefer = new TypeRefer<Brother>() {};
     private static final StructSerializerContext context =
             new StructSerializerContext("codec.model");
 
@@ -35,9 +35,14 @@ public class SerializerTest {
 
         byte[] bytes = new byte[1200];
         Arrays.fill(bytes, (byte) 67);
-        User struct = toStruct(userTypeRefer, bytes);
-        byte[] buf = toBytes(userTypeRefer, struct);
+        User user = toStruct(userTypeRefer, bytes);
+        byte[] buf = toBytes(userTypeRefer, user);
         byte[] emptyBuf = toBytes(userTypeRefer, new User<>());
+
+        byte[] bytes1 = new byte[16];
+        Arrays.fill(bytes1, (byte) 67);
+        Brother brother = toStruct(brotherRefer, bytes1);
+        byte[]  bytes2  = toBytes(brotherRefer, brother);
         Console.log(">correctness test passed!!!!!!!!<");
         Console.log("");
     }
