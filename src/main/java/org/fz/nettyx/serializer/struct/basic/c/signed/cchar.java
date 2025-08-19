@@ -4,6 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * this type in C language is char
  *
@@ -37,6 +40,15 @@ public class cchar extends CBasic<Byte> {
     @Override
     protected Byte toValue(ByteBuf byteBuf) {
         return byteBuf.readByte();
+    }
+
+    @Override
+    public String toString() {
+        return new String(this.getBytes(), StandardCharsets.US_ASCII);
+    }
+
+    public String toString(Charset charset) {
+        return new String(this.getBytes(), charset);
     }
 
 }
