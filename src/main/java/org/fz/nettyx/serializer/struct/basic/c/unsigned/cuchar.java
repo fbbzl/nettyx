@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * this type in C language is unsigned char
  *
@@ -54,11 +52,6 @@ public class cuchar extends CBasic<Short> {
     @Override
     protected Short toValue(ByteBuf byteBuf) {
         return byteBuf.readUnsignedByte();
-    }
-
-    @Override
-    public String toString() {
-        return new String(this.getBytes(), StandardCharsets.US_ASCII);
     }
 
 }
