@@ -17,11 +17,6 @@ public class cushort extends CBasic<Integer> {
             MIN_VALUE = new cushort(0),
             MAX_VALUE = new cushort(Short.MAX_VALUE * 2 + 1);
 
-    /**
-     * Instantiates a new Cushort.
-     *
-     * @param value the length
-     */
     public cushort(Integer value) {
         super(value, 2);
     }
@@ -31,11 +26,6 @@ public class cushort extends CBasic<Integer> {
         return false;
     }
 
-    /**
-     * Instantiates a new Cushort.
-     *
-     * @param buf the buf
-     */
     public cushort(ByteBuf buf) {
         super(buf, 2);
     }

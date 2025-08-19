@@ -17,20 +17,10 @@ public class cuint extends CBasic<Long> {
             MIN_VALUE = new cuint(0L),
             MAX_VALUE = new cuint(Integer.MAX_VALUE * 2L + 1);
 
-    /**
-     * Instantiates a new Cuint.
-     *
-     * @param value the length
-     */
     public cuint(Long value) {
         super(value, 4);
     }
 
-    /**
-     * Instantiates a new Cuint.
-     *
-     * @param buf the buf
-     */
     public cuint(ByteBuf buf) {
         super(buf, 4);
     }
