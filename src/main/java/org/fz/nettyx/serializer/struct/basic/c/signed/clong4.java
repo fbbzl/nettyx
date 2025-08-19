@@ -15,20 +15,10 @@ public class clong4 extends cint {
             MIN_VALUE = new clong4(Integer.MIN_VALUE),
             MAX_VALUE = new clong4(Integer.MAX_VALUE);
 
-    /**
-     * Instantiates a new Clong 4.
-     *
-     * @param value the length
-     */
     public clong4(Integer value) {
         super(value);
     }
 
-    /**
-     * Instantiates a new Clong 4.
-     *
-     * @param buf the buf
-     */
     public clong4(ByteBuf buf) {
         super(buf);
     }

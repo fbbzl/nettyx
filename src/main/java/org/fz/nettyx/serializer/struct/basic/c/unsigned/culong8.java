@@ -20,20 +20,10 @@ public class culong8 extends CBasic<BigInteger> {
             MIN_VALUE = new culong8(BigInteger.ZERO),
             MAX_VALUE = new culong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
-    /**
-     * Instantiates a new Culong 8.
-     *
-     * @param value the length
-     */
     public culong8(BigInteger value) {
         super(value, 8);
     }
 
-    /**
-     * Instantiates a new Culong 8.
-     *
-     * @param buf the buf
-     */
     public culong8(ByteBuf buf) {
         super(buf, 8);
     }
