@@ -16,20 +16,10 @@ public class cshort extends CBasic<Short> {
             MIN_VALUE = new cshort(Integer.valueOf(Short.MIN_VALUE)),
             MAX_VALUE = new cshort(Integer.valueOf(Short.MAX_VALUE));
 
-    /**
-     * Instantiates a new Cshort.
-     *
-     * @param value the length
-     */
     public cshort(Integer value) {
         super(value.shortValue(), 2);
     }
 
-    /**
-     * Instantiates a new Cshort.
-     *
-     * @param buf the buf
-     */
     public cshort(ByteBuf buf) {
         super(buf, 2);
     }

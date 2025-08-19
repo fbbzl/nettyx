@@ -15,20 +15,10 @@ public class clonglong extends clong8 {
             MIN_VALUE = new clonglong(Long.MIN_VALUE),
             MAX_VALUE = new clonglong(Long.MAX_VALUE);
 
-    /**
-     * Instantiates a new Clonglong.
-     *
-     * @param value the length
-     */
     public clonglong(Long value) {
         super(value);
     }
 
-    /**
-     * Instantiates a new Clonglong.
-     *
-     * @param buf the buf
-     */
     public clonglong(ByteBuf buf) {
         super(buf);
     }
