@@ -4,6 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.CBasic;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
  * this type in C language is unsigned char
  *
@@ -17,20 +20,10 @@ public class cuchar extends CBasic<Short> {
             MIN_VALUE = new cuchar(0),
             MAX_VALUE = new cuchar(Byte.MAX_VALUE * 2 + 1);
 
-    /**
-     * Instantiates a new Cuchar.
-     *
-     * @param value the length
-     */
     public cuchar(Integer value) {
         super(value.shortValue(), 1);
     }
 
-    /**
-     * Instantiates a new Cuchar.
-     *
-     * @param buf the buf
-     */
     public cuchar(ByteBuf buf) {
         super(buf, 1);
     }
@@ -52,6 +45,15 @@ public class cuchar extends CBasic<Short> {
     @Override
     protected Short toValue(ByteBuf byteBuf) {
         return byteBuf.readUnsignedByte();
+    }
+
+    @Override
+    public String toString() {
+        return new String(this.getBytes(), StandardCharsets.US_ASCII);
+    }
+
+    public String toString(Charset charset) {
+        return new String(this.getBytes(), charset);
     }
 
 }
