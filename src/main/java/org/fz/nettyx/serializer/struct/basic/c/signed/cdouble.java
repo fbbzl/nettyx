@@ -17,11 +17,6 @@ public class cdouble extends CBasic<Double> {
             MIN_VALUE = new cdouble(Double.MIN_VALUE),
             MAX_VALUE = new cdouble(Double.MAX_VALUE);
 
-    /**
-     * Instantiates a new Cdouble.
-     *
-     * @param value the length
-     */
     public cdouble(Double value) {
         super(value, 8);
     }
@@ -30,11 +25,6 @@ public class cdouble extends CBasic<Double> {
         return new cdouble(value);
     }
 
-    /**
-     * Instantiates a new Cdouble.
-     *
-     * @param buf the buf
-     */
     public cdouble(ByteBuf buf) {
         super(buf, 8);
     }

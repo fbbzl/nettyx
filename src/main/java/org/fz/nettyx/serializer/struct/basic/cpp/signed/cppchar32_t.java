@@ -44,8 +44,4 @@ public class cppchar32_t extends CppBasic<Integer> {
         return new String(this.getBytes(), UTF_32);
     }
 
-    public String toString(Charset charset) {
-        return new String(this.getBytes(), charset);
-    }
-
 }
