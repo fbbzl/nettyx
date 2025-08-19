@@ -6,7 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
-import org.fz.nettyx.template.tcp.client.SingleTcpChannelClientTemplate;
+import org.fz.nettyx.template.tcp.client.SingleChannelClientTemplate;
 import template.TestChannelInitializer;
 
 import java.net.InetSocketAddress;
@@ -16,7 +16,7 @@ import static codec.UserCodec.TEST_USER;
 import static org.fz.nettyx.action.ListenerAction.redo;
 
 
-public class TestSingleTcpClient extends SingleTcpChannelClientTemplate {
+public class TestSingleTcpClient extends SingleChannelClientTemplate {
 
     public TestSingleTcpClient(InetSocketAddress address) {
         super(address);

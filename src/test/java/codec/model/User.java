@@ -3,13 +3,11 @@ package codec.model;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
 import org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned.cuint8_t;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.cppushort;
 
 @Data
@@ -25,7 +23,7 @@ public class User<T, W, G> {
     @ToArray(length = 5)
     cppushort[] ss;
     @ToArray(length = 5)
-    You[] tts;
+    You[]       tts;
 
     Bom<T, W, G> b;
     @ToArray(length = 2)
@@ -41,6 +39,4 @@ public class User<T, W, G> {
 
     transient cuint8_t uname;
 
-    @Ignore
-    culong8 deviceS;
 }

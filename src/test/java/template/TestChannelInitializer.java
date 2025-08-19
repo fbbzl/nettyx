@@ -24,7 +24,9 @@ public class TestChannelInitializer<C extends Channel> extends ChannelInitialize
     @Override
     protected void initChannel(C channel) {
         InboundAdvice inboundAdvice = new InboundAdvice(channel)
-                .whenExceptionCaught((ctx, t) -> System.err.println(t))
+                .whenExceptionCaught((ctx, t) -> {
+                    System.err.println(t);
+                })
                 .whenReadIdle(3, ctx -> System.err.println("read idle"));
 
         EscapeMap escapeMap = new EscapeMap();

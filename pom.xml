@@ -62,7 +62,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.1.7-RELEASE</erwin.version>
+        <erwin.version>1.2.2-RELEASE</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
