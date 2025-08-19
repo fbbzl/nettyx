@@ -17,11 +17,6 @@ public class cint extends CBasic<Integer> {
             MIN_VALUE = new cint(Integer.MIN_VALUE),
             MAX_VALUE = new cint(Integer.MAX_VALUE);
 
-    /**
-     * Instantiates a new Cint.
-     *
-     * @param value the length
-     */
     public cint(Integer value) {
         super(value, 4);
     }
@@ -30,11 +25,6 @@ public class cint extends CBasic<Integer> {
         return new cint(value);
     }
 
-    /**
-     * Instantiates a new Cint.
-     *
-     * @param buf the buf
-     */
     public cint(ByteBuf buf) {
         super(buf, 4);
     }

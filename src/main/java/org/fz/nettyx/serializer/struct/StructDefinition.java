@@ -56,11 +56,12 @@ public class StructDefinition {
     @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
     public static class StructField {
 
-        Field                                                        wrapped;
-        UnaryOperator<Type>                                          type;
-        Function<?, ?>                                               getter;
-        BiConsumer<?, ?>                                             setter;
-        Annotation                                                   annotation;
+        Field               wrapped;
+        UnaryOperator<Type> type;
+        Function<?, ?>      getter;
+        BiConsumer<?, ?>    setter;
+        Annotation          annotation;
+
         Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
 
         public StructField(Field field)

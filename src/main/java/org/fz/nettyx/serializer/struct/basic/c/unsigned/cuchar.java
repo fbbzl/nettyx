@@ -20,20 +20,10 @@ public class cuchar extends CBasic<Short> {
             MIN_VALUE = new cuchar(0),
             MAX_VALUE = new cuchar(Byte.MAX_VALUE * 2 + 1);
 
-    /**
-     * Instantiates a new Cuchar.
-     *
-     * @param value the length
-     */
     public cuchar(Integer value) {
         super(value.shortValue(), 1);
     }
 
-    /**
-     * Instantiates a new Cuchar.
-     *
-     * @param buf the buf
-     */
     public cuchar(ByteBuf buf) {
         super(buf, 1);
     }

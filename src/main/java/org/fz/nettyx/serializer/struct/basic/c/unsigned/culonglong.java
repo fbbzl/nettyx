@@ -17,20 +17,10 @@ public class culonglong extends culong8 {
             MIN_VALUE = new culonglong(BigInteger.ZERO),
             MAX_VALUE = new culonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
 
-    /**
-     * Instantiates a new Culonglong.
-     *
-     * @param value the length
-     */
     public culonglong(BigInteger value) {
         super(value);
     }
 
-    /**
-     * Instantiates a new Culonglong.
-     *
-     * @param buf the buf
-     */
     public culonglong(ByteBuf buf) {
         super(buf);
     }
