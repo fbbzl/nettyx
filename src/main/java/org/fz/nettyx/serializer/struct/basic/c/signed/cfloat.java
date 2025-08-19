@@ -17,11 +17,6 @@ public class cfloat extends CBasic<Float> {
             MIN_VALUE = new cfloat(Float.MIN_VALUE),
             MAX_VALUE = new cfloat(Float.MAX_VALUE);
 
-    /**
-     * Instantiates a new Cfloat.
-     *
-     * @param value the length
-     */
     public cfloat(Float value) {
         super(value, 4);
     }
@@ -30,11 +25,6 @@ public class cfloat extends CBasic<Float> {
         return new cfloat(value);
     }
 
-    /**
-     * Instantiates a new Cfloat.
-     *
-     * @param buf the buf
-     */
     public cfloat(ByteBuf buf) {
         super(buf, 4);
     }

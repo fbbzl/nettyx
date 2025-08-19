@@ -15,20 +15,10 @@ public class culong4 extends cuint {
             MIN_VALUE = new culong4(0L),
             MAX_VALUE = new culong4(Integer.MAX_VALUE * 2L + 1);
 
-    /**
-     * Instantiates a new Culong 4.
-     *
-     * @param value the length
-     */
     public culong4(Long value) {
         super(value);
     }
 
-    /**
-     * Instantiates a new Culong 4.
-     *
-     * @param buf the buf
-     */
     public culong4(ByteBuf buf) {
         super(buf);
     }
