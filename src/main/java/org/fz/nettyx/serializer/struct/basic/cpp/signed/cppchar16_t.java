@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.cpp.CppBasic;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -40,6 +41,10 @@ public class cppchar16_t extends CppBasic<Character> {
     @Override
     public String toString() {
         return new String(this.getBytes(), StandardCharsets.UTF_16);
+    }
+
+    public String toString(Charset charset) {
+        return new String(this.getBytes(), charset);
     }
 
 }
