@@ -49,7 +49,7 @@ public class SerializerTest {
 
     @Test
     public void testStructSerializer() {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             byte[] bytes = new byte[900];
             Arrays.fill(bytes, (byte) 67);
 
