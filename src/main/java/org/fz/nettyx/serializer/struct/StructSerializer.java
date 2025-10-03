@@ -254,8 +254,9 @@ public final class StructSerializer implements Serializer {
             S       struct,
             ByteBuf writing)
     {
-        StructSerializerContext.StructDefinition structDef        = getStructDefinition(structType);
-        Type                                     actualStructType = TypeUtil.getActualType(root, structType);
+        StructSerializerContext.StructDefinition structDef = getStructDefinition(structType);
+        Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when write, " + "root type: [" + structType + "]"));
+        Type actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
             Type                  fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
