@@ -49,17 +49,19 @@ public class SerializerTest {
 
     @Test
     public void testStructSerializer() {
-        byte[] bytes = new byte[900];
-        Arrays.fill(bytes, (byte) 67);
+        for (int i = 0; i < 5; i++) {
+            byte[] bytes = new byte[900];
+            Arrays.fill(bytes, (byte) 67);
 
-        StopWatch stopWatch = StopWatch.create("反序列");
-        stopWatch.start();
-        for (int i = 0; i < 1_000_000; i++) {
-            toStruct(youTypeRefer, bytes);
+            StopWatch stopWatch = StopWatch.create("反序列");
+            stopWatch.start();
+            for (int j = 0; j < 1_000_000; j++) {
+                toStruct(youTypeRefer, bytes);
 
+            }
+            stopWatch.stop();
+            Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
         }
-        stopWatch.stop();
-        Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
     }
 }
 
