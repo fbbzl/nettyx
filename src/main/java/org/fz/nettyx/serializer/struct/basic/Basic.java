@@ -119,6 +119,11 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         }
     }
 
+    @Override
+    public void pack(int packSize) {
+        this.size = packSize;
+    }
+
     /**
      * Hex dump string.
      *

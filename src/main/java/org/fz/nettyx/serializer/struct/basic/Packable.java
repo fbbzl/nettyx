@@ -6,4 +6,5 @@ package org.fz.nettyx.serializer.struct.basic;
  * @since 2025/10/16 11:03
  */
 public interface Packable {
+    void pack(int packSize);
 }
