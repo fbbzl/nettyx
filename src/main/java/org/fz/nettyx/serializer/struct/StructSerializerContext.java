@@ -10,7 +10,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -176,10 +175,9 @@ public class StructSerializerContext {
 
     static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandler(Field field)
     {
-        Annotation handlerAnnotation         = getHandlerAnnotation(field);
-        boolean    handlerAnnotationAssigned = handlerAnnotation != null;
+        Annotation handlerAnnotation = getHandlerAnnotation(field);
 
-        if (handlerAnnotationAssigned) {
+        if (handlerAnnotation != null) {
             Supplier<H> handlerSupplier =
                     lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
 
@@ -187,9 +185,11 @@ public class StructSerializerContext {
             if (handler.isSingleton()) Singleton.put(handler);
             handler.doAnnotationValid(handlerAnnotation, field);
 
+            // if is singleton, return singleton instance
             return handler.isSingleton() ? () -> (H) handler : (Supplier<H>) handlerSupplier;
         }
-        else return () -> (H) DEFAULT_STRUCT_FIELD_HANDLER;
+        else
+            return () -> (H) DEFAULT_STRUCT_FIELD_HANDLER;
     }
 
     static <A extends Annotation> A getHandlerAnnotation(Field field)
@@ -204,9 +204,11 @@ public class StructSerializerContext {
 
     public static StructDefinition getStructDefinition(Type type)
     {
-        if (type instanceof Class<?>)          return STRUCT_DEFINITION_CACHE.get((Class<?>) type);
+        if (type instanceof Class<?> clazz)
+            return STRUCT_DEFINITION_CACHE.get(clazz);
         else
-        if (type instanceof ParameterizedType) return getStructDefinition(((ParameterizedType) type).getRawType());
+        if (type instanceof ParameterizedType parameterizedType)
+            return getStructDefinition((parameterizedType).getRawType());
 
         throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
     }
@@ -220,8 +222,8 @@ public class StructSerializerContext {
         Type[] genericInterfaces = clazz.getGenericInterfaces();
 
         for (Type genericInterface : genericInterfaces) {
-            if (genericInterface instanceof ParameterizedType) {
-                Type[] actualTypeArguments = ((ParameterizedType) genericInterface).getActualTypeArguments();
+            if (genericInterface instanceof ParameterizedType parameterizedType) {
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
                 if (actualTypeArguments.length > 0) {
                     return (Class<A>) actualTypeArguments[0];
                 }
@@ -229,16 +231,13 @@ public class StructSerializerContext {
         } return null;
     }
 
-    @Data
-    @RequiredArgsConstructor
     @Accessors(fluent = true)
     @SuppressWarnings("unchecked")
-    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    public static class StructDefinition {
-        Class<?>      type;
-        Supplier<?>   constructor;
-        StructField[] fields;
-
+    public record StructDefinition(
+            Class<?>      type,
+            Supplier<?>   constructor,
+            StructField[] fields
+    ) {
         public StructDefinition(Class<?> clazz)
         {
             this(clazz,
