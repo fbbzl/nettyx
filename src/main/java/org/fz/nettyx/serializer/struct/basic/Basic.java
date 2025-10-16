@@ -25,11 +25,11 @@ import static lombok.AccessLevel.PRIVATE;
  */
 @Getter
 @FieldDefaults(level = PRIVATE)
-public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
+public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>>, Packable {
 
     final int size;
-    byte[] bytes;
-    V      value;
+    byte[]    bytes;
+    V         value;
 
     public V getValue() {
         // do value lazy set
