@@ -204,20 +204,17 @@ public class StructSerializerContext {
 
     public static StructDefinition getStructDefinition(Type type)
     {
-        if (type instanceof Class<?> clazz)
-            return STRUCT_DEFINITION_CACHE.get(clazz);
-        else
-        if (type instanceof ParameterizedType parameterizedType)
-            return getStructDefinition((parameterizedType).getRawType());
-
-        throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
+        return switch (type) {
+            case Class<?> clazz -> STRUCT_DEFINITION_CACHE.get(clazz);
+            case ParameterizedType parameterizedType -> getStructDefinition(parameterizedType.getRawType());
+            default -> throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
+        };
     }
+
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz)
     {
-        if (!ClassUtil.isNormalClass(clazz)) {
-            return null;
-        }
+        if (!ClassUtil.isNormalClass(clazz)) return null;
 
         Type[] genericInterfaces = clazz.getGenericInterfaces();
 
@@ -228,7 +225,8 @@ public class StructSerializerContext {
                     return (Class<A>) actualTypeArguments[0];
                 }
             }
-        } return null;
+        }
+        return null;
     }
 
     @Accessors(fluent = true)
@@ -260,7 +258,8 @@ public class StructSerializerContext {
             BiConsumer<?, ?>    setter;
             Annotation          annotation;
 
-            Supplier<? extends StructFieldHandler<? extends Annotation>> handler;
+            @Getter(AccessLevel.NONE)
+            Supplier<? extends StructFieldHandler<? extends Annotation>> handleSupplier;
 
             public StructField(Field field)
             {
@@ -287,7 +286,7 @@ public class StructSerializerContext {
             }
 
             public <A extends Annotation, H extends StructFieldHandler<A>> H handler() {
-                return (H) handler.get();
+                return (H) handleSupplier.get();
             }
 
             public <O, R> Function<O, R> getter() {
@@ -303,6 +302,5 @@ public class StructSerializerContext {
                 return wrapped.toString();
             }
         }
-
     }
 }
