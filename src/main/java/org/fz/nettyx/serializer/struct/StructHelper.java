@@ -106,16 +106,16 @@ public class StructHelper {
         return hasAnnotation(field, Ignore.class) || hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static <T> T[] newArray(
-            Type componentType,
-            int  length)
+    public static <T> T[] newArray(Type componentType, int length)
     {
-        if (componentType instanceof Class<?>)
-            return (T[]) Array.newInstance((Class<?>) componentType, length);
-        if (componentType instanceof ParameterizedType parameterizedType)
-            return (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
-
-        return (T[]) Array.newInstance(Object.class, length);
+        return switch (componentType) {
+            case Class<?> clazz ->
+                    (T[]) Array.newInstance(clazz, length);
+            case ParameterizedType parameterizedType ->
+                    (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
+            default ->
+                    (T[]) Array.newInstance(Object.class, length);
+        };
     }
 
     public static <T> T basicNullDefault(

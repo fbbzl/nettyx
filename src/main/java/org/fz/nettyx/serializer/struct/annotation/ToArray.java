@@ -95,16 +95,15 @@ public @interface ToArray {
             serializer.writeArray(fieldVal, componentType, length, writing, flexible);
         }
 
-        static Type getComponentType(
-                Type root,
-                Type type)
+        static Type getComponentType(Type root, Type type)
         {
-            if (type instanceof Class<?> clazz)
-                return clazz.getComponentType();
-            if (type instanceof GenericArrayType genericArrayType)
-                return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
-
-            return type;
+            return switch (type) {
+                case Class<?> clazz ->
+                        clazz.getComponentType();
+                case GenericArrayType genericArrayType ->
+                        TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
+                default -> type;
+            };
         }
 
         @Override
