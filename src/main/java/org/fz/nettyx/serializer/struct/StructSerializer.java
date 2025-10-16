@@ -58,8 +58,8 @@ public final class StructSerializer implements Serializer {
             Type    root,
             ByteBuf byteBuf)
     {
-        if (root instanceof TypeRefer<?>)
-            return toStruct(((TypeRefer<?>) root).getTypeValue(), byteBuf);
+        if (root instanceof TypeRefer<?> typeRefer)
+            return toStruct(typeRefer.getTypeValue(), byteBuf);
         else
             return new StructSerializer(root).doDeserialize(byteBuf);
     }
@@ -104,10 +104,10 @@ public final class StructSerializer implements Serializer {
         if (root instanceof Class<?> || root instanceof ParameterizedType)
             return new StructSerializer(root).doSerialize(struct);
         else
-        if (root instanceof TypeRefer<?>)
-            return toByteBuf(((TypeRefer<?>) root).getTypeValue(), struct);
-        else
-            throw new TypeJudgmentException(root);
+        if (root instanceof TypeRefer<?> typeRefer)
+            return toByteBuf(typeRefer.getTypeValue(), struct);
+
+        throw new TypeJudgmentException(root);
     }
 
     public static <T> byte[] toBytes(T struct)
@@ -330,8 +330,10 @@ public final class StructSerializer implements Serializer {
 
     public boolean isBasic(Type type)
     {
-        if (type instanceof Class<?>)        return Basic.class.isAssignableFrom((Class<?>) type) && Basic.class != type;
-        if (type instanceof TypeVariable<?>) return isBasic(TypeUtil.getActualType(root, type));
+        if (type instanceof Class<?> clazz)
+            return Basic.class.isAssignableFrom(clazz) && Basic.class != type;
+        if (type instanceof TypeVariable<?>)
+            return isBasic(TypeUtil.getActualType(root, type));
 
         return false;
     }

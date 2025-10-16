@@ -99,9 +99,12 @@ public @interface ToArray {
                 Type root,
                 Type type)
         {
-            if (type instanceof Class<?>)         return ((Class<?>) type).getComponentType();
-            if (type instanceof GenericArrayType) return TypeUtil.getActualType(root, ((GenericArrayType) type).getGenericComponentType());
-            else                                  return type;
+            if (type instanceof Class<?> clazz)
+                return clazz.getComponentType();
+            if (type instanceof GenericArrayType genericArrayType)
+                return TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
+
+            return type;
         }
 
         @Override

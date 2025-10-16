@@ -37,7 +37,7 @@ public interface StructFieldHandler<A extends Annotation> {
         return false;
     }
 
-    default void doAnnotationValid(A annotationm, Field field) {}
+    default void doAnnotationValid(A annotation, Field field) {}
 
     default Object doRead(
             StructSerializer serializer,
