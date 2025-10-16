@@ -97,8 +97,7 @@ public abstract class WebSocketClientTemplate extends AbstractSingleChannelTempl
                 return;
             }
 
-            if (frame instanceof BinaryWebSocketFrame) {
-                BinaryWebSocketFrame binaryFrame = (BinaryWebSocketFrame) frame;
+            if (frame instanceof BinaryWebSocketFrame binaryFrame) {
                 log.info("WebSocket Client received binary message: {} bytes", binaryFrame.content().readableBytes());
                 // stream
                 upstream.writeAndFlush(binaryFrame.content());

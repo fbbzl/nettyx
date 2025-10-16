@@ -333,23 +333,29 @@ public final class StructSerializer implements Serializer {
 
     public boolean isBasic(Type type)
     {
-        if (type instanceof Class<?> clazz)
-            return Basic.class.isAssignableFrom(clazz) && Basic.class != type;
-        if (type instanceof TypeVariable<?>)
-            return isBasic(TypeUtil.getActualType(root, type));
-
-        return false;
+        return switch (type) {
+            case Class<?> clazz ->
+                    Basic.class.isAssignableFrom(clazz) && Basic.class != type;
+            case TypeVariable<?> ignored ->
+                    isBasic(TypeUtil.getActualType(root, type));
+            default -> false;
+        };
     }
 
-    public boolean isStruct(
-            Type type)
+
+    public boolean isStruct(Type type)
     {
-        if (type instanceof Class<?>)          return STRUCT_DEFINITION_CACHE.containsKey((Class<?>) type);
-        if (type instanceof ParameterizedType) return isStruct(((ParameterizedType) type).getRawType());
-        if (type instanceof TypeVariable<?>)   return isStruct(TypeUtil.getActualType(root, type));
-
-        return false;
+        return switch (type) {
+            case Class<?> clazz ->
+                    STRUCT_DEFINITION_CACHE.containsKey(clazz);
+            case ParameterizedType parameterizedType ->
+                    isStruct(parameterizedType.getRawType());
+            case TypeVariable<?> ignored ->
+                    isStruct(TypeUtil.getActualType(root, type));
+            default -> false;
+        };
     }
+
 
     //******************************************      public end       ***********************************************//
 
