@@ -18,6 +18,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface Struct {
 
-    int pack() default 0;
+    int pack() default -1;
 
 }
