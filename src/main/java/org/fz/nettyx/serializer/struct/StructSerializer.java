@@ -342,7 +342,6 @@ public final class StructSerializer implements Serializer {
         };
     }
 
-
     public boolean isStruct(Type type)
     {
         return switch (type) {
@@ -355,7 +354,6 @@ public final class StructSerializer implements Serializer {
             default -> false;
         };
     }
-
 
     //******************************************      public end       ***********************************************//
 
