@@ -247,7 +247,7 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public <B extends Basic<?>> void writeBasic(Object  basicValue, ByteBuf writingBuf)
+    public <B extends Basic<?>> void writeBasic(Object basicValue, ByteBuf writingBuf)
     {
         writingBuf.writeBytes(((B) (basicValue)).getBytes());
     }

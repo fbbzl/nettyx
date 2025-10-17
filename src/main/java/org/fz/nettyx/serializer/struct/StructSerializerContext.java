@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Filter;
-import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
@@ -182,7 +181,6 @@ public class StructSerializerContext {
                     lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
 
             StructFieldHandler handler = (StructFieldHandler) handlerSupplier.get();
-            if (handler.isSingleton()) Singleton.put(handler);
             handler.doAnnotationValid(handlerAnnotation, field);
 
             // if is singleton, return singleton instance
