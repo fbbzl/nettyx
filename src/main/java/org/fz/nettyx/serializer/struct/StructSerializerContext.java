@@ -173,7 +173,7 @@ public class StructSerializerContext {
         }
     }
 
-    static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandler(Field field)
+    static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandlerSupplier(Field field)
     {
         Annotation handlerAnnotation = getHandlerAnnotation(field);
 
@@ -188,8 +188,8 @@ public class StructSerializerContext {
             // if is singleton, return singleton instance
             return handler.isSingleton() ? () -> (H) handler : (Supplier<H>) handlerSupplier;
         }
-        else
-            return () -> (H) DEFAULT_STRUCT_FIELD_HANDLER;
+
+        return () -> (H) DEFAULT_STRUCT_FIELD_HANDLER;
     }
 
     static <A extends Annotation> A getHandlerAnnotation(Field field)
@@ -268,7 +268,7 @@ public class StructSerializerContext {
                      LambdaMetas.lambdaGetter(field),
                      LambdaMetas.lambdaSetter(field),
                      getHandlerAnnotation(field),
-                     getHandler(field));
+                     getHandlerSupplier(field));
             }
 
             static UnaryOperator<Type> typeSupplier(Field field) {
