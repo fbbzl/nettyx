@@ -25,7 +25,7 @@ import static lombok.AccessLevel.PRIVATE;
  */
 @Getter
 @FieldDefaults(level = PRIVATE)
-public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>>, Packable {
+public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
     final int size;
     byte[]    bytes;
@@ -117,11 +117,6 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         if (fillLength > 0) {
             buf.writeBytes(new byte[fillLength]);
         }
-    }
-
-    @Override
-    public void pack(int packSize) {
-        this.size = packSize;
     }
 
     /**
