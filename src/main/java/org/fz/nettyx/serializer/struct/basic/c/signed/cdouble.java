@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 /**
  * this type in C language is double
@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cdouble extends CBasic<Double> {
+public class cdouble extends cbasic<Double> {
 
     public static final cdouble
             MIN_VALUE = new cdouble(Double.MIN_VALUE),

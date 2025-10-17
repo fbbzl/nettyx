@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 /**
  * this type in C language is short
@@ -10,7 +10,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @author fengbinbin
  * @version 1.0
  */
-public class cshort extends CBasic<Short> {
+public class cshort extends cbasic<Short> {
 
     public static final cshort
             MIN_VALUE = new cshort(Integer.valueOf(Short.MIN_VALUE)),

@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.cpp.CppBasic;
+import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since 2023/12/27 13:31
  */
-public class cppchar16_t extends CppBasic<Character> {
+public class cppchar16_t extends cppbasic<Character> {
 
     public cppchar16_t(Character value) {
         super(value, 2);

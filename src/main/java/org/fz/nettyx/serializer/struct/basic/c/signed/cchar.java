@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since 2023 /12/15 14:38
  */
-public class cchar extends CBasic<Byte> {
+public class cchar extends cbasic<Byte> {
 
     public static final cchar
             MIN_VALUE = new cchar(Integer.valueOf(Byte.MIN_VALUE)),

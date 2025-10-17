@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -137,7 +137,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public boolean equals(Object anotherObj) {
         if (anotherObj == null) return false;
 
-        if (anotherObj instanceof CBasic<?> cBasic) {
+        if (anotherObj instanceof cbasic<?> cBasic) {
             if (this.getSize()   != cBasic.getSize()
                 ||
                 this.hasSinged() != cBasic.hasSinged()

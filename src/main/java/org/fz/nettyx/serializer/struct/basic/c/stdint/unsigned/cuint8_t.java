@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 /**
  * this type in C language is unit8_t
@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023/12/15 14:38
  */
-public class cuint8_t extends CBasic<Short> {
+public class cuint8_t extends cbasic<Short> {
 
     public static final cuint8_t
             MIN_VALUE = new cuint8_t(0),
