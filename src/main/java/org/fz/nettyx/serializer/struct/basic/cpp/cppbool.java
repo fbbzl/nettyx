@@ -10,7 +10,7 @@ import io.netty.buffer.Unpooled;
  * @version 1.0
  * @since 2023 /12/18 15:17
  */
-public class cppbool extends CppBasic<Boolean> {
+public class cppbool extends cppbasic<Boolean> {
 
     public static final cppbool
             CPP_TRUE  = new cppbool(true),

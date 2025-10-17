@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 /**
  * this type in C language is long8
@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/18 13:29
  */
-public class clong8 extends CBasic<Long> {
+public class clong8 extends cbasic<Long> {
 
     public static final clong8
             MIN_VALUE = new clong8(Long.MIN_VALUE),

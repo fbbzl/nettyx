@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 /**
  * this type in C language is unsigned int
@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public class cuint extends CBasic<Long> {
+public class cuint extends cbasic<Long> {
 
     public static final cuint
             MIN_VALUE = new cuint(0L),

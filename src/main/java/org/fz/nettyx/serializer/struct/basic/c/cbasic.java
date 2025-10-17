@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public abstract class CBasic<V extends Comparable<V>> extends Basic<V> {
+public abstract class cbasic<V extends Comparable<V>> extends Basic<V> {
 
     private static final boolean   C_DEFAULT_SINGED = true;
     private static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
@@ -25,7 +25,7 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> {
      * @param value the length
      * @param size  the size
      */
-    protected CBasic(V value, int size) {
+    protected cbasic(V value, int size) {
         super(value, size);
     }
 
@@ -35,7 +35,7 @@ public abstract class CBasic<V extends Comparable<V>> extends Basic<V> {
      * @param buf  the buf
      * @param size the size
      */
-    protected CBasic(ByteBuf buf, int size) {
+    protected cbasic(ByteBuf buf, int size) {
         super(buf, size);
     }
 
