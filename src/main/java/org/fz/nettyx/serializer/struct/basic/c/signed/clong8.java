@@ -30,7 +30,7 @@ public class clong8 extends cbasic<Long> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value, int size) {
+    protected ByteBuf toByteBuf(Long value) {
         return Unpooled.buffer(size).writeLongLE(value);
     }
 

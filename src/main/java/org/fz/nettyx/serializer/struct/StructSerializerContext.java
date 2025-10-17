@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.ByteOrder;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -59,6 +60,11 @@ public class StructSerializerContext {
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     public StructSerializerContext(String... basePackages)
+    {
+        this(ByteOrder.LITTLE_ENDIAN, basePackages);
+    }
+
+    public StructSerializerContext(ByteOrder byteOrder, String... basePackages)
     {
         // will scan all packages if user do not assign
         this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);

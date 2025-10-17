@@ -26,7 +26,7 @@ public class cppchar32_t extends cppbasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
+    protected ByteBuf toByteBuf(Integer value) {
         return Unpooled.buffer(getSize()).writeIntLE(value);
     }
 

@@ -29,7 +29,7 @@ public class cshort extends cbasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value, int size) {
+    protected ByteBuf toByteBuf(Short value) {
         return Unpooled.buffer(size).writeShortLE(value);
     }
 

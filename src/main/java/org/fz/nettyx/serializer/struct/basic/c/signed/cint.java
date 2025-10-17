@@ -30,7 +30,7 @@ public class cint extends cbasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
+    protected ByteBuf toByteBuf(Integer value) {
         return Unpooled.buffer(size).writeIntLE(value);
     }
 

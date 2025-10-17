@@ -56,8 +56,8 @@ public class SerializerTest {
             StopWatch stopWatch = StopWatch.create("反序列");
             stopWatch.start();
             for (int j = 0; j < 1_000_000; j++) {
-                toStruct(youTypeRefer, bytes);
-
+                Object struct = toStruct(youTypeRefer, bytes);
+                byte[] bytes1 = toBytes(youTypeRefer, struct);
             }
             stopWatch.stop();
             Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));

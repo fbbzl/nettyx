@@ -26,7 +26,7 @@ public class cint8_t extends cbasic<Byte> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Byte value, int size) {
+    protected ByteBuf toByteBuf(Byte value) {
         return Unpooled.buffer(size).writeByte(value);
     }
 

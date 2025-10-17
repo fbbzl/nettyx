@@ -33,7 +33,7 @@ public class cchar extends cbasic<Byte> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Byte value, int size) {
+    protected ByteBuf toByteBuf(Byte value) {
         return Unpooled.buffer(size).writeByte(value);
     }
 

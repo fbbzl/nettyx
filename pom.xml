@@ -62,7 +62,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.2.2-RELEASE</erwin.version>
+        <erwin.version>1.2.3-RELEASE</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
@@ -103,6 +103,7 @@
             <artifactId>protostuff-core</artifactId>
             <version>${protostuff-core.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
