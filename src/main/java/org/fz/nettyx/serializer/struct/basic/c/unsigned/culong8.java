@@ -38,7 +38,7 @@ public class culong8 extends cbasic<BigInteger> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(BigInteger value, int size) {
+    protected ByteBuf toByteBuf(BigInteger value) {
         byte[] bytes = PrimitiveArrayUtil.reverse(value.toByteArray());
         return Unpooled.buffer(size).writeBytes(bytes);
     }

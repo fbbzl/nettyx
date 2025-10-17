@@ -35,7 +35,7 @@ public class cuint extends cbasic<Long> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value, int size) {
+    protected ByteBuf toByteBuf(Long value) {
         return Unpooled.buffer(size).writeIntLE(value.intValue());
     }
 

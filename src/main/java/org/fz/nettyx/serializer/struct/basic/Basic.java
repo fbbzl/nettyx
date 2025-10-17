@@ -13,7 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static lombok.AccessLevel.PRIVATE;
+import static lombok.AccessLevel.PROTECTED;
 
 /**
  * The type Basic. The specific implementation can be enhanced
@@ -24,20 +24,12 @@ import static lombok.AccessLevel.PRIVATE;
  * @since 2021 /10/22 13:26
  */
 @Getter
-@FieldDefaults(level = PRIVATE)
+@FieldDefaults(level = PROTECTED)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
-
+    ByteOrder byteOrder;
     final int size;
     byte[]    bytes;
     V         value;
-
-    public V getValue() {
-        // do value lazy set
-        if (this.bytes != null && this.value == null) {
-            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
-        }
-        return value;
-    }
 
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
@@ -45,6 +37,11 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
 
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);
+    }
+
+    protected Basic(V value, int size) {
+        this.size  = size;
+        this.value = value;
     }
 
     /**
@@ -59,16 +56,17 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
      *
      * @return the byte order
      */
-    public abstract ByteOrder order();
+    public ByteOrder order() {
+        return byteOrder;
+    }
 
     /**
      * To byte buf.
      *
      * @param value the value
-     * @param size  the size
      * @return the byte buf
      */
-    protected abstract ByteBuf toByteBuf(V value, int size);
+    protected abstract ByteBuf toByteBuf(V value);
 
     /**
      * To value v.
@@ -96,15 +94,18 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         return ByteBuffer.wrap(this.getBytes());
     }
 
-    protected Basic(V value, int size) {
-        this.size  = size;
-        this.value = value;
+    public V getValue() {
+        // do value lazy set
+        if (this.bytes != null && this.value == null) {
+            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
+        }
+        return value;
     }
 
     public byte[] getBytes() {
         if (this.value != null && this.bytes == null) {
             this.bytes = new byte[this.size];
-            ByteBuf buf = this.toByteBuf(this.value, this.size);
+            ByteBuf buf = this.toByteBuf(this.value);
             this.fill(buf, this.size);
             buf.readBytes(this.bytes);
             ReferenceCountUtil.release(buf);

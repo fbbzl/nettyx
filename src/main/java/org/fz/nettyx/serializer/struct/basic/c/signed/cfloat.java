@@ -30,7 +30,7 @@ public class cfloat extends cbasic<Float> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Float value, int size) {
+    protected ByteBuf toByteBuf(Float value) {
         return Unpooled.buffer(size).writeFloatLE(value);
     }
 

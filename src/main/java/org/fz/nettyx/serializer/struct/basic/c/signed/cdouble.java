@@ -30,7 +30,7 @@ public class cdouble extends cbasic<Double> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Double value, int size) {
+    protected ByteBuf toByteBuf(Double value) {
         return Unpooled.buffer(size).writeDoubleLE(value);
     }
 

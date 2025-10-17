@@ -35,7 +35,7 @@ public class cushort extends cbasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
+    protected ByteBuf toByteBuf(Integer value) {
         return Unpooled.buffer(size).writeShortLE(value.shortValue());
     }
 
