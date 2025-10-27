@@ -2,6 +2,8 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is longlong
  *
@@ -11,19 +13,11 @@ import io.netty.buffer.ByteBuf;
  */
 public class clonglong extends clong8 {
 
-    public static final clonglong
-            MIN_VALUE = new clonglong(Long.MIN_VALUE),
-            MAX_VALUE = new clonglong(Long.MAX_VALUE);
-
-    public clonglong(Long value) {
-        super(value);
+    public clonglong(Long value, ByteOrder byteOrder) {
+        super(value, byteOrder);
     }
 
-    public clonglong(ByteBuf buf) {
-        super(buf);
-    }
-
-    public static clonglong of(Long value) {
-        return new clonglong(value);
+    public clonglong(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

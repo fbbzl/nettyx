@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 import io.netty.buffer.ByteBuf;
 
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is unsigned longlong
@@ -13,19 +14,11 @@ import java.math.BigInteger;
  */
 public class culonglong extends culong8 {
 
-    public static final culonglong
-            MIN_VALUE = new culonglong(BigInteger.ZERO),
-            MAX_VALUE = new culonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
-
-    public culonglong(BigInteger value) {
-        super(value);
+    public culonglong(BigInteger value, ByteOrder byteOrder) {
+        super(value, byteOrder);
     }
 
-    public culonglong(ByteBuf buf) {
-        super(buf);
-    }
-
-    public static culonglong of(BigInteger value) {
-        return new culonglong(value);
+    public culonglong(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

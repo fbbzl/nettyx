@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is short
  *
@@ -12,20 +14,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cshort extends cbasic<Short> {
 
-    public static final cshort
-            MIN_VALUE = new cshort(Integer.valueOf(Short.MIN_VALUE)),
-            MAX_VALUE = new cshort(Integer.valueOf(Short.MAX_VALUE));
-
-    public cshort(Integer value) {
-        super(value.shortValue(), 2);
+    public cshort(Integer value, ByteOrder byteOrder) {
+        super(value.shortValue(), 2, byteOrder);
     }
 
-    public cshort(ByteBuf buf) {
-        super(buf, 2);
-    }
-
-    public static cshort of(Integer value) {
-        return new cshort(value);
+    public cshort(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 2, byteOrder);
     }
 
     @Override

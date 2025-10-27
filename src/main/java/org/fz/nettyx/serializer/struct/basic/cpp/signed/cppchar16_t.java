@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -16,12 +17,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cppchar16_t extends cppbasic<Character> {
 
-    public cppchar16_t(Character value) {
-        super(value, 2);
+    public cppchar16_t(Character value, ByteOrder byteOrder) {
+        super(value, 2, byteOrder);
     }
 
-    public cppchar16_t(ByteBuf buf) {
-        super(buf, 2);
+    public cppchar16_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 2, byteOrder);
     }
 
     @Override
@@ -32,10 +33,6 @@ public class cppchar16_t extends cppbasic<Character> {
     @Override
     protected Character toValue(ByteBuf byteBuf) {
         return byteBuf.readChar();
-    }
-
-    public static cppchar16_t of(Character value) {
-        return new cppchar16_t(value);
     }
 
     @Override

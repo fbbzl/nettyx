@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is int
  *
@@ -13,20 +15,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cint extends cbasic<Integer> {
 
-    public static final cint
-            MIN_VALUE = new cint(Integer.MIN_VALUE),
-            MAX_VALUE = new cint(Integer.MAX_VALUE);
-
-    public cint(Integer value) {
-        super(value, 4);
+    public cint(Integer value, ByteOrder byteOrder) {
+        super(value, 4, byteOrder);
     }
 
-    public static cint of(Integer value) {
-        return new cint(value);
-    }
-
-    public cint(ByteBuf buf) {
-        super(buf, 4);
+    public cint(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 4, byteOrder);
     }
 
     @Override

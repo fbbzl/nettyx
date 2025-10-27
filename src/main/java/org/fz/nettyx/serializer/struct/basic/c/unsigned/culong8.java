@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is unsigned long8
@@ -16,20 +17,12 @@ import java.math.BigInteger;
  */
 public class culong8 extends cbasic<BigInteger> {
 
-    public static final culong8
-            MIN_VALUE = new culong8(BigInteger.ZERO),
-            MAX_VALUE = new culong8(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
-
-    public culong8(BigInteger value) {
-        super(value, 8);
+    public culong8(BigInteger value, ByteOrder byteOrder) {
+        super(value, 8, byteOrder);
     }
 
-    public culong8(ByteBuf buf) {
-        super(buf, 8);
-    }
-
-    public static culong8 of(BigInteger value) {
-        return new culong8(value);
+    public culong8(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 8, byteOrder);
     }
 
     @Override

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is double
  *
@@ -13,20 +15,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cdouble extends cbasic<Double> {
 
-    public static final cdouble
-            MIN_VALUE = new cdouble(Double.MIN_VALUE),
-            MAX_VALUE = new cdouble(Double.MAX_VALUE);
-
-    public cdouble(Double value) {
-        super(value, 8);
+    public cdouble(Double value, ByteOrder byteOrder) {
+        super(value, 8, byteOrder);
     }
 
-    public static cdouble of(Double value) {
-        return new cdouble(value);
-    }
-
-    public cdouble(ByteBuf buf) {
-        super(buf, 8);
+    public cdouble(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 8, byteOrder);
     }
 
     @Override

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is unsigned short
  *
@@ -13,12 +15,8 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cushort extends cbasic<Integer> {
 
-    public static final cushort
-            MIN_VALUE = new cushort(0),
-            MAX_VALUE = new cushort(Short.MAX_VALUE * 2 + 1);
-
-    public cushort(Integer value) {
-        super(value, 2);
+    public cushort(Integer value, ByteOrder byteOrder) {
+        super(value, 2, byteOrder);
     }
 
     @Override
@@ -26,12 +24,8 @@ public class cushort extends cbasic<Integer> {
         return false;
     }
 
-    public cushort(ByteBuf buf) {
-        super(buf, 2);
-    }
-
-    public static cushort of(Integer value) {
-        return new cushort(value);
+    public cushort(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 2, byteOrder);
     }
 
     @Override

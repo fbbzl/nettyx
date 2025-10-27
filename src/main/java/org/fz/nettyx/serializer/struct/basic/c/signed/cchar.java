@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -16,20 +17,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cchar extends cbasic<Byte> {
 
-    public static final cchar
-            MIN_VALUE = new cchar(Integer.valueOf(Byte.MIN_VALUE)),
-            MAX_VALUE = new cchar(Integer.valueOf(Byte.MAX_VALUE));
-
-    public cchar(Integer value) {
-        super(value.byteValue(), 1);
+    public cchar(Integer value, ByteOrder byteOrder) {
+        super(value.byteValue(), 1, byteOrder);
     }
 
-    public cchar(ByteBuf buf) {
-        super(buf, 1);
-    }
-
-    public static cchar of(Integer value) {
-        return new cchar(value);
+    public cchar(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 1, byteOrder);
     }
 
     @Override

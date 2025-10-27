@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in Cpp language is short
  *
@@ -12,20 +14,12 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
  */
 public class cppshort extends cshort {
 
-    public static final cppshort
-            MIN_VALUE = new cppshort(Integer.valueOf(Short.MIN_VALUE)),
-            MAX_VALUE = new cppshort(Integer.valueOf(Short.MAX_VALUE));
-
-    public cppshort(Integer value) {
-        super(value);
+    public cppshort(Integer value, ByteOrder byteOrder) {
+        super(value, byteOrder);
     }
 
-    public cppshort(ByteBuf buf) {
-        super(buf);
-    }
-
-    public static cppshort of(Integer value) {
-        return new cppshort(value);
+    public cppshort(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

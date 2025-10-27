@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is unit64_t
@@ -14,19 +15,11 @@ import java.math.BigInteger;
  */
 public class cuint64_t extends culong8 {
 
-    public static final cuint64_t
-            MIN_VALUE = new cuint64_t(BigInteger.ZERO),
-            MAX_VALUE = new cuint64_t(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
-
-    public cuint64_t(BigInteger value) {
-        super(value);
+    public cuint64_t(BigInteger value, ByteOrder byteOrder) {
+        super(value, byteOrder);
     }
 
-    public cuint64_t(ByteBuf buf) {
-        super(buf);
-    }
-
-    public static cuint64_t of(BigInteger value) {
-        return new cuint64_t(value);
+    public cuint64_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }
