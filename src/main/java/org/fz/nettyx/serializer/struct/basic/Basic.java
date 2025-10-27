@@ -6,7 +6,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
@@ -26,22 +25,25 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @FieldDefaults(level = PROTECTED)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
+
     ByteOrder byteOrder;
     final int size;
     byte[]    bytes;
     V         value;
 
-    protected Basic(ByteBuf byteBuf, int size) {
+    protected Basic(ByteBuf byteBuf, int size, ByteOrder byteOrder) {
         this.size = size;
-        Throws.ifTrue(byteBuf.readableBytes() < size, () -> new TooLessBytesException(size, byteBuf.readableBytes()));
+        if (byteBuf.readableBytes() < size) throw new TooLessBytesException(size, byteBuf.readableBytes());
 
         this.bytes = new byte[this.size];
         byteBuf.readBytes(this.bytes);
+        this.byteOrder = byteOrder;
     }
 
-    protected Basic(V value, int size) {
+    protected Basic(V value, int size, ByteOrder byteOrder) {
         this.size  = size;
         this.value = value;
+        this.byteOrder = byteOrder;
     }
 
     /**
