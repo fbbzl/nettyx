@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is unit8_t
  *
@@ -13,20 +15,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cuint8_t extends cbasic<Short> {
 
-    public static final cuint8_t
-            MIN_VALUE = new cuint8_t(0),
-            MAX_VALUE = new cuint8_t(Byte.MAX_VALUE * 2 + 1);
-
-    public cuint8_t(Integer value) {
-        super(value.shortValue(), 1);
+    public cuint8_t(Integer value, ByteOrder byteOrder) {
+        super(value.shortValue(), 1, byteOrder);
     }
 
-    public cuint8_t(ByteBuf buf) {
-        super(buf, 1);
-    }
-
-    public static cuint8_t of(Integer value) {
-        return new cuint8_t(value);
+    public cuint8_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 1, byteOrder);
     }
 
     @Override

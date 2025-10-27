@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 /**
@@ -17,12 +18,12 @@ public class cppchar32_t extends cppbasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 
-    public cppchar32_t(Integer value) {
-        super(value, 4);
+    public cppchar32_t(Integer value, ByteOrder byteOrder) {
+        super(value, 4, byteOrder);
     }
 
-    public cppchar32_t(ByteBuf buf) {
-        super(buf, 4);
+    public cppchar32_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 4, byteOrder);
     }
 
     @Override
@@ -33,10 +34,6 @@ public class cppchar32_t extends cppbasic<Integer> {
     @Override
     protected Integer toValue(ByteBuf byteBuf) {
         return byteBuf.readIntLE();
-    }
-
-    public static cppchar32_t of(Integer value) {
-        return new cppchar32_t(value);
     }
 
     @Override

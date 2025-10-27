@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is long8
  *
@@ -13,20 +15,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class clong8 extends cbasic<Long> {
 
-    public static final clong8
-            MIN_VALUE = new clong8(Long.MIN_VALUE),
-            MAX_VALUE = new clong8(Long.MAX_VALUE);
-
-    public clong8(Long value) {
-        super(value, 8);
+    public clong8(Long value, ByteOrder byteOrder) {
+        super(value, 8, byteOrder);
     }
 
-    public clong8(ByteBuf buf) {
-        super(buf, 8);
-    }
-
-    public static clong8 of(Long value) {
-        return new clong8(value);
+    public clong8(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 8, byteOrder);
     }
 
     @Override

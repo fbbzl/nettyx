@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in Cpp language is long8
  *
@@ -12,20 +14,12 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
  */
 public class cpplong8 extends clong8 {
 
-    public static final cpplong8
-            MIN_VALUE = new cpplong8(Long.MIN_VALUE),
-            MAX_VALUE = new cpplong8(Long.MAX_VALUE);
-
-    public cpplong8(Long value) {
-        super(value);
+    public cpplong8(Long value, ByteOrder byteOrder) {
+        super(value, byteOrder);
     }
 
-    public cpplong8(ByteBuf buf) {
-        super(buf);
-    }
-
-    public static cpplong8 of(Long value) {
-        return new cpplong8(value);
+    public cpplong8(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

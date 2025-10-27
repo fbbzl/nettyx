@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in Cpp language is boolean
  *
@@ -12,16 +14,12 @@ import io.netty.buffer.Unpooled;
  */
 public class cppbool extends cppbasic<Boolean> {
 
-    public static final cppbool
-            CPP_TRUE  = new cppbool(true),
-            CPP_FALSE = new cppbool(false);
-
-    public cppbool(Boolean value) {
-        super(value, 1);
+    public cppbool(Boolean value, ByteOrder byteOrder) {
+        super(value, 1, byteOrder);
     }
 
-    public cppbool(ByteBuf buf) {
-        super(buf, 1);
+    public cppbool(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 1, byteOrder);
     }
 
     @Override

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is float
  *
@@ -13,20 +15,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cfloat extends cbasic<Float> {
 
-    public static final cfloat
-            MIN_VALUE = new cfloat(Float.MIN_VALUE),
-            MAX_VALUE = new cfloat(Float.MAX_VALUE);
-
-    public cfloat(Float value) {
-        super(value, 4);
+    public cfloat(Float value, ByteOrder byteOrder) {
+        super(value, 4, byteOrder);
     }
 
-    public static cfloat of(Float value) {
-        return new cfloat(value);
-    }
-
-    public cfloat(ByteBuf buf) {
-        super(buf, 4);
+    public cfloat(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 4, byteOrder);
     }
 
     @Override

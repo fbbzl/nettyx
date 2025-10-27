@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * The type Cpp basic.
  *
@@ -12,12 +14,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public abstract class cppbasic<V extends Comparable<V>> extends cbasic<V> {
 
-    protected cppbasic(V value, int size) {
-        super(value, size);
+    protected cppbasic(V value, int size, ByteOrder byteOrder) {
+        super(value, size, byteOrder);
     }
 
-    protected cppbasic(ByteBuf buf, int size) {
-        super(buf, size);
+    protected cppbasic(ByteBuf buf, int size, ByteOrder byteOrder) {
+        super(buf, size, byteOrder);
     }
 
 }

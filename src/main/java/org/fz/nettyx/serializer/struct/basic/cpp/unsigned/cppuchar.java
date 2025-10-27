@@ -3,6 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -14,25 +15,17 @@ import java.nio.charset.StandardCharsets;
  */
 public class cppuchar extends cuchar {
 
-    public static final cppuchar
-            MIN_VALUE = new cppuchar(0),
-            MAX_VALUE = new cppuchar(Byte.MAX_VALUE * 2 + 1);
-
-    public cppuchar(Integer value) {
-        super(value);
+    public cppuchar(Integer value, ByteOrder byteOrder) {
+        super(value, byteOrder);
     }
 
-    public cppuchar(ByteBuf buf) {
-        super(buf);
+    public cppuchar(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
     public String toString() {
         return new String(this.getBytes(), StandardCharsets.UTF_8);
-    }
-
-    public static cppuchar of(Integer value) {
-        return new cppuchar(value);
     }
 
 }

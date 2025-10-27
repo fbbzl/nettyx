@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is int8_t
  *
@@ -13,16 +15,12 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  */
 public class cint8_t extends cbasic<Byte> {
 
-    public static final cint8_t
-            MIN_VALUE = new cint8_t(Integer.valueOf(Byte.MIN_VALUE)),
-            MAX_VALUE = new cint8_t(Integer.valueOf(Byte.MAX_VALUE));
-
-    public cint8_t(Integer value) {
-        super(value.byteValue(), 1);
+    public cint8_t(Integer value, ByteOrder byteOrder) {
+        super(value.byteValue(), 1, byteOrder);
     }
 
-    public cint8_t(ByteBuf buf) {
-        super(buf, 1);
+    public cint8_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, 1, byteOrder);
     }
 
     @Override
@@ -33,10 +31,6 @@ public class cint8_t extends cbasic<Byte> {
     @Override
     protected Byte toValue(ByteBuf byteBuf) {
         return byteBuf.readByte();
-    }
-
-    public static cint8_t of(Integer value) {
-        return new cint8_t(value);
     }
 
 }
