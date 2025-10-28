@@ -24,11 +24,17 @@ public class cshort extends cbasic<Short> {
 
     @Override
     protected ByteBuf toByteBuf(Short value) {
-        return Unpooled.buffer(size).writeShortLE(value);
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeShortLE(value);
+        else
+            return Unpooled.buffer(size).writeShort(value);
     }
 
     @Override
     protected Short toValue(ByteBuf byteBuf) {
-        return byteBuf.readShortLE();
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readShortLE();
+        else
+            return byteBuf.readShort();
     }
 }

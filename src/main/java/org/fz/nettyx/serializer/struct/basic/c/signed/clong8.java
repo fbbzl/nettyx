@@ -25,12 +25,18 @@ public class clong8 extends cbasic<Long> {
 
     @Override
     protected ByteBuf toByteBuf(Long value) {
-        return Unpooled.buffer(size).writeLongLE(value);
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeLongLE(value);
+        else
+            return Unpooled.buffer(size).writeLong(value);
     }
 
     @Override
     protected Long toValue(ByteBuf byteBuf) {
-        return byteBuf.readLongLE();
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readLongLE();
+        else
+            return byteBuf.readLong();
     }
 
 }

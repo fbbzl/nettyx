@@ -32,17 +32,27 @@ public class culong8 extends cbasic<BigInteger> {
 
     @Override
     protected ByteBuf toByteBuf(BigInteger value) {
-        byte[] bytes = PrimitiveArrayUtil.reverse(value.toByteArray());
-        return Unpooled.buffer(size).writeBytes(bytes);
+        byte[] byteArray = value.toByteArray();
+
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+            byteArray = PrimitiveArrayUtil.reverse(byteArray);
+        }
+
+        return Unpooled.buffer(size).writeBytes(byteArray);
     }
 
     @Override
     protected BigInteger toValue(ByteBuf byteBuf) {
-        final byte[] bytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(bytes);
-        // the no sign length in BigInteger is 1
+        byte[] byteArray = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(byteArray);
+
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+            byteArray = PrimitiveArrayUtil.reverse(byteArray);
+        }
+
+        // the no sign in BigInteger is 1
         final int noSign = 1;
-        return new BigInteger(noSign, PrimitiveArrayUtil.reverse(bytes));
+        return new BigInteger(noSign, byteArray);
     }
 
 }
