@@ -10,6 +10,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
@@ -181,23 +182,24 @@ public final class StructSerializer implements Serializer {
 
     public <S> S readStruct(Type structType, ByteBuf byteBuf)
     {
-        StructSerializerContext.StructDefinition structDef = getStructDefinition(structType);
+        StructDefinition structDef = getStructDefinition(structType);
         Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when read, root type: [" + structType + "]"));
-        Object struct           = structDef.constructor().get();
-        Type   actualStructType = TypeUtil.getActualType(root, structType);
-        for (StructField field : structDef.fields()) {
+        S    struct           = (S) structDef.constructor().get();
+        Type actualStructType = TypeUtil.getActualType(root, structType);
+        for (StructField field : structDef.fields())
+        {
             Type                  fieldType = field.type(actualStructType);
             StructFieldHandler<?> handler   = field.handler();
             try
             {
-                Object fieldVal = handler.doRead(this, root, struct, field, fieldType, byteBuf, field.annotation());
+                S fieldVal = (S) handler.doRead(this, root, struct, field, fieldType, byteBuf, field.annotation());
                 field.setter().accept(struct, fieldVal);
             }
             catch (Exception exception) {
                 throw new SerializeException("read exception occur, field is [" + field + "]", exception);
             }
         }
-        return (S) struct;
+        return struct;
     }
 
     public  <T> T[] readArray(
@@ -257,7 +259,7 @@ public final class StructSerializer implements Serializer {
             S       struct,
             ByteBuf writing)
     {
-        StructSerializerContext.StructDefinition structDef = getStructDefinition(structType);
+        StructDefinition structDef = getStructDefinition(structType);
         Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when write, " + "root type: [" + structType + "]"));
         Type actualStructType = TypeUtil.getActualType(root, structType);
         for (StructField field : structDef.fields()) {
