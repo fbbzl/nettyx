@@ -50,14 +50,16 @@ public class ProtostuffDemo {
 //            }
 //        }
         System.err.println(data.length);
-        StopWatch stopWatch = StopWatch.create("反序列");
-        stopWatch.start();
-        for (int i = 0; i < 1_000_000; i++) {
-            ProtostuffIOUtil.mergeFrom(data, user, schema);
-           // List age = newUser.getAge();
-        }
-        stopWatch.stop();
+        for (int i = 0; i < 10; i++) {
+            StopWatch stopWatch = StopWatch.create("反序列");
+            stopWatch.start();
+            for (int j = 0; j < 1_000_000; j++) {
+                ProtostuffIOUtil.mergeFrom(data, user, schema);
+                // List age = newUser.getAge();
+            }
+            stopWatch.stop();
 
-        Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+            Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+        }
     }
 }
