@@ -23,15 +23,15 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
  */
 public class SerializerTest {
 
-    static final         TypeRefer<You>          youTypeRefer = new TypeRefer<You>() {};
-    static final         TypeRefer<Brother>      brotherRefer = new TypeRefer<Brother>() {};
+    static final         TypeRefer<You>          youTypeRefer = new TypeRefer<>() {};
+    static final         TypeRefer<Brother>      brotherRefer = new TypeRefer<>() {};
     private static final StructSerializerContext context      =
             new StructSerializerContext("codec.model");
 
     @Before
     public void correctnessTest() {
         TypeRefer<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, GirlFriend>> userTypeRefer =
-                new TypeRefer<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, GirlFriend>>() {};
+                new TypeRefer<>() {};
 
         byte[] bytes = new byte[1200];
         Arrays.fill(bytes, (byte) 67);
