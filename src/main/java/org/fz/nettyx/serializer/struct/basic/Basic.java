@@ -44,8 +44,8 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     }
 
     protected Basic(ByteOrder byteOrder, V value, int size) {
-        this.size  = size;
-        this.value = value;
+        this.size      = size;
+        this.value     = value;
         this.byteOrder = byteOrder;
     }
 
