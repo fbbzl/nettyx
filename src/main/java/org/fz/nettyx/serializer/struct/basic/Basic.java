@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import lombok.experimental.NonFinal;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -83,24 +81,6 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
      */
     protected abstract V toValue(ByteBuf byteBuf, ByteOrder byteOrder);
 
-    /**
-     * Gets byte buf.
-     *
-     * @return the byte buf
-     */
-    public ByteBuf getByteBuf() {
-        return Unpooled.wrappedBuffer(this.getBytes());
-    }
-
-    /**
-     * Gets nio buffer.
-     *
-     * @return the nio buffer
-     */
-    public ByteBuffer getNioBuffer() {
-        return ByteBuffer.wrap(this.getBytes());
-    }
-
     public V getValue() {
         // do value lazy set
         if (this.bytes != null && this.value == null) {
@@ -124,17 +104,8 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     private void fill(ByteBuf buf, int requiredSize) {
         int fillLength = requiredSize - buf.readableBytes();
         if (fillLength > 0) {
-            buf.writeBytes(new byte[fillLength]);
+            buf.writeZero(fillLength);
         }
-    }
-
-    /**
-     * Hex dump string.
-     *
-     * @return the string
-     */
-    public String hexDump() {
-        return ByteBufUtil.hexDump(this.getBytes());
     }
 
     @Override
