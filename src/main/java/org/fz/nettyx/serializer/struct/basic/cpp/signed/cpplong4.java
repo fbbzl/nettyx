@@ -13,12 +13,12 @@ import java.nio.ByteOrder;
  */
 public class cpplong4 extends cppint {
 
-    public cpplong4(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cpplong4(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cpplong4(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cpplong4(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

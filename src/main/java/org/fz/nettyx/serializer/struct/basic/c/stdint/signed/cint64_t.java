@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
  */
 public class cint64_t extends clong8 {
 
-    public cint64_t(Long value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cint64_t(ByteOrder byteOrder, Long value) {
+        super(byteOrder, value);
     }
 
-    public cint64_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cint64_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

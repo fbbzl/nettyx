@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cppdouble extends cdouble {
 
-    public cppdouble(Double value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppdouble(ByteOrder byteOrder, Double value) {
+        super(byteOrder, value);
     }
 
-    public cppdouble(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppdouble(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

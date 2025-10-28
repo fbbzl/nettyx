@@ -15,11 +15,11 @@ import java.nio.ByteOrder;
  */
 public class cuint64_t extends culong8 {
 
-    public cuint64_t(BigInteger value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cuint64_t(ByteOrder byteOrder, BigInteger value) {
+        super(byteOrder, value);
     }
 
-    public cuint64_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cuint64_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cppulonglong extends cppulong8 {
 
-    public cppulonglong(BigInteger value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppulonglong(ByteOrder byteOrder, BigInteger value) {
+        super(byteOrder, value);
     }
 
-    public cppulonglong(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppulonglong(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

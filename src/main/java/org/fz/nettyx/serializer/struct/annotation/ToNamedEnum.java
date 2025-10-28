@@ -9,6 +9,7 @@ import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -64,6 +65,7 @@ public @interface ToNamedEnum {
                 Object           earlyStruct,
                 StructField      field,
                 Type             fieldType,
+                ByteOrder        byteOrder,
                 ByteBuf          reading,
                 ToNamedEnum      toNamedEnum)
         {
@@ -83,6 +85,7 @@ public @interface ToNamedEnum {
                 StructField      field,
                 Type             fieldType,
                 Object           fieldVal,
+                ByteOrder        byteOrder,
                 ByteBuf          writing,
                 ToNamedEnum      toNamedEnum)
         {

@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
  */
 public class culonglong extends culong8 {
 
-    public culonglong(BigInteger value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public culonglong(ByteOrder byteOrder, BigInteger value) {
+        super(byteOrder, value);
     }
 
-    public culonglong(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public culonglong(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

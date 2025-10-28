@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
  */
 public class cppuint extends cuint {
 
-    public cppuint(Long value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppuint(ByteOrder byteOrder, Long value) {
+        super(byteOrder, value);
     }
 
-    public cppuint(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppuint(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

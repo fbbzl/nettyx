@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cppint extends cint {
 
-    public cppint(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppint(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cppint(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppint(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

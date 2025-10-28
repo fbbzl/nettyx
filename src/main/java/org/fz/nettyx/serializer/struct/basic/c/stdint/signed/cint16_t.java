@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cint16_t extends cshort {
 
-    public cint16_t(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cint16_t(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cint16_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cint16_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

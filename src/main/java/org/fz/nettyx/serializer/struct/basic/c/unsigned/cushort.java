@@ -15,17 +15,17 @@ import java.nio.ByteOrder;
  */
 public class cushort extends cbasic<Integer> {
 
-    public cushort(Integer value, ByteOrder byteOrder) {
-        super(value, 2, byteOrder);
+    public cushort(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value, 2);
+    }
+
+    public cushort(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 2);
     }
 
     @Override
     public boolean hasSinged() {
         return false;
-    }
-
-    public cushort(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, 2, byteOrder);
     }
 
     @Override

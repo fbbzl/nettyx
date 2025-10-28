@@ -18,12 +18,12 @@ public class cppchar32_t extends cppbasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 
-    public cppchar32_t(Integer value, ByteOrder byteOrder) {
-        super(value, 4, byteOrder);
+    public cppchar32_t(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value, 4);
     }
 
-    public cppchar32_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, 4, byteOrder);
+    public cppchar32_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 4);
     }
 
     @Override

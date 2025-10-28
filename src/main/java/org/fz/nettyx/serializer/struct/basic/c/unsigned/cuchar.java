@@ -17,12 +17,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cuchar extends cbasic<Short> {
 
-    public cuchar(Integer value, ByteOrder byteOrder) {
-        super(value.shortValue(), 1, byteOrder);
+    public cuchar(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value.shortValue(), 1);
     }
 
-    public cuchar(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, 1, byteOrder);
+    public cuchar(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 1);
     }
 
     @Override

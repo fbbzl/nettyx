@@ -10,6 +10,7 @@ import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
+import java.nio.ByteOrder;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -46,6 +47,7 @@ public @interface Chunk {
                 Object           earlyStruct,
                 StructField      field,
                 Type             fieldType,
+                ByteOrder        byteOrder,
                 ByteBuf          reading,
                 Chunk            chunk)
         {
@@ -66,6 +68,7 @@ public @interface Chunk {
                 StructField      field,
                 Type             fieldType,
                 Object           fieldVal,
+                ByteOrder        byteOrder,
                 ByteBuf          writing,
                 Chunk            chunk)
         {

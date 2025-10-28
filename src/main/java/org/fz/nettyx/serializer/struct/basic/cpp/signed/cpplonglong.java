@@ -13,12 +13,12 @@ import java.nio.ByteOrder;
  */
 public class cpplonglong extends cpplong8 {
 
-    public cpplonglong(Long value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cpplonglong(ByteOrder byteOrder, Long value) {
+        super(byteOrder, value);
     }
 
-    public cpplonglong(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cpplonglong(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

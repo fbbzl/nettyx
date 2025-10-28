@@ -15,12 +15,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cppuchar extends cuchar {
 
-    public cppuchar(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppuchar(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cppuchar(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppuchar(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
     @Override

@@ -33,9 +33,9 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 @UtilityClass
 public class StructHelper {
 
-    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass)
+    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass, ByteOrder byteOrder)
     {
-        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
+        return newBasic(basicClass, byteOrder, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
     public static int findBasicSize(Type basicClass) {
@@ -54,7 +54,7 @@ public class StructHelper {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try
         {
-            return newBasic(basicClass, fillingBuf).getSize();
+            return newBasic(basicClass, ByteOrder.nativeOrder(), fillingBuf).getSize();
         }
         finally
         {
@@ -67,16 +67,18 @@ public class StructHelper {
      *
      * @param <B>        the type parameter
      * @param basicClass the basic class
+     * @param byteOrder  the byte order
      * @param buf        the buf
      * @return the t
      */
     public static <B extends Basic<?>> B newBasic(
-            Class<?> basicClass,
-            ByteBuf  buf)
+            Class<?>  basicClass,
+            ByteOrder byteOrder,
+            ByteBuf   buf)
     {
         try
         {
-            return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
+            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(byteOrder, buf);
         }
         catch (Exception instanceError)
         {
@@ -130,10 +132,11 @@ public class StructHelper {
     }
 
     public static <T> T basicNullDefault(
-            Object   fieldValue,
-            Class<?> fieldActualType)
+            Object    fieldValue,
+            ByteOrder byteOrder,
+            Class<?>  fieldActualType)
     {
-        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
+        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType, byteOrder));
     }
 
     public static <T> T structNullDefault(

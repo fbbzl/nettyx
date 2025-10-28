@@ -13,11 +13,11 @@ import java.nio.ByteOrder;
  */
 public class clonglong extends clong8 {
 
-    public clonglong(Long value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public clonglong(ByteOrder byteOrder, Long value) {
+        super(byteOrder, value);
     }
 
-    public clonglong(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public clonglong(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -31,7 +31,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     byte[]    bytes;
     V         value;
 
-    protected Basic(ByteBuf byteBuf, int size, ByteOrder byteOrder) {
+    protected Basic(ByteOrder byteOrder, ByteBuf byteBuf, int size) {
         this.size = size;
         if (byteBuf.readableBytes() < size) throw new TooLessBytesException(size, byteBuf.readableBytes());
 
@@ -40,7 +40,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         this.byteOrder = byteOrder;
     }
 
-    protected Basic(V value, int size, ByteOrder byteOrder) {
+    protected Basic(ByteOrder byteOrder, V value, int size) {
         this.size  = size;
         this.value = value;
         this.byteOrder = byteOrder;
@@ -115,6 +115,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         return bytes;
     }
 
+    // TODO fill see endian
     private void fill(ByteBuf buf, int requiredSize) {
         int fillLength = requiredSize - buf.readableBytes();
         if (fillLength > 0) {

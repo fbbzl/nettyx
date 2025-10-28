@@ -17,12 +17,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cchar extends cbasic<Byte> {
 
-    public cchar(Integer value, ByteOrder byteOrder) {
-        super(value.byteValue(), 1, byteOrder);
+    public cchar(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value.byteValue(), 1);
     }
 
-    public cchar(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, 1, byteOrder);
+    public cchar(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 1);
     }
 
     @Override
