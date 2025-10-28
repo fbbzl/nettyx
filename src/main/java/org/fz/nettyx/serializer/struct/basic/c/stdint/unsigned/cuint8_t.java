@@ -29,12 +29,12 @@ public class cuint8_t extends cbasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value) {
+    protected ByteBuf toByteBuf(Short value, ByteOrder byteOrder) {
         return Unpooled.buffer(size).writeByte(value);
     }
 
     @Override
-    protected Short toValue(ByteBuf byteBuf) {
+    protected Short toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         return byteBuf.readUnsignedByte();
     }
 

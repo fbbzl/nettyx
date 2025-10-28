@@ -31,7 +31,7 @@ public class culong8 extends cbasic<BigInteger> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(BigInteger value) {
+    protected ByteBuf toByteBuf(BigInteger value, ByteOrder byteOrder) {
         byte[] byteArray = value.toByteArray();
 
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
@@ -42,7 +42,7 @@ public class culong8 extends cbasic<BigInteger> {
     }
 
     @Override
-    protected BigInteger toValue(ByteBuf byteBuf) {
+    protected BigInteger toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         byte[] byteArray = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(byteArray);
 

@@ -24,7 +24,7 @@ public class cfloat extends cbasic<Float> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Float value) {
+    protected ByteBuf toByteBuf(Float value, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return Unpooled.buffer(size).writeFloatLE(value);
         else
@@ -32,7 +32,7 @@ public class cfloat extends cbasic<Float> {
     }
 
     @Override
-    protected Float toValue(ByteBuf byteBuf) {
+    protected Float toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readFloatLE();
         else

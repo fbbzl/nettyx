@@ -24,7 +24,7 @@ public class cdouble extends cbasic<Double> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Double value) {
+    protected ByteBuf toByteBuf(Double value, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return Unpooled.buffer(size).writeDoubleLE(value);
         else
@@ -32,7 +32,7 @@ public class cdouble extends cbasic<Double> {
     }
 
     @Override
-    protected Double toValue(ByteBuf byteBuf) {
+    protected Double toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readDoubleLE();
         else
