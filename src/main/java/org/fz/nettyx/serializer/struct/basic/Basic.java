@@ -100,7 +100,6 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         return bytes;
     }
 
-    // TODO fill see endian
     private void fill(ByteBuf buf, int requiredSize) {
         int fillLength = requiredSize - buf.readableBytes();
         if (fillLength > 0) {
