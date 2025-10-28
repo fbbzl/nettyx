@@ -25,11 +25,17 @@ public class cfloat extends cbasic<Float> {
 
     @Override
     protected ByteBuf toByteBuf(Float value) {
-        return Unpooled.buffer(size).writeFloatLE(value);
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeFloatLE(value);
+        else
+            return Unpooled.buffer(size).writeFloat(value);
     }
 
     @Override
     protected Float toValue(ByteBuf byteBuf) {
-        return byteBuf.readFloatLE();
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readFloatLE();
+        else
+            return byteBuf.readFloat();
     }
 }

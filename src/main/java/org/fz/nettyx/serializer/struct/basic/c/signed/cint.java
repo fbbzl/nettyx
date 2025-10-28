@@ -25,11 +25,17 @@ public class cint extends cbasic<Integer> {
 
     @Override
     protected ByteBuf toByteBuf(Integer value) {
-        return Unpooled.buffer(size).writeIntLE(value);
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeIntLE(value);
+        else
+            return Unpooled.buffer(size).writeInt(value);
     }
 
     @Override
     protected Integer toValue(ByteBuf byteBuf) {
-        return byteBuf.readIntLE();
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readIntLE();
+        else
+            return byteBuf.readInt();
     }
 }

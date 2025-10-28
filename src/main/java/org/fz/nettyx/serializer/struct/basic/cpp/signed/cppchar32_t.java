@@ -28,12 +28,18 @@ public class cppchar32_t extends cppbasic<Integer> {
 
     @Override
     protected ByteBuf toByteBuf(Integer value) {
-        return Unpooled.buffer(getSize()).writeIntLE(value);
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(getSize()).writeIntLE(value);
+        else
+            return Unpooled.buffer(getSize()).writeInt(value);
     }
 
     @Override
     protected Integer toValue(ByteBuf byteBuf) {
-        return byteBuf.readIntLE();
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readIntLE();
+        else
+            return byteBuf.readInt();
     }
 
     @Override
