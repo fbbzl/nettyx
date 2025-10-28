@@ -238,7 +238,8 @@ public class StructSerializerContext {
     public record StructDefinition(
             Class<?>      type,
             Supplier<?>   constructor,
-            StructField[] fields
+            StructField[] fields,
+            ByteOrder     byteOrder
     ) {
         public StructDefinition(Class<?> clazz)
         {
@@ -246,13 +247,15 @@ public class StructSerializerContext {
                  lambdaConstructor(clazz),
                  Stream.of(getFields(clazz, StructHelper::legalStructField))
                        .map(StructField::new)
-                       .toArray(StructField[]::new));
+                       .toArray(StructField[]::new),
+                 StructHelper.getByteOrder(clazz)
+                 );
         }
 
         @Getter
         @RequiredArgsConstructor
-        @SuppressWarnings("unchecked")
         @Accessors(fluent = true)
+        @SuppressWarnings("unchecked")
         @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
         public static class StructField {
 

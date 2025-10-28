@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ModifierUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -8,9 +9,12 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.Struct.Endian;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.reflect.*;
+import java.nio.ByteOrder;
 
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
@@ -36,6 +40,13 @@ public class StructHelper {
 
     public static int findBasicSize(Type basicClass) {
         return BASIC_SIZE_CACHE.get(basicClass);
+    }
+
+    public static ByteOrder getByteOrder(Class<?> clazz) {
+        Struct annotation = AnnotationUtil.getAnnotation(clazz, Struct.class);
+        if (annotation == null) return Endian.NATIVE.getByteOrder();
+
+        return annotation.endian().getByteOrder();
     }
 
     public static int reflectForSize(Class<? extends Basic<?>> basicClass)
