@@ -23,9 +23,9 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
  */
 public class SerializerTest {
 
-    static final TypeRefer<You> youTypeRefer = new TypeRefer<You>() {};
-    static final TypeRefer<Brother> brotherRefer = new TypeRefer<Brother>() {};
-    private static final StructSerializerContext context =
+    static final         TypeRefer<You>          youTypeRefer = new TypeRefer<You>() {};
+    static final         TypeRefer<Brother>      brotherRefer = new TypeRefer<Brother>() {};
+    private static final StructSerializerContext context      =
             new StructSerializerContext("codec.model");
 
     @Before
@@ -35,8 +35,8 @@ public class SerializerTest {
 
         byte[] bytes = new byte[1200];
         Arrays.fill(bytes, (byte) 67);
-        User user = toStruct(userTypeRefer, bytes);
-        byte[] buf = toBytes(userTypeRefer, user);
+        User   user     = toStruct(userTypeRefer, bytes);
+        byte[] buf      = toBytes(userTypeRefer, user);
         byte[] emptyBuf = toBytes(userTypeRefer, new User<>());
 
         byte[] bytes1 = new byte[16];
@@ -53,13 +53,13 @@ public class SerializerTest {
             byte[] bytes = new byte[900];
             Arrays.fill(bytes, (byte) 67);
 
-            byte[]    bytes1    = toBytes(youTypeRefer, toStruct(youTypeRefer, bytes));
+            byte[] bytes1 = toBytes(youTypeRefer, toStruct(youTypeRefer, bytes));
             System.err.println(bytes1.length);
 
             StopWatch stopWatch = StopWatch.create("反序列");
             stopWatch.start();
             for (int j = 0; j < 1_000_000; j++) {
-                Object struct = toStruct(youTypeRefer, bytes);
+                toStruct(youTypeRefer, bytes);
 //                byte[] bytes1 = toBytes(youTypeRefer, struct);
 //                System.err.println(bytes1.length);
             }
