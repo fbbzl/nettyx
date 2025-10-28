@@ -38,7 +38,7 @@ public class SerializerTest {
         User   user     = toStruct(userTypeRefer, bytes);
         byte[] buf      = toBytes(userTypeRefer, user);
         byte[] emptyBuf = toBytes(userTypeRefer, new User<>());
-
+        System.err.println(emptyBuf.length);
         byte[] bytes1 = new byte[16];
         Arrays.fill(bytes1, (byte) 67);
         Brother brother = toStruct(brotherRefer, bytes1);
@@ -51,8 +51,10 @@ public class SerializerTest {
     public void testStructSerializer() {
         byte[] bytes = new byte[900];
         Arrays.fill(bytes, (byte) 67);
-
-        byte[] bytes1 = toBytes(youTypeRefer, toStruct(youTypeRefer, bytes));
+        You struct = toStruct(youTypeRefer, bytes);
+        struct.setC(null);
+        struct.setChunk(null);
+        byte[] bytes1 = toBytes(youTypeRefer, struct);
         System.err.println(bytes1.length);
 
         for (int i = 0; i < 10; i++) {
