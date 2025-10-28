@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
@@ -23,12 +24,14 @@ import static lombok.AccessLevel.PROTECTED;
  * @since 2021 /10/22 13:26
  */
 @Getter
-@FieldDefaults(level = PROTECTED)
+@FieldDefaults(level = PROTECTED, makeFinal = true)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
-    final ByteOrder byteOrder;
-    final int       size;
+    ByteOrder byteOrder;
+    int       size;
+    @NonFinal
     byte[] bytes;
+    @NonFinal
     V      value;
 
     protected Basic(ByteOrder byteOrder, ByteBuf byteBuf, int size) {
