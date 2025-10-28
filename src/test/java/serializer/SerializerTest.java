@@ -57,7 +57,8 @@ public class SerializerTest {
             stopWatch.start();
             for (int j = 0; j < 1_000_000; j++) {
                 Object struct = toStruct(youTypeRefer, bytes);
-                byte[] bytes1 = toBytes(youTypeRefer, struct);
+//                byte[] bytes1 = toBytes(youTypeRefer, struct);
+//                System.err.println(bytes1.length);
             }
             stopWatch.stop();
             Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
