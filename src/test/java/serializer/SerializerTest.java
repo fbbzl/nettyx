@@ -49,19 +49,17 @@ public class SerializerTest {
 
     @Test
     public void testStructSerializer() {
+        byte[] bytes = new byte[900];
+        Arrays.fill(bytes, (byte) 67);
+
+        byte[] bytes1 = toBytes(youTypeRefer, toStruct(youTypeRefer, bytes));
+        System.err.println(bytes1.length);
+
         for (int i = 0; i < 10; i++) {
-            byte[] bytes = new byte[900];
-            Arrays.fill(bytes, (byte) 67);
-
-            byte[] bytes1 = toBytes(youTypeRefer, toStruct(youTypeRefer, bytes));
-            System.err.println(bytes1.length);
-
             StopWatch stopWatch = StopWatch.create("反序列");
             stopWatch.start();
             for (int j = 0; j < 1_000_000; j++) {
                 toStruct(youTypeRefer, bytes);
-//                byte[] bytes1 = toBytes(youTypeRefer, struct);
-//                System.err.println(bytes1.length);
             }
             stopWatch.stop();
             Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
