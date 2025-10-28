@@ -31,9 +31,9 @@ public class cushort extends cbasic<Integer> {
     @Override
     protected ByteBuf toByteBuf(Integer value) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return Unpooled.buffer(size).writeShortLE(value.shortValue());
+            return Unpooled.buffer(size).writeShortLE(value);
         else
-            return Unpooled.buffer(size).writeShort(value.shortValue());
+            return Unpooled.buffer(size).writeShort(value);
     }
 
     @Override
