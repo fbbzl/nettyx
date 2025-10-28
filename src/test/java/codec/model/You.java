@@ -27,7 +27,7 @@ public class You {
     cuchar sex;
     cfloat address;
     cdouble platformId;
-    @ToArray(length = 5)
+    @ToArray(length = 6)
     Hit[] description;
     culong8 interest;
     Hit     c;
