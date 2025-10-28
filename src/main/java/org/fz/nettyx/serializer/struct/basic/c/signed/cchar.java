@@ -26,12 +26,12 @@ public class cchar extends cbasic<Byte> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Byte value) {
+    protected ByteBuf toByteBuf(Byte value, ByteOrder byteOrder) {
         return Unpooled.buffer(size).writeByte(value);
     }
 
     @Override
-    protected Byte toValue(ByteBuf byteBuf) {
+    protected Byte toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         return byteBuf.readByte();
     }
 

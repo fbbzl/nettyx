@@ -23,12 +23,12 @@ public class cppbool extends cppbasic<Boolean> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Boolean value) {
+    protected ByteBuf toByteBuf(Boolean value, ByteOrder byteOrder) {
         return Unpooled.buffer(getSize()).writeBoolean(value);
     }
 
     @Override
-    protected Boolean toValue(ByteBuf byteBuf) {
+    protected Boolean toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         return byteBuf.readBoolean();
     }
 }

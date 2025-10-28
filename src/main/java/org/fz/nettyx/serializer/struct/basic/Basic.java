@@ -26,10 +26,10 @@ import static lombok.AccessLevel.PROTECTED;
 @FieldDefaults(level = PROTECTED)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
-    ByteOrder byteOrder;
-    final int size;
-    byte[]    bytes;
-    V         value;
+    final ByteOrder byteOrder;
+    final int       size;
+    byte[] bytes;
+    V      value;
 
     protected Basic(ByteOrder byteOrder, ByteBuf byteBuf, int size) {
         this.size = size;
@@ -65,18 +65,20 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     /**
      * To byte buf.
      *
-     * @param value the value
+     * @param value     the value
+     * @param byteOrder the byte order
      * @return the byte buf
      */
-    protected abstract ByteBuf toByteBuf(V value);
+    protected abstract ByteBuf toByteBuf(V value, ByteOrder byteOrder);
 
     /**
      * To value v.
      *
-     * @param byteBuf the byte buf
+     * @param byteBuf   the byte buf
+     * @param byteOrder the byte order
      * @return the v
      */
-    protected abstract V toValue(ByteBuf byteBuf);
+    protected abstract V toValue(ByteBuf byteBuf, ByteOrder byteOrder);
 
     /**
      * Gets byte buf.
@@ -99,7 +101,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public V getValue() {
         // do value lazy set
         if (this.bytes != null && this.value == null) {
-            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes));
+            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes), byteOrder);
         }
         return value;
     }
@@ -107,7 +109,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public byte[] getBytes() {
         if (this.value != null && this.bytes == null) {
             this.bytes = new byte[this.size];
-            ByteBuf buf = this.toByteBuf(this.value);
+            ByteBuf buf = this.toByteBuf(this.value, byteOrder);
             this.fill(buf, this.size);
             buf.readBytes(this.bytes);
             ReferenceCountUtil.release(buf);

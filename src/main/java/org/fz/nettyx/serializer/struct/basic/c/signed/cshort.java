@@ -23,7 +23,7 @@ public class cshort extends cbasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value) {
+    protected ByteBuf toByteBuf(Short value, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return Unpooled.buffer(size).writeShortLE(value);
         else
@@ -31,7 +31,7 @@ public class cshort extends cbasic<Short> {
     }
 
     @Override
-    protected Short toValue(ByteBuf byteBuf) {
+    protected Short toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readShortLE();
         else

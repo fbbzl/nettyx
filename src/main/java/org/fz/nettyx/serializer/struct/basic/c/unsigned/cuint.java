@@ -29,7 +29,7 @@ public class cuint extends cbasic<Long> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value) {
+    protected ByteBuf toByteBuf(Long value, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return Unpooled.buffer(size).writeIntLE(value.intValue());
         else
@@ -37,7 +37,7 @@ public class cuint extends cbasic<Long> {
     }
 
     @Override
-    protected Long toValue(ByteBuf byteBuf) {
+    protected Long toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readUnsignedIntLE();
         else
