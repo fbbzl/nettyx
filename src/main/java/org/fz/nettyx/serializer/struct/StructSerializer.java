@@ -333,7 +333,7 @@ public final class StructSerializer implements Serializer {
 
         for (int i = 0; i < (flexible ? structArray.length : length); i++) {
             if (i < structArray.length)
-                writeStruct(elementType, structNullDefault(structArray[i], elementType), writing);
+                writeStruct(elementType, StructHelper.defaultStruct(structArray[i], elementType), writing);
             else
                 writeStruct(elementType, newStruct(elementType), writing);
         }

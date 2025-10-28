@@ -131,7 +131,7 @@ public class StructHelper {
         };
     }
 
-    public static <T> T basicNullDefault(
+    public static <T> T defaultBasic(
             Object    fieldValue,
             ByteOrder byteOrder,
             Class<?>  fieldActualType)
@@ -139,7 +139,7 @@ public class StructHelper {
         return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType, byteOrder));
     }
 
-    public static <T> T structNullDefault(
+    public static <T> T defaultStruct(
             Object fieldValue,
             Type   fieldActualType)
     {

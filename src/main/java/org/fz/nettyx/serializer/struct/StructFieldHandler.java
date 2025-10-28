@@ -10,9 +10,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.ByteOrder;
 
-import static org.fz.nettyx.serializer.struct.StructHelper.basicNullDefault;
-import static org.fz.nettyx.serializer.struct.StructHelper.structNullDefault;
-
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
  *
@@ -68,11 +65,11 @@ public interface StructFieldHandler<A extends Annotation> {
             A                annotation)
     {
         if (serializer.isBasic(fieldType)) {
-            serializer.writeBasic((Basic<?>) basicNullDefault(fieldVal, byteOrder, (Class<? extends Basic<?>>) fieldType), writing);
+            serializer.writeBasic((Basic<?>) StructHelper.defaultBasic(fieldVal, byteOrder, (Class<? extends Basic<?>>) fieldType), writing);
             return;
         }
         if (serializer.isStruct(fieldType)) {
-            serializer.writeStruct(fieldType, structNullDefault(fieldVal, fieldType), writing);
+            serializer.writeStruct(fieldType, StructHelper.defaultStruct(fieldVal, fieldType), writing);
             return;
         }
         throw new TypeJudgmentException(field);
