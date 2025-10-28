@@ -17,12 +17,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cppchar16_t extends cppbasic<Character> {
 
-    public cppchar16_t(Character value, ByteOrder byteOrder) {
-        super(value, 2, byteOrder);
+    public cppchar16_t(ByteOrder byteOrder, Character value) {
+        super(byteOrder, value, 2);
     }
 
-    public cppchar16_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, 2, byteOrder);
+    public cppchar16_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 2);
     }
 
     @Override

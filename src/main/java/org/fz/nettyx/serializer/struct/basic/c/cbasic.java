@@ -25,8 +25,8 @@ public abstract class cbasic<V extends Comparable<V>> extends Basic<V> {
      * @param value the length
      * @param size  the size
      */
-    protected cbasic(V value, int size, ByteOrder byteOrder) {
-        super(value, size, byteOrder);
+    protected cbasic(ByteOrder byteOrder, V value, int size) {
+        super(byteOrder, value, size);
     }
 
     /**
@@ -35,8 +35,8 @@ public abstract class cbasic<V extends Comparable<V>> extends Basic<V> {
      * @param buf  the buf
      * @param size the size
      */
-    protected cbasic(ByteBuf buf, int size, ByteOrder byteOrder) {
-        super(buf, size, byteOrder);
+    protected cbasic(ByteOrder byteOrder, ByteBuf buf, int size) {
+        super(byteOrder, buf, size);
     }
 
     @Override

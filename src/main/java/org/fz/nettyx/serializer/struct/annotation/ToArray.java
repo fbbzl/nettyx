@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.nio.ByteOrder;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
 import static java.lang.annotation.ElementType.FIELD;
@@ -59,6 +60,7 @@ public @interface ToArray {
                 Object           earlyStruct,
                 StructField      field,
                 Type             fieldType,
+                ByteOrder        byteOrder,
                 ByteBuf          reading,
                 ToArray          toArray)
         {
@@ -70,7 +72,7 @@ public @interface ToArray {
 
             boolean flexible = toArray.flexible();
 
-            return serializer.readArray(componentType, reading, length, flexible);
+            return serializer.readArray(componentType, byteOrder, reading, length, flexible);
         }
 
         @Override
@@ -81,6 +83,7 @@ public @interface ToArray {
                 StructField      field,
                 Type             fieldType,
                 Object           fieldVal,
+                ByteOrder        byteOrder,
                 ByteBuf          writing,
                 ToArray          toArray)
         {

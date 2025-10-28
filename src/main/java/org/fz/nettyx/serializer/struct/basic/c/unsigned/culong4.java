@@ -13,11 +13,11 @@ import java.nio.ByteOrder;
  */
 public class culong4 extends cuint {
 
-    public culong4(Long value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public culong4(ByteOrder byteOrder, Long value) {
+        super(byteOrder, value);
     }
 
-    public culong4(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public culong4(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -15,11 +15,11 @@ import java.nio.ByteOrder;
  */
 public class cppulong8 extends culong8 {
 
-    public cppulong8(BigInteger value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppulong8(ByteOrder byteOrder, BigInteger value) {
+        super(byteOrder, value);
     }
 
-    public cppulong8(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppulong8(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

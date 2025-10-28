@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
  */
 public class cuint16_t extends cushort {
 
-    public cuint16_t(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cuint16_t(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cuint16_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cuint16_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

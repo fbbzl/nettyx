@@ -24,10 +24,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
@@ -51,20 +48,15 @@ public class StructSerializerContext {
     @Getter
     private final String[] basePackages;
 
-    static final Map<Type, Integer>                                   BASIC_SIZE_CACHE                = new HashMap<>(64);
-    static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>> BASIC_BYTEBUF_CONSTRUCTOR_CACHE = new HashMap<>(64);
-    static final Map<Class<?>, StructDefinition>                      STRUCT_DEFINITION_CACHE         = new HashMap<>(256);
+    static final Map<Type, Integer>                                                BASIC_SIZE_CACHE        = new HashMap<>(64);
+    static final Map<Class<? extends Basic<?>>, BiFunction<ByteOrder, ByteBuf, ?>> BASIC_CONSTRUCTOR_CACHE = new HashMap<>(64);
+    static final Map<Class<?>, StructDefinition>                                   STRUCT_DEFINITION_CACHE = new HashMap<>(256);
 
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
 
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
     public StructSerializerContext(String... basePackages)
-    {
-        this(ByteOrder.LITTLE_ENDIAN, basePackages);
-    }
-
-    public StructSerializerContext(ByteOrder byteOrder, String... basePackages)
     {
         // will scan all packages if user do not assign
         this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);
@@ -89,11 +81,12 @@ public class StructSerializerContext {
         // 1 scan field handler
         this.scanHandler(classes);
 
-        // 2 scan basic
+        // 2 scan struct
+        this.scanStruct(classes);
+
+        // 3 scan basic
         this.scanBasic(classes);
 
-        // 3 scan struct
-        this.scanStruct(classes);
     }
 
     /**
@@ -103,22 +96,23 @@ public class StructSerializerContext {
      */
     protected Set<Class<?>> classesForScan()
     {
-        Set<Class<?>> forScan = new HashSet<>(256);
+        Set<Class<?>> classesForScan = new HashSet<>(256);
 
         Filter<Class<?>> scanCondition = clazz ->
                 !ClassUtil.isJdkClass(clazz)
                 &&
                 ClassUtil.isNormalClass(clazz);
 
-        if (log.isDebugEnabled()) log.debug("serializer context started scanning, base-packages: {}",
-                                            Arrays.toString(getBasePackages()));
-        for (String basePackage :
-                append(getBasePackages(), ClassUtil.getPackage(this.getClass())))
-            forScan.addAll(ClassScanner.scanAllPackage(basePackage, scanCondition));
-        if (log.isDebugEnabled()) log.debug("serializer context finished scanning, base-packages: {}",
-                                            Arrays.toString(getBasePackages()));
+        String[] basePackages = getBasePackages();
 
-        return forScan;
+        for (String pack : append(basePackages, ClassUtil.getPackage(this.getClass()))) {
+            classesForScan.addAll(ClassScanner.scanAllPackage(pack, scanCondition));
+        }
+
+        if (log.isDebugEnabled())
+            log.debug("serializer context finished scanning, base-packages: {}", Arrays.toString(basePackages));
+
+        return classesForScan;
     }
 
     protected void scanHandler(Set<Class<?>> classes)
@@ -142,28 +136,6 @@ public class StructSerializerContext {
         }
     }
 
-    protected void scanBasic(Set<Class<?>> classes)
-    {
-        for (Class<?> clazz : classes) {
-            try {
-                boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-
-                if (isBasic) {
-                    // cache basics constructor
-                    BASIC_BYTEBUF_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                                lambdaConstructor(clazz, ByteBuf.class));
-
-                    // cache bytes size
-                    BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                 StructHelper.reflectForSize((Class<? extends Basic<?>>) clazz));
-                }
-            }
-            catch (Throwable throwable) {
-                log.error("scan basic failed please check, basic type is: [{}]", clazz, throwable);
-            }
-        }
-    }
-
     protected void scanStruct(Set<Class<?>> classes)
     {
         for (Class<?> clazz : classes) {
@@ -178,13 +150,35 @@ public class StructSerializerContext {
         }
     }
 
+    protected void scanBasic(Set<Class<?>> classes)
+    {
+        for (Class<?> clazz : classes) {
+            try {
+                boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+
+                if (isBasic) {
+                    // cache basics constructor
+                    BASIC_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
+                                                        lambdaConstructor(clazz, ByteOrder.class, ByteBuf.class));
+
+                    // cache bytes size
+                    BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
+                                                 StructHelper.reflectForSize((Class<? extends Basic<?>>) clazz));
+                }
+            }
+            catch (Throwable throwable) {
+                log.error("scan basic failed please check, basic type is: [{}]", clazz, throwable);
+            }
+        }
+    }
+
     static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandlerSupplier(Field field)
     {
         Annotation handlerAnnotation = getHandlerAnnotation(field);
 
         if (handlerAnnotation != null) {
             Supplier<H> handlerSupplier =
-                    lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
+                    (Supplier<H>) lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
 
             StructFieldHandler handler = (StructFieldHandler) handlerSupplier.get();
             handler.doAnnotationValid(handlerAnnotation, field);

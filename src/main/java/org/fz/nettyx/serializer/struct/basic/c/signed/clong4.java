@@ -13,11 +13,11 @@ import java.nio.ByteOrder;
  */
 public class clong4 extends cint {
 
-    public clong4(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public clong4(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public clong4(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public clong4(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

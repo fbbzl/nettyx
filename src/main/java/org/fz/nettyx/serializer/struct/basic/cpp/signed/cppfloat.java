@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cppfloat extends cfloat {
 
-    public cppfloat(Float value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppfloat(ByteOrder byteOrder, Float value) {
+        super(byteOrder, value);
     }
 
-    public cppfloat(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppfloat(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

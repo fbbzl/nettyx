@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
  */
 public class cint32_t extends cint {
 
-    public cint32_t(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cint32_t(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cint32_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cint32_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -14,11 +14,11 @@ import java.nio.ByteOrder;
  */
 public class cppushort extends cushort {
 
-    public cppushort(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppushort(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cppushort(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppushort(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cppchar8_t extends cchar {
 
-    public cppchar8_t(Integer value, ByteOrder byteOrder) {
-        super(value, byteOrder);
+    public cppchar8_t(ByteOrder byteOrder, Integer value) {
+        super(byteOrder, value);
     }
 
-    public cppchar8_t(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+    public cppchar8_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

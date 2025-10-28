@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public abstract class cppbasic<V extends Comparable<V>> extends cbasic<V> {
 
-    protected cppbasic(V value, int size, ByteOrder byteOrder) {
-        super(value, size, byteOrder);
+    protected cppbasic(ByteOrder byteOrder, V value, int size) {
+        super(byteOrder, value, size);
     }
 
-    protected cppbasic(ByteBuf buf, int size, ByteOrder byteOrder) {
-        super(buf, size, byteOrder);
+    protected cppbasic(ByteOrder byteOrder, ByteBuf buf, int size) {
+        super(byteOrder, buf, size);
     }
 
 }

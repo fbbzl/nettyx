@@ -8,6 +8,7 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.nio.ByteOrder;
 
 import static org.fz.nettyx.serializer.struct.StructHelper.basicNullDefault;
 import static org.fz.nettyx.serializer.struct.StructHelper.structNullDefault;
@@ -45,10 +46,11 @@ public interface StructFieldHandler<A extends Annotation> {
             Object           earlyStruct,
             StructField      field,
             Type             fieldType,
+            ByteOrder        byteOrder,
             ByteBuf          reading,
             A                annotation)
     {
-        if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, reading);
+        if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, byteOrder, reading);
         if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType, reading);
 
         throw new TypeJudgmentException(field);
@@ -61,11 +63,12 @@ public interface StructFieldHandler<A extends Annotation> {
             StructField      field,
             Type             fieldType,
             Object           fieldVal,
+            ByteOrder        byteOrder,
             ByteBuf          writing,
             A                annotation)
     {
         if (serializer.isBasic(fieldType)) {
-            serializer.writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) fieldType), writing);
+            serializer.writeBasic((Basic<?>) basicNullDefault(fieldVal, byteOrder, (Class<? extends Basic<?>>) fieldType), writing);
             return;
         }
         if (serializer.isStruct(fieldType)) {

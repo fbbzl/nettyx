@@ -22,6 +22,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -174,13 +175,17 @@ public final class StructSerializer implements Serializer {
     }
 
     public <B extends Basic<?>> B readBasic(
-            Class<?> basicType,
-            ByteBuf  byteBuf)
+            Class<?>  basicType,
+            ByteOrder byteOrder,
+            ByteBuf   byteBuf
+       )
     {
-        return newBasic(basicType, byteBuf);
+        return newBasic(basicType, byteOrder, byteBuf);
     }
 
-    public <S> S readStruct(Type structType, ByteBuf byteBuf)
+    public <S> S readStruct(
+            Type      structType,
+            ByteBuf   byteBuf)
     {
         StructDefinition structDef = getStructDefinition(structType);
         Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when read, root type: [" + structType + "]"));
@@ -192,7 +197,7 @@ public final class StructSerializer implements Serializer {
             StructFieldHandler<?> handler   = field.handler();
             try
             {
-                S fieldVal = (S) handler.doRead(this, root, struct, field, fieldType, byteBuf, field.annotation());
+                S fieldVal = (S) handler.doRead(this, root, struct, field, fieldType, structDef.byteOrder(), byteBuf, field.annotation());
                 field.setter().accept(struct, fieldVal);
             }
             catch (Exception exception) {
@@ -203,30 +208,32 @@ public final class StructSerializer implements Serializer {
     }
 
     public  <T> T[] readArray(
-            Type    elementType,
-            ByteBuf byteBuf,
-            int     length,
-            boolean flexible)
+            Type      elementType,
+            ByteOrder byteOrder,
+            ByteBuf   byteBuf,
+            int       length,
+            boolean   flexible)
     {
-        if (isBasic(elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteBuf, length, flexible);
+        if (isBasic(elementType))  return (T[]) readBasicArray((Class<? extends Basic<?>>) elementType, byteOrder, byteBuf, length, flexible);
         if (isStruct(elementType)) return readStructArray(elementType, byteBuf, length, flexible);
         else                       throw new TypeJudgmentException(elementType);
     }
 
     public <B extends Basic<?>> B[] readBasicArray(
-            Class<?> elementType,
-            ByteBuf  byteBuf,
-            int      length,
-            boolean  flexible)
+            Class<?>  elementType,
+            ByteOrder byteOrder,
+            ByteBuf   byteBuf,
+            int       length,
+            boolean   flexible)
     {
         if (!flexible) {
             B[] basics = newArray(elementType, length);
-            for (int i = 0; i < length; i++) basics[i] = newBasic(elementType, byteBuf);
+            for (int i = 0; i < length; i++) basics[i] = newBasic(elementType, byteOrder, byteBuf);
             return basics;
         }
         else {
             List<B> flexibleBasics = new ArrayList<>(8);
-            while (byteBuf.isReadable()) flexibleBasics.add(newBasic(elementType, byteBuf));
+            while (byteBuf.isReadable()) flexibleBasics.add(newBasic(elementType, byteOrder, byteBuf));
             return flexibleBasics.toArray(newArray(elementType, flexibleBasics.size()));
         }
     }
@@ -249,9 +256,8 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public <B extends Basic<?>> void writeBasic(Object basicValue, ByteBuf writingBuf)
-    {
-        writingBuf.writeBytes(((B) (basicValue)).getBytes());
+    public <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
+        writingBuf.writeBytes(basicValue.getBytes());
     }
 
     public <S> void writeStruct(
@@ -269,7 +275,7 @@ public final class StructSerializer implements Serializer {
 
             try
             {
-                handler.doWrite(this, root, struct, field, fieldType, fieldVal, writing, field.annotation());
+                handler.doWrite(this, root, struct, field, fieldType, fieldVal, structDef.byteOrder(), writing, field.annotation());
             }
             catch (Exception exception) {
                 throw new SerializeException("write exception occur, field [" + field + "]", exception);
