@@ -17,6 +17,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toBytes;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 
 
+
 /**
  * @author fengbinbin
  * @version 1.0
@@ -68,6 +69,8 @@ public class SerializerTest {
             stopWatch.stop();
             Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
         }
+
+
     }
 }
 
