@@ -24,7 +24,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
@@ -48,9 +51,9 @@ public class StructSerializerContext {
     @Getter
     private final String[] basePackages;
 
-    static final Map<Type, Integer>                                                BASIC_SIZE_CACHE        = new HashMap<>(64);
-    static final Map<Class<? extends Basic<?>>, BiFunction<ByteOrder, ByteBuf, ?>> BASIC_CONSTRUCTOR_CACHE = new HashMap<>(64);
-    static final Map<Class<?>, StructDefinition>                                   STRUCT_DEFINITION_CACHE = new HashMap<>(256);
+    static final Map<Type, Integer>                                   BASIC_SIZE_CACHE        = new HashMap<>(64);
+    static final Map<Class<? extends Basic<?>>, Function<ByteBuf, ?>> BASIC_CONSTRUCTOR_CACHE = new HashMap<>(64);
+    static final Map<Class<?>, StructDefinition>                      STRUCT_DEFINITION_CACHE = new HashMap<>(256);
 
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
 
@@ -159,7 +162,7 @@ public class StructSerializerContext {
                 if (isBasic) {
                     // cache basics constructor
                     BASIC_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                        lambdaConstructor(clazz, ByteOrder.class, ByteBuf.class));
+                                                        lambdaConstructor(clazz, ByteBuf.class));
 
                     // cache bytes size
                     BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
