@@ -290,9 +290,8 @@ public final class StructSerializer implements Serializer {
             ByteBuf writing,
             boolean flexible)
     {
-        if (isBasic(componentType)) {
+        if (isBasic(componentType))
             writeBasicArray((Basic<?>[]) arrayValue, StructHelper.findBasicSize(componentType), length, writing, flexible);
-        }
         else
         if (isStruct(componentType))
             writeStructArray(arrayValue, componentType, length, writing, flexible);
