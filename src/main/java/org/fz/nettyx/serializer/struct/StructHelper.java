@@ -78,7 +78,9 @@ public class StructHelper {
     {
         try
         {
-            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(byteOrder, buf);
+            B basic = (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
+            basic.setByteOrder(byteOrder);
+            return basic;
         }
         catch (Exception instanceError)
         {
