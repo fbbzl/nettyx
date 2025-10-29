@@ -250,7 +250,7 @@ public final class StructSerializer implements Serializer {
             return structs;
         }
         else {
-            List<S> flexibleStructs = new ArrayList<>(8);
+            List<S> flexibleStructs = new ArrayList<>(length);
             while (byteBuf.isReadable()) flexibleStructs.add(readStruct(elementType, byteBuf));
             return flexibleStructs.toArray(newArray(elementType, flexibleStructs.size()));
         }
