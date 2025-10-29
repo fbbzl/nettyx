@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cfloat extends cbasic<Float> {
 
-    public cfloat(ByteOrder byteOrder, Float value) {
-        super(byteOrder, value, 4);
+    public cfloat(Float value) {
+        super(value, 4);
     }
 
-    public cfloat(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 4);
+    public cfloat(ByteBuf buf) {
+        super(buf, 4);
     }
 
     @Override

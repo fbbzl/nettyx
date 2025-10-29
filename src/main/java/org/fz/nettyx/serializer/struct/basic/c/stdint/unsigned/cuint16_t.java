@@ -3,8 +3,6 @@ package org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
 
-import java.nio.ByteOrder;
-
 /**
  * this type in C language is unit16_t
  *
@@ -14,11 +12,11 @@ import java.nio.ByteOrder;
  */
 public class cuint16_t extends cushort {
 
-    public cuint16_t(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value);
+    public cuint16_t(Integer value) {
+        super(value);
     }
 
-    public cuint16_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cuint16_t(ByteBuf buf) {
+        super(buf);
     }
 }

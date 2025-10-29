@@ -2,8 +2,6 @@ package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteOrder;
-
 /**
  * this type in Cpp language is unsigned long4
  *
@@ -13,11 +11,11 @@ import java.nio.ByteOrder;
  */
 public class cppulong4 extends cppuint {
 
-    public cppulong4(ByteOrder byteOrder, Long value) {
-        super(byteOrder, value);
+    public cppulong4(Long value) {
+        super(value);
     }
 
-    public cppulong4(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppulong4(ByteBuf buf) {
+        super(buf);
     }
 }

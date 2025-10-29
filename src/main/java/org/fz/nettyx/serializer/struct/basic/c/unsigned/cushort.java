@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cushort extends cbasic<Integer> {
 
-    public cushort(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value, 2);
+    public cushort(Integer value) {
+        super(value, 2);
     }
 
-    public cushort(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 2);
+    public cushort(ByteBuf buf) {
+        super(buf, 2);
     }
 
     @Override

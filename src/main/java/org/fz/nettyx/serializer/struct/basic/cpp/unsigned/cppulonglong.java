@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 import io.netty.buffer.ByteBuf;
 
 import java.math.BigInteger;
-import java.nio.ByteOrder;
 
 /**
  * this type in Cpp language is unsigned longlong
@@ -14,12 +13,12 @@ import java.nio.ByteOrder;
  */
 public class cppulonglong extends cppulong8 {
 
-    public cppulonglong(ByteOrder byteOrder, BigInteger value) {
-        super(byteOrder, value);
+    public cppulonglong(BigInteger value) {
+        super(value);
     }
 
-    public cppulonglong(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppulonglong(ByteBuf buf) {
+        super(buf);
     }
 
 }

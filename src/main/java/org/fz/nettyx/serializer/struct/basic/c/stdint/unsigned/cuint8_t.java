@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cuint8_t extends cbasic<Short> {
 
-    public cuint8_t(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value.shortValue(), 1);
+    public cuint8_t(Integer value) {
+        super(value.shortValue(), 1);
     }
 
-    public cuint8_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 1);
+    public cuint8_t(ByteBuf buf) {
+        super(buf, 1);
     }
 
     @Override

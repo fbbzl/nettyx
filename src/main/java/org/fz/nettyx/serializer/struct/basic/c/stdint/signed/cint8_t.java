@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cint8_t extends cbasic<Byte> {
 
-    public cint8_t(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value.byteValue(), 1);
+    public cint8_t(Integer value) {
+        super(value.byteValue(), 1);
     }
 
-    public cint8_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 1);
+    public cint8_t(ByteBuf buf) {
+        super(buf, 1);
     }
 
     @Override

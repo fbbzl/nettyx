@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -15,12 +14,12 @@ import java.nio.charset.StandardCharsets;
  */
 public class cppuchar extends cuchar {
 
-    public cppuchar(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value);
+    public cppuchar(Integer value) {
+        super(value);
     }
 
-    public cppuchar(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppuchar(ByteBuf buf) {
+        super(buf);
     }
 
     @Override

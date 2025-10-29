@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cdouble extends cbasic<Double> {
 
-    public cdouble(ByteOrder byteOrder, Double value) {
-        super(byteOrder, value, 8);
+    public cdouble(Double value) {
+        super(value, 8);
     }
 
-    public cdouble(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 8);
+    public cdouble(ByteBuf buf) {
+        super(buf, 8);
     }
 
     @Override
