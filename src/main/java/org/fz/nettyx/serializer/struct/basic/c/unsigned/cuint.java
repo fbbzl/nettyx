@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cuint extends cbasic<Long> {
 
-    public cuint(ByteOrder byteOrder, Long value) {
-        super(byteOrder, value, 4);
+    public cuint(Long value) {
+        super(value, 4);
     }
 
-    public cuint(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 4);
+    public cuint(ByteBuf buf) {
+        super(buf, 4);
     }
 
     @Override

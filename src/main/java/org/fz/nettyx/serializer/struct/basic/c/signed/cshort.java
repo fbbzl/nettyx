@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cshort extends cbasic<Short> {
 
-    public cshort(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value.shortValue(), 2);
+    public cshort(Integer value) {
+        super(value.shortValue(), 2);
     }
 
-    public cshort(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 2);
+    public cshort(ByteBuf buf) {
+        super(buf, 2);
     }
 
     @Override

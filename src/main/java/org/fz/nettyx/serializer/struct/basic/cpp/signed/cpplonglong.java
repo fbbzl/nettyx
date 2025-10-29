@@ -2,8 +2,6 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 
 import io.netty.buffer.ByteBuf;
 
-import java.nio.ByteOrder;
-
 /**
  * this type in Cpp language is longlong
  *
@@ -13,12 +11,12 @@ import java.nio.ByteOrder;
  */
 public class cpplonglong extends cpplong8 {
 
-    public cpplonglong(ByteOrder byteOrder, Long value) {
-        super(byteOrder, value);
+    public cpplonglong(Long value) {
+        super(value);
     }
 
-    public cpplonglong(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cpplonglong(ByteBuf buf) {
+        super(buf);
     }
 
 }

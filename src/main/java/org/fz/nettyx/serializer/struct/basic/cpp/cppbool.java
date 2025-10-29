@@ -14,12 +14,12 @@ import java.nio.ByteOrder;
  */
 public class cppbool extends cppbasic<Boolean> {
 
-    public cppbool(ByteOrder byteOrder, Boolean value) {
-        super(byteOrder, value, 1);
+    public cppbool(Boolean value) {
+        super(value, 1);
     }
 
-    public cppbool(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 1);
+    public cppbool(ByteBuf buf) {
+        super(buf, 1);
     }
 
     @Override

@@ -17,12 +17,12 @@ import java.nio.ByteOrder;
  */
 public class culong8 extends cbasic<BigInteger> {
 
-    public culong8(ByteOrder byteOrder, BigInteger value) {
-        super(byteOrder, value, 8);
+    public culong8(BigInteger value) {
+        super(value, 8);
     }
 
-    public culong8(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 8);
+    public culong8(ByteBuf buf) {
+        super(buf, 8);
     }
 
     @Override

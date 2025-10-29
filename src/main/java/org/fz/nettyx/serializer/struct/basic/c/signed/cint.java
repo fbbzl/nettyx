@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class cint extends cbasic<Integer> {
 
-    public cint(ByteOrder byteOrder, Integer value) {
-        super(byteOrder, value, 4);
+    public cint(Integer value) {
+        super(value, 4);
     }
 
-    public cint(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 4);
+    public cint(ByteBuf buf) {
+        super(buf, 4);
     }
 
     @Override

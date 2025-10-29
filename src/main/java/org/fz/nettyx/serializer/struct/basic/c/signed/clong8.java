@@ -15,12 +15,12 @@ import java.nio.ByteOrder;
  */
 public class clong8 extends cbasic<Long> {
 
-    public clong8(ByteOrder byteOrder, Long value) {
-        super(byteOrder, value, 8);
+    public clong8(Long value) {
+        super(value, 8);
     }
 
-    public clong8(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 8);
+    public clong8(ByteBuf buf) {
+        super(buf, 8);
     }
 
     @Override

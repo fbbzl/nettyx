@@ -5,6 +5,7 @@ import cn.hutool.core.lang.Console;
 import codec.model.*;
 import org.fz.erwin.lang.TypeRefer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,7 @@ public class SerializerTest {
         You struct = toStruct(youTypeRefer, bytes);
         struct.setC(null);
         struct.setChunk(null);
+        struct.setIsMarried(new cint(1));
         byte[] bytes1 = toBytes(youTypeRefer, struct);
         System.err.println(bytes1.length);
 
