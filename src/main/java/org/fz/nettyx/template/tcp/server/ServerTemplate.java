@@ -24,14 +24,14 @@ import java.net.SocketAddress;
  */
 
 @Getter
-public abstract class TcpServerTemplate {
+public abstract class ServerTemplate {
 
-    private static final InternalLogger log = InternalLoggerFactory.getInstance(TcpServerTemplate.class);
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(ServerTemplate.class);
     private final        EventLoopGroup parentEventLoopGroup, childEventLoopGroup;
 
     private final ServerBootstrap serverBootstrap;
 
-    protected TcpServerTemplate(int bindPort)
+    protected ServerTemplate(int bindPort)
     {
         InetSocketAddress bindAddress = new InetSocketAddress(bindPort);
         this.childEventLoopGroup  = childEventLoopGroup();

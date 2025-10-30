@@ -31,34 +31,38 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
 
     private final boolean skipLeftBytes;
 
-    protected StructCodec()
-    {
+    protected StructCodec() {
         this.skipLeftBytes = DEFAULT_SKIP_LEFT_BYTES;
     }
 
-    protected StructCodec(boolean skipLeftBytes)
-    {
+    protected StructCodec(boolean skipLeftBytes) {
         this.skipLeftBytes = skipLeftBytes;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out)
-    {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
         try {
             out.add(StructSerializer.toStruct(type, msg));
-        } finally {
-            // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes is true
+        }
+        finally {
+            // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes
+            // is true
             if (skipLeftBytes && msg.readableBytes() > 0) {
                 int readableLength = msg.readableBytes();
-                log.debug("There is still readable bytes in the buffer after serialization, it will be skipped, length is [{}]", readableLength);
+                log.debug("There is still readable bytes in the buffer after serialization, it will be skipped, "
+                          + "length is [{}]", readableLength);
                 msg.skipBytes(readableLength);
             }
         }
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out)
-    {
-        out.writeBytes(StructSerializer.toByteBuf(type, struct));
+    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
+        try {
+            out.writeBytes(StructSerializer.toByteBuf(type, struct));
+        }
+        catch (Exception error) {
+            log.error("struct serialization failed, channel: {} struct: {}", struct, ctx.channel(), error);
+        }
     }
 }

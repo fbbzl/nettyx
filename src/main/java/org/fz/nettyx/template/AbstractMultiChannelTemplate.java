@@ -36,22 +36,13 @@ import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 @SuppressWarnings({ "unchecked", "unused" })
 public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F extends ChannelConfig> extends Template<C> {
 
-    protected static final AttributeKey<?> MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
-    private static final   InternalLogger  log               = InternalLoggerFactory.getInstance(AbstractMultiChannelTemplate.class);
+    protected static final AttributeKey<?>             MULTI_CHANNEL_KEY = AttributeKey.valueOf("__$multi_channel_key$");
+    private static final   InternalLogger              log               = InternalLoggerFactory.getInstance(AbstractMultiChannelTemplate.class);
+    protected final        ChannelStorage<K>           channelStorage    = new ChannelStorage<>(16);
+    protected              ConcurrentMap<K, Bootstrap> bootstrapMap;
 
-    private final ChannelStorage<K>           channelStorage = new ChannelStorage<>(16);
-    private final Map<K, SocketAddress>       addressMap;
-    private final ConcurrentMap<K, Bootstrap> bootstrapMap;
-
-    protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap)
-    {
-        this.addressMap   = (Map<K, SocketAddress>) addressMap;
+    protected <S extends SocketAddress> AbstractMultiChannelTemplate(Map<K, S> addressMap) {
         this.bootstrapMap = new SafeConcurrentHashMap<>(MapUtil.map(addressMap, this::newBootstrap));
-    }
-
-    public Map<K, ChannelFuture> connectAll()
-    {
-        return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
     public ChannelFuture connect(K key)

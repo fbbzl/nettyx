@@ -2,7 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is unsigned int
@@ -11,11 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public class cuint extends CBasic<Long> {
-
-    public static final cuint
-            MIN_VALUE = new cuint(0L),
-            MAX_VALUE = new cuint(Integer.MAX_VALUE * 2L + 1);
+public class cuint extends Cbasic<Long> {
 
     public cuint(Long value) {
         super(value, 4);
@@ -25,22 +23,24 @@ public class cuint extends CBasic<Long> {
         super(buf, 4);
     }
 
-    public static cuint of(Long value) {
-        return new cuint(value);
-    }
-
     @Override
     public boolean hasSinged() {
         return false;
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value, int size) {
-        return Unpooled.buffer(size).writeIntLE(value.intValue());
+    protected ByteBuf toByteBuf(Long value, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeIntLE(value.intValue());
+        else
+            return Unpooled.buffer(size).writeInt(value.intValue());
     }
 
     @Override
-    protected Long toValue(ByteBuf byteBuf) {
-        return byteBuf.readUnsignedIntLE();
+    protected Long toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readUnsignedIntLE();
+        else
+            return byteBuf.readUnsignedInt();
     }
 }

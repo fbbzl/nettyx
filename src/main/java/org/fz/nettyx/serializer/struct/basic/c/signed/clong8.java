@@ -2,7 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is long8
@@ -11,11 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/18 13:29
  */
-public class clong8 extends CBasic<Long> {
-
-    public static final clong8
-            MIN_VALUE = new clong8(Long.MIN_VALUE),
-            MAX_VALUE = new clong8(Long.MAX_VALUE);
+public class clong8 extends Cbasic<Long> {
 
     public clong8(Long value) {
         super(value, 8);
@@ -25,18 +23,20 @@ public class clong8 extends CBasic<Long> {
         super(buf, 8);
     }
 
-    public static clong8 of(Long value) {
-        return new clong8(value);
+    @Override
+    protected ByteBuf toByteBuf(Long value, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeLongLE(value);
+        else
+            return Unpooled.buffer(size).writeLong(value);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value, int size) {
-        return Unpooled.buffer(size).writeLongLE(value);
-    }
-
-    @Override
-    protected Long toValue(ByteBuf byteBuf) {
-        return byteBuf.readLongLE();
+    protected Long toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readLongLE();
+        else
+            return byteBuf.readLong();
     }
 
 }

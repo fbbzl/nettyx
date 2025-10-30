@@ -11,19 +11,11 @@ import io.netty.buffer.ByteBuf;
  */
 public class culong4 extends cuint {
 
-    public static final culong4
-            MIN_VALUE = new culong4(0L),
-            MAX_VALUE = new culong4(Integer.MAX_VALUE * 2L + 1);
-
     public culong4(Long value) {
         super(value);
     }
 
     public culong4(ByteBuf buf) {
         super(buf);
-    }
-
-    public static culong4 of(Long value) {
-        return new culong4(value);
     }
 }

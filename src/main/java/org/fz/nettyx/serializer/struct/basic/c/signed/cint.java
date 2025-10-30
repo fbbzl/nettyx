@@ -2,7 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is int
@@ -11,18 +13,10 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/15 14:38
  */
-public class cint extends CBasic<Integer> {
-
-    public static final cint
-            MIN_VALUE = new cint(Integer.MIN_VALUE),
-            MAX_VALUE = new cint(Integer.MAX_VALUE);
+public class cint extends Cbasic<Integer> {
 
     public cint(Integer value) {
         super(value, 4);
-    }
-
-    public static cint of(Integer value) {
-        return new cint(value);
     }
 
     public cint(ByteBuf buf) {
@@ -30,12 +24,18 @@ public class cint extends CBasic<Integer> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
-        return Unpooled.buffer(size).writeIntLE(value);
+    protected ByteBuf toByteBuf(Integer value, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeIntLE(value);
+        else
+            return Unpooled.buffer(size).writeInt(value);
     }
 
     @Override
-    protected Integer toValue(ByteBuf byteBuf) {
-        return byteBuf.readIntLE();
+    protected Integer toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readIntLE();
+        else
+            return byteBuf.readInt();
     }
 }
