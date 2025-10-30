@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
+import org.fz.nettyx.serializer.struct.basic.cpp.Cppbasic;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
  * @version 1.0
  * @since 2023/12/27 13:31
  */
-public class cppchar32_t extends cppbasic<Integer> {
+public class cppchar32_t extends Cppbasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 

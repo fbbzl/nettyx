@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
 
@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public class cuint extends cbasic<Long> {
+public class cuint extends Cbasic<Long> {
 
     public cuint(Long value) {
         super(value, 4);

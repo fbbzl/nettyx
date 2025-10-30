@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 import cn.hutool.core.util.PrimitiveArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.math.BigInteger;
 import java.nio.ByteOrder;
@@ -15,7 +15,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/18 13:30
  */
-public class culong8 extends cbasic<BigInteger> {
+public class culong8 extends Cbasic<BigInteger> {
 
     public culong8(BigInteger value) {
         super(value, 8);

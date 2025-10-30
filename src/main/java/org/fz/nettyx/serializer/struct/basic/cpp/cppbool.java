@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/18 15:17
  */
-public class cppbool extends cppbasic<Boolean> {
+public class cppbool extends Cppbasic<Boolean> {
 
     public cppbool(Boolean value) {
         super(value, 1);

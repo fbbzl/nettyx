@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.cpp;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 /**
  * The type Cpp basic.
@@ -10,13 +10,13 @@ import org.fz.nettyx.serializer.struct.basic.c.cbasic;
  * @version 1.0
  * @since 2023 /12/15 16:04
  */
-public abstract class cppbasic<V extends Comparable<V>> extends cbasic<V> {
+public abstract class Cppbasic<V extends Comparable<V>> extends Cbasic<V> {
 
-    protected cppbasic(V value, int size) {
+    protected Cppbasic(V value, int size) {
         super(value, size);
     }
 
-    protected cppbasic(ByteBuf buf, int size) {
+    protected Cppbasic(ByteBuf buf, int size) {
         super(buf, size);
     }
 
