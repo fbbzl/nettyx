@@ -2,7 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is unsigned short
@@ -11,14 +13,14 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cushort extends CBasic<Integer> {
-
-    public static final cushort
-            MIN_VALUE = new cushort(0),
-            MAX_VALUE = new cushort(Short.MAX_VALUE * 2 + 1);
+public class cushort extends Cbasic<Integer> {
 
     public cushort(Integer value) {
         super(value, 2);
+    }
+
+    public cushort(ByteBuf buf) {
+        super(buf, 2);
     }
 
     @Override
@@ -26,22 +28,20 @@ public class cushort extends CBasic<Integer> {
         return false;
     }
 
-    public cushort(ByteBuf buf) {
-        super(buf, 2);
-    }
-
-    public static cushort of(Integer value) {
-        return new cushort(value);
+    @Override
+    protected ByteBuf toByteBuf(Integer value, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeShortLE(value);
+        else
+            return Unpooled.buffer(size).writeShort(value);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, int size) {
-        return Unpooled.buffer(size).writeShortLE(value.shortValue());
-    }
-
-    @Override
-    protected Integer toValue(ByteBuf byteBuf) {
-        return byteBuf.readUnsignedShortLE();
+    protected Integer toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readUnsignedShortLE();
+        else
+            return byteBuf.readUnsignedShort();
     }
 
 }

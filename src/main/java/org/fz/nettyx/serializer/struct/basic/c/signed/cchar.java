@@ -2,8 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -14,11 +15,7 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since 2023 /12/15 14:38
  */
-public class cchar extends CBasic<Byte> {
-
-    public static final cchar
-            MIN_VALUE = new cchar(Integer.valueOf(Byte.MIN_VALUE)),
-            MAX_VALUE = new cchar(Integer.valueOf(Byte.MAX_VALUE));
+public class cchar extends Cbasic<Byte> {
 
     public cchar(Integer value) {
         super(value.byteValue(), 1);
@@ -28,17 +25,13 @@ public class cchar extends CBasic<Byte> {
         super(buf, 1);
     }
 
-    public static cchar of(Integer value) {
-        return new cchar(value);
-    }
-
     @Override
-    protected ByteBuf toByteBuf(Byte value, int size) {
+    protected ByteBuf toByteBuf(Byte value, ByteOrder byteOrder) {
         return Unpooled.buffer(size).writeByte(value);
     }
 
     @Override
-    protected Byte toValue(ByteBuf byteBuf) {
+    protected Byte toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         return byteBuf.readByte();
     }
 

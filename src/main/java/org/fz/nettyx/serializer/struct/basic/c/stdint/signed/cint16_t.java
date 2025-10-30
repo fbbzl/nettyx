@@ -12,20 +12,12 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
  */
 public class cint16_t extends cshort {
 
-    public static final cint16_t
-            MIN_VALUE = new cint16_t(Integer.valueOf(Short.MIN_VALUE)),
-            MAX_VALUE = new cint16_t(Integer.valueOf(Short.MAX_VALUE));
-
     public cint16_t(Integer value) {
         super(value);
     }
 
     public cint16_t(ByteBuf buf) {
         super(buf);
-    }
-
-    public static cint16_t of(Integer value) {
-        return new cint16_t(value);
     }
 
 }

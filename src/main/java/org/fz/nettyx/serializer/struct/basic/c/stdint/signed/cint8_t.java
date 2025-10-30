@@ -2,7 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.stdint.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is int8_t
@@ -11,11 +13,7 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023/12/15 14:38
  */
-public class cint8_t extends CBasic<Byte> {
-
-    public static final cint8_t
-            MIN_VALUE = new cint8_t(Integer.valueOf(Byte.MIN_VALUE)),
-            MAX_VALUE = new cint8_t(Integer.valueOf(Byte.MAX_VALUE));
+public class cint8_t extends Cbasic<Byte> {
 
     public cint8_t(Integer value) {
         super(value.byteValue(), 1);
@@ -26,17 +24,13 @@ public class cint8_t extends CBasic<Byte> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Byte value, int size) {
+    protected ByteBuf toByteBuf(Byte value, ByteOrder byteOrder) {
         return Unpooled.buffer(size).writeByte(value);
     }
 
     @Override
-    protected Byte toValue(ByteBuf byteBuf) {
+    protected Byte toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
         return byteBuf.readByte();
-    }
-
-    public static cint8_t of(Integer value) {
-        return new cint8_t(value);
     }
 
 }

@@ -1,6 +1,6 @@
 package org.fz.nettyx.exception;
 
-import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
