@@ -37,9 +37,9 @@
 
     <properties>
         <!--build-->
-        <java.version>8</java.version>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven-compiler-plugin-version>3.8.1</maven-compiler-plugin-version>
@@ -62,7 +62,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.1.7-RELEASE</erwin.version>
+        <erwin.version>1.2.4-RELEASE</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>

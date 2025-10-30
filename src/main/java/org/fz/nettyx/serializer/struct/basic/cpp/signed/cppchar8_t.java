@@ -20,8 +20,4 @@ public class cppchar8_t extends cchar {
         super(buf);
     }
 
-    public static cppchar8_t of(Integer value) {
-        return new cppchar8_t(value);
-    }
-
 }
