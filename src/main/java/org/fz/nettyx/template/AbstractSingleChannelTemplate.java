@@ -26,14 +26,11 @@ import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(AbstractSingleChannelTemplate.class);
-    private final        SocketAddress  remoteAddress;
-    private final        Bootstrap      bootstrap;
-    private              C              channel;
+    protected Bootstrap bootstrap;
+    protected C         channel;
 
-    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress)
-    {
-        this.remoteAddress = remoteAddress;
-        this.bootstrap     = newBootstrap(remoteAddress);
+    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
+        this.bootstrap = this.newBootstrap(remoteAddress);
     }
 
     public ChannelFuture connect()

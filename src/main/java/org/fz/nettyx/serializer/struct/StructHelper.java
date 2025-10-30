@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.ModifierUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -8,9 +9,12 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.Struct.Endian;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.reflect.*;
+import java.nio.ByteOrder;
 
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
@@ -29,13 +33,20 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 @UtilityClass
 public class StructHelper {
 
-    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass)
+    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass, ByteOrder byteOrder)
     {
-        return newBasic(basicClass, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
+        return newBasic(basicClass, byteOrder, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
     }
 
     public static int findBasicSize(Type basicClass) {
         return BASIC_SIZE_CACHE.get(basicClass);
+    }
+
+    public static ByteOrder getByteOrder(Class<?> clazz) {
+        Struct annotation = AnnotationUtil.getAnnotation(clazz, Struct.class);
+        if (annotation == null) return Endian.NATIVE.getByteOrder();
+
+        return annotation.endian().getByteOrder();
     }
 
     public static int reflectForSize(Class<? extends Basic<?>> basicClass)
@@ -43,7 +54,7 @@ public class StructHelper {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try
         {
-            return newBasic(basicClass, fillingBuf).getSize();
+            return newBasic(basicClass, ByteOrder.nativeOrder(), fillingBuf).getSize();
         }
         finally
         {
@@ -56,16 +67,20 @@ public class StructHelper {
      *
      * @param <B>        the type parameter
      * @param basicClass the basic class
+     * @param byteOrder  the byte order
      * @param buf        the buf
      * @return the t
      */
     public static <B extends Basic<?>> B newBasic(
-            Class<?> basicClass,
-            ByteBuf  buf)
+            Class<?>  basicClass,
+            ByteOrder byteOrder,
+            ByteBuf   buf)
     {
         try
         {
-            return (B) BASIC_BYTEBUF_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
+            B basic = (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
+            basic.setByteOrder(byteOrder);
+            return basic;
         }
         catch (Exception instanceError)
         {
@@ -106,34 +121,30 @@ public class StructHelper {
         return hasAnnotation(field, Ignore.class) || hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
     }
 
-    public static <T> T[] newArray(
-            Type componentType,
-            int  length)
+    public static <T> T[] newArray(Type componentType, int length)
     {
-        if (componentType instanceof Class<?>)          return (T[]) Array.newInstance((Class<?>) componentType, length);
-        if (componentType instanceof ParameterizedType) return (T[]) Array.newInstance((Class<?>) ((ParameterizedType) componentType).getRawType(), length);
-        else                                            return (T[]) Array.newInstance(Object.class, length);
+        return switch (componentType) {
+            case Class<?> clazz ->
+                    (T[]) Array.newInstance(clazz, length);
+            case ParameterizedType parameterizedType ->
+                    (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
+            default ->
+                    (T[]) Array.newInstance(Object.class, length);
+        };
     }
 
-    public static <T> T basicNullDefault(
-            Object   fieldValue,
-            Class<?> fieldActualType)
+    public static <T> T defaultBasic(
+            Object    fieldValue,
+            ByteOrder byteOrder,
+            Class<?>  fieldActualType)
     {
-        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType));
+        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType, byteOrder));
     }
 
-    public static <T> T structNullDefault(
+    public static <T> T defaultStruct(
             Object fieldValue,
             Type   fieldActualType)
     {
         return (T) defaultIfNull(fieldValue, () -> newStruct(fieldActualType));
-    }
-
-    public static <T> T[] arrayNullDefault(
-            Object arrayValue,
-            Type   componentType,
-            int    length)
-    {
-        return (T[]) defaultIfNull(arrayValue, () -> newArray(componentType, length));
     }
 }

@@ -13,19 +13,11 @@ import java.math.BigInteger;
  */
 public class culonglong extends culong8 {
 
-    public static final culonglong
-            MIN_VALUE = new culonglong(BigInteger.ZERO),
-            MAX_VALUE = new culonglong(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.valueOf(Long.MAX_VALUE)).add(BigInteger.ONE));
-
     public culonglong(BigInteger value) {
         super(value);
     }
 
     public culonglong(ByteBuf buf) {
         super(buf);
-    }
-
-    public static culonglong of(BigInteger value) {
-        return new culonglong(value);
     }
 }
