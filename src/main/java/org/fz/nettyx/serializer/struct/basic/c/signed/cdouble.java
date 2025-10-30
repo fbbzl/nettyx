@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
 
@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cdouble extends cbasic<Double> {
+public class cdouble extends Cbasic<Double> {
 
     public cdouble(Double value) {
         super(value, 8);

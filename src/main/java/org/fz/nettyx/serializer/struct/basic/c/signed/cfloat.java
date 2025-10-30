@@ -2,7 +2,7 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
 
@@ -13,7 +13,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cfloat extends cbasic<Float> {
+public class cfloat extends Cbasic<Float> {
 
     public cfloat(Float value) {
         super(value, 4);
