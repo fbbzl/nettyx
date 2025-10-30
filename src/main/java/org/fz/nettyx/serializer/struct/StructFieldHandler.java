@@ -2,14 +2,12 @@ package org.fz.nettyx.serializer.struct;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-
-import static org.fz.nettyx.serializer.struct.StructHelper.basicNullDefault;
-import static org.fz.nettyx.serializer.struct.StructHelper.structNullDefault;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -36,6 +34,8 @@ public interface StructFieldHandler<A extends Annotation> {
         return false;
     }
 
+    default void doAnnotationValid(A annotation, Field field) {}
+
     default Object doRead(
             StructSerializer serializer,
             Type             root,
@@ -45,7 +45,7 @@ public interface StructFieldHandler<A extends Annotation> {
             ByteBuf          reading,
             A                annotation)
     {
-        if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, reading);
+        if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, field.byteOrder(), reading);
         if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType, reading);
 
         throw new TypeJudgmentException(field);
@@ -62,11 +62,11 @@ public interface StructFieldHandler<A extends Annotation> {
             A                annotation)
     {
         if (serializer.isBasic(fieldType)) {
-            serializer.writeBasic((Basic<?>) basicNullDefault(fieldVal, (Class<? extends Basic<?>>) fieldType), writing);
+            serializer.writeBasic((Basic<?>) StructHelper.defaultBasic(fieldVal, field.byteOrder(), (Class<? extends Basic<?>>) fieldType), writing);
             return;
         }
         if (serializer.isStruct(fieldType)) {
-            serializer.writeStruct(fieldType, structNullDefault(fieldVal, fieldType), writing);
+            serializer.writeStruct(fieldType, StructHelper.defaultStruct(fieldVal, fieldType), writing);
             return;
         }
         throw new TypeJudgmentException(field);

@@ -12,20 +12,12 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
  */
 public class cppshort extends cshort {
 
-    public static final cppshort
-            MIN_VALUE = new cppshort(Integer.valueOf(Short.MIN_VALUE)),
-            MAX_VALUE = new cppshort(Integer.valueOf(Short.MAX_VALUE));
-
     public cppshort(Integer value) {
         super(value);
     }
 
     public cppshort(ByteBuf buf) {
         super(buf);
-    }
-
-    public static cppshort of(Integer value) {
-        return new cppshort(value);
     }
 
 }

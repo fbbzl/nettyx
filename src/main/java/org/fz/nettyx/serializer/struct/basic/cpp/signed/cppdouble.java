@@ -12,21 +12,12 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
  */
 public class cppdouble extends cdouble {
 
-
-    public static final cppdouble
-            MIN_VALUE = new cppdouble(Double.MIN_VALUE),
-            MAX_VALUE = new cppdouble(Double.MAX_VALUE);
-
     public cppdouble(Double value) {
         super(value);
     }
 
     public cppdouble(ByteBuf buf) {
         super(buf);
-    }
-
-    public static cppdouble of(Double value) {
-        return new cppdouble(value);
     }
 
 }
