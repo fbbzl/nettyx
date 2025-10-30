@@ -12,20 +12,12 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
  */
 public class cppfloat extends cfloat {
 
-    public static final cppfloat
-            MIN_VALUE = new cppfloat(Float.MIN_VALUE),
-            MAX_VALUE = new cppfloat(Float.MAX_VALUE);
-
     public cppfloat(Float value) {
         super(value);
     }
 
     public cppfloat(ByteBuf buf) {
         super(buf);
-    }
-
-    public static cppfloat of(Float value) {
-        return new cppfloat(value);
     }
 
 }

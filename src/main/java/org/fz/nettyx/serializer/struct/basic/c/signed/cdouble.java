@@ -2,7 +2,9 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.struct.basic.c.CBasic;
+import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+
+import java.nio.ByteOrder;
 
 /**
  * this type in C language is double
@@ -11,18 +13,10 @@ import org.fz.nettyx.serializer.struct.basic.c.CBasic;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cdouble extends CBasic<Double> {
-
-    public static final cdouble
-            MIN_VALUE = new cdouble(Double.MIN_VALUE),
-            MAX_VALUE = new cdouble(Double.MAX_VALUE);
+public class cdouble extends Cbasic<Double> {
 
     public cdouble(Double value) {
         super(value, 8);
-    }
-
-    public static cdouble of(Double value) {
-        return new cdouble(value);
     }
 
     public cdouble(ByteBuf buf) {
@@ -30,12 +24,18 @@ public class cdouble extends CBasic<Double> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Double value, int size) {
-        return Unpooled.buffer(size).writeDoubleLE(value);
+    protected ByteBuf toByteBuf(Double value, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return Unpooled.buffer(size).writeDoubleLE(value);
+        else
+            return Unpooled.buffer(size).writeDouble(value);
     }
 
     @Override
-    protected Double toValue(ByteBuf byteBuf) {
-        return byteBuf.readDoubleLE();
+    protected Double toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN)
+            return byteBuf.readDoubleLE();
+        else
+            return byteBuf.readDouble();
     }
 }

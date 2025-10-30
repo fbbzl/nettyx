@@ -11,19 +11,11 @@ import io.netty.buffer.ByteBuf;
  */
 public class clonglong extends clong8 {
 
-    public static final clonglong
-            MIN_VALUE = new clonglong(Long.MIN_VALUE),
-            MAX_VALUE = new clonglong(Long.MAX_VALUE);
-
     public clonglong(Long value) {
         super(value);
     }
 
     public clonglong(ByteBuf buf) {
         super(buf);
-    }
-
-    public static clonglong of(Long value) {
-        return new clonglong(value);
     }
 }
