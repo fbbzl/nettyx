@@ -10,7 +10,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
@@ -59,7 +58,6 @@ public @interface ToCharSequence {
                 Object           earlyStruct,
                 StructField      field,
                 Type             fieldType,
-                ByteOrder        byteOrder,
                 ByteBuf          reading,
                 ToCharSequence   toCharSequence)
         {
@@ -85,7 +83,6 @@ public @interface ToCharSequence {
                 StructField      field,
                 Type             fieldType,
                 Object           fieldVal,
-                ByteOrder        byteOrder,
                 ByteBuf          writing,
                 ToCharSequence   toCharSequence)
         {

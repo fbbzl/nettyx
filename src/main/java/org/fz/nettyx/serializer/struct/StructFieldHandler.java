@@ -8,7 +8,6 @@ import org.fz.nettyx.serializer.struct.basic.Basic;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.nio.ByteOrder;
 
 /**
  * The top-level parent class of all custom serialization processors default is not singleton
@@ -43,11 +42,10 @@ public interface StructFieldHandler<A extends Annotation> {
             Object           earlyStruct,
             StructField      field,
             Type             fieldType,
-            ByteOrder        byteOrder,
             ByteBuf          reading,
             A                annotation)
     {
-        if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, byteOrder, reading);
+        if (serializer.isBasic(fieldType))  return serializer.readBasic((Class<? extends Basic<?>>) fieldType, field.byteOrder(), reading);
         if (serializer.isStruct(fieldType)) return serializer.readStruct(fieldType, reading);
 
         throw new TypeJudgmentException(field);
@@ -60,12 +58,11 @@ public interface StructFieldHandler<A extends Annotation> {
             StructField      field,
             Type             fieldType,
             Object           fieldVal,
-            ByteOrder        byteOrder,
             ByteBuf          writing,
             A                annotation)
     {
         if (serializer.isBasic(fieldType)) {
-            serializer.writeBasic((Basic<?>) StructHelper.defaultBasic(fieldVal, byteOrder, (Class<? extends Basic<?>>) fieldType), writing);
+            serializer.writeBasic((Basic<?>) StructHelper.defaultBasic(fieldVal, field.byteOrder(), (Class<? extends Basic<?>>) fieldType), writing);
             return;
         }
         if (serializer.isStruct(fieldType)) {
