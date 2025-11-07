@@ -1,12 +1,13 @@
 package org.fz.nettyx.template.websocket.client;
 
 import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.AttributeKey;
@@ -30,23 +31,21 @@ public abstract class WebSocketClientTemplate extends AbstractSingleChannelTempl
 
     public static final AttributeKey<WebSocketClientHandshaker> HAND_SHAKER = AttributeKey.valueOf("$_handshake_$");
 
-    protected URI     uri;
-    protected Channel upstream;
+    protected URI uri;
 
-    public WebSocketClientTemplate(URI uri, Channel upstream) {
+    public WebSocketClientTemplate(URI uri) {
         super(new InetSocketAddress(uri.getHost(), uri.getPort() < 0 ? 80 : uri.getPort()));
-        this.uri      = uri;
-        this.upstream = upstream;
+        this.uri = uri;
     }
 
     @Override
-    protected ChannelInitializer<NioSocketChannel> channelInitializer() {
-        return new ChannelInitializer<NioSocketChannel>() {
+    protected final ChannelInitializer<NioSocketChannel> channelInitializer() {
+        return new ChannelInitializer<>() {
             @Override
             protected void initChannel(NioSocketChannel chl) {
                 chl.pipeline()
                    .addLast(defaultWebsocketClientHandlers(chl))
-                   .addLast(getStreamableChannelHandlers());
+                   .addLast(channelHandlers(chl));
             }
         };
     }
@@ -57,25 +56,29 @@ public abstract class WebSocketClientTemplate extends AbstractSingleChannelTempl
      * @return websocket handlers
      */
     protected ChannelHandler[] defaultWebsocketClientHandlers(NioSocketChannel chl) {
-        URI uri = URI.create(chl.remoteAddress().toString());
         WebSocketClientHandshaker webSocketClientHandshaker =
                 WebSocketClientHandshakerFactory.newHandshaker(uri, WebSocketVersion.V13, null, false, new DefaultHttpHeaders());
         chl.attr(HAND_SHAKER).set(webSocketClientHandshaker);
         return new ChannelHandler[] {
-                new HttpServerCodec(),
+                new HttpClientCodec(),
                 new ChunkedWriteHandler(),
                 new HttpObjectAggregator(8192),
                 new WebSocketClientProtocolHandler(webSocketClientHandshaker)
         };
     }
 
-    protected abstract ChannelHandler[] getStreamableChannelHandlers();
+    @Override
+    protected EventLoopGroup newEventLoopGroup() {
+        return new NioEventLoopGroup();
+    }
+
+    protected abstract ChannelHandler[] channelHandlers(Channel channel);
 
     @RequiredArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     public abstract static class StreamableChannelHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
         private static final InternalLogger log = InternalLoggerFactory.getInstance(StreamableChannelHandler.class);
-        protected Channel upstream;
+        protected            Channel        upstream;
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
