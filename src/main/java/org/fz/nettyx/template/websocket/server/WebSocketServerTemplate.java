@@ -3,9 +3,9 @@ package org.fz.nettyx.template.websocket.server;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.fz.nettyx.template.tcp.server.ServerTemplate;
@@ -24,13 +24,13 @@ public abstract class WebSocketServerTemplate extends ServerTemplate {
     }
 
     @Override
-    protected ChannelInitializer<? extends Channel> childChannelInitializer() {
-        return new ChannelInitializer<Channel>() {
+    protected final ChannelInitializer<? extends Channel> childChannelInitializer() {
+        return new ChannelInitializer<>() {
             @Override
-            protected void initChannel(Channel socketChannel) {
-                socketChannel.pipeline()
-                             .addLast(defaultWebsocketServerHandlers())
-                             .addLast(childChannelHandlers());
+            protected void initChannel(Channel channel) {
+                channel.pipeline()
+                             .addLast(defaultWebsocketServerHandlers(channel))
+                             .addLast(childChannelHandlers(channel));
             }
         };
     }
@@ -40,16 +40,14 @@ public abstract class WebSocketServerTemplate extends ServerTemplate {
      *
      * @return websocket handlers
      */
-    protected ChannelHandler[] defaultWebsocketServerHandlers() {
+    protected ChannelHandler[] defaultWebsocketServerHandlers(Channel channel) {
         return new ChannelHandler[] {
                 new HttpServerCodec(),
                 new ChunkedWriteHandler(),
                 new HttpObjectAggregator(8192),
-                new WebSocketServerProtocolHandler(this.getWebSocketConfig())
+                new WebSocketServerProtocolHandler("/ws", HttpHeaderValues.WEBSOCKET.toString(), true, 65536 * 10)
         };
     }
 
-    protected abstract WebSocketServerProtocolConfig getWebSocketConfig();
-
-    protected abstract ChannelHandler[] childChannelHandlers();
+    protected abstract ChannelHandler[] childChannelHandlers(Channel channel);
 }
