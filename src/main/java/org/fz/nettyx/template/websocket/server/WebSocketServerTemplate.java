@@ -29,8 +29,8 @@ public abstract class WebSocketServerTemplate extends ServerTemplate {
             @Override
             protected void initChannel(Channel channel) {
                 channel.pipeline()
-                             .addLast(defaultWebsocketServerHandlers(channel))
-                             .addLast(childChannelHandlers(channel));
+                       .addLast(defaultWebsocketServerHandlers(channel))
+                       .addLast(childChannelHandlers(channel));
             }
         };
     }

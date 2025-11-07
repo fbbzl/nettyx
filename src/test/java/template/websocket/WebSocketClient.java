@@ -32,8 +32,9 @@ public class WebSocketClient extends WebSocketClientTemplate {
 
     @Override
     protected ChannelHandler[] channelHandlers(Channel channel) {
-        EscapeMap escapeMap = new EscapeMap();
-        escapeMap.putHex("7e", "7d5e");
+        EscapeMap escapeMap = new EscapeMap(){{
+            putHex("7e", "7d5e");
+        }};
         return new ChannelHandler[] {
                 new StartEndFlagFrameCodec(1024 * 1024, true, "7e")
                 , new EscapeCodec(escapeMap)
