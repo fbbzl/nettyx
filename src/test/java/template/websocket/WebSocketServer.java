@@ -5,6 +5,7 @@ import codec.UserCodec;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.logging.LoggingHandler;
 import org.fz.nettyx.codec.EscapeCodec;
 import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
@@ -34,7 +35,13 @@ public class WebSocketServer extends WebSocketServerTemplate {
                 new StartEndFlagFrameCodec(1024 * 1024, true, "7e")
                 , new EscapeCodec(escapeMap)
                 , new UserCodec()
-                , new MessageEchoHandler()
+                , new MessageEchoHandler(){
+                    @Override
+                    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+                        super.channelRead(ctx, msg);
+                        Console.log("server接收到消息：{}", msg);
+                    }
+                }
                 , new LoggingHandler(HEX_DUMP)};
     }
 
