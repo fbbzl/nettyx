@@ -5,11 +5,11 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolConfig;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import org.fz.nettyx.template.tcp.server.ServerTemplate;
 
-import static io.netty.handler.codec.http.HttpHeaders.Values.WEBSOCKET;
 
 /**
  * @author fengbinbin
@@ -45,9 +45,11 @@ public abstract class WebSocketServerTemplate extends ServerTemplate {
                 new HttpServerCodec(),
                 new ChunkedWriteHandler(),
                 new HttpObjectAggregator(8192),
-                new WebSocketServerProtocolHandler("/ws", WEBSOCKET, true, 65536 * 10)
+                new WebSocketServerProtocolHandler(this.getWebSocketConfig())
         };
     }
+
+    protected abstract WebSocketServerProtocolConfig getWebSocketConfig();
 
     protected abstract ChannelHandler[] childChannelHandlers();
 }
