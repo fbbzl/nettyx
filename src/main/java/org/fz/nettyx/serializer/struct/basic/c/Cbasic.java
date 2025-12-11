@@ -44,7 +44,6 @@ public abstract class Cbasic<V extends Comparable<V>> extends Basic<V> {
         return C_DEFAULT_SINGED;
     }
 
-    @Override
     public ByteOrder order() {
         return C_DEFAULT_ENDIAN;
     }
