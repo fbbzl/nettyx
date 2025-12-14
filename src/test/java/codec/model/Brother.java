@@ -13,11 +13,11 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 @Struct
 @Data
 public class Brother {
-    @ToArray(flexible = true)
-    cint[] ages;
-
 //    @ToArray(flexible = true)
-//    Son<cint, cint>[] sons;
+//    cint[] ages;
+
+    @ToArray(flexible = true)
+    Son<cint, cint>[] sons;
 
 //    @ToArray(flexible = true)
 //    Lover[] lovers;
