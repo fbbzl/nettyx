@@ -3,7 +3,6 @@ package codec.model;
 import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 
 /**
  * @author fengbinbin
@@ -16,10 +15,10 @@ public class Brother {
 //    @ToArray(flexible = true)
 //    cint[] ages;
 
-    @ToArray(flexible = true)
-    Son<cint, cint>[] sons;
-
 //    @ToArray(flexible = true)
-//    Lover[] lovers;
+//    Son<cint, cint>[] sons;
+
+    @ToArray(flexible = true)
+    Lover[] lovers;
 
 }
