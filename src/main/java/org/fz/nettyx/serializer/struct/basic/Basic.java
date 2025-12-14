@@ -56,15 +56,6 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public abstract boolean hasSinged();
 
     /**
-     * Order byte order.
-     *
-     * @return the byte order
-     */
-    public ByteOrder order() {
-        return byteOrder;
-    }
-
-    /**
      * To byte buf.
      *
      * @param value     the value
@@ -120,9 +111,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         if (anotherObj instanceof Cbasic<?> cBasic) {
             if (this.getSize()   != cBasic.getSize()
                 ||
-                this.hasSinged() != cBasic.hasSinged()
-                ||
-                this.order()     != cBasic.order()) {
+                this.hasSinged() != cBasic.hasSinged()) {
                 return false;
             }
 
