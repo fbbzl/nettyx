@@ -18,7 +18,7 @@ public class Brother {
 //    cint[] ages;
 
     @ToArray(flexible = true)
-    Son<cint, cint>[] sons;
+    Son<Lover, cint>[] sons;
 
 //    @ToArray(flexible = true)
 //    Lover[] lovers;
