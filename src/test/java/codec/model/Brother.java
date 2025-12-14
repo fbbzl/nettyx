@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
  * @version 1.0
  * @since 2025/9/26 0:41
  */
-@Struct(endian = Endian.BE)
+@Struct(endian = Endian.LE)
 @Data
 public class Brother {
 //    @ToArray(flexible = true)
