@@ -41,8 +41,9 @@ public class SerializerTest {
         byte[] buf      = toBytes(userTypeRefer, user);
         byte[] emptyBuf = toBytes(userTypeRefer, new User<>());
         System.err.println(emptyBuf.length);
-        byte[] bytes1 = new byte[16];
-        Arrays.fill(bytes1, (byte) 67);
+
+        byte[] bytes1 = {16,23,32,11,12,13,14,15,16,17,18,19,20,21,22,22,11,15,26,127,46,34,43,68,24,12,34,12,33,34,35,36,37,38,39,40,41,43,44,45,46,48,49,50,51,52,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79};
+
         Brother brother = toStruct(brotherRefer, bytes1);
         byte[]  bytes2  = toBytes(brotherRefer, brother);
         Console.log(">correctness test passed!!!!!!!!<");
