@@ -12,7 +12,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 
 import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.BE;
-import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.LITTLE;
+import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.LE;
 
 /**
  * @author fengbinbin
@@ -46,7 +46,7 @@ public class You {
 
 
     @Data
-    @Struct(endian = LITTLE)
+    @Struct(endian = LE)
     public static class Hit {
         culong8 interest;
     }
