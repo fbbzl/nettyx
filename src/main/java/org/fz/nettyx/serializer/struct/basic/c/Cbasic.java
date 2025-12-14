@@ -44,10 +44,6 @@ public abstract class Cbasic<V extends Comparable<V>> extends Basic<V> {
         return C_DEFAULT_SINGED;
     }
 
-    public ByteOrder order() {
-        return C_DEFAULT_ENDIAN;
-    }
-
     @Override
     public String toString() {
         return this.getValue().toString();
