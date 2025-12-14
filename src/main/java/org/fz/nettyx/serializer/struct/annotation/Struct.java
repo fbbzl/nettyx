@@ -33,12 +33,12 @@ public @interface Struct {
         /**
          * Big endian - most significant byte first
          */
-        BIG(ByteOrder.BIG_ENDIAN),
+        BE(ByteOrder.BIG_ENDIAN),
 
         /**
          * Little endian - least significant byte first
          */
-        LITTLE(ByteOrder.LITTLE_ENDIAN),
+        LE(ByteOrder.LITTLE_ENDIAN),
 
         /**
          * Native endian - follows the byte order of the underlying platform
