@@ -6,7 +6,7 @@
 
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.5-RELEASE</version>
+    <version>2.6.6-RELEASE</version>
 
     <name>nettyx</name>
     <description>a tool about netty</description>
@@ -62,7 +62,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.2.4-RELEASE</erwin.version>
+        <erwin.version>1.2.5-RELEASE</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
