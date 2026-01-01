@@ -1,11 +1,11 @@
 package org.fz.nettyx.serializer.struct;
 
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import org.fz.erwin.exception.Throws;
-import org.fz.erwin.lang.TypeRefer;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TypeJudgmentException;
@@ -60,8 +60,8 @@ public final class StructSerializer implements Serializer {
             Type    root,
             ByteBuf byteBuf)
     {
-        if (root instanceof TypeRefer<?> typeRefer)
-            return toStruct(typeRefer.getTypeValue(), byteBuf);
+        if (root instanceof TypeReference<?> typeRefer)
+            return toStruct(typeRefer.getType(), byteBuf);
         else
             return new StructSerializer(root).doDeserialize(byteBuf);
     }
@@ -108,8 +108,8 @@ public final class StructSerializer implements Serializer {
                     new StructSerializer(clazz).doSerialize(struct);
             case ParameterizedType parameterizedType ->
                     new StructSerializer(parameterizedType).doSerialize(struct);
-            case TypeRefer<?> typeRefer ->
-                    toByteBuf(typeRefer.getTypeValue(), struct);
+            case TypeReference<?> typeRefer ->
+                    toByteBuf(typeRefer.getType(), struct);
             default ->
                     throw new TypeJudgmentException(root);
         };
