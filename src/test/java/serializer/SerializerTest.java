@@ -2,8 +2,8 @@ package serializer;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.lang.TypeReference;
 import codec.model.*;
-import org.fz.erwin.lang.TypeRefer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
@@ -25,15 +25,15 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
  */
 public class SerializerTest {
 
-    static final         TypeRefer<You>          youTypeRefer = new TypeRefer<>() {};
-    static final         TypeRefer<Brother>      brotherRefer = new TypeRefer<>() {};
+    static final TypeReference<You> youTypeRefer = new TypeReference<>() {};
+    static final TypeReference<Brother> brotherRefer = new TypeReference<>() {};
     private static final StructSerializerContext context      =
             new StructSerializerContext("codec.model");
 
     @Before
     public void correctnessTest() {
-        TypeRefer<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, GirlFriend>> userTypeRefer =
-                new TypeRefer<>() {};
+        TypeReference<User<Bill, Wife<Son<clong4, Bill>, Son<clong4, Bill>>, GirlFriend>> userTypeRefer =
+                new TypeReference<>() {};
 
         byte[] bytes = new byte[1200];
         Arrays.fill(bytes, (byte) 67);
