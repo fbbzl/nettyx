@@ -16,9 +16,11 @@
 </a>
 </p>
 
-## 鸣谢
- 首先谢谢家人, 给了我充足的时间专注在此项目上, 然后感谢JetBrain赠送的Ultimate Edition版的Idea, 最后谢谢自己.
- 希望此框架能够为大家节省哪怕一分钟的开发时间
+<p align="center" style="font-size: 20px;font-weight: bold;">鸣谢</p>
+<p style="text-indent: 2em;">
+首先谢谢家人, 给了我充足的时间专注在此项目上, 然后感谢JetBrain赠送的Ultimate Edition版的Idea, 最后谢谢自己.
+希望此框架能够为大家节省哪怕一分钟的开发时间
+</p>
 
 ## 链接
 JetBrain官网: https://www.jetbrains.com<br>
@@ -29,7 +31,7 @@ Gitee地址: https://gitee.com/fbbzl/nettyx<br>
 ### 介绍
 基于[netty4.1.X.Final]进行了超轻量级的封装, 提供了一些工具和基础模板, 并额外提供串口通信模板, 帮助你快速搭建基于netty的服务端/客户端应用 及 基于串口的应用
 
-#### 安装教程
+#### 教程
 1. 在项目添加以下依赖包：
 ```xml
 
