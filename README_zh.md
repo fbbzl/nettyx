@@ -1,6 +1,6 @@
 <h1 align="center">Nettyx</h1>
 
-<p>
+<p align="center">
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk21-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.21+-red" alt="JDK">
 </a>
