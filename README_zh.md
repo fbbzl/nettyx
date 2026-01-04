@@ -17,7 +17,7 @@
 </p>
 
 <p align="center" style="font-size: 20px;font-weight: bold;">鸣谢</p>
-<p style="text-indent: 2em;">
+<p style="text-indent: 2em;font-weight: bold;">
 首先谢谢家人, 给了我充足的时间专注在此项目上, 然后感谢JetBrain赠送的Ultimate Edition版的Idea, 最后谢谢自己.
 希望此框架能够为大家节省哪怕一分钟的开发时间
 </p>

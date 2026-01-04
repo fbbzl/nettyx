@@ -16,9 +16,11 @@
 </a>
 </p>
 
-## Express gratitude
+<p align="center" style="font-size: 20px;font-weight: bold;">Express gratitude</p>
+<p style="text-indent: 2em;font-weight: bold;">
 First of all, I would like to thank my family for giving me enough time to focus on this project, then I would like to thank JetBrain for giving me the Ultimate Edition of the Idea, and finally I would like to thank myself.
 Hopefully, this framework will save you even a minute of development time
+</p>
 
 ## Links
 JetBrain Website: https://www.jetbrains.com<br>
