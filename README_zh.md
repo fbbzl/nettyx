@@ -1,4 +1,20 @@
-# Nettyx
+<h1 align="center">Nettyx</h1>
+
+<p>
+<a href="https://www.oracle.com/java/technologies/javase/javase-jdk21-downloads.html">
+    <img src="https://img.shields.io/badge/JDK-1.21+-red" alt="JDK">
+</a>
+
+<a href="https://opensource.org/licenses/mit-license.php">
+    <img src="https://img.shields.io/badge/license-APACHE 2.0-blue.svg" alt="License">
+</a>
+<a>
+    <img src="https://img.shields.io/badge/document-1.x-yellow.svg" alt="Documentation">
+</a>
+<a>
+    <img src="https://img.shields.io/badge/author-fbb-green.svg" alt="Author">
+</a>
+</p>
 
 ## 鸣谢
  首先谢谢家人, 给了我充足的时间专注在此项目上, 然后感谢JetBrain赠送的Ultimate Edition版的Idea, 最后谢谢自己.
