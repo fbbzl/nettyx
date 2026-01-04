@@ -1,4 +1,20 @@
-# Nettyx
+<h1 align="center">Nettyx</h1>
+
+<p>
+<a href="https://www.oracle.com/java/technologies/javase/javase-jdk21-downloads.html">
+    <img src="https://img.shields.io/badge/JDK-1.21+-red" alt="JDK">
+</a>
+
+<a href="https://opensource.org/licenses/mit-license.php">
+    <img src="https://img.shields.io/badge/license-APACHE 2.0-blue.svg" alt="License">
+</a>
+<a>
+    <img src="https://img.shields.io/badge/document-1.x-yellow.svg" alt="Documentation">
+</a>
+<a>
+    <img src="https://img.shields.io/badge/author-fbb-green.svg" alt="Author">
+</a>
+</p>
 
 ## Express gratitude
 First of all, I would like to thank my family for giving me enough time to focus on this project, then I would like to thank JetBrain for giving me the Ultimate Edition of the Idea, and finally I would like to thank myself.
