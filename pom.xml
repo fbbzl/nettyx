@@ -42,6 +42,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!--maven plugin-->
         <maven-compiler-plugin-version>3.14.1</maven-compiler-plugin-version>
         <maven-javadoc-plugin-version>3.12.0</maven-javadoc-plugin-version>
         <maven-gpg-plugin-version>3.2.8</maven-gpg-plugin-version>
@@ -49,6 +50,7 @@
         <maven-source-plugin-version>3.4.0</maven-source-plugin-version>
         <nexus-staging-maven-plugin-version>1.7.0</nexus-staging-maven-plugin-version>
 
+        <!--extension-->
         <lombok.version>1.18.42</lombok.version>
 
         <!--transport-->
@@ -58,7 +60,7 @@
         <jSerialComm.version>2.11.0</jSerialComm.version>
         <rxtx.version>2.1.7</rxtx.version>
 
-        <!--bluetooth-->
+        <!--blue tooth-->
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
