@@ -128,13 +128,13 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             byte[]  target,
             int     tarLength)
     {
-        switch (tarLength) {
-            case 1:
-            case 2: return hasSimilar(msgBuf, target, tarLength);
-            default: return hasSimilar(msgBuf, target, tarLength)
-                            &&
-                            equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
-        }
+        return switch (tarLength)
+        {
+            case 1, 2 -> hasSimilar(msgBuf, target, tarLength);
+            default -> hasSimilar(msgBuf, target, tarLength)
+                       &&
+                       equalsContent(getBytes(msgBuf, msgBuf.readerIndex(), tarLength), target);
+        };
     }
 
     private static boolean hasSimilar(

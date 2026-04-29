@@ -123,13 +123,11 @@ public class StructHelper {
 
     public static <T> T[] newArray(Type componentType, int length)
     {
-        return switch (componentType) {
-            case Class<?> clazz ->
-                    (T[]) Array.newInstance(clazz, length);
-            case ParameterizedType parameterizedType ->
-                    (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
-            default ->
-                    (T[]) Array.newInstance(Object.class, length);
+        return switch (componentType)
+        {
+            case Class<?>          clazz             -> (T[]) Array.newInstance(clazz, length);
+            case ParameterizedType parameterizedType -> (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
+            default                                  -> (T[]) Array.newInstance(Object.class, length);
         };
     }
 

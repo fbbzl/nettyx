@@ -97,12 +97,11 @@ public @interface ToArray {
 
         static Type getComponentType(Type root, Type type)
         {
-            return switch (type) {
-                case Class<?> clazz ->
-                        clazz.getComponentType();
-                case GenericArrayType genericArrayType ->
-                        TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
-                default -> type;
+            return switch (type)
+            {
+                case Class<?>         clazz            -> clazz.getComponentType();
+                case GenericArrayType genericArrayType -> TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
+                default                                -> type;
             };
         }
 
