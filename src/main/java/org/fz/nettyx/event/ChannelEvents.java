@@ -124,12 +124,11 @@ public class ChannelEvents {
      */
     public static boolean isAssignedState(Object obj, IdleState state)
     {
-        return switch (obj) {
-            case IdleStateEvent event ->
-                    event.state() == state;
-            case IdleState idleState ->
-                    idleState == state;
-            default -> false;
+        return switch (obj)
+        {
+            case IdleStateEvent event -> event.state() == state;
+            case IdleState idleState  -> idleState == state;
+            default                   -> false;
         };
     }
 

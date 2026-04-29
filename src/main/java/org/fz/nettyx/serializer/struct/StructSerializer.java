@@ -104,14 +104,10 @@ public final class StructSerializer implements Serializer {
         Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + root + "]");
 
         return switch (root) {
-            case Class<?> clazz ->
-                    new StructSerializer(clazz).doSerialize(struct);
-            case ParameterizedType parameterizedType ->
-                    new StructSerializer(parameterizedType).doSerialize(struct);
-            case TypeReference<?> typeRefer ->
-                    toByteBuf(typeRefer.getType(), struct);
-            default ->
-                    throw new TypeJudgmentException(root);
+            case Class<?>          clazz             -> new StructSerializer(clazz).doSerialize(struct);
+            case ParameterizedType parameterizedType -> new StructSerializer(parameterizedType).doSerialize(struct);
+            case TypeReference<?>  typeRefer         -> toByteBuf(typeRefer.getType(), struct);
+            default                                  -> throw new TypeJudgmentException(root);
         };
     }
 
@@ -340,25 +336,22 @@ public final class StructSerializer implements Serializer {
 
     public boolean isBasic(Type type)
     {
-        return switch (type) {
-            case Class<?> clazz ->
-                    Basic.class.isAssignableFrom(clazz) && Basic.class != type;
-            case TypeVariable<?> ignored ->
-                    isBasic(TypeUtil.getActualType(root, type));
-            default -> false;
+        return switch (type)
+        {
+            case Class<?>        clazz   -> Basic.class.isAssignableFrom(clazz) && Basic.class != type;
+            case TypeVariable<?> ignored -> isBasic(TypeUtil.getActualType(root, type));
+            default                      -> false;
         };
     }
 
     public boolean isStruct(Type type)
     {
-        return switch (type) {
-            case Class<?> clazz ->
-                    STRUCT_DEFINITION_CACHE.containsKey(clazz);
-            case ParameterizedType parameterizedType ->
-                    isStruct(parameterizedType.getRawType());
-            case TypeVariable<?> ignored ->
-                    isStruct(TypeUtil.getActualType(root, type));
-            default -> false;
+        return switch (type)
+        {
+            case Class<?>          clazz             -> STRUCT_DEFINITION_CACHE.containsKey(clazz);
+            case ParameterizedType parameterizedType -> isStruct(parameterizedType.getRawType());
+            case TypeVariable<?>   ignored           -> isStruct(TypeUtil.getActualType(root, type));
+            default                                  -> false;
         };
     }
 
