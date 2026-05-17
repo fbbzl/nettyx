@@ -6,7 +6,7 @@
 
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.9-RELEASE</version>
+    <version>${revision}</version>
 
     <name>nettyx</name>
     <description>a tool about netty</description>
@@ -36,12 +36,13 @@
     </licenses>
 
     <properties>
-        <!--build-->
+        <revision>2.6.10</revision>
+        <!--java-->
         <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!--maven-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
         <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
@@ -62,7 +63,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.2.5-RELEASE</erwin.version>
+        <erwin.version>1.2.11</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
@@ -93,6 +94,8 @@
             <version>${lombok.version}</version>
         </dependency>
 
+
+
         <dependency>
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>
@@ -117,6 +120,8 @@
             <version>${reflectasm.version}</version>
             <scope>test</scope>
         </dependency>
+
+
 
     </dependencies>
 
@@ -193,6 +198,32 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flatten-maven-plugin.version}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
                         </goals>
                     </execution>
                 </executions>
