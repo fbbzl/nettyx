@@ -253,10 +253,12 @@ call :push_branch "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_REMOTES%
 echo.
 echo ========== nettyx develop release commit ==========
 call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_DEV_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :run_in_dir "%PROJECT_NETTYX%" git -C "%PROJECT_NETTYX%" merge --squash "%NETTYX_FEATURE_BRANCH%" || exit /b 1
+call :squash_merge_nettyx_feature "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" || exit /b 1
+call :resolve_nettyx_develop_known_paths "%PROJECT_NETTYX%" || exit /b 1
 call :restore_head_paths "%PROJECT_NETTYX%" README.md README_zh.md || exit /b 1
 call :drop_or_restore_head_paths "%PROJECT_NETTYX%" src/test/java || exit /b 1
 call :clean_nettyx_develop_pom "%PROJECT_NETTYX%" || exit /b 1
+call :assert_no_unmerged_paths "%PROJECT_NETTYX%" || exit /b 1
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
 call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
 call :commit_staged_changes "nettyx develop" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
@@ -371,6 +373,55 @@ if "%SKIP_GIT_PUSH%"=="1" (
 )
 for %%R in (%PUSH_REMOTES%) do (
     call :run_in_dir "%PUSH_PROJECT_PATH%" git -C "%PUSH_PROJECT_PATH%" push %%R HEAD:%PUSH_BRANCH% || exit /b 1
+)
+exit /b 0
+
+:squash_merge_nettyx_feature
+set "SQUASH_PROJECT_PATH=%~1"
+set "SQUASH_FEATURE_BRANCH=%~2"
+call :run_in_dir_no_fail "%SQUASH_PROJECT_PATH%" git -C "%SQUASH_PROJECT_PATH%" merge --squash "%SQUASH_FEATURE_BRANCH%"
+set "SQUASH_EXIT=%ERRORLEVEL%"
+if "%DRY_RUN%"=="1" exit /b 0
+if "%SQUASH_EXIT%"=="0" exit /b 0
+echo Squash merge reported conflicts. Known nettyx develop-only paths will be resolved automatically.
+exit /b 0
+
+:resolve_nettyx_develop_known_paths
+set "RESOLVE_KNOWN_PROJECT_PATH=%~1"
+if "%DRY_RUN%"=="1" exit /b 0
+call :checkout_ours_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" README.md || exit /b 1
+call :checkout_ours_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" README_zh.md || exit /b 1
+call :checkout_theirs_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" .gitignore || exit /b 1
+call :checkout_theirs_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" pom.xml || exit /b 1
+call :drop_or_restore_head_paths "%RESOLVE_KNOWN_PROJECT_PATH%" src/test/java || exit /b 1
+exit /b 0
+
+:checkout_ours_if_unmerged
+set "CHECKOUT_PROJECT_PATH=%~1"
+set "CHECKOUT_PATH=%~2"
+git -C "%CHECKOUT_PROJECT_PATH%" ls-files -u -- "%CHECKOUT_PATH%" | findstr . >nul 2>nul
+if not "%ERRORLEVEL%"=="0" exit /b 0
+call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" checkout --ours -- "%CHECKOUT_PATH%" || exit /b 1
+call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" add -- "%CHECKOUT_PATH%" || exit /b 1
+exit /b 0
+
+:checkout_theirs_if_unmerged
+set "CHECKOUT_PROJECT_PATH=%~1"
+set "CHECKOUT_PATH=%~2"
+git -C "%CHECKOUT_PROJECT_PATH%" ls-files -u -- "%CHECKOUT_PATH%" | findstr . >nul 2>nul
+if not "%ERRORLEVEL%"=="0" exit /b 0
+call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" checkout --theirs -- "%CHECKOUT_PATH%" || exit /b 1
+call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" add -- "%CHECKOUT_PATH%" || exit /b 1
+exit /b 0
+
+:assert_no_unmerged_paths
+set "UNMERGED_PROJECT_PATH=%~1"
+if "%DRY_RUN%"=="1" exit /b 0
+git -C "%UNMERGED_PROJECT_PATH%" ls-files -u | findstr . >nul 2>nul
+if "%ERRORLEVEL%"=="0" (
+    echo Unresolved merge conflicts remain:
+    git -C "%UNMERGED_PROJECT_PATH%" diff --name-only --diff-filter=U
+    exit /b 1
 )
 exit /b 0
 
@@ -529,6 +580,27 @@ if not "%RUN_EXIT%"=="0" (
     exit /b %RUN_EXIT%
 )
 exit /b 0
+
+:run_in_dir_no_fail
+set "WORK_DIR=%~1"
+set "RUN_COMMAND="
+:run_in_dir_no_fail_args
+shift
+if "%~1"=="" goto run_in_dir_no_fail_ready
+if defined RUN_COMMAND (
+    set "RUN_COMMAND=!RUN_COMMAND! "%~1""
+) else (
+    set "RUN_COMMAND="%~1""
+)
+goto run_in_dir_no_fail_args
+:run_in_dir_no_fail_ready
+echo [%WORK_DIR%] !RUN_COMMAND!
+if "%DRY_RUN%"=="1" exit /b 0
+pushd "%WORK_DIR%" || exit /b 1
+call !RUN_COMMAND!
+set "RUN_EXIT=%ERRORLEVEL%"
+popd
+exit /b %RUN_EXIT%
 
 :fail
 echo.
