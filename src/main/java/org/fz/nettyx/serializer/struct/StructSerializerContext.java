@@ -206,9 +206,9 @@ public class StructSerializerContext {
     public static StructDefinition getStructDefinition(Type type)
     {
         return switch (type) {
-            case Class<?> clazz -> STRUCT_DEFINITION_CACHE.get(clazz);
+            case Class<?>          clazz             -> STRUCT_DEFINITION_CACHE.get(clazz);
             case ParameterizedType parameterizedType -> getStructDefinition(parameterizedType.getRawType());
-            default -> throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
+            default                                  -> throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
         };
     }
 
