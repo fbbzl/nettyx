@@ -2,6 +2,16 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
+if not "%NETTYX_PUBLISH_TEMP_RUN%"=="1" (
+    set "PUBLISH_SCRIPT_TEMP=%TEMP%\%~n0_%RANDOM%%RANDOM%%~x0"
+    copy /Y "%~f0" "!PUBLISH_SCRIPT_TEMP!" >nul || exit /b 1
+    set "NETTYX_PUBLISH_TEMP_RUN=1"
+    call "!PUBLISH_SCRIPT_TEMP!" %*
+    set "PUBLISH_EXIT=%ERRORLEVEL%"
+    del "!PUBLISH_SCRIPT_TEMP!" >nul 2>nul
+    exit /b %PUBLISH_EXIT%
+)
+
 set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
 set "MAVEN_SETTINGS=D:\maven\settings.xml"
 set "MAVEN_REPO=D:\maven\repository"
@@ -15,7 +25,7 @@ set "NETTYX_VERSION="
 set "STARTER_VERSION="
 set "NETTYX_REMOTES=gitee github"
 set "STARTER_REMOTES=gitee github"
-set "NETTYX_FEATURE_BRANCH="
+set "NETTYX_FEATURE_BRANCH=feature"
 set "NETTYX_DEV_BRANCH=develop"
 set "NETTYX_RELEASE_BRANCH=release"
 set "NETTYX_MAIN_BRANCH=main"
@@ -121,6 +131,7 @@ echo MAVEN_OPTS=%MAVEN_OPTS%
 
 call :publish_nettyx || goto fail
 call :publish_starter || goto fail
+call :return_work_branches || goto fail
 
 echo.
 echo ========== done ==========
@@ -257,6 +268,7 @@ call :squash_merge_nettyx_feature "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" |
 call :resolve_nettyx_develop_known_paths "%PROJECT_NETTYX%" || exit /b 1
 call :restore_head_paths "%PROJECT_NETTYX%" README.md README_zh.md || exit /b 1
 call :drop_or_restore_head_paths "%PROJECT_NETTYX%" src/test/java || exit /b 1
+call :remove_feature_only_files "%PROJECT_NETTYX%" publish-nettyx-projects.cmd || exit /b 1
 call :clean_nettyx_develop_pom "%PROJECT_NETTYX%" || exit /b 1
 call :assert_no_unmerged_paths "%PROJECT_NETTYX%" || exit /b 1
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
@@ -314,8 +326,15 @@ if "%SKIP_DEPLOY%"=="1" (
 echo.
 echo ========== spring-boot-starter-nettyx main sync ==========
 call :switch_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
-call :run_in_dir "%PROJECT_STARTER%" git -C "%PROJECT_STARTER%" merge --no-ff "%STARTER_PUBLISH_BRANCH%" -m "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
+call :merge_no_ff_accept_theirs "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
 call :push_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
+exit /b 0
+
+:return_work_branches
+echo.
+echo ========== return work branches ==========
+call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
+call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
 exit /b 0
 
 :set_project_version
@@ -425,6 +444,31 @@ if "%ERRORLEVEL%"=="0" (
 )
 exit /b 0
 
+:merge_no_ff_accept_theirs
+set "MERGE_PROJECT_PATH=%~1"
+set "MERGE_SOURCE_BRANCH=%~2"
+set "MERGE_MESSAGE=%~3"
+call :run_in_dir_no_fail "%MERGE_PROJECT_PATH%" git -C "%MERGE_PROJECT_PATH%" merge --no-ff "%MERGE_SOURCE_BRANCH%" -m "%MERGE_MESSAGE%"
+set "MERGE_EXIT=%ERRORLEVEL%"
+if "%DRY_RUN%"=="1" exit /b 0
+if "%MERGE_EXIT%"=="0" exit /b 0
+echo Merge reported conflicts. Accepting source branch changes for unresolved paths: %MERGE_SOURCE_BRANCH%
+call :checkout_all_theirs_unmerged "%MERGE_PROJECT_PATH%" || exit /b 1
+call :assert_no_unmerged_paths "%MERGE_PROJECT_PATH%" || exit /b 1
+call :commit_staged_changes "merge %MERGE_SOURCE_BRANCH%" "%MERGE_PROJECT_PATH%" "%MERGE_MESSAGE%" || exit /b 1
+exit /b 0
+
+:checkout_all_theirs_unmerged
+set "ALL_THEIRS_PROJECT_PATH=%~1"
+set "ALL_THEIRS_FILE=%TEMP%\fz_unmerged_%RANDOM%%RANDOM%.txt"
+git -C "%ALL_THEIRS_PROJECT_PATH%" diff --name-only --diff-filter=U > "%ALL_THEIRS_FILE%"
+for /f "usebackq delims=" %%P in ("%ALL_THEIRS_FILE%") do (
+    call :run_in_dir "%ALL_THEIRS_PROJECT_PATH%" git -C "%ALL_THEIRS_PROJECT_PATH%" checkout --theirs -- "%%P" || exit /b 1
+    call :run_in_dir "%ALL_THEIRS_PROJECT_PATH%" git -C "%ALL_THEIRS_PROJECT_PATH%" add -- "%%P" || exit /b 1
+)
+del "%ALL_THEIRS_FILE%" >nul 2>nul
+exit /b 0
+
 :restore_head_paths
 set "RESTORE_PROJECT_PATH=%~1"
 shift
@@ -461,6 +505,19 @@ if "%DRY_RUN%"=="1" (
 )
 shift
 goto drop_or_restore_head_paths_loop
+
+:remove_feature_only_files
+set "FEATURE_ONLY_PROJECT_PATH=%~1"
+shift
+:remove_feature_only_files_loop
+if "%~1"=="" exit /b 0
+if "%DRY_RUN%"=="1" (
+    call :run_in_dir "%FEATURE_ONLY_PROJECT_PATH%" git -C "%FEATURE_ONLY_PROJECT_PATH%" rm --ignore-unmatch -- "%~1" || exit /b 1
+) else (
+    call :run_in_dir "%FEATURE_ONLY_PROJECT_PATH%" git -C "%FEATURE_ONLY_PROJECT_PATH%" rm --ignore-unmatch -- "%~1" || exit /b 1
+)
+shift
+goto remove_feature_only_files_loop
 
 :commit_current_changes
 set "CURRENT_COMMIT_LABEL=%~1"
