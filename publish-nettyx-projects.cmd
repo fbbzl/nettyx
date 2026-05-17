@@ -101,7 +101,7 @@ if not defined NETTYX_VERSION (
     call :next_version_keep_suffix "%CURRENT_NETTYX_VERSION%" NETTYX_VERSION || goto fail
 )
 if not defined STARTER_VERSION (
-    call :next_version_keep_suffix "%CURRENT_STARTER_VERSION%" STARTER_VERSION || goto fail
+    call :next_project_version "%PROJECT_STARTER%" "spring-boot-starter-nettyx" "%NETTYX_VERSION%" STARTER_VERSION || goto fail
 )
 
 echo.
@@ -236,6 +236,11 @@ exit /b 0
 :next_version_keep_suffix
 for /f "usebackq delims=" %%V in (`cscript //nologo //E:JScript "%~f0" nextVersion "%~1"`) do set "%~2=%%V"
 if not defined %~2 exit /b 1
+exit /b 0
+
+:next_project_version
+for /f "usebackq delims=" %%V in (`cscript //nologo //E:JScript "%~f0" nextProjectVersion "%~1" "%~2" "%~3"`) do set "%~4=%%V"
+if not defined %~4 exit /b 1
 exit /b 0
 
 :publish_nettyx
@@ -623,10 +628,59 @@ function getSingleMatch(text, pattern, path, subject) {
     return value;
 }
 
+function getPropertyValueFromText(text, path, propertyName, required) {
+    var pattern = propertyVersionPattern(propertyName);
+    var match;
+    var count = 0;
+    var value = "";
+    while ((match = pattern.exec(text)) !== null) {
+        count++;
+        value = trim(match[2]);
+    }
+    if (count === 0 && !required) {
+        return "";
+    }
+    if (count !== 1) {
+        fail("Expected exactly one property " + propertyName + ", but found " + count + ": " + path);
+    }
+    return value;
+}
+
+function resolveProperties(text, path, value, overrides) {
+    var resolved = trim(value);
+    for (var i = 0; i < 20; i++) {
+        var changed = false;
+        resolved = resolved.replace(/\$\{([^}]+)\}/g, function(all, name) {
+            if (overrides && overrides.hasOwnProperty(name)) {
+                changed = true;
+                return overrides[name];
+            }
+            var prop = getPropertyValueFromText(text, path, name, false);
+            if (prop === "") {
+                return all;
+            }
+            changed = true;
+            return prop;
+        });
+        if (!changed || resolved.indexOf("${") < 0) {
+            break;
+        }
+    }
+    return resolved;
+}
+
+function rawProjectVersion(text, path, artifactId) {
+    return getSingleMatch(text, projectVersionPattern(artifactId), path, "project version for " + artifactId);
+}
+
+function resolvedProjectVersion(text, path, artifactId, overrides) {
+    return resolveProperties(text, path, rawProjectVersion(text, path, artifactId), overrides || {});
+}
+
 function getProjectVersion(projectPath, artifactId) {
     var path = requirePom(projectPath);
     var text = readUtf8(path);
-    WScript.Echo(getSingleMatch(text, projectVersionPattern(artifactId), path, "project version for " + artifactId));
+    WScript.Echo(resolvedProjectVersion(text, path, artifactId, {}));
 }
 
 function getPropertyVersion(projectPath, propertyName) {
@@ -656,6 +710,20 @@ function setByPattern(projectPath, pattern, newVersion, subject, dryRun) {
 }
 
 function setProjectVersion(projectPath, artifactId, newVersion, dryRun) {
+    var path = requirePom(projectPath);
+    var text = readUtf8(path);
+    var rawVersion = rawProjectVersion(text, path, artifactId);
+
+    if (rawVersion === "${revision}") {
+        var revision = getPropertyValueFromText(text, path, "revision", true);
+        if (revision.indexOf("${") >= 0) {
+            WScript.Echo("Project version is managed by revision expression, unchanged: " + projectPath + " -> " + revision);
+            return;
+        }
+        setByPattern(projectPath, propertyVersionPattern("revision"), newVersion, "property revision", dryRun);
+        return;
+    }
+
     setByPattern(projectPath, projectVersionPattern(artifactId), newVersion, "project version for " + artifactId, dryRun);
 }
 
@@ -742,6 +810,47 @@ function nextVersion(currentVersion) {
     WScript.Echo(String(major) + "." + String(minor) + "." + String(patch) + suffix);
 }
 
+function nextVersionValue(currentVersion) {
+    var match = /^(\d+)\.(\d+)\.(\d+)(.*)$/.exec(trim(currentVersion));
+    if (!match) {
+        fail("Version must be MAJOR.MINOR.PATCH with optional suffix: " + currentVersion);
+    }
+
+    var major = parseInt(match[1], 10);
+    var minor = parseInt(match[2], 10);
+    var patch = parseInt(match[3], 10) + 1;
+    var suffix = match[4];
+
+    if (patch > 99) {
+        patch = 0;
+        minor++;
+    }
+    if (minor > 99) {
+        minor = 0;
+        major++;
+    }
+
+    return String(major) + "." + String(minor) + "." + String(patch) + suffix;
+}
+
+function nextProjectVersion(projectPath, artifactId, nettyxVersion) {
+    var path = requirePom(projectPath);
+    var text = readUtf8(path);
+    var rawVersion = rawProjectVersion(text, path, artifactId);
+
+    if (rawVersion === "${revision}") {
+        var revision = getPropertyValueFromText(text, path, "revision", true);
+        if (revision.indexOf("${") >= 0) {
+            WScript.Echo(resolveProperties(text, path, revision, { "nettyx.version": nettyxVersion }));
+            return;
+        }
+        WScript.Echo(nextVersionValue(revision));
+        return;
+    }
+
+    WScript.Echo(nextVersionValue(rawVersion));
+}
+
 if (WScript.Arguments.length < 1) {
     fail("Missing helper command.");
 }
@@ -759,6 +868,8 @@ if (command === "getProjectVersion") {
     cleanNettyxDevelopPom(WScript.Arguments(1), WScript.Arguments.length > 2 && WScript.Arguments(2) === "dryRun");
 } else if (command === "nextVersion") {
     nextVersion(WScript.Arguments(1));
+} else if (command === "nextProjectVersion") {
+    nextProjectVersion(WScript.Arguments(1), WScript.Arguments(2), WScript.Arguments(3));
 } else {
     fail("Unknown helper command: " + command);
 }
