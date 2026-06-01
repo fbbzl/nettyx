@@ -62,11 +62,13 @@ public interface StructFieldHandler<A extends Annotation> {
             A                annotation)
     {
         if (serializer.isBasic(fieldType)) {
-            serializer.writeBasic((Basic<?>) StructHelper.defaultBasic(fieldVal, field.byteOrder(), (Class<? extends Basic<?>>) fieldType), writing);
+            if (fieldVal != null) serializer.writeBasic((Basic<?>) fieldVal, writing);
+            else                  writing.writeZero(StructHelper.findBasicSize(fieldType));
             return;
         }
         if (serializer.isStruct(fieldType)) {
-            serializer.writeStruct(fieldType, StructHelper.defaultStruct(fieldVal, fieldType), writing);
+            if (fieldVal != null) serializer.writeStruct(fieldType, fieldVal, writing);
+            else                  serializer.writeStruct(fieldType, StructHelper.newStruct(fieldType), writing);
             return;
         }
         throw new TypeJudgmentException(field);

@@ -33,11 +33,6 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 @UtilityClass
 public class StructHelper {
 
-    public static <B extends Basic<?>> B newEmptyBasic(Class<?> basicClass, ByteOrder byteOrder)
-    {
-        return newBasic(basicClass, byteOrder, Unpooled.wrappedBuffer(new byte[findBasicSize(basicClass)]));
-    }
-
     public static int findBasicSize(Type basicClass) {
         return BASIC_SIZE_CACHE.get(basicClass);
     }
@@ -129,14 +124,6 @@ public class StructHelper {
             case ParameterizedType parameterizedType -> (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
             default                                  -> (T[]) Array.newInstance(Object.class, length);
         };
-    }
-
-    public static <T> T defaultBasic(
-            Object    fieldValue,
-            ByteOrder byteOrder,
-            Class<?>  fieldActualType)
-    {
-        return (T) defaultIfNull(fieldValue, () -> newEmptyBasic(fieldActualType, byteOrder));
     }
 
     public static <T> T defaultStruct(
