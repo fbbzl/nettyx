@@ -303,17 +303,17 @@ public final class StructSerializer implements Serializer {
             boolean    flexible)
     {
         if (basicArray == null) {
-            writing.writeBytes(new byte[elementBytesSize * (flexible ? 0 : length)]);
+            writing.writeZero(elementBytesSize * (flexible ? 0 : length));
             return;
         }
 
         for (int i = 0; i < (flexible ? basicArray.length : length); i++) {
             if (i < basicArray.length) {
                 Basic<?> basic = basicArray[i];
-                if (basic == null) writing.writeBytes(new byte[elementBytesSize]);
-                else writing.writeBytes(basicArray[i].getBytes());
+                if (basic == null) writing.writeZero(elementBytesSize);
+                else               writing.writeBytes(basic.getBytes());
             }
-            else writing.writeBytes(new byte[elementBytesSize]);
+            else writing.writeZero(elementBytesSize);
         }
     }
 
