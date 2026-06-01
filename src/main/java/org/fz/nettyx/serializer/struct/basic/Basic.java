@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
 
+import static lombok.AccessLevel.NONE;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
@@ -30,8 +30,10 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     @Setter
     ByteOrder byteOrder;
     int       size;
+    @Getter(PROTECTED)
     @NonFinal
-    byte[] bytes;
+    ByteBuf bytesBuf;
+    @Getter(NONE)
     @NonFinal
     V      value;
 
@@ -39,8 +41,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         this.size = size;
         if (byteBuf.readableBytes() < size) throw new TooLessBytesException(size, byteBuf.readableBytes());
 
-        this.bytes = new byte[this.size];
-        byteBuf.readBytes(this.bytes);
+        this.bytesBuf = byteBuf.readRetainedSlice(size);
     }
 
     protected Basic(V value, int size) {
@@ -53,7 +54,7 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
      *
      * @return the boolean
      */
-    public abstract boolean hasSinged();
+    public abstract boolean hasSigned();
 
     /**
      * To byte buf.
@@ -73,24 +74,36 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
      */
     protected abstract V toValue(ByteBuf byteBuf, ByteOrder byteOrder);
 
-    public V getValue() {
-        // do value lazy set
-        if (this.bytes != null && this.value == null) {
-            this.value = this.toValue(Unpooled.wrappedBuffer(this.bytes), byteOrder);
+    /**
+     * Read the Java value from internal ByteBuf, auto-release bytesBuf after reading.
+     *
+     * @return the java value
+     */
+    public V read() {
+        if (this.bytesBuf != null && this.value == null) {
+            this.value = this.toValue(this.bytesBuf, byteOrder);
+            ReferenceCountUtil.release(this.bytesBuf);
+            this.bytesBuf = null;
         }
         return value;
     }
 
-    public byte[] getBytes() {
-        if (this.value != null && this.bytes == null) {
-            this.bytes = new byte[this.size];
-            ByteBuf buf = this.toByteBuf(this.value, byteOrder);
-            this.fill(buf, this.size);
-            buf.readBytes(this.bytes);
-            ReferenceCountUtil.release(buf);
+    /**
+     * Write the bytes to the target ByteBuf, auto-release bytesBuf after writing.
+     *
+     * @param writingBuf the target ByteBuf to write into
+     */
+    public void write(ByteBuf writingBuf) {
+        if (this.value != null && this.bytesBuf == null) {
+            this.bytesBuf = this.toByteBuf(this.value, byteOrder);
+            this.fill(this.bytesBuf, this.size);
         }
-        return bytes;
+        if (this.bytesBuf == null) { writingBuf.writeZero(size); return; }
+        writingBuf.writeBytes(this.bytesBuf);
+        ReferenceCountUtil.release(this.bytesBuf);
+        this.bytesBuf = null;
     }
+
 
     private void fill(ByteBuf buf, int requiredSize) {
         int fillLength = requiredSize - buf.readableBytes();
@@ -99,9 +112,18 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         }
     }
 
+    /**
+     * Release the internal ByteBuf if it is retained. Idempotent.
+     */
+    public void release() {
+        ReferenceCountUtil.release(this.bytesBuf);
+        this.bytesBuf = null;
+    }
+
     @Override
     public int hashCode() {
-        return this.getValue().hashCode();
+        V v = value != null ? value : read();
+        return v != null ? v.hashCode() : 0;
     }
 
     @Override
@@ -111,17 +133,21 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
         if (anotherObj instanceof Cbasic<?> cBasic) {
             if (this.getSize()   != cBasic.getSize()
                 ||
-                this.hasSinged() != cBasic.hasSinged()) {
+                this.hasSigned() != cBasic.hasSigned()) {
                 return false;
             }
 
-            return this.getValue().equals(cBasic.getValue());
+            V thisVal = value != null ? value : read();
+            Object thatVal = cBasic.value != null ? cBasic.value : cBasic.read();
+            return thisVal.equals(thatVal);
         }
         return false;
     }
 
     @Override
     public int compareTo(Basic<V> anotherCBasic) {
-        return this.getValue().compareTo(anotherCBasic.getValue());
+        V thisVal = value != null ? value : read();
+        V thatVal = anotherCBasic.value != null ? anotherCBasic.value : anotherCBasic.read();
+        return thisVal.compareTo(thatVal);
     }
 }

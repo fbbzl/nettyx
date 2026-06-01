@@ -89,8 +89,12 @@ public @interface ToCharSequence {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
 
-            if (fieldVal != null) writing.writeBytes(fieldVal.toString().getBytes(Charset.forName(charset)));
-            else writing.writeZero(bufferLength);
+            if (fieldVal != null) {
+                byte[] encoded = fieldVal.toString().getBytes(Charset.forName(charset));
+                writing.writeBytes(encoded);
+                int pad = bufferLength - encoded.length;
+                if (pad > 0) writing.writeZero(pad);
+            } else writing.writeZero(bufferLength);
         }
     }
 }

@@ -45,7 +45,7 @@ public class StructSerializerStructTest {
 
         You result = toStruct(You.class, bytes);
         assertNotNull(result);
-        assertEquals(Integer.valueOf(1), result.getIsMarried().getValue());
+        assertEquals(Integer.valueOf(1), result.getIsMarried().read());
     }
 
     @Test

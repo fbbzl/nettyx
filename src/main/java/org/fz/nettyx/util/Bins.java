@@ -49,6 +49,8 @@ public class Bins {
 
     private static byte[] toBins(int value, int digest)
     {
+        if (digest < 32 && (value >> digest) != 0)
+            throw new IllegalArgumentException("value exceeds " + digest + " bits");
         byte[] buf     = new byte[digest];
         int    charPos = digest;
         int    radix   = 2;
@@ -201,13 +203,13 @@ public class Bins {
 
     public void replace(int startIndex, byte... bins)
     {
-        replace(startIndex, bins);
+        for (int i = 0; i < bins.length; i++) set(startIndex + i, bins[i]);
     }
 
     public void replace(int startIndex, Bins bins)
     {
-        for (int i = startIndex, j = startIndex + bins.length(), k = 0; i < j; i++, j--, k++) {
-            this.set(i, bins.get(k));
+        for (int k = 0; k < bins.length(); k++) {
+            this.set(startIndex + k, bins.get(k));
         }
     }
 
