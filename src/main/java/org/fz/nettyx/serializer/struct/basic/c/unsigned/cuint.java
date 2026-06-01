@@ -24,7 +24,7 @@ public class cuint extends Cbasic<Long> {
     }
 
     @Override
-    public boolean hasSinged() {
+    public boolean hasSigned() {
         return false;
     }
 

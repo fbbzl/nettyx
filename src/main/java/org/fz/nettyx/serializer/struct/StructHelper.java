@@ -34,7 +34,10 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 public class StructHelper {
 
     public static int findBasicSize(Type basicClass) {
-        return BASIC_SIZE_CACHE.get(basicClass);
+        Type raw = basicClass instanceof ParameterizedType ? ((ParameterizedType) basicClass).getRawType() : basicClass;
+        Integer size = BASIC_SIZE_CACHE.get(raw);
+        if (size == null) throw new SerializeException("uncached basic type: " + basicClass);
+        return size;
     }
 
     public static ByteOrder getByteOrder(Class<?> clazz) {

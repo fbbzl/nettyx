@@ -253,7 +253,7 @@ public final class StructSerializer implements Serializer {
     }
 
     public <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
-        writingBuf.writeBytes(basicValue.getBytes());
+        basicValue.write(writingBuf);
     }
 
     public <S> void writeStruct(
@@ -311,7 +311,7 @@ public final class StructSerializer implements Serializer {
             if (i < basicArray.length) {
                 Basic<?> basic = basicArray[i];
                 if (basic == null) writing.writeZero(elementBytesSize);
-                else               writing.writeBytes(basic.getBytes());
+                else               basic.write(writing);
             }
             else writing.writeZero(elementBytesSize);
         }

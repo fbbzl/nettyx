@@ -121,7 +121,7 @@ public enum EndianKit {
 
         @Override
         public BigInteger toUnsignedLong(byte[] bytes) {
-            return new BigInteger(bytes);
+            return new BigInteger(1, bytes);
         }
 
         public float toFloat(byte[] bytes) {
@@ -333,7 +333,7 @@ public enum EndianKit {
 
         @Override
         public BigInteger toUnsignedLong(byte[] bytes) {
-            return new BigInteger(PrimitiveArrayUtil.reverse(bytes));
+            return new BigInteger(1, PrimitiveArrayUtil.reverse(bytes));
         }
 
         @Override

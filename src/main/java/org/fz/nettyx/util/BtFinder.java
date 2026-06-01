@@ -34,7 +34,7 @@ public final class BtFinder {
         private       DiscoveryListener  listener     = new DiscoveryListenerAdapter() {
             @Override
             public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-                devices.add(btDevice);
+                synchronized (completedTag) { devices.add(btDevice); }
             }
 
             @Override
@@ -59,18 +59,17 @@ public final class BtFinder {
         public List<RemoteDevice> getDevices(Predicate<RemoteDevice> condition)
         {
             try {
-                devices.clear();
-
                 synchronized (completedTag) {
+                    devices.clear();
                     DiscoveryAgent discoveryAgent = LocalDevice.getLocalDevice().getDiscoveryAgent();
                     boolean        started        = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, listener);
 
                     if (started) {
-                        completedTag.wait();
+                        completedTag.wait(30_000);
                         discoveryAgent.cancelInquiry(listener);
                     }
+                    devices.removeIf(condition.negate());
                 }
-                devices.removeIf(condition.negate());
             } catch (BluetoothStateException stateException) {
                 log.error("bluetooth state is illegal, please check");
                 return Collections.emptyList();
@@ -85,17 +84,19 @@ public final class BtFinder {
 
         private static final int               DEFAULT_ATTR_ID = 0x0100;
         private final        Object            completedTag    = new Object();
-        private final        List<String>      services        = new ArrayList<>(32);
-        private              DiscoveryListener listener        = new DiscoveryListenerAdapter() {
+        private final List<String>      services        = new ArrayList<>(32);
+        private              DiscoveryListener  listener        = new DiscoveryListenerAdapter() {
             @Override
             public void servicesDiscovered(int transID, ServiceRecord[] servRecord)
             {
-                for (ServiceRecord serviceRecord : servRecord) {
-                    String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-                    if (CharSequenceUtil.isEmpty(url)) {
-                        continue;
+                synchronized (completedTag) {
+                    for (ServiceRecord serviceRecord : servRecord) {
+                        String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
+                        if (CharSequenceUtil.isEmpty(url)) {
+                            continue;
+                        }
+                        services.add(url);
                     }
-                    services.add(url);
                 }
             }
 
@@ -123,11 +124,11 @@ public final class BtFinder {
             UUID[] searchUuidSet = new UUID[]{ new UUID(serviceUUID, false) };
 
             synchronized (completedTag) {
+                services.clear();
                 LocalDevice.getLocalDevice().getDiscoveryAgent().searchServices(new int[]{ DEFAULT_ATTR_ID }, searchUuidSet, btDevice, listener);
-                completedTag.wait();
+                completedTag.wait(30_000);
+                services.removeIf(condition.negate());
             }
-
-            services.removeIf(condition.negate());
 
             return services;
         }
