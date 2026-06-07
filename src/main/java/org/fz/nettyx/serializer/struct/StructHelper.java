@@ -34,7 +34,7 @@ import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 public class StructHelper {
 
     public static int findBasicSize(Type basicClass) {
-        Type raw = basicClass instanceof ParameterizedType ? ((ParameterizedType) basicClass).getRawType() : basicClass;
+        Type raw = basicClass instanceof ParameterizedType parameterizedtype ? parameterizedtype.getRawType() : basicClass;
         Integer size = BASIC_SIZE_CACHE.get(raw);
         if (size == null) throw new SerializeException("uncached basic type: " + basicClass);
         return size;
