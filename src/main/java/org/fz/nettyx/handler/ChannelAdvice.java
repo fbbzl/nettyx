@@ -198,7 +198,7 @@ public class ChannelAdvice {
 
         public final OutboundAdvice whenReadTimeout(int timeoutSeconds, ChannelExceptionAction timeoutAction)
         {
-            return whenWriteTimeout(timeoutSeconds, true, timeoutAction);
+            throw new UnsupportedOperationException("read-timeout not supported on outbound handler");
         }
 
         public final OutboundAdvice whenWriteTimeout(

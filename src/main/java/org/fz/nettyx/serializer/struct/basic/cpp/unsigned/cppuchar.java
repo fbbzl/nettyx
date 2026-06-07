@@ -24,7 +24,8 @@ public class cppuchar extends cuchar {
 
     @Override
     public String toString() {
-        return new String(this.getBytes(), StandardCharsets.UTF_8);
+        if (bytesBuf != null) return bytesBuf.toString(StandardCharsets.UTF_8);
+        return value != null ? value.toString() : "";
     }
 
 }

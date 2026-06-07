@@ -90,7 +90,7 @@ public @interface ToNamedEnum {
             String charset      = toNamedEnum.charset();
 
             if (fieldVal != null) writing.writeBytes(fieldVal.toString().getBytes(Charset.forName(charset)));
-            else writing.writeBytes(new byte[bufferLength]);
+            else writing.writeZero(bufferLength);
         }
     }
 

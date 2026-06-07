@@ -64,7 +64,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
         ChannelPromise pro = newPromise();
 
         try {
-            inputStream.close();
+            if (inputStream != null) inputStream.close();
             pro.setSuccess();
         } catch (Exception t) {
             pro.setFailure(t);
@@ -93,7 +93,12 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
         inputStream = streamConnection.openInputStream();
-        activate(inputStream, streamConnection.openOutputStream());
+        try {
+            activate(inputStream, streamConnection.openOutputStream());
+        } catch (Exception e) {
+            inputStream.close();
+            throw e;
+        }
     }
 
     @Override
@@ -146,7 +151,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
 
                 if (!wasActive && isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {
-                promise.setFailure(t);
+                promise.tryFailure(t);
                 closeIfClosed();
             }
         }

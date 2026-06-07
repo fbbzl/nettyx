@@ -1,7 +1,6 @@
 package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
-import io.netty.util.ReferenceCountUtil;
 import org.fz.erwin.exception.Throws;
 
 import java.net.SocketAddress;
@@ -113,12 +112,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
                 return;
             }
 
-            try {
-                this.preChannelRead(ctx, (M) msg);
-            } finally {
-                // always free this msg, important
-                ReferenceCountUtil.release(msg);
-            }
+            this.preChannelRead(ctx, (M) msg);
         }
 
         @Override

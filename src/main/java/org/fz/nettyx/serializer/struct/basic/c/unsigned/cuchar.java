@@ -26,7 +26,7 @@ public class cuchar extends Cbasic<Short> {
     }
 
     @Override
-    public boolean hasSinged() {
+    public boolean hasSigned() {
         return false;
     }
 
@@ -42,11 +42,12 @@ public class cuchar extends Cbasic<Short> {
 
     @Override
     public String toString() {
-        return new String(this.getBytes(), StandardCharsets.US_ASCII);
+        return toString(StandardCharsets.US_ASCII);
     }
 
     public String toString(Charset charset) {
-        return new String(this.getBytes(), charset);
+        if (bytesBuf != null) return bytesBuf.toString(charset);
+        return value != null ? value.toString() : "";
     }
 
 }
