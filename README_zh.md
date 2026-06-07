@@ -69,6 +69,19 @@ Login login = StructSerializer.toStruct(buf, Login.class);
 byte[] bytes = StructSerializer.toBytes(login);
 ```
 
+### 串口 — RXTX
+
+```java
+SingleRxtxChannelTemplate serial = new SingleRxtxChannelTemplate("COM1") {
+    @Override
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
+        return ch -> ch.pipeline().addLast(new StringCodec());
+    }
+};
+serial.connect();
+serial.writeAndFlush("Hello");
+```
+
 ### 蓝牙服务端
 
 ```java
