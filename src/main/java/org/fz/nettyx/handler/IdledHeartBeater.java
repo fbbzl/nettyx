@@ -24,10 +24,14 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
     private static final InternalLogger              log = InternalLoggerFactory.getInstance(IdledHeartBeater.class);
     private final        ChannelHandlerContextAction idledHeartBeatAction;
 
-    protected IdledHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+    protected IdledHeartBeater(
+            int readerIdleSeconds,
+            int writerIdleSeconds,
+            int allIdleSeconds,
+            ChannelHandlerContextAction idledHeartBeatAction)
     {
-        super(readIdleSeconds, 0, 0, SECONDS);
-        this.idledHeartBeatAction = readIdleHeartBeatAction;
+        super(readerIdleSeconds, writerIdleSeconds, allIdleSeconds, SECONDS);
+        this.idledHeartBeatAction = idledHeartBeatAction;
     }
 
     abstract boolean condition(IdleStateEvent evt);
@@ -65,7 +69,7 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
 
         public ReadIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
         {
-            super(readIdleSeconds, readIdleHeartBeatAction);
+            super(readIdleSeconds, 0, 0, readIdleHeartBeatAction);
         }
     }
 
@@ -82,9 +86,9 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
             return "write-idle";
         }
 
-        public WriteIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+        public WriteIdleHeartBeater(int writeIdleSeconds, ChannelHandlerContextAction writeIdleHeartBeatAction)
         {
-            super(readIdleSeconds, readIdleHeartBeatAction);
+            super(0, writeIdleSeconds, 0, writeIdleHeartBeatAction);
         }
     }
 
@@ -100,9 +104,9 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
             return "all-idle";
         }
 
-        public AllIdleHeartBeater(int readIdleSeconds, ChannelHandlerContextAction readIdleHeartBeatAction)
+        public AllIdleHeartBeater(int allIdleSeconds, ChannelHandlerContextAction allIdleHeartBeatAction)
         {
-            super(readIdleSeconds, readIdleHeartBeatAction);
+            super(0, 0, allIdleSeconds, allIdleHeartBeatAction);
         }
     }
 
