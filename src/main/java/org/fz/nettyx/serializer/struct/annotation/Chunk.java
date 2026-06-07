@@ -72,10 +72,14 @@ public @interface Chunk {
             Class<?> chunkType = field.wrapped().getType();
             checkChunk(chunkType);
 
-            byte[] bytes   = (fieldVal == null) ? new byte[chunk.length()] : (byte[]) fieldVal;
-            int    padding = computePadding(chunk, bytes.length);
-            writing.writeBytes(bytes);
-            if (padding > 0) writing.writeBytes(new byte[padding]);
+            if (fieldVal != null) {
+                byte[] bytes = (byte[]) fieldVal;
+                int padding = computePadding(chunk, bytes.length);
+                writing.writeBytes(bytes);
+                if (padding > 0) writing.writeZero(padding);
+            } else {
+                writing.writeZero(chunk.length());
+            }
         }
 
         static void checkChunk(Class<?> fieldType)
