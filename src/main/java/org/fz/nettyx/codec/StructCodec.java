@@ -4,6 +4,7 @@ import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
@@ -58,11 +59,16 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
+        ByteBuf serialized = null;
         try {
-            out.writeBytes(StructSerializer.toByteBuf(type, struct));
+            serialized = StructSerializer.toByteBuf(type, struct);
+            out.writeBytes(serialized);
         }
         catch (Exception error) {
             log.error("struct serialization failed, channel: {} struct: {}", struct, ctx.channel(), error);
+        }
+        finally {
+            ReferenceCountUtil.release(serialized);
         }
     }
 }

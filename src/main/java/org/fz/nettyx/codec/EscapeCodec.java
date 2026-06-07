@@ -172,6 +172,10 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         public void putBuf(ByteBuf real, ByteBuf replacement) {
             byte[] realBytes        = new byte[real.readableBytes()],
                    replacementBytes = new byte[replacement.readableBytes()];
+
+            real.readBytes(realBytes);
+            replacement.readBytes(replacementBytes);
+
             putIfAbsent(realBytes, replacementBytes);
             checkEscapeMap();
         }
@@ -184,7 +188,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         {
             // 1 check if byte buf is valid
             for (Entry<byte[], byte[]> entry : this.entrySet()) {
-                byte[] real = entry.getKey(), replacement = entry.getKey();
+                byte[] real = entry.getKey(), replacement = entry.getValue();
                 Throws.ifTrue(PrimitiveArrayUtil.isEmpty(real) || PrimitiveArrayUtil.isEmpty(replacement),
                               () -> "reals or replacements contains invalid buf, please check");
             }
