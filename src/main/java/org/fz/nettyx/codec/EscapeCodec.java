@@ -38,6 +38,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
     public EscapeCodec(EscapeDecoder escapeDecoder, EscapeEncoder escapeEncoder)
     {
         super(escapeDecoder, escapeEncoder);
+        if (escapeDecoder.getMap().isEmpty() || escapeEncoder.getMap().isEmpty()) throw new IllegalArgumentException("escape map must not be empty");
     }
 
     @Getter
