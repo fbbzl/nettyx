@@ -44,7 +44,7 @@ abstract class Template<C extends Channel> {
         do {
             supperType  = supperClass.getGenericSuperclass();
             supperClass = supperClass.getSuperclass();
-        } while (supperClass != Template.class);
+        } while (supperClass != null && supperClass != Template.class);
 
         Type typeArgument = TypeUtil.getTypeArgument(supperType);
 
