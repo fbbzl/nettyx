@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -63,15 +64,12 @@ public final class CommPorts {
         List<String>   ports   = new ArrayList<>();
         String         command = "reg query HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM";
         Process        process = Runtime.getRuntime().exec(command);
-        InputStream    in      = process.getInputStream();
-        BufferedReader br      = new BufferedReader(new InputStreamReader(in));
-        String         line;
-        int            index   = 0;
-        try {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(),
+                                                                           StandardCharsets.UTF_8))) {
+            String line;
+            int    index = 0;
             while ((line = br.readLine()) != null) {
-                if (line.isEmpty()) {
-                    continue;
-                }
+                if (line.isEmpty()) continue;
                 if (index != 0) {
                     String[] strs    = line.replaceAll(" +", ",").split(",");
                     String   comPort = strs[strs.length - 1];
@@ -81,8 +79,9 @@ public final class CommPorts {
             }
         } catch (IOException ioException) {
             throw new UnsupportedOperationException("exception occur while reading windows regedit, command: " + command);
+        } finally {
+            process.destroy();
         }
-
         return ports;
     }
 

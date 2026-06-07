@@ -16,7 +16,7 @@ import java.nio.ByteOrder;
  */
 public abstract class Cbasic<V extends Comparable<V>> extends Basic<V> {
 
-    private static final boolean   C_DEFAULT_SINGED = true;
+    private static final boolean   C_DEFAULT_SIGNED = true;
     private static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
 
     /**
@@ -40,13 +40,13 @@ public abstract class Cbasic<V extends Comparable<V>> extends Basic<V> {
     }
 
     @Override
-    public boolean hasSinged() {
-        return C_DEFAULT_SINGED;
+    public boolean hasSigned() {
+        return C_DEFAULT_SIGNED;
     }
 
     @Override
     public String toString() {
-        return this.getValue().toString();
+        return String.valueOf(value);
     }
 
 }
