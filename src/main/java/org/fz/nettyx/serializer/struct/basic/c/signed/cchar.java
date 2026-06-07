@@ -37,11 +37,12 @@ public class cchar extends Cbasic<Byte> {
 
     @Override
     public String toString() {
-        return new String(this.getBytes(), StandardCharsets.US_ASCII);
+        return toString(StandardCharsets.US_ASCII);
     }
 
     public String toString(Charset charset) {
-        return new String(this.getBytes(), charset);
+        if (bytesBuf != null) return bytesBuf.toString(charset);
+        return value != null ? value.toString() : "";
     }
 
 }

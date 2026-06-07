@@ -27,7 +27,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(AbstractSingleChannelTemplate.class);
     protected Bootstrap bootstrap;
-    protected C         channel;
+    protected volatile C channel;
 
     protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
         this.bootstrap = this.newBootstrap(remoteAddress);

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.9-RELEASE</version>
+    <version>2.6.10-RELEASE</version>
 
     <name>nettyx</name>
     <description>a tool about netty</description>
@@ -49,13 +47,13 @@
         <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
         <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 
-        <lombok.version>1.18.34</lombok.version>
+        <lombok.version>1.18.46</lombok.version>
 
         <!--transport-->
-        <netty-all.version>4.2.12.Final</netty-all.version>
+        <netty-all.version>4.2.15.Final</netty-all.version>
 
         <!--comm-->
-        <jSerialComm.version>2.11.0</jSerialComm.version>
+        <jSerialComm.version>2.11.4</jSerialComm.version>
         <rxtx.version>2.1.7</rxtx.version>
 
         <!--bluetooth-->
@@ -66,6 +64,10 @@
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
+        <protostuff-core.version>1.8.0</protostuff-core.version>
+        <junit.version>4.13.2</junit.version>
+        <cglib.version>3.3.0</cglib.version>
+        <javolution-core-java.version>6.0.0</javolution-core-java.version>
     </properties>
 
     <dependencies>
@@ -94,6 +96,18 @@
         </dependency>
 
         <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
+            <version>${protostuff-core.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.protostuff</groupId>
+            <artifactId>protostuff-runtime</artifactId>
+            <version>${protostuff-core.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>
             <version>${jSerialComm.version}</version>
@@ -118,6 +132,25 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>${cglib.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javolution</groupId>
+            <artifactId>javolution-core-java</artifactId>
+            <version>${javolution-core-java.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.channel.oio.OioByteStreamChannel;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 
 /**
@@ -17,6 +19,8 @@ import io.netty.channel.oio.OioByteStreamChannel;
 @SuppressWarnings("deprecation")
 public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel {
 
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(EnhancedOioByteStreamChannel.class);
+
     @Override
     protected ChannelFuture shutdownInput()
     {
@@ -28,6 +32,11 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
         super(null);
     }
 
+    protected EnhancedOioByteStreamChannel(io.netty.channel.Channel parent)
+    {
+        super(parent);
+    }
+
     @Override
     protected int doReadBytes(ByteBuf buf)
     {
@@ -36,6 +45,7 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
             if (available() > 0) return super.doReadBytes(buf);
             return 0;
         } catch (Exception e) {
+            log.debug("doReadBytes failed", e);
             return 0;
         }
     }
