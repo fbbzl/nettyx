@@ -26,13 +26,18 @@ public class culong8 extends Cbasic<BigInteger> {
     }
 
     @Override
-    public boolean hasSinged() {
+    public boolean hasSigned() {
         return false;
     }
 
     @Override
     protected ByteBuf toByteBuf(BigInteger value, ByteOrder byteOrder) {
         byte[] byteArray = value.toByteArray();
+        if (byteArray.length > size) {
+            byte[] trimmed = new byte[size];
+            System.arraycopy(byteArray, byteArray.length - size, trimmed, 0, size);
+            byteArray = trimmed;
+        }
 
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
             byteArray = PrimitiveArrayUtil.reverse(byteArray);
