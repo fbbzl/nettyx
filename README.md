@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>🚀 基于 Netty 的极简开发框架</b><br>
+  <b>🚀 Ultra-lightweight Netty framework</b><br>
   <sub>Lightweight, fast, and ready for production — for TCP, Serial, and Bluetooth</sub>
 </p>
 
