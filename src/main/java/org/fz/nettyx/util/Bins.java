@@ -100,9 +100,8 @@ public class Bins {
     private static long toLong(byte[] bins)
     {
         long result = 0;
-        int  radix  = 2;
-        for (int i = bins.length - 1, digit = 1; i >= 0; i--, digit *= radix) {
-            result += ((long) bins[i] * digit);
+        for (int i = 0; i < bins.length; i++) {
+            result = (result << 1) | bins[i];
         }
 
         return result;
