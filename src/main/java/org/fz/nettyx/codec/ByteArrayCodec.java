@@ -2,10 +2,8 @@ package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import io.netty.util.ReferenceCountUtil;
 
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class ByteArrayCodec extends ByteToMessageCodec<byte[]> {
             byte[]                msg,
             ByteBuf               out)
     {
-        out.writeBytes(Unpooled.wrappedBuffer(msg));
+        out.writeBytes(msg);
     }
 
     @Override
@@ -32,11 +30,7 @@ public class ByteArrayCodec extends ByteToMessageCodec<byte[]> {
             ByteBuf               in,
             List<Object>          out)
     {
-        try {
-            out.add(ByteBufUtil.getBytes(in));
-        } finally {
-            ReferenceCountUtil.safeRelease(in);
-        }
+        out.add(ByteBufUtil.getBytes(in));
     }
 
 }
