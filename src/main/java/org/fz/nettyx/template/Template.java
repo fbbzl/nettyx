@@ -27,14 +27,7 @@ abstract class Template<C extends Channel> {
 
     public static boolean gracefullyCloseable(Channel channel)
     {
-        return
-                channel != null
-                &&
-                !channel.isActive()
-                &&
-                !channel.isOpen()
-                &&
-                !channel.isWritable();
+        return channel != null && channel.isActive();
     }
 
     protected Class<C> findChannelClass()
