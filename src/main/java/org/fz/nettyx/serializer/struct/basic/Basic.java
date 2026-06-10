@@ -26,16 +26,11 @@ import static lombok.AccessLevel.PROTECTED;
 @FieldDefaults(level = PROTECTED, makeFinal = true)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
-    @NonFinal
-    @Setter
-    ByteOrder byteOrder;
-    int       size;
-    @Getter(PROTECTED)
-    @NonFinal
-    ByteBuf bytesBuf;
-    @Getter(NONE)
-    @NonFinal
-    V      value;
+    @Setter            @NonFinal ByteOrder byteOrder;
+    @Getter(PROTECTED) @NonFinal ByteBuf   bytesBuf;
+    @Getter(NONE)      @NonFinal V         value;
+
+    int size;
 
     protected Basic(ByteBuf byteBuf, int size) {
         this.size = size;
