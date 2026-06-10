@@ -55,6 +55,7 @@ public class JscChannel extends SerialCommChannel {
 
         // set config
         this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, config().getOption(JscChannelOption.READ_TIMEOUT), 0);
+        open = true;
         this.serialPort.setComPortParameters(
                 config().getOption(JscChannelOption.BAUD_RATE),
                 config().getOption(JscChannelOption.DATA_BITS).value(),

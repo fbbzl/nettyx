@@ -24,7 +24,7 @@ public class cushort extends Cbasic<Integer> {
     }
 
     @Override
-    public boolean hasSinged() {
+    public boolean hasSigned() {
         return false;
     }
 

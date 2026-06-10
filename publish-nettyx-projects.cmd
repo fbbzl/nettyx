@@ -2,16 +2,6 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-if not "%NETTYX_PUBLISH_TEMP_RUN%"=="1" (
-    set "PUBLISH_SCRIPT_TEMP=%TEMP%\%~n0_%RANDOM%%RANDOM%%~x0"
-    copy /Y "%~f0" "!PUBLISH_SCRIPT_TEMP!" >nul || exit /b 1
-    set "NETTYX_PUBLISH_TEMP_RUN=1"
-    call "!PUBLISH_SCRIPT_TEMP!" %*
-    set "PUBLISH_EXIT=%ERRORLEVEL%"
-    del "!PUBLISH_SCRIPT_TEMP!" >nul 2>nul
-    exit /b %PUBLISH_EXIT%
-)
-
 set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
 set "MAVEN_SETTINGS=D:\maven\settings.xml"
 set "MAVEN_REPO=D:\maven\repository"
@@ -268,7 +258,6 @@ call :squash_merge_nettyx_feature "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" |
 call :resolve_nettyx_develop_known_paths "%PROJECT_NETTYX%" || exit /b 1
 call :restore_head_paths "%PROJECT_NETTYX%" README.md README_zh.md || exit /b 1
 call :drop_or_restore_head_paths "%PROJECT_NETTYX%" src/test/java || exit /b 1
-call :remove_feature_only_files "%PROJECT_NETTYX%" publish-nettyx-projects.cmd || exit /b 1
 call :clean_nettyx_develop_pom "%PROJECT_NETTYX%" || exit /b 1
 call :assert_no_unmerged_paths "%PROJECT_NETTYX%" || exit /b 1
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
@@ -506,19 +495,6 @@ if "%DRY_RUN%"=="1" (
 shift
 goto drop_or_restore_head_paths_loop
 
-:remove_feature_only_files
-set "FEATURE_ONLY_PROJECT_PATH=%~1"
-shift
-:remove_feature_only_files_loop
-if "%~1"=="" exit /b 0
-if "%DRY_RUN%"=="1" (
-    call :run_in_dir "%FEATURE_ONLY_PROJECT_PATH%" git -C "%FEATURE_ONLY_PROJECT_PATH%" rm --ignore-unmatch -- "%~1" || exit /b 1
-) else (
-    call :run_in_dir "%FEATURE_ONLY_PROJECT_PATH%" git -C "%FEATURE_ONLY_PROJECT_PATH%" rm --ignore-unmatch -- "%~1" || exit /b 1
-)
-shift
-goto remove_feature_only_files_loop
-
 :commit_current_changes
 set "CURRENT_COMMIT_LABEL=%~1"
 set "CURRENT_COMMIT_PROJECT_PATH=%~2"
@@ -682,6 +658,8 @@ exit /b 0
 
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 
+var POM_NS = "http://maven.apache.org/POM/4.0.0";
+
 function fail(message) {
     WScript.StdErr.WriteLine(message);
     WScript.Quit(1);
@@ -735,174 +713,144 @@ function requirePom(projectPath) {
     return path;
 }
 
-function projectVersionPattern(artifactId) {
-    return new RegExp("(<artifactId>\\s*" + escapeRegExp(artifactId) + "\\s*</artifactId>\\s*<version>)([\\s\\S]*?)(</version>)", "g");
+function loadDoc(path) {
+    var doc = new ActiveXObject("MSXML2.DOMDocument.6.0");
+    doc.async = false;
+    doc.preserveWhiteSpace = true;
+    doc.setProperty("SelectionNamespaces", "xmlns:m='" + POM_NS + "'");
+    if (!doc.load(path)) {
+        fail("Failed to parse pom.xml: " + path + " - " + doc.parseError.reason);
+    }
+    return doc;
 }
 
-function propertyVersionPattern(propertyName) {
-    return new RegExp("(<" + escapeRegExp(propertyName) + ">)([\\s\\S]*?)(</" + escapeRegExp(propertyName) + ">)", "g");
+function selectNode(node, xpath) {
+    return node ? node.selectSingleNode(xpath) : null;
 }
 
-function getSingleMatch(text, pattern, path, subject) {
-    var match;
-    var count = 0;
-    var value = "";
-    while ((match = pattern.exec(text)) !== null) {
-        count++;
-        value = trim(match[2]);
-    }
-    if (count !== 1) {
-        fail("Expected exactly one " + subject + ", but found " + count + ": " + path);
-    }
-    return value;
+function selectNodes(node, xpath) {
+    return node ? node.selectNodes(xpath) : null;
 }
 
-function getPropertyValueFromText(text, path, propertyName, required) {
-    var pattern = propertyVersionPattern(propertyName);
-    var match;
-    var count = 0;
-    var value = "";
-    while ((match = pattern.exec(text)) !== null) {
-        count++;
-        value = trim(match[2]);
-    }
-    if (count === 0 && !required) {
-        return "";
-    }
-    if (count !== 1) {
-        fail("Expected exactly one property " + propertyName + ", but found " + count + ": " + path);
-    }
-    return value;
+function getNodeText(node) {
+    return node ? trim(node.text) : "";
 }
 
-function resolveProperties(text, path, value, overrides) {
+function resolvePropertyRefs(pomText, value) {
     var resolved = trim(value);
     for (var i = 0; i < 20; i++) {
         var changed = false;
         resolved = resolved.replace(/\$\{([^}]+)\}/g, function(all, name) {
-            if (overrides && overrides.hasOwnProperty(name)) {
+            var propRegex = new RegExp("<" + escapeRegExp(name) + ">([^<]*)</" + escapeRegExp(name) + ">");
+            var match = pomText.match(propRegex);
+            if (match) {
                 changed = true;
-                return overrides[name];
+                return trim(match[1]);
             }
-            var prop = getPropertyValueFromText(text, path, name, false);
-            if (prop === "") {
-                return all;
-            }
-            changed = true;
-            return prop;
+            return all;
         });
-        if (!changed || resolved.indexOf("${") < 0) {
-            break;
-        }
+        if (!changed || resolved.indexOf("${") < 0) break;
     }
     return resolved;
-}
-
-function rawProjectVersion(text, path, artifactId) {
-    return getSingleMatch(text, projectVersionPattern(artifactId), path, "project version for " + artifactId);
-}
-
-function resolvedProjectVersion(text, path, artifactId, overrides) {
-    return resolveProperties(text, path, rawProjectVersion(text, path, artifactId), overrides || {});
 }
 
 function getProjectVersion(projectPath, artifactId) {
     var path = requirePom(projectPath);
     var text = readUtf8(path);
-    WScript.Echo(resolvedProjectVersion(text, path, artifactId, {}));
+    var doc = loadDoc(path);
+    var versionEl = selectNode(doc, "/m:project/m:version");
+    var rawVersion = getNodeText(versionEl);
+
+    if (rawVersion === "${revision}") {
+        var revision = getNodeText(selectNode(doc, "/m:project/m:properties/m:revision"));
+        if (!revision) fail("Revision property not found in " + path);
+        WScript.Echo(resolvePropertyRefs(text, revision));
+    } else {
+        WScript.Echo(resolvePropertyRefs(text, rawVersion));
+    }
 }
 
 function getPropertyVersion(projectPath, propertyName) {
     var path = requirePom(projectPath);
-    var text = readUtf8(path);
-    WScript.Echo(getSingleMatch(text, propertyVersionPattern(propertyName), path, "property " + propertyName));
-}
-
-function setByPattern(projectPath, pattern, newVersion, subject, dryRun) {
-    var path = requirePom(projectPath);
-    var text = readUtf8(path);
-    var oldVersion = getSingleMatch(text, pattern, path, subject);
-
-    if (oldVersion === newVersion) {
-        WScript.Echo("Version unchanged: " + projectPath + " " + subject + " -> " + newVersion);
-        return;
-    }
-
-    if (dryRun) {
-        WScript.Echo("DryRun: " + path + " " + subject + " " + oldVersion + " -> " + newVersion);
-        return;
-    }
-
-    var newText = text.replace(pattern, "$1" + newVersion + "$3");
-    writeUtf8NoBom(path, newText);
-    WScript.Echo("Updated version: " + projectPath + " " + subject + " " + oldVersion + " -> " + newVersion);
+    var doc = loadDoc(path);
+    var propEl = selectNode(doc, "/m:project/m:properties/m:" + propertyName);
+    if (!propEl) fail("Property not found: " + propertyName + " in " + path);
+    WScript.Echo(getNodeText(propEl));
 }
 
 function setProjectVersion(projectPath, artifactId, newVersion, dryRun) {
     var path = requirePom(projectPath);
-    var text = readUtf8(path);
-    var rawVersion = rawProjectVersion(text, path, artifactId);
+    var doc = loadDoc(path);
+    var versionEl = selectNode(doc, "/m:project/m:version");
 
-    if (rawVersion === "${revision}") {
-        var revision = getPropertyValueFromText(text, path, "revision", true);
-        if (revision.indexOf("${") >= 0) {
-            WScript.Echo("Project version is managed by revision expression, unchanged: " + projectPath + " -> " + revision);
+    if (!versionEl || getNodeText(versionEl) === "") {
+        var revisionEl = selectNode(doc, "/m:project/m:properties/m:revision");
+        if (revisionEl) {
+            setNodeText(path, doc, revisionEl, newVersion, "property revision", dryRun);
             return;
         }
-        setByPattern(projectPath, propertyVersionPattern("revision"), newVersion, "property revision", dryRun);
-        return;
+        fail("Cannot find version element for " + artifactId + " in " + path);
     }
-
-    setByPattern(projectPath, projectVersionPattern(artifactId), newVersion, "project version for " + artifactId, dryRun);
+    setNodeText(path, doc, versionEl, newVersion, "project version for " + artifactId, dryRun);
 }
 
 function setPropertyVersion(projectPath, propertyName, newVersion, dryRun) {
-    setByPattern(projectPath, propertyVersionPattern(propertyName), newVersion, "property " + propertyName, dryRun);
+    var path = requirePom(projectPath);
+    var doc = loadDoc(path);
+    var propEl = selectNode(doc, "/m:project/m:properties/m:" + propertyName);
+    if (!propEl) fail("Property not found: " + propertyName + " in " + path);
+    setNodeText(path, doc, propEl, newVersion, "property " + propertyName, dryRun);
 }
 
-function removeProperty(text, propertyName) {
-    var pattern = new RegExp("^[ \\t]*<" + escapeRegExp(propertyName) + ">[\\s\\S]*?</" + escapeRegExp(propertyName) + ">\\r?\\n?", "gm");
-    return text.replace(pattern, "");
+function setNodeText(path, doc, node, newValue, subject, dryRun) {
+    var oldValue = getNodeText(node);
+    if (oldValue === newValue) {
+        WScript.Echo("Version unchanged: " + path + " " + subject + " -> " + newValue);
+        return;
+    }
+    if (dryRun) {
+        WScript.Echo("DryRun: " + path + " " + subject + " " + oldValue + " -> " + newValue);
+        return;
+    }
+    node.text = newValue;
+    var xml = '<?xml version="1.0" encoding="UTF-8"?>\r\n' + doc.documentElement.xml;
+    writeUtf8NoBom(path, xml);
+    WScript.Echo("Updated version: " + path + " " + subject + " " + oldValue + " -> " + newValue);
 }
 
-function removeDependencyByArtifact(text, artifactId) {
-    return text.replace(/^[ \t]*<dependency>[\s\S]*?<\/dependency>\r?\n?/gm, function(block) {
-        var artifactPattern = new RegExp("<artifactId>\\s*" + escapeRegExp(artifactId) + "\\s*</artifactId>");
-        return artifactPattern.test(block) ? "" : block;
-    });
+function removeNode(doc, xpath) {
+    var node = selectNode(doc, xpath);
+    if (node) {
+        var parent = node.parentNode;
+        parent.removeChild(node);
+        return true;
+    }
+    return false;
 }
 
 function cleanNettyxDevelopPom(projectPath, dryRun) {
     var path = requirePom(projectPath);
-    var text = readUtf8(path);
-    var cleaned = text;
+    var doc = loadDoc(path);
+    var changed = false;
 
-    cleaned = cleaned.replace(/^[ \t]*<!--test-->\r?\n?/gm, "");
+    if (removeNode(doc, "/m:project/m:properties/m:protostuff-core.version")) changed = true;
+    if (removeNode(doc, "/m:project/m:properties/m:junit.version")) changed = true;
+    if (removeNode(doc, "/m:project/m:properties/m:cglib.version")) changed = true;
+    if (removeNode(doc, "/m:project/m:properties/m:javolution-core-java.version")) changed = true;
 
-    var properties = [
-        "protostuff-core.version",
-        "junit.version",
-        "cglib.version",
-        "javolution-core-java.version"
-    ];
-    for (var i = 0; i < properties.length; i++) {
-        cleaned = removeProperty(cleaned, properties[i]);
+    var artifactNames = ["protostuff-core", "protostuff-runtime", "junit", "cglib", "javolution-core-java"];
+    for (var i = 0; i < artifactNames.length; i++) {
+        var deps = selectNodes(doc, "/m:project/m:dependencies/m:dependency[m:artifactId='" + artifactNames[i] + "']");
+        if (deps) {
+            for (var j = deps.length - 1; j >= 0; j--) {
+                var parent = deps[j].parentNode;
+                parent.removeChild(deps[j]);
+                changed = true;
+            }
+        }
     }
 
-    var artifacts = [
-        "protostuff-core",
-        "protostuff-runtime",
-        "junit",
-        "cglib",
-        "javolution-core-java"
-    ];
-    for (var j = 0; j < artifacts.length; j++) {
-        cleaned = removeDependencyByArtifact(cleaned, artifacts[j]);
-    }
-
-    cleaned = cleaned.replace(/\r?\n{3,}/g, "\r\n\r\n");
-
-    if (cleaned === text) {
+    if (!changed) {
         WScript.Echo("Nettyx develop pom unchanged after test dependency cleanup: " + path);
         return;
     }
@@ -912,7 +860,24 @@ function cleanNettyxDevelopPom(projectPath, dryRun) {
         return;
     }
 
-    writeUtf8NoBom(path, cleaned);
+    var xml = readUtf8(path);
+    var cleaned = xml;
+
+    // Remove <!--test--> comments that were adjacent to removed dependencies
+    cleaned = cleaned.replace(/^[ \t]*<!--test-->\r?\n?/gm, "");
+
+    // The DOM output preserves whitespace, but leftover blank lines from removed elements need cleanup
+    cleaned = cleaned.replace(/\r?\n{3,}/g, "\r\n\r\n");
+
+    // Remove empty <dependencies> element if all deps were removed
+    cleaned = cleaned.replace(/^[ \t]*<dependencies>\s*[\r\n]+\s*<\/dependencies>\r?\n?/gm, "");
+
+    // Remove empty <properties> element if all props were removed
+    cleaned = cleaned.replace(/^[ \t]*<properties>\s*[\r\n]+\s*<\/properties>\r?\n?/gm, "");
+
+    if (cleaned !== xml) {
+        writeUtf8NoBom(path, cleaned);
+    }
     WScript.Echo("Cleaned nettyx develop pom test-only properties and dependencies: " + path);
 }
 
@@ -965,15 +930,17 @@ function nextVersionValue(currentVersion) {
 function nextProjectVersion(projectPath, artifactId, nettyxVersion) {
     var path = requirePom(projectPath);
     var text = readUtf8(path);
-    var rawVersion = rawProjectVersion(text, path, artifactId);
+    var doc = loadDoc(path);
+    var versionEl = selectNode(doc, "/m:project/m:version");
+    var rawVersion = getNodeText(versionEl);
 
     if (rawVersion === "${revision}") {
-        var revision = getPropertyValueFromText(text, path, "revision", true);
-        if (revision.indexOf("${") >= 0) {
-            WScript.Echo(resolveProperties(text, path, revision, { "nettyx.version": nettyxVersion }));
+        var revision = getNodeText(selectNode(doc, "/m:project/m:properties/m:revision"));
+        if (revision && revision.indexOf("${") >= 0) {
+            WScript.Echo(resolvePropertyRefs(text, revision));
             return;
         }
-        WScript.Echo(nextVersionValue(revision));
+        WScript.Echo(nextVersionValue(revision || rawVersion));
         return;
     }
 

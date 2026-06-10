@@ -24,7 +24,7 @@ public class cuint8_t extends Cbasic<Short> {
     }
 
     @Override
-    public boolean hasSinged() {
+    public boolean hasSigned() {
         return false;
     }
 
