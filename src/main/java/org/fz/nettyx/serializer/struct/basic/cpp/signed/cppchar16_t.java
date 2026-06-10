@@ -37,11 +37,12 @@ public class cppchar16_t extends Cppbasic<Character> {
 
     @Override
     public String toString() {
-        return new String(this.getBytes(), StandardCharsets.UTF_16);
+        return toString(StandardCharsets.UTF_16);
     }
 
     public String toString(Charset charset) {
-        return new String(this.getBytes(), charset);
+        if (bytesBuf != null) return bytesBuf.toString(charset);
+        return value != null ? value.toString() : "";
     }
 
 }

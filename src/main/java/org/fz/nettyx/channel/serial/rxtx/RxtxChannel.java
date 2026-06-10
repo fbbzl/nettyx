@@ -51,6 +51,7 @@ public class RxtxChannel extends SerialCommChannel {
                                       );
         serialPort.setDTR(config().getOption(RxtxChannelOption.DTR));
         serialPort.setRTS(config().getOption(RxtxChannelOption.RTS));
+        open = true;
     }
 
     @Override

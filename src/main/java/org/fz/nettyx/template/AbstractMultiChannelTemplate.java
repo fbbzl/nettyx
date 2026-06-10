@@ -68,7 +68,7 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
     {
         channelStorage.compute(key, Try.apply((k, old) -> {
             if (isActive(old)) {
-                old.close().sync();
+                old.close();
             }
             log.debug("has stored channel [{}]", channel);
             return channel;

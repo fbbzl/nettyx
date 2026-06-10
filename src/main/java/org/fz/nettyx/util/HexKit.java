@@ -62,6 +62,7 @@ public class HexKit {
 
     public static byte[] decode(String hex)
     {
+        if (hex == null) return new byte[0];
         int    hexLen = hex.length();
         byte[] result;
         if (hexLen % 2 == 1) {
