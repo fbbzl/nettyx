@@ -7,5 +7,6 @@
 /**/target/**
 /*/*.iml
 /**/.xcodemap/**
+/.flattened-pom.xml
 
 

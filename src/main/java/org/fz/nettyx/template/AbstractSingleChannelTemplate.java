@@ -6,7 +6,6 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.util.ChannelState;
 
@@ -48,16 +47,14 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
 
     protected void storeChannel(C channel)
     {
-        if (isActive(this.channel)) closeChannelDirectly(true);
+        if (isActive(this.channel)) this.channel.close();
 
         this.channel = channel;
     }
 
-    @SneakyThrows(InterruptedException.class)
-    public void closeChannelDirectly(boolean sync)
+    public void closeChannelDirectly()
     {
-        if (sync) this.channel.close().sync();
-        else this.channel.close();
+        this.channel.close();
     }
 
     public void closeChannelGracefully()
