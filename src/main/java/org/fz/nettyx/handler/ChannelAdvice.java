@@ -339,10 +339,9 @@ public class ChannelAdvice {
                     Object                msg,
                     ChannelPromise        promise) throws Exception
             {
-                String msgStr = String.valueOf(msg);
                 promise.addListener(cf -> {
                     if (cf.cause() != null) {
-                        log.error("exception occur while writing, message is [{}]", msgStr, cf.cause());
+                        log.error("exception occur while writing, message is [{}]", msg, cf.cause());
                         invokeAction(whenExceptionCaught, ctx, cf.cause());
                     }
                 });
