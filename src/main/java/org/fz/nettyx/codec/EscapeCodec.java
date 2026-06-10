@@ -99,7 +99,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     static ByteBuf doEscape(ByteBuf msgBuf, Map<byte[], byte[]> map)
     {
-        if (isEmpty(map)) return msgBuf;
+        if (isEmpty(map)) return msgBuf.retain();
 
         final ByteBuf escaped = msgBuf.alloc().buffer();
         while (msgBuf.readableBytes() > 0) {
