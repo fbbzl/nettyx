@@ -341,7 +341,7 @@ public class ChannelAdvice {
             {
                 promise.addListener(cf -> {
                     if (cf.cause() != null) {
-                        log.error("exception occur while writing, message is [" + msg + "]", cf.cause());
+                        log.error("exception occur while writing, message is [{}]", msg, cf.cause());
                         invokeAction(whenExceptionCaught, ctx, cf.cause());
                     }
                 });
