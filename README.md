@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <b>🚀 基于 Netty 的极简开发框架</b><br>
+  <b>🚀 Ultra-lightweight Netty framework</b><br>
   <sub>Lightweight, fast, and ready for production — for TCP, Serial, and Bluetooth</sub>
 </p>
 
@@ -67,6 +67,19 @@ public class Login {
 ```java
 Login login = StructSerializer.toStruct(buf, Login.class);
 byte[] bytes = StructSerializer.toBytes(login);
+```
+
+### Serial Port — RXTX
+
+```java
+SingleRxtxChannelTemplate serial = new SingleRxtxChannelTemplate("COM1") {
+    @Override
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
+        return ch -> ch.pipeline().addLast(new StringCodec());
+    }
+};
+serial.connect();
+serial.writeAndFlush("Hello");
 ```
 
 ### Bluetooth Server
