@@ -1,7 +1,6 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
@@ -30,7 +29,10 @@ public class ByteArrayCodec extends ByteToMessageCodec<byte[]> {
             ByteBuf               in,
             List<Object>          out)
     {
-        out.add(ByteBufUtil.getBytes(in));
+        int readable = in.readableBytes();
+        byte[] bytes = new byte[readable];
+        in.readBytes(bytes);
+        out.add(bytes);
     }
 
 }
