@@ -31,7 +31,6 @@ public class MessageFilter extends ChannelHandlerAdapter {
             if (fireCondition.test((M) msg)) super.channelRead(ctx, msg);
             else {
                 ReferenceCountUtil.release(msg);
-                log.debug("has filter inbound-message [{}]", msg);
             }
         }
     }
@@ -51,8 +50,6 @@ public class MessageFilter extends ChannelHandlerAdapter {
             else {
                 ReferenceCountUtil.release(msg);
                 promise.setFailure(new UnsupportedOperationException("message has been filtered"));
-
-                log.debug("has filter outbound-message [{}]", msg);
             }
         }
     }
