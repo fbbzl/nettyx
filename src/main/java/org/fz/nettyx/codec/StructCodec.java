@@ -65,7 +65,8 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
             out.writeBytes(serialized);
         }
         catch (Exception error) {
-            log.error("struct serialization failed, channel: {} struct: {}", struct, ctx.channel(), error);
+            log.error("struct serialization failed, channel: {} struct: {}", ctx.channel(), struct, error);
+            throw error;
         }
         finally {
             ReferenceCountUtil.release(serialized);

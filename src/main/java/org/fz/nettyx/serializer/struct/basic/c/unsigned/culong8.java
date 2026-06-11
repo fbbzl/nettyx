@@ -37,6 +37,10 @@ public class culong8 extends Cbasic<BigInteger> {
             byte[] trimmed = new byte[size];
             System.arraycopy(byteArray, byteArray.length - size, trimmed, 0, size);
             byteArray = trimmed;
+        } else if (byteArray.length < size) {
+            byte[] padded = new byte[size];
+            System.arraycopy(byteArray, 0, padded, size - byteArray.length, byteArray.length);
+            byteArray = padded;
         }
 
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
