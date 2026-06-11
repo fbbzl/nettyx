@@ -63,7 +63,9 @@ public final class CommPorts {
     {
         List<String>   ports   = new ArrayList<>();
         String         command = "reg query HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM";
-        Process        process = Runtime.getRuntime().exec(command);
+        ProcessBuilder pb      = new ProcessBuilder("cmd", "/c", command);
+        pb.redirectErrorStream(true);
+        Process        process = pb.start();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(),
                                                                            StandardCharsets.UTF_8))) {
             String line;
@@ -78,7 +80,7 @@ public final class CommPorts {
                 index++;
             }
         } catch (IOException ioException) {
-            throw new UnsupportedOperationException("exception occur while reading windows regedit, command: " + command);
+            throw new UnsupportedOperationException("exception occur while reading windows regedit, command: " + command, ioException);
         } finally {
             process.destroy();
         }
