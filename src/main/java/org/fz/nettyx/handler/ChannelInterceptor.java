@@ -26,7 +26,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
      * true : Means this interceptor no longer intercepts any events
      * false: Means the specified channel-event will be intercepted
      */
-    private boolean state = false;
+    private volatile boolean state = false;
 
     public boolean isFreed()
     {
@@ -366,7 +366,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             else           this.preFlush(ctx);
         }
 
-        public final void preBind(
+        protected void preBind(
                 ChannelHandlerContext ctx,
                 SocketAddress         localAddress,
                 ChannelPromise        promise)
@@ -374,7 +374,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             if (!defaultInterceptAll) ctx.bind(localAddress, promise);
         }
 
-        public final void preConnect(
+        protected void preConnect(
                 ChannelHandlerContext ctx,
                 SocketAddress         remoteAddress,
                 SocketAddress         localAddress,
@@ -383,27 +383,27 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             if (!defaultInterceptAll) ctx.connect(remoteAddress, localAddress, promise);
         }
 
-        public final void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise)
+        protected void preDisconnect(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (!defaultInterceptAll) ctx.disconnect(promise);
         }
 
-        public final void preClose(ChannelHandlerContext ctx, ChannelPromise promise)
+        protected void preClose(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (!defaultInterceptAll) ctx.close(promise);
         }
 
-        public final void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise)
+        protected void preDeregister(ChannelHandlerContext ctx, ChannelPromise promise)
         {
             if (!defaultInterceptAll) ctx.deregister(promise);
         }
 
-        public final void preRead(ChannelHandlerContext ctx)
+        protected void preRead(ChannelHandlerContext ctx)
         {
             if (!defaultInterceptAll) ctx.read();
         }
 
-        public final void preWrite(
+        protected void preWrite(
                 ChannelHandlerContext ctx,
                 Object                msg,
                 ChannelPromise        promise)
@@ -411,7 +411,7 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
             if (!defaultInterceptAll) ctx.write(msg, promise);
         }
 
-        public final void preFlush(ChannelHandlerContext ctx)
+        protected void preFlush(ChannelHandlerContext ctx)
         {
             if (!defaultInterceptAll) ctx.flush();
         }

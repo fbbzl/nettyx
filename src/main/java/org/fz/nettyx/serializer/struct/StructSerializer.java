@@ -84,10 +84,11 @@ public final class StructSerializer implements Serializer {
             Type        root,
             InputStream is) throws IOException
     {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        for (int b = is.read(); b >= 0; b = is.read()) baos.write(b);
-        is.close();
-        return toStruct(root, baos.toByteArray());
+        try (is) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            for (int b = is.read(); b >= 0; b = is.read()) baos.write(b);
+            return toStruct(root, baos.toByteArray());
+        }
     }
 
     //*************************************       read write splitter     ********************************************//

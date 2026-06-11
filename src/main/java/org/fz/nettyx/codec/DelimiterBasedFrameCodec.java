@@ -2,7 +2,6 @@ package org.fz.nettyx.codec;
 
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
@@ -54,7 +53,8 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
                 ByteBuf               msg,
                 ByteBuf               out)
         {
-            out.writeBytes(Unpooled.wrappedBuffer(msg, delimiter.duplicate()));
+            out.writeBytes(msg);
+            out.writeBytes(delimiter, delimiter.readerIndex(), delimiter.readableBytes());
         }
 
     }
