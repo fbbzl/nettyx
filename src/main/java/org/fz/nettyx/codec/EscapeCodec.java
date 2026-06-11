@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
@@ -55,8 +56,14 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
         {
-            ByteBuf decode = doEscape(in, map);
-            out.add(decode);
+            ByteBuf decode = null;
+            try {
+                decode = doEscape(in, map);
+                out.add(decode);
+            } catch (Exception e) {
+                ReferenceCountUtil.release(decode);
+                throw e;
+            }
         }
     }
 
