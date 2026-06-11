@@ -89,7 +89,13 @@ public @interface ToNamedEnum {
             int    bufferLength = toNamedEnum.bufferLength();
             String charset      = toNamedEnum.charset();
 
-            if (fieldVal != null) writing.writeBytes(fieldVal.toString().getBytes(Charset.forName(charset)));
+            if (fieldVal != null) {
+                byte[] bytes    = fieldVal.toString().getBytes(Charset.forName(charset));
+                int    writeLen = Math.min(bytes.length, bufferLength);
+                writing.writeBytes(bytes, 0, writeLen);
+                int padding = bufferLength - writeLen;
+                if (padding > 0) writing.writeZero(padding);
+            }
             else writing.writeZero(bufferLength);
         }
     }
