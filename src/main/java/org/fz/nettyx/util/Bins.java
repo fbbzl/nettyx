@@ -123,38 +123,34 @@ public class Bins {
 
     public byte getByte(int startIndex, int length)
     {
-        byte[] copy = new byte[length];
-
-        System.arraycopy(getBinaries(), startIndex, copy, 0, length);
-
-        return (byte) toInt(copy);
+        return (byte) toInt(copyBits(startIndex, length));
     }
 
     public short getShort(int startIndex, int length)
     {
-        byte[] copy = new byte[length];
-
-        System.arraycopy(getBinaries(), startIndex, copy, 0, length);
-
-        return (short) toInt(copy);
+        return (short) toInt(copyBits(startIndex, length));
     }
 
     public int getInt(int startIndex, int length)
     {
-        byte[] copy = new byte[length];
-
-        System.arraycopy(getBinaries(), startIndex, copy, 0, length);
-
-        return toInt(copy);
+        return toInt(copyBits(startIndex, length));
     }
 
     public long getLong(int startIndex, int length)
     {
+        return toLong(copyBits(startIndex, length));
+    }
+
+    private byte[] copyBits(int startIndex, int length)
+    {
+        if (startIndex < 0 || length < 0 || startIndex > length() - length)
+            throw new IndexOutOfBoundsException("startIndex [" + startIndex + "], length [" + length + "]");
+
         byte[] copy = new byte[length];
-
-        System.arraycopy(getBinaries(), startIndex, copy, 0, length);
-
-        return toLong(copy);
+        for (int i = 0; i < length; i++) {
+            copy[i] = get(startIndex + length - 1 - i);
+        }
+        return copy;
     }
 
     public void set(int index, int value)
