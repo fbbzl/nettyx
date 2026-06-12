@@ -49,7 +49,7 @@ public class MessageFilter extends ChannelHandlerAdapter {
             if (fireCondition.test((M) msg)) super.write(ctx, msg, promise);
             else {
                 ReferenceCountUtil.release(msg);
-                promise.setFailure(new UnsupportedOperationException("message has been filtered"));
+                promise.setSuccess();
             }
         }
     }
