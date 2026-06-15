@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 
 /**
  * this type in Cpp language is unsigned long8
@@ -18,7 +19,7 @@ public class cppulong8 extends culong8 {
         super(value);
     }
 
-    public cppulong8(ByteBuf buf) {
-        super(buf);
+    public cppulong8(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in Cpp language is char8_t
  *
@@ -16,8 +18,8 @@ public class cppchar8_t extends cchar {
         super(value);
     }
 
-    public cppchar8_t(ByteBuf buf) {
-        super(buf);
+    public cppchar8_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

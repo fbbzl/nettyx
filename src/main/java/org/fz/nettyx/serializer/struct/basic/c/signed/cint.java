@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
@@ -19,20 +18,20 @@ public class cint extends Cbasic<Integer> {
         super(value, 4);
     }
 
-    public cint(ByteBuf buf) {
-        super(buf, 4);
+    public cint(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 4);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Integer value, ByteOrder byteOrder) {
+    public void write(ByteBuf writingBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return Unpooled.buffer(size).writeIntLE(value);
+            writingBuf.writeIntLE(value);
         else
-            return Unpooled.buffer(size).writeInt(value);
+            writingBuf.writeInt(value);
     }
 
     @Override
-    protected Integer toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Integer read(ByteBuf byteBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readIntLE();
         else

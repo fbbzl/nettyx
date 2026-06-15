@@ -32,12 +32,12 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.12</version>
+    <version>2.6.22</version>
 </dependency>
 ```
 
 ```groovy
-implementation 'io.github.fbbzl:nettyx:2.6.12'
+implementation 'io.github.fbbzl:nettyx:2.6.22'
 ```
 
 ---

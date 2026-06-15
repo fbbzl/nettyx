@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
@@ -19,8 +18,8 @@ public class cuint8_t extends Cbasic<Short> {
         super(value.shortValue(), 1);
     }
 
-    public cuint8_t(ByteBuf buf) {
-        super(buf, 1);
+    public cuint8_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 1);
     }
 
     @Override
@@ -29,12 +28,12 @@ public class cuint8_t extends Cbasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value, ByteOrder byteOrder) {
-        return Unpooled.buffer(size).writeByte(value);
+    public void write(ByteBuf writingBuf) {
+        writingBuf.writeByte(value);
     }
 
     @Override
-    protected Short toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Short read(ByteBuf byteBuf) {
         return byteBuf.readUnsignedByte();
     }
 

@@ -1,8 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
-import cn.hutool.core.util.PrimitiveArrayUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.math.BigInteger;
@@ -21,8 +19,8 @@ public class culong8 extends Cbasic<BigInteger> {
         super(value, 8);
     }
 
-    public culong8(ByteBuf buf) {
-        super(buf, 8);
+    public culong8(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 8);
     }
 
     @Override
@@ -31,32 +29,31 @@ public class culong8 extends Cbasic<BigInteger> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(BigInteger value, ByteOrder byteOrder) {
+    public void write(ByteBuf writingBuf) {
         byte[] byteArray = value.toByteArray();
-        if (byteArray.length > size) {
-            byte[] trimmed = new byte[size];
-            System.arraycopy(byteArray, byteArray.length - size, trimmed, 0, size);
-            byteArray = trimmed;
-        } else if (byteArray.length < size) {
-            byte[] padded = new byte[size];
-            System.arraycopy(byteArray, 0, padded, size - byteArray.length, byteArray.length);
-            byteArray = padded;
-        }
-
+        int copyLength = Math.min(byteArray.length, size);
+        int copyStart  = byteArray.length - copyLength;
+        int padding    = size - copyLength;
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            byteArray = PrimitiveArrayUtil.reverse(byteArray);
+            for (int i = byteArray.length - 1; i >= copyStart; i--) {
+                writingBuf.writeByte(byteArray[i]);
+            }
+            if (padding > 0) writingBuf.writeZero(padding);
+        } else {
+            if (padding > 0) writingBuf.writeZero(padding);
+            writingBuf.writeBytes(byteArray, copyStart, copyLength);
         }
-
-        return Unpooled.buffer(size).writeBytes(byteArray);
     }
 
     @Override
-    protected BigInteger toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
-        byte[] byteArray = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(byteArray);
-
+    protected BigInteger read(ByteBuf byteBuf) {
+        byte[] byteArray = new byte[size];
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            byteArray = PrimitiveArrayUtil.reverse(byteArray);
+            for (int i = size - 1; i >= 0; i--) {
+                byteArray[i] = byteBuf.readByte();
+            }
+        } else {
+            byteBuf.readBytes(byteArray);
         }
 
         // the no sign in BigInteger is 1

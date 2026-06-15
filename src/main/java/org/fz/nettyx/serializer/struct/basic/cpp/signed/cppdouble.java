@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in Cpp language is double
  *
@@ -16,8 +18,8 @@ public class cppdouble extends cdouble {
         super(value);
     }
 
-    public cppdouble(ByteBuf buf) {
-        super(buf);
+    public cppdouble(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
 }

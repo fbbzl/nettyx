@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.ByteOrder;
 
 /**
  * this type in Cpp language is unsigned char
@@ -18,13 +18,12 @@ public class cppuchar extends cuchar {
         super(value);
     }
 
-    public cppuchar(ByteBuf buf) {
-        super(buf);
+    public cppuchar(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 
     @Override
     public String toString() {
-        if (bytesBuf != null) return bytesBuf.toString(StandardCharsets.UTF_8);
         return value != null ? value.toString() : "";
     }
 

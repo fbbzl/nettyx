@@ -1,15 +1,18 @@
 package org.fz.nettyx.codec;
 
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
+import org.fz.erwin.exception.Throws;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -59,17 +62,21 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
-        ByteBuf serialized = null;
+        int writerIndex = out.writerIndex();
         try {
-            serialized = StructSerializer.toByteBuf(type, struct);
-            out.writeBytes(serialized);
+            Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + type + "]");
+
+            Type structType = type instanceof TypeReference<?> typeRefer ? typeRefer.getType() : type;
+            switch (structType) {
+                case Class<?>          clazz             -> new StructSerializer(clazz).writeStruct(clazz, struct, out);
+                case ParameterizedType parameterizedType -> new StructSerializer(parameterizedType).writeStruct(parameterizedType, struct, out);
+                default                                  -> throw new TypeJudgmentException(structType);
+            }
         }
         catch (Exception error) {
+            out.writerIndex(writerIndex);
             log.error("struct serialization failed, channel: {} struct: {}", ctx.channel(), struct, error);
             throw error;
-        }
-        finally {
-            ReferenceCountUtil.release(serialized);
         }
     }
 }

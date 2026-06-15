@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
@@ -21,8 +20,8 @@ public class cuchar extends Cbasic<Short> {
         super(value.shortValue(), 1);
     }
 
-    public cuchar(ByteBuf buf) {
-        super(buf, 1);
+    public cuchar(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 1);
     }
 
     @Override
@@ -31,12 +30,12 @@ public class cuchar extends Cbasic<Short> {
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value, ByteOrder byteOrder) {
-        return Unpooled.buffer(size).writeByte(value);
+    public void write(ByteBuf writingBuf) {
+        writingBuf.writeByte(value);
     }
 
     @Override
-    protected Short toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Short read(ByteBuf byteBuf) {
         return byteBuf.readUnsignedByte();
     }
 
@@ -46,7 +45,6 @@ public class cuchar extends Cbasic<Short> {
     }
 
     public String toString(Charset charset) {
-        if (bytesBuf != null) return bytesBuf.toString(charset);
         return value != null ? value.toString() : "";
     }
 

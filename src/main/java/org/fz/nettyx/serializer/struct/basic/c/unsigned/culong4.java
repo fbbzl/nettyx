@@ -2,6 +2,8 @@ package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is unsigned long4
  *
@@ -15,7 +17,7 @@ public class culong4 extends cuint {
         super(value);
     }
 
-    public culong4(ByteBuf buf) {
-        super(buf);
+    public culong4(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

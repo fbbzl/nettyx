@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
@@ -19,20 +18,20 @@ public class clong8 extends Cbasic<Long> {
         super(value, 8);
     }
 
-    public clong8(ByteBuf buf) {
-        super(buf, 8);
+    public clong8(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 8);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Long value, ByteOrder byteOrder) {
+    public void write(ByteBuf writingBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return Unpooled.buffer(size).writeLongLE(value);
+            writingBuf.writeLongLE(value);
         else
-            return Unpooled.buffer(size).writeLong(value);
+            writingBuf.writeLong(value);
     }
 
     @Override
-    protected Long toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Long read(ByteBuf byteBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readLongLE();
         else
