@@ -1,0 +1,12 @@
+#root ignore
+/*.iml
+/git
+
+#module ignore
+/**/.idea/**
+/**/target/**
+/*/*.iml
+/**/.xcodemap/**
+/.flattened-pom.xml
+
+

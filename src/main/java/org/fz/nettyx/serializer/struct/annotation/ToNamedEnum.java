@@ -1,0 +1,103 @@
+package org.fz.nettyx.serializer.struct.annotation;
+
+import cn.hutool.core.util.EnumUtil;
+import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.serializer.struct.StructFieldHandler;
+import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+/**
+ * find enum by enum name
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024 /1/10 16:43
+ */
+@SuppressWarnings("all")
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface ToNamedEnum {
+
+    /**
+     * Enum type class.
+     *
+     * @return the class
+     */
+    Class<? extends Enum> enumType();
+
+    /**
+     * Charset string.
+     *
+     * @return the string
+     */
+    String charset() default "US-ASCII";
+
+    /**
+     * Buffer length int.
+     *
+     * @return the int
+     */
+    int bufferLength();
+
+    /**
+     * The type To named enum handler.
+     */
+    class ToNamedEnumHandler implements StructFieldHandler<ToNamedEnum> {
+        @Override
+        public boolean isSingleton()
+        {
+            return true;
+        }
+
+        @Override
+        public Object doRead(
+                StructSerializer serializer,
+                Type             root,
+                Object           earlyStruct,
+                StructField      field,
+                Type             fieldType,
+                ByteBuf          reading,
+                ToNamedEnum      toNamedEnum)
+        {
+            Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
+            String enumName = reading
+                    .readCharSequence(toNamedEnum.bufferLength(),
+                                      Charset.forName(toNamedEnum.charset())).toString();
+
+            return EnumUtil.fromString(enumClass, enumName);
+        }
+
+        @Override
+        public void doWrite(
+                StructSerializer serializer,
+                Type             root,
+                Object           struct,
+                StructField      field,
+                Type             fieldType,
+                Object           fieldVal,
+                ByteBuf          writing,
+                ToNamedEnum      toNamedEnum)
+        {
+            int    bufferLength = toNamedEnum.bufferLength();
+            String charset      = toNamedEnum.charset();
+
+            if (fieldVal != null) {
+                byte[] bytes    = fieldVal.toString().getBytes(Charset.forName(charset));
+                int    writeLen = Math.min(bytes.length, bufferLength);
+                writing.writeBytes(bytes, 0, writeLen);
+                int padding = bufferLength - writeLen;
+                if (padding > 0) writing.writeZero(padding);
+            }
+            else writing.writeZero(bufferLength);
+        }
+    }
+
+}
