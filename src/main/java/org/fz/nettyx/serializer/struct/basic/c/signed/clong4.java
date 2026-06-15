@@ -2,6 +2,8 @@ package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in C language is long4
  *
@@ -15,7 +17,7 @@ public class clong4 extends cint {
         super(value);
     }
 
-    public clong4(ByteBuf buf) {
-        super(buf);
+    public clong4(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

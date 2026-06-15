@@ -9,6 +9,7 @@ import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -49,9 +50,6 @@ public @interface Chunk {
                 ByteBuf          reading,
                 Chunk            chunk)
         {
-            Class<?> chunkType = field.wrapped().getType();
-            checkChunk(chunkType);
-
             byte[] chunkBytes = new byte[chunk.length()];
             reading.readBytes(chunkBytes);
 
@@ -69,9 +67,6 @@ public @interface Chunk {
                 ByteBuf          writing,
                 Chunk            chunk)
         {
-            Class<?> chunkType = field.wrapped().getType();
-            checkChunk(chunkType);
-
             if (fieldVal != null) {
                 byte[] bytes = (byte[]) fieldVal;
                 int padding = computePadding(chunk, bytes.length);
@@ -82,8 +77,9 @@ public @interface Chunk {
             }
         }
 
-        static void checkChunk(Class<?> fieldType)
-        {
+        @Override
+        public void doAnnotationValid(Chunk chunk, Field field) {
+            Class<?> fieldType = field.getType();
             Throws.ifFalse(byte[].class.isAssignableFrom(fieldType),
                            () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
         }

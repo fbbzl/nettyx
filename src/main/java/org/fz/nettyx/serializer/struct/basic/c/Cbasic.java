@@ -17,7 +17,7 @@ import java.nio.ByteOrder;
 public abstract class Cbasic<V extends Comparable<V>> extends Basic<V> {
 
     private static final boolean   C_DEFAULT_SIGNED = true;
-    private static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
+    protected static final ByteOrder C_DEFAULT_ENDIAN = ByteOrder.LITTLE_ENDIAN;
 
     /**
      * Instantiates a new C basic.
@@ -26,17 +26,15 @@ public abstract class Cbasic<V extends Comparable<V>> extends Basic<V> {
      * @param size  the size
      */
     protected Cbasic(V value, int size) {
-        super(value, size);
+        this(C_DEFAULT_ENDIAN, value, size);
     }
 
-    /**
-     * Instantiates a new C basic.
-     *
-     * @param buf  the buf
-     * @param size the size
-     */
-    protected Cbasic(ByteBuf buf, int size) {
-        super(buf, size);
+    protected Cbasic(ByteOrder byteOrder, V value, int size) {
+        super(byteOrder, value, size);
+    }
+
+    protected Cbasic(ByteOrder byteOrder, ByteBuf buf, int size) {
+        super(byteOrder, buf, size);
     }
 
     @Override

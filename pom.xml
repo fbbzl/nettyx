@@ -34,7 +34,7 @@
     </licenses>
 
     <properties>
-        <revision>2.6.20</revision>
+        <revision>2.6.22</revision>
 
         <!--build-->
         <java.version>21</java.version>
@@ -63,7 +63,7 @@
         <bluecove.version>2.1.1</bluecove.version>
 
         <!--util-->
-        <erwin.version>1.2.5-RELEASE</erwin.version>
+        <erwin.version>1.2.14</erwin.version>
 
         <!--reflect-->
         <reflectasm.version>1.11.9</reflectasm.version>
@@ -71,6 +71,7 @@
         <junit.version>4.13.2</junit.version>
         <cglib.version>3.3.0</cglib.version>
         <javolution-core-java.version>6.0.0</javolution-core-java.version>
+        <log4j2.version>2.24.3</log4j2.version>
     </properties>
 
     <dependencies>
@@ -153,6 +154,24 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>${log4j2.version}</version>
         </dependency>
     </dependencies>
 

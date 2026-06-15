@@ -3,6 +3,8 @@ package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
 
+import java.nio.ByteOrder;
+
 /**
  * this type in Cpp language is unsigned short
  *
@@ -16,7 +18,7 @@ public class cppushort extends cushort {
         super(value);
     }
 
-    public cppushort(ByteBuf buf) {
-        super(buf);
+    public cppushort(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf);
     }
 }

@@ -16,7 +16,7 @@ set "STARTER_VERSION="
 set "NETTYX_REMOTES=gitee github"
 set "STARTER_REMOTES=gitee github"
 set "NETTYX_FEATURE_BRANCH=feature"
-set "NETTYX_DEV_BRANCH=develop"
+set "NETTYX_DEV_BRANCH=dev"
 set "NETTYX_RELEASE_BRANCH=release"
 set "NETTYX_MAIN_BRANCH=main"
 set "STARTER_PUBLISH_BRANCH=publish"
@@ -252,17 +252,17 @@ call :commit_current_changes "nettyx feature" "%PROJECT_NETTYX%" "%FEATURE_COMMI
 call :push_branch "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 echo.
-echo ========== nettyx develop release commit ==========
+echo ========== nettyx dev release commit ==========
 call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_DEV_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
 call :squash_merge_nettyx_feature "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" || exit /b 1
-call :resolve_nettyx_develop_known_paths "%PROJECT_NETTYX%" || exit /b 1
+call :resolve_nettyx_dev_known_paths "%PROJECT_NETTYX%" || exit /b 1
 call :restore_head_paths "%PROJECT_NETTYX%" README.md README_zh.md || exit /b 1
 call :drop_or_restore_head_paths "%PROJECT_NETTYX%" src/test/java || exit /b 1
-call :clean_nettyx_develop_pom "%PROJECT_NETTYX%" || exit /b 1
+call :clean_nettyx_dev_pom "%PROJECT_NETTYX%" || exit /b 1
 call :assert_no_unmerged_paths "%PROJECT_NETTYX%" || exit /b 1
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
 call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
-call :commit_staged_changes "nettyx develop" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+call :commit_staged_changes "nettyx dev" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
 call :push_branch "%PROJECT_NETTYX%" "%NETTYX_DEV_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 echo.
@@ -342,7 +342,7 @@ if "%DRY_RUN%"=="1" (
 )
 exit /b %ERRORLEVEL%
 
-:clean_nettyx_develop_pom
+:clean_nettyx_dev_pom
 if "%DRY_RUN%"=="1" (
     cscript //nologo //E:JScript "%~f0" cleanNettyxDevelopPom "%~1" dryRun
 ) else (
@@ -391,10 +391,10 @@ call :run_in_dir_no_fail "%SQUASH_PROJECT_PATH%" git -C "%SQUASH_PROJECT_PATH%" 
 set "SQUASH_EXIT=%ERRORLEVEL%"
 if "%DRY_RUN%"=="1" exit /b 0
 if "%SQUASH_EXIT%"=="0" exit /b 0
-echo Squash merge reported conflicts. Known nettyx develop-only paths will be resolved automatically.
+echo Squash merge reported conflicts. Known nettyx dev-only paths will be resolved automatically.
 exit /b 0
 
-:resolve_nettyx_develop_known_paths
+:resolve_nettyx_dev_known_paths
 set "RESOLVE_KNOWN_PROJECT_PATH=%~1"
 if "%DRY_RUN%"=="1" exit /b 0
 call :checkout_ours_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" README.md || exit /b 1
@@ -851,12 +851,12 @@ function cleanNettyxDevelopPom(projectPath, dryRun) {
     }
 
     if (!changed) {
-        WScript.Echo("Nettyx develop pom unchanged after test dependency cleanup: " + path);
+        WScript.Echo("Nettyx dev pom unchanged after test dependency cleanup: " + path);
         return;
     }
 
     if (dryRun) {
-        WScript.Echo("DryRun: clean nettyx develop pom test-only properties and dependencies: " + path);
+        WScript.Echo("DryRun: clean nettyx dev pom test-only properties and dependencies: " + path);
         return;
     }
 
@@ -878,7 +878,7 @@ function cleanNettyxDevelopPom(projectPath, dryRun) {
     if (cleaned !== xml) {
         writeUtf8NoBom(path, cleaned);
     }
-    WScript.Echo("Cleaned nettyx develop pom test-only properties and dependencies: " + path);
+    WScript.Echo("Cleaned nettyx dev pom test-only properties and dependencies: " + path);
 }
 
 function nextVersion(currentVersion) {

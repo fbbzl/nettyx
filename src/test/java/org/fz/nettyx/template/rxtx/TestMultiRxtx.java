@@ -1,0 +1,71 @@
+package org.fz.nettyx.template.rxtx;
+
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.fz.nettyx.channel.serial.SerialCommChannel;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannel;
+import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.template.TestChannelInitializer;
+import org.fz.nettyx.template.serial.rxtx.MultiRxtxChannelTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.fz.nettyx.action.ListenerAction.redo;
+import static org.fz.nettyx.codec.UserCodec.TEST_USER;
+
+
+/**
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/3/1 22:58
+ */
+public class TestMultiRxtx extends MultiRxtxChannelTemplate<String> {
+
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(TestMultiRxtx.class);
+
+    protected TestMultiRxtx(Map<String, SerialCommChannel.SerialCommAddress> stringRxtxDeviceAddressMap) {
+        super(stringRxtxDeviceAddressMap);
+    }
+
+    @Override
+    protected void doChannelConfig(String channelKey, RxtxChannelConfig channelConfig) {
+        // if(targetChannelKey=="MES") {br=19200}
+        channelConfig
+                .setBaudRate(115200)
+                .setDataBits(RxtxChannelConfig.DataBits.DATA_BITS_8)
+                .setStopBits(RxtxChannelConfig.StopBits.STOP_BITS_1)
+                .setParityBit(RxtxChannelConfig.ParityBit.NO)
+                .setDtr(false)
+                .setRts(false);
+    }
+
+    @Override
+    protected ChannelInitializer<RxtxChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
+    public static void main(String[] args) {
+        Map<String, SerialCommChannel.SerialCommAddress> map = new HashMap<>();
+
+        map.put("5", new SerialCommChannel.SerialCommAddress("COM2"));
+        map.put("6", new SerialCommChannel.SerialCommAddress("COM6"));
+
+        TestMultiRxtx testMultiTcp = new TestMultiRxtx(map);
+        ChannelFutureListener listener = new ActionChannelFutureListener()
+                .whenSuccess((l, cf) -> {
+                    cf.channel().writeAndFlush(TEST_USER);
+
+                    log.info(cf.channel().localAddress() + ": ok");
+                })
+                .whenCancelled((l, cf) -> log.info("cancel"))
+                .whenFailure(redo(cf -> testMultiTcp.connect(channelKey(cf)), 2, SECONDS))
+                .whenDone((l, cf) -> log.info("done"));
+
+        testMultiTcp.connectAll().values().forEach(c -> c.addListener(listener));
+    }
+}

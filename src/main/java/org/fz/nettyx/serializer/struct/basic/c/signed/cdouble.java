@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
@@ -19,20 +18,20 @@ public class cdouble extends Cbasic<Double> {
         super(value, 8);
     }
 
-    public cdouble(ByteBuf buf) {
-        super(buf, 8);
+    public cdouble(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 8);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Double value, ByteOrder byteOrder) {
+    public void write(ByteBuf writingBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return Unpooled.buffer(size).writeDoubleLE(value);
+            writingBuf.writeDoubleLE(value);
         else
-            return Unpooled.buffer(size).writeDouble(value);
+            writingBuf.writeDouble(value);
     }
 
     @Override
-    protected Double toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Double read(ByteBuf byteBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readDoubleLE();
         else

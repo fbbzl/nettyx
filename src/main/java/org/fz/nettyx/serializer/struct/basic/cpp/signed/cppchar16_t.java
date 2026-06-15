@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.cpp.Cppbasic;
 
 import java.nio.ByteOrder;
@@ -21,20 +20,20 @@ public class cppchar16_t extends Cppbasic<Character> {
         super(value, 2);
     }
 
-    public cppchar16_t(ByteBuf buf) {
-        super(buf, 2);
+    public cppchar16_t(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 2);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Character value, ByteOrder byteOrder) {
+    public void write(ByteBuf writingBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return Unpooled.buffer(getSize()).writeShortLE((short) value.charValue());
+            writingBuf.writeShortLE((short) value.charValue());
         else
-            return Unpooled.buffer(getSize()).writeChar(value);
+            writingBuf.writeChar(value);
     }
 
     @Override
-    protected Character toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Character read(ByteBuf byteBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return (char) byteBuf.readShortLE();
         else
@@ -47,7 +46,6 @@ public class cppchar16_t extends Cppbasic<Character> {
     }
 
     public String toString(Charset charset) {
-        if (bytesBuf != null) return bytesBuf.toString(charset);
         return value != null ? value.toString() : "";
     }
 

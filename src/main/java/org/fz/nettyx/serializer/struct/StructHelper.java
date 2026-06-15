@@ -76,14 +76,12 @@ public class StructHelper {
     {
         try
         {
-            B basic = (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(buf);
-            basic.setByteOrder(byteOrder);
-            return basic;
+            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(byteOrder, buf);
         }
         catch (Exception instanceError)
         {
             Throwable cause = instanceError.getCause();
-            if (cause instanceof TooLessBytesException)
+            if (instanceError instanceof TooLessBytesException || cause instanceof TooLessBytesException)
                 throw new SerializeException(instanceError);
             else
                 throw new SerializeException("basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", instanceError);

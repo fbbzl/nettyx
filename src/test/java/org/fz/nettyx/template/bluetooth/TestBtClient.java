@@ -1,0 +1,66 @@
+package org.fz.nettyx.template.bluetooth;
+
+import cn.hutool.core.util.StrUtil;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.fz.nettyx.channel.bluetooth.client.BtChannel;
+import org.fz.nettyx.listener.ActionChannelFutureListener;
+import org.fz.nettyx.template.TestChannelInitializer;
+import org.fz.nettyx.template.bluetooth.client.SingleBtChannelTemplate;
+import org.fz.nettyx.util.BtFinder;
+
+import javax.bluetooth.RemoteDevice;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static org.fz.nettyx.codec.UserCodec.TEST_USER;
+
+/**
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/5/30 19:57
+ */
+public class TestBtClient extends SingleBtChannelTemplate {
+
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(TestBtClient.class);
+
+    static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    public TestBtClient(String address) {
+        super(address);
+    }
+
+    @Override
+    protected ChannelInitializer<BtChannel> channelInitializer() {
+        return new TestChannelInitializer<>();
+    }
+
+    public static void main(String[] args) throws Exception {
+        List<RemoteDevice> devices = new BtFinder.DeviceFinder().getDevices();
+
+        for (RemoteDevice device : devices) {
+            System.err.println(device.getBluetoothAddress());
+            System.err.println(device.getFriendlyName(false));
+        }
+
+        String       url = StrUtil.format("btspp://{}:1;authenticate=false;encrypt=false;master=false", devices.get(0).getBluetoothAddress());
+
+        TestBtClient client = new TestBtClient(url);
+
+        ChannelFutureListener listener = new ActionChannelFutureListener()
+                .whenSuccess((l, cf) -> {
+                    executor.scheduleAtFixedRate(() -> {
+                        client.writeAndFlush(TEST_USER);
+                    }, 2, 30, TimeUnit.MILLISECONDS);
+                })
+                .whenCancelled((l, cf) -> log.info("cancel"))
+                .whenDone((l, cf) -> log.info("done"));
+
+        client.connect().addListener(listener);
+
+    }
+
+}

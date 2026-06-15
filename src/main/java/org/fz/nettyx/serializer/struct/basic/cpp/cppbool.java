@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.cpp;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
 import java.nio.ByteOrder;
 
@@ -18,17 +17,17 @@ public class cppbool extends Cppbasic<Boolean> {
         super(value, 1);
     }
 
-    public cppbool(ByteBuf buf) {
-        super(buf, 1);
+    public cppbool(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 1);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Boolean value, ByteOrder byteOrder) {
-        return Unpooled.buffer(getSize()).writeBoolean(value);
+    public void write(ByteBuf writingBuf) {
+        writingBuf.writeBoolean(value);
     }
 
     @Override
-    protected Boolean toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Boolean read(ByteBuf byteBuf) {
         return byteBuf.readBoolean();
     }
 }

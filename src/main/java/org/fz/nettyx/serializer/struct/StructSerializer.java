@@ -51,7 +51,7 @@ public final class StructSerializer implements Serializer {
         return root;
     }
 
-    StructSerializer(Type root)
+    public StructSerializer(Type root)
     {
         this.root = root;
     }
@@ -102,14 +102,22 @@ public final class StructSerializer implements Serializer {
             Type root,
             T    struct)
     {
-        Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + root + "]");
+        ByteBuf writing = buffer();
+        try {
+            Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + root + "]");
 
-        return switch (root) {
-            case Class<?>          clazz             -> new StructSerializer(clazz).doSerialize(struct);
-            case ParameterizedType parameterizedType -> new StructSerializer(parameterizedType).doSerialize(struct);
-            case TypeReference<?>  typeRefer         -> toByteBuf(typeRefer.getType(), struct);
-            default                                  -> throw new TypeJudgmentException(root);
-        };
+            Type structType = root instanceof TypeReference<?> typeRefer ? typeRefer.getType() : root;
+            switch (structType) {
+                case Class<?>          clazz             -> new StructSerializer(clazz).writeStruct(clazz, struct, writing);
+                case ParameterizedType parameterizedType -> new StructSerializer(parameterizedType).writeStruct(parameterizedType, struct, writing);
+                default                                  -> throw new TypeJudgmentException(structType);
+            }
+            return writing;
+        }
+        catch (Exception error) {
+            ReferenceCountUtil.release(writing);
+            throw error;
+        }
     }
 
     public static <T> byte[] toBytes(T struct)
@@ -253,8 +261,11 @@ public final class StructSerializer implements Serializer {
         }
     }
 
-    public <B extends Basic<?>> void writeBasic(B basicValue, ByteBuf writingBuf) {
-        basicValue.write(writingBuf);
+    public <B extends Basic<?>> void writeBasic(
+            B         basicValue,
+            ByteBuf   writingBuf) {
+        if (basicValue.value() == null) writingBuf.writeZero(basicValue.getSize());
+        else                            basicValue.write(writingBuf);
     }
 
     public <S> void writeStruct(
@@ -311,8 +322,8 @@ public final class StructSerializer implements Serializer {
         for (int i = 0; i < (flexible ? basicArray.length : length); i++) {
             if (i < basicArray.length) {
                 Basic<?> basic = basicArray[i];
-                if (basic == null) writing.writeZero(elementBytesSize);
-                else               basic.write(writing);
+                if (basic == null || basic.value() == null) writing.writeZero(elementBytesSize);
+                else                                        basic.write(writing);
             }
             else writing.writeZero(elementBytesSize);
         }

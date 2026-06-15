@@ -1,7 +1,6 @@
 package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
@@ -18,20 +17,20 @@ public class cshort extends Cbasic<Short> {
         super(value.shortValue(), 2);
     }
 
-    public cshort(ByteBuf buf) {
-        super(buf, 2);
+    public cshort(ByteOrder byteOrder, ByteBuf buf) {
+        super(byteOrder, buf, 2);
     }
 
     @Override
-    protected ByteBuf toByteBuf(Short value, ByteOrder byteOrder) {
+    public void write(ByteBuf writingBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return Unpooled.buffer(size).writeShortLE(value);
+            writingBuf.writeShortLE(value);
         else
-            return Unpooled.buffer(size).writeShort(value);
+            writingBuf.writeShort(value);
     }
 
     @Override
-    protected Short toValue(ByteBuf byteBuf, ByteOrder byteOrder) {
+    protected Short read(ByteBuf byteBuf) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             return byteBuf.readShortLE();
         else
