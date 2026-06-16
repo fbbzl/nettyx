@@ -18,7 +18,7 @@ public class cuint16_t extends cushort {
         super(value);
     }
 
-    public cuint16_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cuint16_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

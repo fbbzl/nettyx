@@ -17,7 +17,7 @@ public class cppulong4 extends cppuint {
         super(value);
     }
 
-    public cppulong4(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppulong4(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

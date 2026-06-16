@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.cpp.signed;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.cpp.Cppbasic;
+import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -13,20 +13,22 @@ import java.nio.charset.Charset;
  * @version 1.0
  * @since 2023/12/27 13:31
  */
-public class cppchar32_t extends Cppbasic<Integer> {
+public class cppchar32_t extends cppbasic<Integer> {
 
     private static final Charset UTF_32 = Charset.forName("UTF-32");
 
     public cppchar32_t(Integer value) {
-        super(value, 4);
+        super(value);
     }
 
-    public cppchar32_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 4);
+    public cppchar32_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public int size() { return 4; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             writingBuf.writeIntLE(value);
         else
@@ -34,11 +36,11 @@ public class cppchar32_t extends Cppbasic<Integer> {
     }
 
     @Override
-    protected Integer read(ByteBuf byteBuf) {
+    protected Integer read(ByteBuf readingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return byteBuf.readIntLE();
+            return readingBuf.readIntLE();
         else
-            return byteBuf.readInt();
+            return readingBuf.readInt();
     }
 
     @Override

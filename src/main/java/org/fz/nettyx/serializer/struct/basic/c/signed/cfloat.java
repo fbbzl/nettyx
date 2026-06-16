@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteOrder;
 
@@ -12,18 +12,20 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cfloat extends Cbasic<Float> {
+public class cfloat extends cbasic<Float> {
 
     public cfloat(Float value) {
-        super(value, 4);
+        super(value);
     }
 
-    public cfloat(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 4);
+    public cfloat(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public int size() { return 4; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             writingBuf.writeFloatLE(value);
         else
@@ -31,10 +33,10 @@ public class cfloat extends Cbasic<Float> {
     }
 
     @Override
-    protected Float read(ByteBuf byteBuf) {
+    protected Float read(ByteBuf readingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return byteBuf.readFloatLE();
+            return readingBuf.readFloatLE();
         else
-            return byteBuf.readFloat();
+            return readingBuf.readFloat();
     }
 }

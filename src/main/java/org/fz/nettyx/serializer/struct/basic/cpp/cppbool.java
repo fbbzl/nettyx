@@ -11,23 +11,30 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/18 15:17
  */
-public class cppbool extends Cppbasic<Boolean> {
+public class cppbool extends cppbasic<Boolean> {
 
     public cppbool(Boolean value) {
-        super(value, 1);
+        super(value);
     }
 
-    public cppbool(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 1);
+    public cppbool(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public boolean hasSigned() {
+        return false;
+    }
+
+    @Override
+    public int size() { return 1; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
         writingBuf.writeBoolean(value);
     }
 
     @Override
-    protected Boolean read(ByteBuf byteBuf) {
-        return byteBuf.readBoolean();
+    protected Boolean read(ByteBuf readingBuf, ByteOrder byteOrder) {
+        return readingBuf.readBoolean();
     }
 }

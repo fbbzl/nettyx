@@ -334,6 +334,17 @@ public class ChannelAdvice {
             }
 
             @Override
+            public void connect(
+                    ChannelHandlerContext ctx,
+                    SocketAddress         remoteAddress,
+                    SocketAddress         localAddress,
+                    ChannelPromise        promise) throws Exception
+            {
+                promise.addListener(failureListener(ctx, this.whenExceptionCaught));
+                super.connect(ctx, remoteAddress, localAddress, promise);
+            }
+
+            @Override
             public void write(
                     ChannelHandlerContext ctx,
                     Object                msg,

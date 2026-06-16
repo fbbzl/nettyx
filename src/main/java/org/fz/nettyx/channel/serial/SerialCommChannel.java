@@ -28,7 +28,7 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
 
     protected SerialCommAddress remoteAddress;
 
-    protected boolean open = true;
+    protected volatile boolean open = true;
 
     @Override
     public boolean isOpen()

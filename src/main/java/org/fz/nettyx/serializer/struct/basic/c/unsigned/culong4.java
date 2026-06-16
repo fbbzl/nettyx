@@ -17,7 +17,7 @@ public class culong4 extends cuint {
         super(value);
     }
 
-    public culong4(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public culong4(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

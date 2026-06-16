@@ -1,11 +1,8 @@
 package org.fz.nettyx.serializer.struct.basic;
 
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
 
 import java.nio.ByteOrder;
 import java.util.Objects;
@@ -21,46 +18,27 @@ import static lombok.AccessLevel.PROTECTED;
  * @since 2021 /10/22 13:26
  */
 
-@FieldDefaults(level = PROTECTED, makeFinal = true)
+@FieldDefaults(level = PROTECTED)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
-    @NonFinal ByteOrder byteOrder;
-    @NonFinal V         value;
-    @Getter   int       size;
 
-    protected Basic(ByteOrder byteOrder, ByteBuf byteBuf, int size) {
-        this.byteOrder = Objects.requireNonNull(byteOrder, "byteOrder");
-        this.size = size;
-        if (byteBuf.readableBytes() < size) throw new TooLessBytesException(size, byteBuf.readableBytes());
-        this.value = this.read(byteBuf);
+    V value;
+
+    protected Basic(ByteBuf byteBuf, ByteOrder byteOrder) {
+        if (byteBuf.readableBytes() < size()) throw new TooLessBytesException(size(), byteBuf.readableBytes());
+        this.value = this.read(byteBuf, byteOrder);
     }
 
-    protected Basic(ByteOrder byteOrder, V value, int size) {
-        this.byteOrder = Objects.requireNonNull(byteOrder, "byteOrder");
-        this.size      = size;
-        this.value     = value;
+    protected Basic(V value) {
+        this.value = value;
     }
 
-    /**
-     * Has singed boolean.
-     *
-     * @return the boolean
-     */
+    public abstract int size();
+
     public abstract boolean hasSigned();
 
-    /**
-     * Write the Java value to target byte buf.
-     *
-     * @param writingBuf the target byte buf
-     */
-    public abstract void write(ByteBuf writingBuf);
+    public abstract void write(ByteBuf writingBuf, ByteOrder byteOrder);
 
-    /**
-     * Read the Java value from source byte buf.
-     *
-     * @param byteBuf the byte buf
-     * @return the v
-     */
-    protected abstract V read(ByteBuf byteBuf);
+    protected abstract V read(ByteBuf readingBuf, ByteOrder byteOrder);
 
     public final V value() {
         return value;
@@ -76,27 +54,26 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public boolean equals(Object anotherObj) {
         if (anotherObj == null) return false;
 
-        if (anotherObj instanceof Cbasic<?> cBasic) {
-            if (this.getSize()   != cBasic.getSize()
+        if (anotherObj instanceof Basic<?> anotherBasic) {
+            if (this.size() != anotherBasic.size()
                 ||
-                this.hasSigned() != cBasic.hasSigned()) {
+                this.hasSigned() != anotherBasic.hasSigned()) {
                 return false;
             }
 
             V thisVal = value != null ? value : null;
-            if (thisVal == null) return false;
-
-            Object thatVal = cBasic.value != null ? cBasic.value : null;
-            return thisVal.equals(thatVal);
+            Object thatVal = anotherBasic.value != null ? anotherBasic.value : null;
+            return Objects.equals(thisVal, thatVal);
         }
         return false;
     }
 
     @Override
-    public int compareTo(Basic<V> anotherCBasic) {
+    public int compareTo(Basic<V> anotherBasic) {
         V thisVal = value != null ? value : null;
-        V thatVal = anotherCBasic.value != null ? anotherCBasic.value : null;
+        V thatVal = anotherBasic.value != null ? anotherBasic.value : null;
         if (thisVal == null) throw new IllegalArgumentException("this value is null");
+        if (thatVal == null) throw new IllegalArgumentException("another value is null");
         return thisVal.compareTo(thatVal);
     }
 }

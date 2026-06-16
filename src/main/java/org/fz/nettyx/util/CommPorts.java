@@ -109,25 +109,24 @@ public final class CommPorts {
             }
             return newArrayList(ttys);
         } catch (IOException exception) {
-            throw new UnsupportedOperationException("can not find comm-ports please check");
+            throw new UnsupportedOperationException("can not find comm-ports please check", exception);
         }
     }
 
     public static String executeLinuxCmd(String cmd) throws IOException
     {
         Runtime run = Runtime.getRuntime();
-        Process process;
-        process = run.exec(cmd);
-        InputStream   in  = process.getInputStream();
-        StringBuilder out = new StringBuilder();
-        byte[]        b   = new byte[8192];
-        for (int n; (n = in.read(b)) != -1; ) {
-            out.append(new String(b, 0, n));
+        Process process = run.exec(cmd);
+        try (InputStream in = process.getInputStream()) {
+            StringBuilder out = new StringBuilder();
+            byte[]        b   = new byte[8192];
+            for (int n; (n = in.read(b)) != -1; ) {
+                out.append(new String(b, 0, n));
+            }
+            return out.toString();
+        } finally {
+            process.destroy();
         }
-
-        in.close();
-        process.destroy();
-        return out.toString();
     }
 
 }

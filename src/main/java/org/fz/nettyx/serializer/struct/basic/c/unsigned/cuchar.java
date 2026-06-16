@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -14,14 +14,16 @@ import java.nio.charset.StandardCharsets;
  * @version 1.0
  * @since 2023 /12/15 14:38
  */
-public class cuchar extends Cbasic<Short> {
+public class cuchar extends cbasic<Short> {
 
     public cuchar(Integer value) {
-        super(value.shortValue(), 1);
+        super(value.shortValue());
+        if (value == null || value < 0 || value > 0xFF)
+            throw new IllegalArgumentException("cuchar value out of range [0, 255]: " + value);
     }
 
-    public cuchar(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 1);
+    public cuchar(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
@@ -30,13 +32,17 @@ public class cuchar extends Cbasic<Short> {
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public int size() { return 1; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
+        if (value == null || value < 0 || value > 0xFF)
+            throw new IllegalArgumentException("cuchar value out of range [0, 255]: " + value);
         writingBuf.writeByte(value);
     }
 
     @Override
-    protected Short read(ByteBuf byteBuf) {
-        return byteBuf.readUnsignedByte();
+    protected Short read(ByteBuf readingBuf, ByteOrder byteOrder) {
+        return readingBuf.readUnsignedByte();
     }
 
     @Override

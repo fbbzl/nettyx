@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteOrder;
 
@@ -12,14 +12,15 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 14:39
  */
-public class cushort extends Cbasic<Integer> {
+public class cushort extends cbasic<Integer> {
 
     public cushort(Integer value) {
-        super(value, 2);
+        super(value);
+        if (value == null || value < 0) throw new IllegalArgumentException("cushort value must be non-negative");
     }
 
-    public cushort(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 2);
+    public cushort(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
@@ -28,7 +29,11 @@ public class cushort extends Cbasic<Integer> {
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public int size() { return 2; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
+        if (value == null || value < 0 || value > 0xFFFF)
+            throw new IllegalArgumentException("cushort value out of range [0, 65535]: " + value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             writingBuf.writeShortLE(value);
         else
@@ -36,11 +41,11 @@ public class cushort extends Cbasic<Integer> {
     }
 
     @Override
-    protected Integer read(ByteBuf byteBuf) {
+    protected Integer read(ByteBuf readingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return byteBuf.readUnsignedShortLE();
+            return readingBuf.readUnsignedShortLE();
         else
-            return byteBuf.readUnsignedShort();
+            return readingBuf.readUnsignedShort();
     }
 
 }

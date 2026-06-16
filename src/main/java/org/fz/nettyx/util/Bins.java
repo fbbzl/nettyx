@@ -2,6 +2,8 @@ package org.fz.nettyx.util;
 
 import lombok.Getter;
 
+import java.util.Objects;
+
 /**
  * The type Bins.
  *
@@ -118,6 +120,7 @@ public class Bins {
 
     public byte get(int index)
     {
+        checkIndex(index);
         return binaries[binaries.length - 1 - index];
     }
 
@@ -155,12 +158,20 @@ public class Bins {
 
     public void set(int index, int value)
     {
+        checkIndex(index);
         binaries[binaries.length - 1 - index] = (byte) value;
     }
 
     public void set(int index, byte value)
     {
+        checkIndex(index);
         binaries[binaries.length - 1 - index] = value;
+    }
+
+    private void checkIndex(int index)
+    {
+        if (index < 0 || index >= binaries.length)
+            throw new IndexOutOfBoundsException("index [" + index + "], length [" + binaries.length + "]");
     }
 
     public void set1(int index)
@@ -201,6 +212,9 @@ public class Bins {
 
     public void replace(int startIndex, Bins bins)
     {
+        Objects.requireNonNull(bins, "bins");
+        if (startIndex < 0 || startIndex + bins.length() > this.length())
+            throw new IndexOutOfBoundsException("startIndex [" + startIndex + "], bins length [" + bins.length() + "], this length [" + this.length() + "]");
         for (int k = 0; k < bins.length(); k++) {
             this.set(startIndex + k, bins.get(k));
         }

@@ -18,7 +18,7 @@ public class cppushort extends cushort {
         super(value);
     }
 
-    public cppushort(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppushort(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

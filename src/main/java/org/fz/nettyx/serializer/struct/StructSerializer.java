@@ -104,7 +104,7 @@ public final class StructSerializer implements Serializer {
     {
         ByteBuf writing = buffer();
         try {
-            Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + root + "]");
+            if (struct == null) throw new SerializeException("struct can not be null when write, root type: [" + root + "]");
 
             Type structType = root instanceof TypeReference<?> typeRefer ? typeRefer.getType() : root;
             switch (structType) {
@@ -174,9 +174,14 @@ public final class StructSerializer implements Serializer {
     @Override
     public ByteBuf doSerialize(Object struct)
     {
-        ByteBuf writing;
-        writeStruct(root, struct, writing = buffer());
-        return writing;
+        ByteBuf writing = buffer();
+        try {
+            writeStruct(root, struct, writing);
+            return writing;
+        } catch (Exception error) {
+            ReferenceCountUtil.release(writing);
+            throw error;
+        }
     }
 
     public <B extends Basic<?>> B readBasic(
@@ -263,9 +268,10 @@ public final class StructSerializer implements Serializer {
 
     public <B extends Basic<?>> void writeBasic(
             B         basicValue,
+            ByteOrder byteOrder,
             ByteBuf   writingBuf) {
-        if (basicValue.value() == null) writingBuf.writeZero(basicValue.getSize());
-        else                            basicValue.write(writingBuf);
+        if (basicValue.value() == null) writingBuf.writeZero(basicValue.size());
+        else                            basicValue.write(writingBuf, byteOrder);
     }
 
     public <S> void writeStruct(
@@ -292,14 +298,15 @@ public final class StructSerializer implements Serializer {
     }
 
     public void writeArray(
-            Object  arrayValue,
-            Type    componentType,
-            int     length,
-            ByteBuf writing,
-            boolean flexible)
+            Object    arrayValue,
+            Type      componentType,
+            int       length,
+            ByteBuf   writing,
+            boolean   flexible,
+            ByteOrder byteOrder)
     {
         if (isBasic(componentType))
-            writeBasicArray((Basic<?>[]) arrayValue, StructHelper.findBasicSize(componentType), length, writing, flexible);
+            writeBasicArray((Basic<?>[]) arrayValue, StructHelper.findBasicSize(componentType), length, writing, flexible, byteOrder);
         else
         if (isStruct(componentType))
             writeStructArray(arrayValue, componentType, length, writing, flexible);
@@ -312,7 +319,8 @@ public final class StructSerializer implements Serializer {
             int        elementBytesSize,
             int        length,
             ByteBuf    writing,
-            boolean    flexible)
+            boolean    flexible,
+            ByteOrder  byteOrder)
     {
         if (basicArray == null) {
             writing.writeZero(elementBytesSize * (flexible ? 0 : length));
@@ -323,7 +331,7 @@ public final class StructSerializer implements Serializer {
             if (i < basicArray.length) {
                 Basic<?> basic = basicArray[i];
                 if (basic == null || basic.value() == null) writing.writeZero(elementBytesSize);
-                else                                        basic.write(writing);
+                else                                        writeBasic(basic, byteOrder, writing);
             }
             else writing.writeZero(elementBytesSize);
         }

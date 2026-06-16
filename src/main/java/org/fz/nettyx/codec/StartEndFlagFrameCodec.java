@@ -72,6 +72,9 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
                     if (stripStartEndDelimiter) return decodedByteBuf;
                     return wrappedBuffer(wrappedBuffer(startFlag), decodedByteBuf, wrappedBuffer(endFlag));
                 }
+                else if (stripStartEndDelimiter && !buf.isReadable()) {
+                    return decodedByteBuf;
+                }
                 else {
                     ReferenceCountUtil.release(decodedByteBuf);
                 }

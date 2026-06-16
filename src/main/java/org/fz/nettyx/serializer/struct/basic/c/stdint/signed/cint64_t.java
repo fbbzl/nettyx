@@ -18,7 +18,7 @@ public class cint64_t extends clong8 {
         super(value);
     }
 
-    public cint64_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cint64_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

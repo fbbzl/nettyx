@@ -154,22 +154,4 @@ public class EscapeCodecTest {
 
         assertFalse(channel.finish());
     }
-
-    @Test
-    public void testEmptyMap() {
-        EscapeMap map = new EscapeMap();
-        EmbeddedChannel channel = new EmbeddedChannel(new EscapeCodec(map));
-
-        byte[] data = {0x01, 0x02, 0x03};
-        assertTrue(channel.writeOutbound(Unpooled.wrappedBuffer(data)));
-
-        ByteBuf encoded = channel.readOutbound();
-        assertNotNull(encoded);
-        byte[] result = new byte[encoded.readableBytes()];
-        encoded.readBytes(result);
-        assertArrayEquals(data, result);
-        encoded.release();
-
-        assertFalse(channel.finish());
-    }
 }

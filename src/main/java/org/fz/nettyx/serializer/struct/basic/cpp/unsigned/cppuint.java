@@ -18,7 +18,7 @@ public class cppuint extends cuint {
         super(value);
     }
 
-    public cppuint(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppuint(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

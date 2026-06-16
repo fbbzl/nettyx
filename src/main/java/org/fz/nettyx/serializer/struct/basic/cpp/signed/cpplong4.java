@@ -17,8 +17,8 @@ public class cpplong4 extends cppint {
         super(value);
     }
 
-    public cpplong4(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cpplong4(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

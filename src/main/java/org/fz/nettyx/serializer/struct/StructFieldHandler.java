@@ -62,7 +62,7 @@ public interface StructFieldHandler<A extends Annotation> {
             A                annotation)
     {
         if (serializer.isBasic(fieldType)) {
-            if (fieldVal != null) serializer.writeBasic((Basic<?>) fieldVal, writing);
+            if (fieldVal != null) serializer.writeBasic((Basic<?>) fieldVal, field.byteOrder(), writing);
             else                  writing.writeZero(StructHelper.findBasicSize(fieldType));
             return;
         }

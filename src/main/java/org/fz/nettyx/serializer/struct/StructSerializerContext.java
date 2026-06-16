@@ -14,21 +14,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.fz.erwin.lambda.LambdaMetas;
+import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
@@ -52,9 +47,9 @@ public class StructSerializerContext {
     @Getter
     private final String[] basePackages;
 
-    static final Map<Type, Integer>                                                   BASIC_SIZE_CACHE        = new HashMap<>(64);
-    static final Map<Class<? extends Basic<?>>, BiFunction<ByteOrder, ByteBuf, ?>> BASIC_CONSTRUCTOR_CACHE = new HashMap<>(64);
-    static final Map<Class<?>, StructDefinition>                                      STRUCT_DEFINITION_CACHE = new HashMap<>(256);
+    static final Map<Type, Integer>                                                BASIC_SIZE_CACHE        = new HashMap<>(64);
+    static final Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> BASIC_CONSTRUCTOR_CACHE = new HashMap<>(64);
+    static final Map<Class<?>, StructDefinition>                                   STRUCT_DEFINITION_CACHE = new HashMap<>(256);
 
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
 
@@ -145,6 +140,14 @@ public class StructSerializerContext {
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
+                    if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+                        throw new SerializeException("struct class can not be interface or abstract: [" + clazz + "]");
+                    }
+                    try {
+                        clazz.getDeclaredConstructor();
+                    } catch (NoSuchMethodException e) {
+                        throw new SerializeException("struct class must have a no-arg constructor: [" + clazz + "]", e);
+                    }
                     STRUCT_DEFINITION_CACHE.put(clazz, new StructDefinition(clazz));
                 }
             }
@@ -163,7 +166,7 @@ public class StructSerializerContext {
                 if (isBasic) {
                     // cache basics constructor
                     BASIC_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                        lambdaConstructor(clazz, ByteOrder.class, ByteBuf.class));
+                                                        lambdaConstructor(clazz, ByteBuf.class, ByteOrder.class));
 
                     // cache bytes size
                     BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
@@ -209,10 +212,14 @@ public class StructSerializerContext {
         return switch (type) {
             case Class<?>          clazz             -> STRUCT_DEFINITION_CACHE.get(clazz);
             case ParameterizedType parameterizedType -> getStructDefinition(parameterizedType.getRawType());
+            case GenericArrayType  genericArrayType  -> getStructDefinition(genericArrayType.getGenericComponentType());
+            case WildcardType      wildcardType      -> {
+                Type[] upperBounds = wildcardType.getUpperBounds();
+                yield upperBounds.length > 0 ? getStructDefinition(upperBounds[0]) : null;
+            }
             default                                  -> throw new TypeJudgmentException("can not find struct definition by: [" + type + "]");
         };
     }
-
 
     static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz)
     {

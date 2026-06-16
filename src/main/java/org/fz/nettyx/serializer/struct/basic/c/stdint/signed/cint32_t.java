@@ -18,7 +18,7 @@ public class cint32_t extends cint {
         super(value);
     }
 
-    public cint32_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cint32_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

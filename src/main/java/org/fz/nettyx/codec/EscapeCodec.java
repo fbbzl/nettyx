@@ -109,26 +109,31 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         if (isEmpty(map)) return msgBuf.retain();
 
         final ByteBuf escaped = msgBuf.alloc().buffer();
-        while (msgBuf.readableBytes() > 0) {
-            boolean match = false;
-            for (Entry<byte[], byte[]> entry : map.entrySet()) {
-                byte[] target    = entry.getKey();
-                int    tarLength = target.length;
+        try {
+            while (msgBuf.readableBytes() > 0) {
+                boolean match = false;
+                for (Entry<byte[], byte[]> entry : map.entrySet()) {
+                    byte[] target    = entry.getKey();
+                    int    tarLength = target.length;
 
-                if (msgBuf.readableBytes() >= tarLength) {
-                    match = overlook(msgBuf, target, tarLength);
+                    if (msgBuf.readableBytes() >= tarLength) {
+                        match = overlook(msgBuf, target, tarLength);
 
-                    if (match) {
-                        msgBuf.skipBytes(tarLength);
-                        escaped.writeBytes(entry.getValue());
-                        // only support one to one mapping
-                        break;
+                        if (match) {
+                            msgBuf.skipBytes(tarLength);
+                            escaped.writeBytes(entry.getValue());
+                            // only support one to one mapping
+                            break;
+                        }
                     }
                 }
+                if (!match) escaped.writeByte(msgBuf.readByte());
             }
-            if (!match) escaped.writeByte(msgBuf.readByte());
+            return escaped;
+        } catch (Exception error) {
+            ReferenceCountUtil.safeRelease(escaped);
+            throw error;
         }
-        return escaped;
     }
 
     private static boolean overlook(

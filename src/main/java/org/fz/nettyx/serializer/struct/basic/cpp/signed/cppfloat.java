@@ -18,8 +18,8 @@ public class cppfloat extends cfloat {
         super(value);
     }
 
-    public cppfloat(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppfloat(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

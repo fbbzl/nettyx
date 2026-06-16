@@ -52,7 +52,7 @@ public class StructHelper {
         ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
         try
         {
-            return newBasic(basicClass, ByteOrder.nativeOrder(), fillingBuf).getSize();
+            return newBasic(basicClass, ByteOrder.nativeOrder(), fillingBuf).size();
         }
         finally
         {
@@ -76,7 +76,7 @@ public class StructHelper {
     {
         try
         {
-            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(byteOrder, buf);
+            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(buf, byteOrder);
         }
         catch (Exception instanceError)
         {

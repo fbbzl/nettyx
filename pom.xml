@@ -34,7 +34,7 @@
     </licenses>
 
     <properties>
-        <revision>2.6.22</revision>
+        <revision>2.6.23</revision>
 
         <!--build-->
         <java.version>21</java.version>
@@ -71,7 +71,6 @@
         <junit.version>4.13.2</junit.version>
         <cglib.version>3.3.0</cglib.version>
         <javolution-core-java.version>6.0.0</javolution-core-java.version>
-        <log4j2.version>2.24.3</log4j2.version>
     </properties>
 
     <dependencies>
@@ -97,18 +96,21 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-core</artifactId>
             <version>${protostuff-core.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.protostuff</groupId>
             <artifactId>protostuff-runtime</artifactId>
             <version>${protostuff-core.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -147,6 +149,7 @@
             <groupId>org.javolution</groupId>
             <artifactId>javolution-core-java</artifactId>
             <version>${javolution-core-java.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -154,24 +157,6 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>${log4j2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>${log4j2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j2-impl</artifactId>
-            <version>${log4j2.version}</version>
         </dependency>
     </dependencies>
 
@@ -184,6 +169,7 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

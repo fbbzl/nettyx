@@ -1,12 +1,24 @@
 #root ignore
-/*.iml
-/git
+*.iml
+*.flattened-pom.xml
 
 #module ignore
-/**/.idea/**
-/**/target/**
-/*/*.iml
-/**/.xcodemap/**
-/.flattened-pom.xml
+**/.idea/**
+**/target/**
+**/.xcodemap/**
 
+# OS / IDE / sensitive files
+.DS_Store
+Thumbs.db
+.vscode/
+.settings/
+.classpath
+.project
+.apt_generated
+*.log
+*.tmp
+*~
+*.versionsBackup
+*.gpg
+.env
 

@@ -18,7 +18,7 @@ public class cuint32_t extends cuint {
         super(value);
     }
 
-    public cuint32_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cuint32_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

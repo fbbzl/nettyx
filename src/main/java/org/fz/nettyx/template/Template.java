@@ -42,6 +42,9 @@ abstract class Template<C extends Channel> {
         Type typeArgument = TypeUtil.getTypeArgument(supperType);
 
         Type[] actualTypes = TypeUtil.getActualTypes(this.getClass(), typeArgument);
+        if (actualTypes == null || actualTypes.length == 0) {
+            throw new IllegalStateException("can not resolve channel class for template [" + this.getClass() + "]");
+        }
         return (Class<C>) actualTypes[0];
     }
 
@@ -96,7 +99,12 @@ abstract class Template<C extends Channel> {
 
     protected ChannelPromise failurePromise(Channel channel, String message)
     {
-        return channel == null ? null : new DefaultChannelPromise(channel).setFailure(new ChannelException(message));
+        if (channel == null) {
+            ChannelPromise promise = new DefaultChannelPromise(null);
+            promise.setFailure(new ChannelException(message));
+            return promise;
+        }
+        return new DefaultChannelPromise(channel).setFailure(new ChannelException(message));
     }
 
     protected void shutdownGracefully()

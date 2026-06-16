@@ -100,7 +100,7 @@ public interface ListenerAction {
         ChannelState state = getChannelState(cf);
         if (state != null) {
             // the first connect-action is also the redo type
-            if (state.getConnectTimes() + 1 > maxRedoTimes - 1) {
+            if (state.getConnectTimes() >= maxRedoTimes) {
                 if (afterMaxRedoTimes != null) afterMaxRedoTimes.accept(ls, cf);
                 throw new StopRedoException();
             } else state.increase(cf);

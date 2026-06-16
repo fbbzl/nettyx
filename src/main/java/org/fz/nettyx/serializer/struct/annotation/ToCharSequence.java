@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
@@ -65,12 +65,11 @@ public @interface ToCharSequence {
             if (!Charset.isSupported(charset))
                 throw new UnsupportedCharsetException("do not support charset [" + charset + "]");
 
-            if (!reading.isReadable()) {
-                throw new IllegalArgumentException(
-                        "buffer is not readable please check [" + ByteBufUtil.hexDump(reading) + "], field is [" + field
-                        + "]");
-            }
-            byte[] bytes = new byte[toCharSequence.bufferLength()];
+            int bufferLength = toCharSequence.bufferLength();
+            if (reading.readableBytes() < bufferLength)
+                throw new TooLessBytesException(bufferLength, reading.readableBytes());
+
+            byte[] bytes = new byte[bufferLength];
             reading.readBytes(bytes);
             return new String(bytes, Charset.forName(charset));
         }

@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.math.BigInteger;
 import java.nio.ByteOrder;
@@ -13,14 +13,16 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/18 13:30
  */
-public class culong8 extends Cbasic<BigInteger> {
+public class culong8 extends cbasic<BigInteger> {
 
     public culong8(BigInteger value) {
-        super(value, 8);
+        super(value);
+        if (value == null || value.signum() < 0)
+            throw new IllegalArgumentException("culong8 value must be non-negative");
     }
 
-    public culong8(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 8);
+    public culong8(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
@@ -29,11 +31,15 @@ public class culong8 extends Cbasic<BigInteger> {
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public int size() { return 8; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
+        if (value == null || value.signum() < 0 || value.compareTo(BigInteger.TWO.pow(64)) >= 0)
+            throw new IllegalArgumentException("culong8 value out of range [0, 2^64-1]: " + value);
         byte[] byteArray = value.toByteArray();
-        int copyLength = Math.min(byteArray.length, size);
+        int copyLength = Math.min(byteArray.length, size());
         int copyStart  = byteArray.length - copyLength;
-        int padding    = size - copyLength;
+        int padding    = size() - copyLength;
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
             for (int i = byteArray.length - 1; i >= copyStart; i--) {
                 writingBuf.writeByte(byteArray[i]);
@@ -46,14 +52,14 @@ public class culong8 extends Cbasic<BigInteger> {
     }
 
     @Override
-    protected BigInteger read(ByteBuf byteBuf) {
-        byte[] byteArray = new byte[size];
+    protected BigInteger read(ByteBuf readingBuf, ByteOrder byteOrder) {
+        byte[] byteArray = new byte[size()];
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            for (int i = size - 1; i >= 0; i--) {
-                byteArray[i] = byteBuf.readByte();
+            for (int i = size() - 1; i >= 0; i--) {
+                byteArray[i] = readingBuf.readByte();
             }
         } else {
-            byteBuf.readBytes(byteArray);
+            readingBuf.readBytes(byteArray);
         }
 
         // the no sign in BigInteger is 1

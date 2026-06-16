@@ -92,7 +92,7 @@ public @interface ToArray {
 
             boolean flexible = toArray.flexible();
 
-            serializer.writeArray(fieldVal, componentType, length, writing, flexible);
+            serializer.writeArray(fieldVal, componentType, length, writing, flexible, field.byteOrder());
         }
 
         static Type getComponentType(Type root, Type type)

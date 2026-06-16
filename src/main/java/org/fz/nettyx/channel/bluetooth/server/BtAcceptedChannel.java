@@ -5,7 +5,9 @@ import org.fz.nettyx.channel.bluetooth.BtDeviceAddress;
 import org.fz.nettyx.channel.enhanced.EnhancedOioByteStreamChannel;
 
 import javax.microedition.io.StreamConnection;
+import java.io.Closeable;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.SocketAddress;
 
 public class BtAcceptedChannel extends EnhancedOioByteStreamChannel {
@@ -24,11 +26,23 @@ public class BtAcceptedChannel extends EnhancedOioByteStreamChannel {
         super(parent);
         this.connection = connection;
         this.inputStream = connection.openInputStream();
+        OutputStream outputStream = null;
         try {
-            activate(inputStream, connection.openOutputStream());
+            outputStream = connection.openOutputStream();
+            activate(inputStream, outputStream);
         } catch (Exception e) {
-            inputStream.close();
+            closeQuietly(inputStream);
+            closeQuietly(outputStream);
             throw e;
+        }
+    }
+
+    private static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception ignored) {
+            }
         }
     }
 

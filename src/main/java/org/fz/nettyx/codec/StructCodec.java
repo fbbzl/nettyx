@@ -1,18 +1,15 @@
 package org.fz.nettyx.codec;
 
-import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import org.fz.erwin.exception.Throws;
-import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -47,8 +44,6 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
         try {
             out.add(StructSerializer.toStruct(type, msg));
-        }
-        finally {
             // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes
             // is true
             if (skipLeftBytes && msg.readableBytes() > 0) {
@@ -57,26 +52,29 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
                           + "length is [{}]", readableLength);
                 msg.skipBytes(readableLength);
             }
+        } catch (Exception error) {
+            // As the last handler in the pipeline, discard the remaining bytes of this message
+            // and keep the channel alive instead of propagating the exception.
+            if (skipLeftBytes && msg.readableBytes() > 0) {
+                msg.skipBytes(msg.readableBytes());
+            }
+            log.error("struct deserialization failed, channel: {}", ctx.channel(), error);
         }
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
-        int writerIndex = out.writerIndex();
+        ByteBuf encoded = null;
         try {
-            Throws.ifNull(struct, () -> "struct can not be null when write, root type: [" + type + "]");
-
-            Type structType = type instanceof TypeReference<?> typeRefer ? typeRefer.getType() : type;
-            switch (structType) {
-                case Class<?>          clazz             -> new StructSerializer(clazz).writeStruct(clazz, struct, out);
-                case ParameterizedType parameterizedType -> new StructSerializer(parameterizedType).writeStruct(parameterizedType, struct, out);
-                default                                  -> throw new TypeJudgmentException(structType);
-            }
+            encoded = StructSerializer.toByteBuf(type, struct);
+            out.writeBytes(encoded);
         }
         catch (Exception error) {
-            out.writerIndex(writerIndex);
             log.error("struct serialization failed, channel: {} struct: {}", ctx.channel(), struct, error);
             throw error;
+        }
+        finally {
+            ReferenceCountUtil.release(encoded);
         }
     }
 }

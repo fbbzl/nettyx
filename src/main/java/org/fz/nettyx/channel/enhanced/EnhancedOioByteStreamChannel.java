@@ -7,6 +7,9 @@ import io.netty.channel.oio.OioByteStreamChannel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.io.EOFException;
+import java.io.IOException;
+
 
 /**
  * cause of {@link AbstractOioChannel sync blocking read task}
@@ -44,6 +47,14 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
             // check before use, it will avoid blocking
             if (available() > 0) return super.doReadBytes(buf);
             return 0;
+        } catch (EOFException e) {
+            log.debug("doReadBytes reached EOF", e);
+            unsafe().closeForcibly();
+            return -1;
+        } catch (IOException e) {
+            log.debug("doReadBytes IO error", e);
+            unsafe().closeForcibly();
+            return -1;
         } catch (Exception e) {
             log.debug("doReadBytes failed", e);
             return 0;

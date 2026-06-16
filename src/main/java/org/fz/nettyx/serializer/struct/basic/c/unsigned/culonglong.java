@@ -18,7 +18,7 @@ public class culonglong extends culong8 {
         super(value);
     }
 
-    public culonglong(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public culonglong(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

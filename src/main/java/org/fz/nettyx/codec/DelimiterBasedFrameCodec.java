@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
+import io.netty.util.ReferenceCountUtil;
 import org.fz.nettyx.codec.DelimiterBasedFrameCodec.DelimiterBasedFrameEncoder;
 
 /**
@@ -44,7 +45,13 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
 
         public DelimiterBasedFrameEncoder(ByteBuf delimiter)
         {
-            this.delimiter = delimiter;
+            this.delimiter = delimiter.retainedSlice();
+        }
+
+        @Override
+        public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+            ReferenceCountUtil.release(delimiter);
+            super.handlerRemoved(ctx);
         }
 
         @Override

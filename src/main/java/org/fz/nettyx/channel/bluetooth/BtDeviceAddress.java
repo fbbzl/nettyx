@@ -31,7 +31,7 @@ public class BtDeviceAddress extends SocketAddress {
     @Override
     public String toString()
     {
-        return friendlyName;
+        return String.valueOf(friendlyName);
     }
 
 }

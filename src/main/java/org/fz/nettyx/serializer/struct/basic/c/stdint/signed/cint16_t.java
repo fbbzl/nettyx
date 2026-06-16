@@ -18,8 +18,8 @@ public class cint16_t extends cshort {
         super(value);
     }
 
-    public cint16_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cint16_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

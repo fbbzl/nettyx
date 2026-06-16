@@ -2,12 +2,17 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
-set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
-set "MAVEN_SETTINGS=D:\maven\settings.xml"
-set "MAVEN_REPO=D:\maven\repository"
+set "MAVEN_HOME=%MAVEN_HOME%"
+if not defined MAVEN_HOME set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
+set "MAVEN_SETTINGS=%MAVEN_SETTINGS%"
+if not defined MAVEN_SETTINGS set "MAVEN_SETTINGS=D:\maven\settings.xml"
+set "MAVEN_REPO=%MAVEN_REPO%"
+if not defined MAVEN_REPO set "MAVEN_REPO=D:\maven\repository"
 
-set "PROJECT_NETTYX=D:\workspace\nettyx"
-set "PROJECT_STARTER=D:\workspace\spring-boot-starter-nettyx"
+set "PROJECT_NETTYX=%PROJECT_NETTYX%"
+if not defined PROJECT_NETTYX set "PROJECT_NETTYX=D:\workspace\nettyx"
+set "PROJECT_STARTER=%PROJECT_STARTER%"
+if not defined PROJECT_STARTER set "PROJECT_STARTER=D:\workspace\spring-boot-starter-nettyx"
 
 set "MVN=%MAVEN_HOME%\bin\mvn.cmd"
 
@@ -77,6 +82,8 @@ echo Unknown argument: %~1
 goto fail
 
 :after_parse_args
+call :resolve_maven
+
 call :assert_path "%MVN%" "mvn.cmd" || goto fail
 call :assert_path "%MAVEN_SETTINGS%" "Maven settings.xml" || goto fail
 call :assert_path "%MAVEN_REPO%" "Maven local repository" || goto fail
@@ -87,6 +94,9 @@ call :get_current_branch "%PROJECT_NETTYX%" CURRENT_NETTYX_BRANCH || goto fail
 if not defined NETTYX_FEATURE_BRANCH set "NETTYX_FEATURE_BRANCH=%CURRENT_NETTYX_BRANCH%"
 call :first_word "%NETTYX_REMOTES%" NETTYX_PRIMARY_REMOTE || goto fail
 call :first_word "%STARTER_REMOTES%" STARTER_PRIMARY_REMOTE || goto fail
+
+call :git_fetch "%PROJECT_NETTYX%" "%NETTYX_PRIMARY_REMOTE%" || goto fail
+call :git_fetch "%PROJECT_STARTER%" "%STARTER_PRIMARY_REMOTE%" || goto fail
 
 call :nettyx_has_updates "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_DEV_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" NETTYX_HAS_CHANGES || goto fail
 if "%NETTYX_HAS_CHANGES%"=="0" goto nothing_to_release
@@ -129,12 +139,33 @@ echo nettyx version: %NETTYX_VERSION%
 echo spring-boot-starter-nettyx version: %STARTER_VERSION%
 goto done
 
+:resolve_maven
+if defined MAVEN_HOME (
+    if exist "%MAVEN_HOME%\bin\mvn.cmd" (
+        set "MVN=%MAVEN_HOME%\bin\mvn.cmd"
+        exit /b 0
+    )
+)
+for %%X in (mvn.cmd) do (
+    set "MVN=%%~$PATH:X"
+    if defined MVN exit /b 0
+)
+echo Cannot find mvn.cmd in MAVEN_HOME or PATH
+exit /b 1
+
 :assert_path
 if not exist "%~1" (
     echo %~2 does not exist: %~1
     exit /b 1
 )
 exit /b 0
+
+:git_fetch
+set "FETCH_PROJECT_PATH=%~1"
+set "FETCH_REMOTE=%~2"
+if "%DRY_RUN%"=="1" exit /b 0
+call :run_in_dir "%FETCH_PROJECT_PATH%" git -C "%FETCH_PROJECT_PATH%" fetch "%FETCH_REMOTE%"
+exit /b %ERRORLEVEL%
 
 :assert_remotes
 set "REMOTE_PROJECT_PATH=%~1"
@@ -260,9 +291,10 @@ call :restore_head_paths "%PROJECT_NETTYX%" README.md README_zh.md || exit /b 1
 call :drop_or_restore_head_paths "%PROJECT_NETTYX%" src/test/java || exit /b 1
 call :clean_nettyx_dev_pom "%PROJECT_NETTYX%" || exit /b 1
 call :assert_no_unmerged_paths "%PROJECT_NETTYX%" || exit /b 1
-call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
-call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
-call :commit_staged_changes "nettyx dev" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+    call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
+    call :update_readme_version "%PROJECT_NETTYX%" "%NETTYX_VERSION%" || exit /b 1
+    call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
+    call :commit_staged_changes "nettyx dev" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
 call :push_branch "%PROJECT_NETTYX%" "%NETTYX_DEV_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 echo.
@@ -334,6 +366,20 @@ if "%DRY_RUN%"=="1" (
 )
 exit /b %ERRORLEVEL%
 
+:update_readme_version
+set "README_PROJECT_PATH=%~1"
+set "README_VERSION=%~2"
+if "%DRY_RUN%"=="1" (
+    echo DryRun: update README version to %README_VERSION%
+    exit /b 0
+)
+for %%F in (README.md README_zh.md) do (
+    if exist "%README_PROJECT_PATH%\%%F" (
+        powershell -NoProfile -Command "(Get-Content -LiteralPath '%README_PROJECT_PATH%\%%F' -Raw) -replace '\u003cversion\u003e[^^\u003c]*\u003c/version\u003e', '\u003cversion\u003e%README_VERSION%\u003c/version\u003e' | Set-Content -LiteralPath '%README_PROJECT_PATH%\%%F' -NoNewline -Encoding UTF8"
+    )
+)
+exit /b 0
+
 :set_property_version
 if "%DRY_RUN%"=="1" (
     cscript //nologo //E:JScript "%~f0" setPropertyVersion "%~1" "%~2" "%~3" dryRun
@@ -344,9 +390,9 @@ exit /b %ERRORLEVEL%
 
 :clean_nettyx_dev_pom
 if "%DRY_RUN%"=="1" (
-    cscript //nologo //E:JScript "%~f0" cleanNettyxDevelopPom "%~1" dryRun
+    cscript //nologo //E:JScript "%~f0" cleanNettyxDevPom "%~1" dryRun
 ) else (
-    cscript //nologo //E:JScript "%~f0" cleanNettyxDevelopPom "%~1"
+    cscript //nologo //E:JScript "%~f0" cleanNettyxDevPom "%~1"
 )
 exit /b %ERRORLEVEL%
 
@@ -531,53 +577,6 @@ set "TEST_ARG="
 if "%SKIP_TESTS%"=="1" set "TEST_ARG=-DskipTests"
 call :run_in_dir "%WORK_DIR%" "%MVN%" -B -U -ntp -s "%MAVEN_SETTINGS%" "-Dmaven.repo.local=%MAVEN_REPO%" %TEST_ARG% "%~2" "%~3"
 exit /b %ERRORLEVEL%
-
-:commit_and_push
-set "COMMIT_PROJECT_NAME=%~1"
-set "COMMIT_PROJECT_PATH=%~2"
-set "COMMIT_REMOTES=%~3"
-set "COMMIT_RELEASE_VERSION=%~4"
-
-if "%SKIP_GIT_PUSH%"=="1" (
-    echo Skipped git push: %COMMIT_PROJECT_NAME%
-    exit /b 0
-)
-
-set "BRANCH="
-for /f "usebackq delims=" %%B in (`git -C "%COMMIT_PROJECT_PATH%" branch --show-current`) do set "BRANCH=%%B"
-if not defined BRANCH (
-    echo Cannot resolve current branch: %COMMIT_PROJECT_PATH%
-    exit /b 1
-)
-
-set "STATUS_FILE=%TEMP%\fz_publish_status_%RANDOM%%RANDOM%.txt"
-git -C "%COMMIT_PROJECT_PATH%" status --porcelain > "%STATUS_FILE%"
-for %%S in ("%STATUS_FILE%") do set "STATUS_SIZE=%%~zS"
-
-if not "%STATUS_SIZE%"=="0" (
-    echo Changes to commit:
-    type "%STATUS_FILE%"
-    del "%STATUS_FILE%" >nul 2>nul
-    call :stage_release_changes "%COMMIT_PROJECT_PATH%" || exit /b 1
-    if "%DRY_RUN%"=="1" (
-        call :run_in_dir "%COMMIT_PROJECT_PATH%" git -C "%COMMIT_PROJECT_PATH%" commit -m "chore: release %COMMIT_PROJECT_NAME% %COMMIT_RELEASE_VERSION%" || exit /b 1
-    ) else (
-        git -C "%COMMIT_PROJECT_PATH%" diff --cached --quiet
-        if "%ERRORLEVEL%"=="0" (
-            echo No stageable repository changes to commit: %COMMIT_PROJECT_NAME%
-        ) else (
-            call :run_in_dir "%COMMIT_PROJECT_PATH%" git -C "%COMMIT_PROJECT_PATH%" commit -m "chore: release %COMMIT_PROJECT_NAME% %COMMIT_RELEASE_VERSION%" || exit /b 1
-        )
-    )
-) else (
-    del "%STATUS_FILE%" >nul 2>nul
-    echo No repository changes to commit: %COMMIT_PROJECT_NAME%
-)
-
-for %%R in (%COMMIT_REMOTES%) do (
-    call :run_in_dir "%COMMIT_PROJECT_PATH%" git -C "%COMMIT_PROJECT_PATH%" push %%R HEAD:%BRANCH% || exit /b 1
-)
-exit /b 0
 
 :stage_release_changes
 set "STAGE_PROJECT_PATH=%~1"
@@ -828,17 +827,14 @@ function removeNode(doc, xpath) {
     return false;
 }
 
-function cleanNettyxDevelopPom(projectPath, dryRun) {
+function cleanNettyxDevPom(projectPath, dryRun) {
     var path = requirePom(projectPath);
     var doc = loadDoc(path);
     var changed = false;
 
-    if (removeNode(doc, "/m:project/m:properties/m:protostuff-core.version")) changed = true;
     if (removeNode(doc, "/m:project/m:properties/m:junit.version")) changed = true;
-    if (removeNode(doc, "/m:project/m:properties/m:cglib.version")) changed = true;
-    if (removeNode(doc, "/m:project/m:properties/m:javolution-core-java.version")) changed = true;
 
-    var artifactNames = ["protostuff-core", "protostuff-runtime", "junit", "cglib", "javolution-core-java"];
+    var artifactNames = ["junit"];
     for (var i = 0; i < artifactNames.length; i++) {
         var deps = selectNodes(doc, "/m:project/m:dependencies/m:dependency[m:artifactId='" + artifactNames[i] + "']");
         if (deps) {
@@ -960,8 +956,8 @@ if (command === "getProjectVersion") {
     setProjectVersion(WScript.Arguments(1), WScript.Arguments(2), WScript.Arguments(3), WScript.Arguments.length > 4 && WScript.Arguments(4) === "dryRun");
 } else if (command === "setPropertyVersion") {
     setPropertyVersion(WScript.Arguments(1), WScript.Arguments(2), WScript.Arguments(3), WScript.Arguments.length > 4 && WScript.Arguments(4) === "dryRun");
-} else if (command === "cleanNettyxDevelopPom") {
-    cleanNettyxDevelopPom(WScript.Arguments(1), WScript.Arguments.length > 2 && WScript.Arguments(2) === "dryRun");
+} else if (command === "cleanNettyxDevPom") {
+    cleanNettyxDevPom(WScript.Arguments(1), WScript.Arguments.length > 2 && WScript.Arguments(2) === "dryRun");
 } else if (command === "nextVersion") {
     nextVersion(WScript.Arguments(1));
 } else if (command === "nextProjectVersion") {

@@ -18,8 +18,8 @@ public class cppdouble extends cdouble {
         super(value);
     }
 
-    public cppdouble(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppdouble(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

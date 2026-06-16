@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import cn.hutool.core.util.EnumUtil;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
@@ -68,8 +69,12 @@ public @interface ToNamedEnum {
                 ToNamedEnum      toNamedEnum)
         {
             Class<Enum> enumClass = (Class<Enum>) toNamedEnum.enumType();
+            int bufferLength = toNamedEnum.bufferLength();
+            if (reading.readableBytes() < bufferLength)
+                throw new TooLessBytesException(bufferLength, reading.readableBytes());
+
             String enumName = reading
-                    .readCharSequence(toNamedEnum.bufferLength(),
+                    .readCharSequence(bufferLength,
                                       Charset.forName(toNamedEnum.charset())).toString();
 
             return EnumUtil.fromString(enumClass, enumName);

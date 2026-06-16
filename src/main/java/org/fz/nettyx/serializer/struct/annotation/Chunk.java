@@ -2,6 +2,7 @@ package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.erwin.exception.Throws;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -50,7 +51,11 @@ public @interface Chunk {
                 ByteBuf          reading,
                 Chunk            chunk)
         {
-            byte[] chunkBytes = new byte[chunk.length()];
+            int length = chunk.length();
+            if (reading.readableBytes() < length)
+                throw new TooLessBytesException(length, reading.readableBytes());
+
+            byte[] chunkBytes = new byte[length];
             reading.readBytes(chunkBytes);
 
             return chunkBytes;

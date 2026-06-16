@@ -18,8 +18,8 @@ public class cppchar8_t extends cchar {
         super(value);
     }
 
-    public cppchar8_t(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppchar8_t(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

@@ -19,7 +19,7 @@ public class cppulong8 extends culong8 {
         super(value);
     }
 
-    public cppulong8(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppulong8(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

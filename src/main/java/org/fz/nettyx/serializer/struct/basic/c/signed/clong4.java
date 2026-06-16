@@ -17,7 +17,7 @@ public class clong4 extends cint {
         super(value);
     }
 
-    public clong4(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public clong4(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

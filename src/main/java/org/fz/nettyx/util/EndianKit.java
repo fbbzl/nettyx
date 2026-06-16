@@ -26,6 +26,7 @@ public enum EndianKit {
         }
 
         public short toShort(byte[] bytes) {
+            checkLength(bytes, 2);
             return (short) ((bytes[0] << 8) | bytes[1] & 0xff);
         }
 
@@ -40,6 +41,7 @@ public enum EndianKit {
         }
 
         public int toUnsignedShort(byte[] bytes) {
+            checkLength(bytes, 2);
             return Short.toUnsignedInt(toShort(bytes));
         }
 
@@ -48,6 +50,7 @@ public enum EndianKit {
         }
 
         public char toChar(byte[] bytes) {
+            checkLength(bytes, 2);
             return (char) toShort(bytes);
         }
 
@@ -63,6 +66,7 @@ public enum EndianKit {
         }
 
         public int toInt(byte[] bytes) {
+            checkLength(bytes, 4);
             int int1 = bytes[3] & 0xff;
             int int2 = (bytes[2] & 0xff) << 8;
             int int3 = (bytes[1] & 0xff) << 16;
@@ -84,6 +88,7 @@ public enum EndianKit {
         }
 
         public long toUnsignedInt(byte[] bytes) {
+            checkLength(bytes, 4);
             return Integer.toUnsignedLong(toInt(bytes));
         }
 
@@ -104,6 +109,7 @@ public enum EndianKit {
         }
 
         public long toLong(byte[] bytes) {
+            checkLength(bytes, 8);
             return (((long) bytes[0] & 0xff) << 56)
                    | (((long) bytes[1] & 0xff) << 48)
                    | (((long) bytes[2] & 0xff) << 40)
@@ -121,10 +127,12 @@ public enum EndianKit {
 
         @Override
         public BigInteger toUnsignedLong(byte[] bytes) {
+            checkLength(bytes, 8);
             return new BigInteger(1, bytes);
         }
 
         public float toFloat(byte[] bytes) {
+            checkLength(bytes, 4);
             int i = ((((bytes[0] & 0xff) << 8 | (bytes[1] & 0xff)) << 8) | (bytes[2] & 0xff)) << 8 | (bytes[3] & 0xff);
 
             return Float.intBitsToFloat(i);
@@ -132,6 +140,7 @@ public enum EndianKit {
 
         @Override
         public double toDouble(byte[] bytes) {
+            checkLength(bytes, 8);
             long h = (bytes[0] & 0xff) << 8;
             h = (h | (bytes[1] & 0xff)) << 8;
             h = (h | (bytes[2] & 0xff)) << 8;
@@ -231,6 +240,7 @@ public enum EndianKit {
 
         @Override
         public short toShort(byte[] bytes) {
+            checkLength(bytes, 2);
             return (short) ((bytes[1] << 8) | bytes[0] & 0xff);
         }
 
@@ -246,6 +256,7 @@ public enum EndianKit {
 
         @Override
         public int toUnsignedShort(byte[] bytes) {
+            checkLength(bytes, 2);
             return Short.toUnsignedInt(toShort(bytes));
         }
 
@@ -256,6 +267,7 @@ public enum EndianKit {
 
         @Override
         public char toChar(byte[] bytes) {
+            checkLength(bytes, 2);
             return (char) toShort(bytes);
         }
 
@@ -273,6 +285,7 @@ public enum EndianKit {
 
         @Override
         public int toInt(byte[] bytes) {
+            checkLength(bytes, 4);
             int int1 = bytes[0] & 0xff;
             int int2 = (bytes[1] & 0xff) << 8;
             int int3 = (bytes[2] & 0xff) << 16;
@@ -295,6 +308,7 @@ public enum EndianKit {
 
         @Override
         public long toUnsignedInt(byte[] bytes) {
+            checkLength(bytes, 4);
             return Integer.toUnsignedLong(toInt(bytes));
         }
 
@@ -316,6 +330,7 @@ public enum EndianKit {
 
         @Override
         public long toLong(byte[] bytes) {
+            checkLength(bytes, 8);
             return ((long) bytes[0] & 0xff)
                    | (((long) bytes[1] & 0xff) << 8)
                    | (((long) bytes[2] & 0xff) << 16)
@@ -333,17 +348,20 @@ public enum EndianKit {
 
         @Override
         public BigInteger toUnsignedLong(byte[] bytes) {
+            checkLength(bytes, 8);
             return new BigInteger(1, PrimitiveArrayUtil.reverse(bytes));
         }
 
         @Override
         public float toFloat(byte[] bytes) {
+            checkLength(bytes, 4);
             int i = ((((bytes[3] & 0xff) << 8 | (bytes[2] & 0xff)) << 8) | (bytes[1] & 0xff)) << 8 | (bytes[0] & 0xff);
             return Float.intBitsToFloat(i);
         }
 
         @Override
         public double toDouble(byte[] bytes) {
+            checkLength(bytes, 8);
             long l = (bytes[7] & 0xff) << 8;
             l = (l | (bytes[6] & 0xff)) << 8;
             l = (l | (bytes[5] & 0xff)) << 8;
@@ -433,6 +451,7 @@ public enum EndianKit {
     }
 
     public byte toByteValue(byte[] bytes) {
+        checkLength(bytes, 1);
         return bytes[0];
     }
 
@@ -533,5 +552,11 @@ public enum EndianKit {
     }
 
     public abstract byte[] fromNumber(Number number, int assignBytesLength);
+
+    protected static void checkLength(byte[] bytes, int expectedLength) {
+        if (bytes == null || bytes.length < expectedLength) {
+            throw new IllegalArgumentException("byte array length must be at least " + expectedLength + ", but was " + (bytes == null ? "null" : bytes.length));
+        }
+    }
 
 }

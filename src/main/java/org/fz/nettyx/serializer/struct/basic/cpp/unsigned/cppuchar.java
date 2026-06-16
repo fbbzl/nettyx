@@ -18,8 +18,8 @@ public class cppuchar extends cuchar {
         super(value);
     }
 
-    public cppuchar(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppuchar(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override

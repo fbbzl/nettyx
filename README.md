@@ -32,12 +32,12 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.22</version>
+    <version>2.6.23</version>
 </dependency>
 ```
 
 ```groovy
-implementation 'io.github.fbbzl:nettyx:2.6.22'
+implementation 'io.github.fbbzl:nettyx:2.6.23'
 ```
 
 ---
@@ -47,10 +47,18 @@ implementation 'io.github.fbbzl:nettyx:2.6.22'
 ### TCP Server — 3 lines
 
 ```java
-new TcpServer(8080, ctx -> {
-    ctx.writeAndFlush(Unpooled.wrappedBuffer("Hello\n".getBytes()));
-    return ctx.executor().newPromise();
-}).start();
+ServerTemplate server = new ServerTemplate(8080) {
+    @Override
+    protected ChannelInitializer<NioSocketChannel> childChannelInitializer() {
+        return ch -> ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+            @Override
+            public void channelRead(ChannelHandlerContext ctx, Object msg) {
+                ctx.writeAndFlush(Unpooled.wrappedBuffer("Hello\n".getBytes()));
+            }
+        });
+    }
+};
+server.bind();
 ```
 
 ### Struct Serializer — Declare your protocol
@@ -58,9 +66,9 @@ new TcpServer(8080, ctx -> {
 ```java
 @Struct
 public class Login {
-    @ToString     String  username;
-    @ToArray(10)  byte[]  password;
-    @Chunk        byte[]  reserved;
+    @ToCharSequence(bufferLength = 32) String  username;
+    @ToArray(10)                       byte[]  password;
+    @Chunk(length = 8)                 byte[]  reserved;
 }
 ```
 
@@ -85,9 +93,17 @@ serial.writeAndFlush("Hello");
 ### Bluetooth Server
 
 ```java
-new BtServerTemplate("localhost", 1, channel -> {
-    System.out.println("Bt client connected: " + channel.remoteAddress());
-});
+BtServerTemplate btServer = new BtServerTemplate("0000110100001000800000805f9b34fb", "MyBtServer") {
+    @Override
+    protected ChannelInitializer<BtAcceptedChannel> childChannelInitializer() {
+        return ch -> ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+            @Override
+            public void channelActive(ChannelHandlerContext ctx) {
+                System.out.println("Bt client connected: " + ctx.channel().remoteAddress());
+            }
+        });
+    }
+};
 ```
 
 ---

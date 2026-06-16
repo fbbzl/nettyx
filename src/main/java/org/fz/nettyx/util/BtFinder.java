@@ -31,6 +31,7 @@ public final class BtFinder {
 
         private final Object             completedTag = new Object();
         private final List<RemoteDevice> devices      = new ArrayList<>(64);
+        private volatile boolean         completed    = false;
         private       DiscoveryListener  listener     = new DiscoveryListenerAdapter() {
             @Override
             public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
@@ -40,6 +41,7 @@ public final class BtFinder {
             @Override
             public void inquiryCompleted(int discType) {
                 synchronized (completedTag) {
+                    completed = true;
                     completedTag.notifyAll();
                 }
             }
@@ -65,7 +67,11 @@ public final class BtFinder {
                     boolean        started        = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, listener);
 
                     if (started) {
-                        completedTag.wait(30_000);
+                        completed = false;
+                        long deadline = System.currentTimeMillis() + 30_000;
+                        while (!completed && System.currentTimeMillis() < deadline) {
+                            completedTag.wait(deadline - System.currentTimeMillis());
+                        }
                         discoveryAgent.cancelInquiry(listener);
                     }
                     devices.removeIf(condition.negate());
@@ -84,8 +90,9 @@ public final class BtFinder {
 
         private static final int               DEFAULT_ATTR_ID = 0x0100;
         private final        Object            completedTag    = new Object();
-        private final List<String>      services        = new ArrayList<>(32);
-        private              DiscoveryListener  listener        = new DiscoveryListenerAdapter() {
+        private final List<String>             services        = new ArrayList<>(32);
+        private volatile boolean                completed      = false;
+        private              DiscoveryListener  listener       = new DiscoveryListenerAdapter() {
             @Override
             public void servicesDiscovered(int transID, ServiceRecord[] servRecord)
             {
@@ -104,6 +111,7 @@ public final class BtFinder {
             public void serviceSearchCompleted(int transID, int respCode)
             {
                 synchronized (completedTag) {
+                    completed = true;
                     completedTag.notifyAll();
                 }
             }
@@ -125,8 +133,12 @@ public final class BtFinder {
 
             synchronized (completedTag) {
                 services.clear();
+                completed = false;
                 LocalDevice.getLocalDevice().getDiscoveryAgent().searchServices(new int[]{ DEFAULT_ATTR_ID }, searchUuidSet, btDevice, listener);
-                completedTag.wait(30_000);
+                long deadline = System.currentTimeMillis() + 30_000;
+                while (!completed && System.currentTimeMillis() < deadline) {
+                    completedTag.wait(deadline - System.currentTimeMillis());
+                }
                 services.removeIf(condition.negate());
             }
 

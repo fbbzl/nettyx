@@ -1,7 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.Cbasic;
+import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteOrder;
 
@@ -12,14 +12,15 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023 /12/15 15:50
  */
-public class cuint extends Cbasic<Long> {
+public class cuint extends cbasic<Long> {
 
     public cuint(Long value) {
-        super(value, 4);
+        super(value);
+        if (value == null || value < 0) throw new IllegalArgumentException("cuint value must be non-negative");
     }
 
-    public cuint(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf, 4);
+    public cuint(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
     @Override
@@ -28,7 +29,11 @@ public class cuint extends Cbasic<Long> {
     }
 
     @Override
-    public void write(ByteBuf writingBuf) {
+    public int size() { return 4; }
+
+    public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
+        if (value == null || value < 0 || value > 0xFFFFFFFFL)
+            throw new IllegalArgumentException("cuint value out of range [0, 2^32-1]: " + value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             writingBuf.writeIntLE(value.intValue());
         else
@@ -36,10 +41,10 @@ public class cuint extends Cbasic<Long> {
     }
 
     @Override
-    protected Long read(ByteBuf byteBuf) {
+    protected Long read(ByteBuf readingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return byteBuf.readUnsignedIntLE();
+            return readingBuf.readUnsignedIntLE();
         else
-            return byteBuf.readUnsignedInt();
+            return readingBuf.readUnsignedInt();
     }
 }

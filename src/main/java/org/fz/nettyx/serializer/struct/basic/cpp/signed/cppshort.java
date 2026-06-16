@@ -18,8 +18,8 @@ public class cppshort extends cshort {
         super(value);
     }
 
-    public cppshort(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppshort(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

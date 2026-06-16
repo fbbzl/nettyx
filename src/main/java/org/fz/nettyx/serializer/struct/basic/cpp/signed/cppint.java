@@ -18,8 +18,8 @@ public class cppint extends cint {
         super(value);
     }
 
-    public cppint(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cppint(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

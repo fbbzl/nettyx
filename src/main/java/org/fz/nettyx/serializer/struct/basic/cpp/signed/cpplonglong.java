@@ -17,8 +17,8 @@ public class cpplonglong extends cpplong8 {
         super(value);
     }
 
-    public cpplonglong(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public cpplonglong(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 
 }

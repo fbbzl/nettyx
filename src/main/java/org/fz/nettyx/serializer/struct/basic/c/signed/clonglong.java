@@ -17,7 +17,7 @@ public class clonglong extends clong8 {
         super(value);
     }
 
-    public clonglong(ByteOrder byteOrder, ByteBuf buf) {
-        super(byteOrder, buf);
+    public clonglong(ByteBuf buf, ByteOrder byteOrder) {
+        super(buf, byteOrder);
     }
 }

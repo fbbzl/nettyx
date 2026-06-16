@@ -105,9 +105,12 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
             return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
+        ChannelPromise promise = channel.newPromise();
         try {
-            return (ChannelPromise) channel.write(message);
+            channel.write(message, promise);
+            return promise;
         } catch (Exception exception) {
+            ReferenceCountUtil.safeRelease(message);
             throw new ChannelException("exception occurred while sending the message [" + message + "], address is " +
                                        "[" + channel.remoteAddress() + "]", exception);
         }
@@ -124,9 +127,12 @@ public abstract class AbstractMultiChannelTemplate<K, C extends Channel, F exten
             return failurePromise(channel, "channel: [" + channel + "] is not usable");
         }
 
+        ChannelPromise promise = channel.newPromise();
         try {
-            return (ChannelPromise) channel.writeAndFlush(message);
+            channel.writeAndFlush(message, promise);
+            return promise;
         } catch (Exception exception) {
+            ReferenceCountUtil.safeRelease(message);
             throw new ChannelException("exception occurred while sending the message [" + message + "], address is " +
                                        "[" + channel.remoteAddress() + "]", exception);
         }
