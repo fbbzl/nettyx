@@ -56,8 +56,9 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
             unsafe().closeForcibly();
             return -1;
         } catch (Exception e) {
-            log.debug("doReadBytes failed", e);
-            return 0;
+            log.error("doReadBytes failed", e);
+            unsafe().closeForcibly();
+            return -1;
         }
     }
 

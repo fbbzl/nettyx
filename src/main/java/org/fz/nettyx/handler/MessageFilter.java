@@ -28,10 +28,17 @@ public class MessageFilter extends ChannelHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
         {
-            if (fireCondition.test((M) msg)) super.channelRead(ctx, msg);
-            else {
+            boolean shouldFire;
+            try {
+                shouldFire = fireCondition.test((M) msg);
+            } catch (Exception e) {
                 ReferenceCountUtil.release(msg);
+                ctx.fireExceptionCaught(e);
+                return;
             }
+
+            if (shouldFire) super.channelRead(ctx, msg);
+            else            ReferenceCountUtil.release(msg);
         }
     }
 
@@ -46,7 +53,16 @@ public class MessageFilter extends ChannelHandlerAdapter {
                 Object                msg,
                 ChannelPromise        promise) throws Exception
         {
-            if (fireCondition.test((M) msg)) super.write(ctx, msg, promise);
+            boolean shouldFire;
+            try {
+                shouldFire = fireCondition.test((M) msg);
+            } catch (Exception e) {
+                ReferenceCountUtil.release(msg);
+                promise.setFailure(e);
+                return;
+            }
+
+            if (shouldFire) super.write(ctx, msg, promise);
             else {
                 ReferenceCountUtil.release(msg);
                 promise.setSuccess();

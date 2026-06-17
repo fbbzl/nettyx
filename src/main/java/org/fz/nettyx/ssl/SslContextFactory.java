@@ -198,7 +198,7 @@ public class SslContextFactory {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
             } catch (Exception serverSslContextException) {
-                throw new SecurityException("init server ssl context failed", serverSslContextException);
+                throw new SecurityException("init server ssl context failed, path: [" + path + "], trustPath: [" + trustPath + "]", serverSslContextException);
             }
         }
 
@@ -220,7 +220,7 @@ public class SslContextFactory {
             try {
                 return getContext(path, pwd.toCharArray(), trustPath, trustPwd.toCharArray());
             } catch (Exception clientSslContextException) {
-                throw new SecurityException("init client ssl context failed", clientSslContextException);
+                throw new SecurityException("init client ssl context failed, path: [" + path + "], trustPath: [" + trustPath + "]", clientSslContextException);
             }
         }
 

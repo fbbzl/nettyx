@@ -230,7 +230,7 @@ public class StructSerializerContext {
         for (Type genericInterface : genericInterfaces) {
             if (genericInterface instanceof ParameterizedType parameterizedType) {
                 Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-                if (actualTypeArguments.length > 0) {
+                if (actualTypeArguments.length > 0 && actualTypeArguments[0] instanceof Class) {
                     return (Class<A>) actualTypeArguments[0];
                 }
             }

@@ -74,17 +74,15 @@ public abstract class RemoteDetector<M> extends SingleChannelClientTemplate {
             // 1. do connect sync
             ChannelFuture cf = this.connect().sync();
 
-            // 2. check if connect success
-            if (cf.cause() != null)
-                throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]: " + cf.cause().getMessage());
-
-            // 3. store channel
+            // 2. store channel
             super.storeChannel((NioSocketChannel) cf.channel());
 
-            // 4. try-send detect req-message
+            // 3. try-send detect req-message
             this.trySend(this.getDetectMessage(), this.detectRetryTimes, this.waitResponseMillis);
 
             return this.responseState.get();
+        } catch (Exception connectException) {
+            throw new ConnectException("can not connect to address [" + this.getRemoteAddress() + "]: " + connectException.getMessage());
         } finally {
             this.closeChannelGracefully();
         }

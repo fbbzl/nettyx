@@ -12,6 +12,7 @@ import org.fz.nettyx.channel.enhanced.EnhancedOioByteStreamChannel;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.SocketAddress;
 
 /**
@@ -93,10 +94,12 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
             streamConnection = (StreamConnection) Connector.open(this.remoteAddress.value(), Connector.READ_WRITE, true);
         }
         inputStream = streamConnection.openInputStream();
+        OutputStream outputStream = streamConnection.openOutputStream();
         try {
-            activate(inputStream, streamConnection.openOutputStream());
+            activate(inputStream, outputStream);
         } catch (Exception e) {
             inputStream.close();
+            outputStream.close();
             throw e;
         }
     }
@@ -147,7 +150,7 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
                 final boolean wasActive = isActive();
 
                 doConnect(remoteAddress, localAddress);
-                promise.setSuccess();
+                safeSetSuccess(promise);
 
                 if (!wasActive && isActive()) pipeline().fireChannelActive();
             } catch (Exception t) {

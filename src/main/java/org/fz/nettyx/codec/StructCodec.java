@@ -55,7 +55,7 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
         } catch (Exception error) {
             // As the last handler in the pipeline, discard the remaining bytes of this message
             // and keep the channel alive instead of propagating the exception.
-            if (skipLeftBytes && msg.readableBytes() > 0) {
+            if (msg.readableBytes() > 0) {
                 msg.skipBytes(msg.readableBytes());
             }
             log.error("struct deserialization failed, channel: {}", ctx.channel(), error);

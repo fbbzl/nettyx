@@ -74,6 +74,13 @@ public class RxtxChannel extends SerialCommChannel {
         } finally {
             if (serialPort != null) {
                 serialPort.removeEventListener();
+                try {
+                    InputStream  in  = serialPort.getInputStream();
+                    OutputStream out = serialPort.getOutputStream();
+                    if (in  != null) in.close();
+                    if (out != null) out.close();
+                } catch (IOException ignored) {
+                }
                 serialPort.close();
                 serialPort = null;
             }

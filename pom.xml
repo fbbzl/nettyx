@@ -34,7 +34,7 @@
     </licenses>
 
     <properties>
-        <revision>2.6.23</revision>
+        <revision>2.6.24</revision>
 
         <!--build-->
         <java.version>21</java.version>
