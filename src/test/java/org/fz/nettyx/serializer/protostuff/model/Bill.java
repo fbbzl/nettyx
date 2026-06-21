@@ -13,13 +13,4 @@ public class Bill {
     private String orgName;
 
 
-    private BillType billType;
-
-    public enum BillType {
-        C,
-        CC,
-        CCC,
-        CCCC, CCCCC,
-        ;
-    }
 }

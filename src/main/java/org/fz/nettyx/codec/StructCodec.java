@@ -22,7 +22,8 @@ import java.util.List;
  */
 
 @Getter
-public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
+public abstract class StructCodec<S> extends ByteToMessageCodec<S>
+{
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(StructCodec.class);
 
@@ -32,16 +33,19 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
 
     private final boolean skipLeftBytes;
 
-    protected StructCodec() {
+    protected StructCodec()
+    {
         this.skipLeftBytes = DEFAULT_SKIP_LEFT_BYTES;
     }
 
-    protected StructCodec(boolean skipLeftBytes) {
+    protected StructCodec(boolean skipLeftBytes)
+    {
         this.skipLeftBytes = skipLeftBytes;
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out)
+    {
         try {
             out.add(StructSerializer.toStruct(type, msg));
             // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes
@@ -52,25 +56,22 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S> {
                           + "length is [{}]", readableLength);
                 msg.skipBytes(readableLength);
             }
-        } catch (Exception error) {
+        }
+        catch (Exception error) {
             ReferenceCountUtil.release(msg);
             log.error("struct deserialization failed, channel: {}", ctx.channel(), error);
         }
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out) {
-        ByteBuf encoded = null;
+    protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out)
+    {
         try {
-            encoded = StructSerializer.toByteBuf(type, struct);
-            out.writeBytes(encoded);
+            StructSerializer.toByteBuf(type, struct, out);
         }
         catch (Exception error) {
             log.error("struct serialization failed, channel: {} struct: {}", ctx.channel(), struct, error);
             throw error;
-        }
-        finally {
-            ReferenceCountUtil.release(encoded);
         }
     }
 }

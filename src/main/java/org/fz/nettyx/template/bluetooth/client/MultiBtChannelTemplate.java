@@ -1,8 +1,6 @@
 package org.fz.nettyx.template.bluetooth.client;
 
 
-import cn.hutool.core.map.MapUtil;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.Getter;
@@ -22,17 +20,10 @@ import java.util.Map;
  */
 @Getter
 @SuppressWarnings("deprecation")
-public abstract class MultiBtChannelTemplate<K> extends AbstractMultiChannelTemplate<K, BtChannel, BtChannelConfig> {
-
-    private final Map<K, BtDeviceAddress> addressMap;
+public abstract class MultiBtChannelTemplate<K> extends AbstractMultiChannelTemplate<K, BtDeviceAddress, BtChannel, BtChannelConfig> {
 
     protected MultiBtChannelTemplate(Map<K, BtDeviceAddress> addressMap) {
         super(addressMap);
-        this.addressMap = addressMap;
-    }
-
-    public Map<K, ChannelFuture> connectAll() {
-        return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
     @Override

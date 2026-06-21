@@ -17,9 +17,7 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
  */
 @Getter
 @SuppressWarnings("deprecation")
-public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTemplate<BtChannel, BtChannelConfig> {
-
-    private final BtDeviceAddress remoteAddress;
+public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTemplate<BtDeviceAddress, BtChannel, BtChannelConfig> {
 
     protected SingleBtChannelTemplate(String address)
     {
@@ -29,7 +27,6 @@ public abstract class SingleBtChannelTemplate extends AbstractSingleChannelTempl
     protected SingleBtChannelTemplate(BtDeviceAddress address)
     {
         super(address);
-        this.remoteAddress = address;
     }
 
     @Override

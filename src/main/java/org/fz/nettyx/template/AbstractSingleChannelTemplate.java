@@ -22,13 +22,15 @@ import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
 
 @Getter
 @SuppressWarnings({ "unchecked", "unused" })
-public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends ChannelConfig> extends Template<C> {
+public abstract class AbstractSingleChannelTemplate<S extends SocketAddress, C extends Channel, F extends ChannelConfig> extends Template<C> {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(AbstractSingleChannelTemplate.class);
     protected Bootstrap bootstrap;
     protected volatile C channel;
+    protected final S remoteAddress;
 
-    protected AbstractSingleChannelTemplate(SocketAddress remoteAddress) {
+    protected AbstractSingleChannelTemplate(S remoteAddress) {
+        this.remoteAddress = remoteAddress;
         this.bootstrap = this.newBootstrap(remoteAddress);
     }
 
@@ -111,7 +113,7 @@ public abstract class AbstractSingleChannelTemplate<C extends Channel, F extends
         }
     }
 
-    protected Bootstrap newBootstrap(SocketAddress remoteAddress)
+    protected Bootstrap newBootstrap(S remoteAddress)
     {
         return new Bootstrap()
                 .remoteAddress(remoteAddress)

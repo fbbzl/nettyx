@@ -2,6 +2,8 @@ package org.fz.nettyx.serializer;
 
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.TypeReference;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.codec.model.*;
@@ -14,7 +16,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.fz.nettyx.serializer.struct.StructSerializer.toBytes;
+import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 
 
@@ -39,15 +41,17 @@ public class SerializerTest {
 
         byte[] bytes = new byte[1200];
         Arrays.fill(bytes, (byte) 67);
-        User   user     = toStruct(userTypeRefer, bytes);
-        byte[] buf      = toBytes(userTypeRefer, user);
-        byte[] emptyBuf = toBytes(userTypeRefer, new User<>());
-        System.err.println(emptyBuf.length);
+        User   user     = toStruct(userTypeRefer, Unpooled.wrappedBuffer(bytes));
+
 
         byte[] bytes1 = {16,23,32,11,12,13,14,15,16,17,18,19,20,21,22,22,11,15,26,127,46,34,43,68,24,12,34,12,33,34,35,36,37,38,39,40,41,43,44,45,46,48,49,50,51,52,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79};
 
-        Brother brother = toStruct(brotherRefer, bytes1);
-        byte[]  bytes2  = toBytes(brotherRefer, brother);
+        Brother brother = toStruct(brotherRefer, Unpooled.wrappedBuffer(bytes1));
+
+        ByteBuf brotherBytesBuf = Unpooled.buffer();
+        toByteBuf(brotherRefer, brother, brotherBytesBuf);
+        byte[]  bytes2  = new byte[brotherBytesBuf.readableBytes()];
+        brotherBytesBuf.readBytes(bytes2);
         log.info(">correctness test passed!!!!!!!!<");
         log.info("");
     }
@@ -56,18 +60,22 @@ public class SerializerTest {
     public void testStructSerializer() {
         byte[] bytes = new byte[900];
         Arrays.fill(bytes, (byte) 67);
-        You struct = toStruct(youTypeRefer, bytes);
+        You struct = toStruct(youTypeRefer, Unpooled.wrappedBuffer(bytes));
         struct.setC(null);
         struct.setChunk(null);
         struct.setIsMarried(new cint(1));
-        byte[] bytes1 = toBytes(youTypeRefer, struct);
+
+        ByteBuf youBytesBuf = Unpooled.buffer();
+        toByteBuf(youTypeRefer, struct, youBytesBuf);
+        byte[] bytes1 = new byte[youBytesBuf.readableBytes()];
+        youBytesBuf.readBytes(bytes1);
         System.err.println("测试序列化字节数组长度:"+bytes1.length);
 
         for (int i = 0; i < 10; i++) {
             StopWatch stopWatch = StopWatch.create("反序列任务");
             stopWatch.start();
             for (int j = 0; j < 1_000_000; j++) {
-                toStruct(youTypeRefer, bytes);
+                toStruct(youTypeRefer, Unpooled.wrappedBuffer(bytes));
             }
             stopWatch.stop();
             log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));

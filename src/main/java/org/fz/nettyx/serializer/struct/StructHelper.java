@@ -18,7 +18,6 @@ import java.nio.ByteOrder;
 
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
-import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
 
 
@@ -125,12 +124,5 @@ public class StructHelper {
             case ParameterizedType parameterizedType -> (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
             default                                  -> (T[]) Array.newInstance(Object.class, length);
         };
-    }
-
-    public static <T> T defaultStruct(
-            Object fieldValue,
-            Type   fieldActualType)
-    {
-        return (T) defaultIfNull(fieldValue, () -> newStruct(fieldActualType));
     }
 }

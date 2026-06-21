@@ -15,22 +15,17 @@
  */
 package org.fz.nettyx.channel.serial.rxtx;
 
-import gnu.io.SerialPort;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.channel.*;
-import lombok.RequiredArgsConstructor;
-import org.fz.nettyx.exception.UnknownConfigException;
+import io.netty.channel.ChannelOption;
+import org.fz.nettyx.channel.serial.*;
 
 import java.util.Map;
-
-import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 
 /**
  * A configuration class for RXTX device connections.
  *
  * <h3>Available options</h3>
  * <p>
- * In addition to the options provided by {@link ChannelConfig},
+ * In addition to the options provided by {@link io.netty.channel.ChannelConfig},
  * {@link DefaultRxtxChannelConfig} allows the following options in the option map:
  *
  * <table border="1" cellspacing="0" cellpadding="6">
@@ -43,11 +38,11 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
  * </tr><tr>
  * <td>{@link RxtxChannelOption#RTS}</td><td>{@link #setRts(boolean)}</td>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#STOP_BITS}</td><td>{@link #setStopBits(StopBits)}</td>
+ * <td>{@link RxtxChannelOption#STOP_BITS}</td><td>{@link #setStopBits(SerialStopBits)}</td>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#DATA_BITS}</td><td>{@link #setDataBits(DataBits)}</td>
+ * <td>{@link RxtxChannelOption#DATA_BITS}</td><td>{@link #setDataBits(SerialDataBits)}</td>
  * </tr><tr>
- * <td>{@link RxtxChannelOption#PARITY_BIT}</td><td>{@link #setParityBit(ParityBit)}</td>
+ * <td>{@link RxtxChannelOption#PARITY_BIT}</td><td>{@link #setParityBit(SerialParityBit)}</td>
  * </tr>
  * </table>
  *
@@ -56,95 +51,28 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
  * @version 1.0
  * @since 2024/3/1 14:44
  */
-public interface RxtxChannelConfig extends ChannelConfig {
+public interface RxtxChannelConfig extends SerialChannelConfig {
 
-    /**
-     * Sets the baud rate (ie. bits per second) for communication with the serial device.
-     * The baud rate will include bits for framing (in the form of stop bits and parity),
-     * such that the effective data rate will be lower than this value.
-     *
-     * @param baudrate The baud rate (in bits per second)
-     */
+    @Override
     RxtxChannelConfig setBaudRate(int baudrate);
 
-    /**
-     * Sets the number of stop bits to include at the end of every character to aid the
-     * serial device in synchronising with the data.
-     *
-     * @param stopbits The number of stop bits to use
-     */
-    RxtxChannelConfig setStopBits(StopBits stopbits);
+    @Override
+    RxtxChannelConfig setStopBits(SerialStopBits stopbits);
 
-    /**
-     * Sets the number of data bits to use to make up each character sent to the serial
-     * device.
-     *
-     * @param databits The number of data bits to use
-     */
-    RxtxChannelConfig setDataBits(DataBits databits);
+    @Override
+    RxtxChannelConfig setDataBits(SerialDataBits databits);
 
-    /**
-     * Sets the type of parity bit to be used when communicating with the serial device.
-     *
-     * @param paritybit The type of parity bit to be used
-     */
-    RxtxChannelConfig setParityBit(ParityBit paritybit);
+    @Override
+    RxtxChannelConfig setParityBit(SerialParityBit paritybit);
 
-    /**
-     * @return The configured baud rate, defaulting to 115200 if unset
-     */
-    int getBaudRate();
-
-    /**
-     * @return The configured stop bits, defaulting to {@link StopBits#STOP_BITS_1} if unset
-     */
-    StopBits getStopBits();
-
-    /**
-     * @return The configured data bits, defaulting to {@link DataBits#DATA_BITS_8} if unset
-     */
-    DataBits getDataBits();
-
-    /**
-     * @return The configured parity bit, defaulting to {@link ParityBit#NO} if unset
-     */
-    ParityBit getParityBit();
-
-    /**
-     * @return true if the serial device should support the Data Terminal Ready signal
-     */
-    boolean getDtr();
-
-    /**
-     * Sets whether the serial device supports the Data Terminal Ready signal, used for
-     * flow control
-     *
-     * @param dtr true if DTR is supported, false otherwise
-     */
+    @Override
     RxtxChannelConfig setDtr(boolean dtr);
 
-    /**
-     * @return true if the serial device should support the Ready to Send signal
-     */
-    boolean getRts();
-
-    /**
-     * Sets whether the serial device supports the Request To Send signal, used for flow
-     * control
-     *
-     * @param rts true if RTS is supported, false otherwise
-     */
+    @Override
     RxtxChannelConfig setRts(boolean rts);
 
-    /**
-     * Sets the maximal time (in ms) to block while try to read from the serial port.
-     */
+    @Override
     RxtxChannelConfig setReadTimeout(int readTimeout);
-
-    /**
-     * Return the maximal time (in ms) to block and wait for something to be ready to read.
-     */
-    int getReadTimeout();
 
     @Override
     RxtxChannelConfig setConnectTimeoutMillis(int connectTimeoutMillis);
@@ -156,10 +84,10 @@ public interface RxtxChannelConfig extends ChannelConfig {
     RxtxChannelConfig setWriteSpinCount(int writeSpinCount);
 
     @Override
-    RxtxChannelConfig setAllocator(ByteBufAllocator allocator);
+    RxtxChannelConfig setAllocator(io.netty.buffer.ByteBufAllocator allocator);
 
     @Override
-    RxtxChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator);
+    RxtxChannelConfig setRecvByteBufAllocator(io.netty.channel.RecvByteBufAllocator allocator);
 
     @Override
     RxtxChannelConfig setAutoRead(boolean autoRead);
@@ -174,117 +102,10 @@ public interface RxtxChannelConfig extends ChannelConfig {
     RxtxChannelConfig setWriteBufferLowWaterMark(int writeBufferLowWaterMark);
 
     @Override
-    RxtxChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark);
+    RxtxChannelConfig setWriteBufferWaterMark(io.netty.channel.WriteBufferWaterMark writeBufferWaterMark);
 
     @Override
-    RxtxChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator);
-
-    @RequiredArgsConstructor
-    enum StopBits {
-        /**
-         * 1 stop bit will be sent at the end of every character
-         */
-        STOP_BITS_1(SerialPort.STOPBITS_1),
-        /**
-         * 2 stop bits will be sent at the end of every character
-         */
-        STOP_BITS_2(SerialPort.STOPBITS_2),
-        /**
-         * 1.5 stop bits will be sent at the end of every character
-         */
-        STOP_BITS_1_5(SerialPort.STOPBITS_1_5);
-
-        private final int value;
-
-        public int value() {
-            return value;
-        }
-
-        public static StopBits valueOf(int value) {
-            for (StopBits stopbit : StopBits.values()) {
-                if (stopbit.value == value) {
-                    return stopbit;
-                }
-            }
-            throw new UnknownConfigException(StopBits.class.getSimpleName(), value);
-        }
-    }
-
-    @RequiredArgsConstructor
-    enum DataBits {
-        /**
-         * 5 data bits will be used for each character (ie. Baudot code)
-         */
-        DATA_BITS_5(SerialPort.DATABITS_5),
-        /**
-         * 6 data bits will be used for each character
-         */
-        DATA_BITS_6(SerialPort.DATABITS_6),
-        /**
-         * 7 data bits will be used for each character (ie. ASCII)
-         */
-        DATA_BITS_7(SerialPort.DATABITS_7),
-        /**
-         * 8 data bits will be used for each character (ie. binary data)
-         */
-        DATA_BITS_8(SerialPort.DATABITS_8);
-
-        private final int value;
-
-        public int value() {
-            return value;
-        }
-
-        public static DataBits valueOf(int value) {
-            for (DataBits databit : DataBits.values()) {
-                if (databit.value == value) {
-                    return databit;
-                }
-            }
-            throw new IllegalArgumentException("unknown " + DataBits.class.getSimpleName() + " value: " + value);
-        }
-    }
-
-    @RequiredArgsConstructor
-    enum ParityBit {
-        /**
-         * No parity bit will be sent with each data character at all
-         */
-        NO(SerialPort.PARITY_NONE),
-        /**
-         * An odd parity bit will be sent with each data character, ie. will be set
-         * to 1 if the data character contains an even number of bits set to 1.
-         */
-        ODD(SerialPort.PARITY_ODD),
-        /**
-         * An even parity bit will be sent with each data character, ie. will be set
-         * to 1 if the data character contains an odd number of bits set to 1.
-         */
-        EVEN(SerialPort.PARITY_EVEN),
-        /**
-         * A mark parity bit (ie. always 1) will be sent with each data character
-         */
-        MARK(SerialPort.PARITY_MARK),
-        /**
-         * A space parity bit (ie. always 0) will be sent with each data character
-         */
-        SPACE(SerialPort.PARITY_SPACE);
-
-        private final int value;
-
-        public int value() {
-            return value;
-        }
-
-        public static ParityBit valueOf(int value) {
-            for (ParityBit paritybit : ParityBit.values()) {
-                if (paritybit.value == value) {
-                    return paritybit;
-                }
-            }
-            throw new IllegalArgumentException("unknown " + ParityBit.class.getSimpleName() + " value: " + value);
-        }
-    }
+    RxtxChannelConfig setMessageSizeEstimator(io.netty.channel.MessageSizeEstimator estimator);
 
     /**
      * Default configuration class for RXTX device connections.
@@ -294,24 +115,15 @@ public interface RxtxChannelConfig extends ChannelConfig {
      * @since 2024/3/1 14:44
      */
     @SuppressWarnings("deprecation")
-    final class DefaultRxtxChannelConfig extends DefaultChannelConfig implements RxtxChannelConfig {
-
-        private volatile int       baudRate    = 115200;
-        private volatile StopBits  stopbits    = StopBits.STOP_BITS_1;
-        private volatile DataBits  databits    = DataBits.DATA_BITS_8;
-        private volatile ParityBit paritybit   = ParityBit.NO;
-        private volatile int       readTimeout = 1000;
-        private volatile boolean   dtr;
-        private volatile boolean   rts;
+    final class DefaultRxtxChannelConfig extends AbstractSerialChannelConfig implements RxtxChannelConfig {
 
         DefaultRxtxChannelConfig(RxtxChannel channel) {
             super(channel);
-            setAllocator(new PreferHeapByteBufAllocator(getAllocator()));
         }
 
         @Override
         public Map<ChannelOption<?>, Object> getOptions() {
-            return getOptions(super.getOptions(), RxtxChannelOption.BAUD_RATE, RxtxChannelOption.DTR, RxtxChannelOption.RTS, RxtxChannelOption.STOP_BITS, RxtxChannelOption.DATA_BITS, RxtxChannelOption.PARITY_BIT);
+            return getOptions(super.getOptions(), RxtxChannelOption.BAUD_RATE, RxtxChannelOption.DTR, RxtxChannelOption.RTS, RxtxChannelOption.STOP_BITS, RxtxChannelOption.DATA_BITS, RxtxChannelOption.PARITY_BIT, RxtxChannelOption.READ_TIMEOUT);
         }
 
         @SuppressWarnings("unchecked")
@@ -352,11 +164,11 @@ public interface RxtxChannelConfig extends ChannelConfig {
             } else if (option == RxtxChannelOption.RTS) {
                 setRts((Boolean) value);
             } else if (option == RxtxChannelOption.STOP_BITS) {
-                setStopBits((StopBits) value);
+                setStopBits((SerialStopBits) value);
             } else if (option == RxtxChannelOption.DATA_BITS) {
-                setDataBits((DataBits) value);
+                setDataBits((SerialDataBits) value);
             } else if (option == RxtxChannelOption.PARITY_BIT) {
-                setParityBit((ParityBit) value);
+                setParityBit((SerialParityBit) value);
             } else if (option == RxtxChannelOption.READ_TIMEOUT) {
                 setReadTimeout((Integer) value);
             } else {
@@ -366,80 +178,45 @@ public interface RxtxChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public RxtxChannelConfig setBaudRate(final int baudRate) {
-            this.baudRate = baudRate;
+        public RxtxChannelConfig setBaudRate(int baudRate) {
+            super.setBaudRate(baudRate);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setStopBits(final StopBits stopbits) {
-            this.stopbits = stopbits;
+        public RxtxChannelConfig setStopBits(SerialStopBits stopBits) {
+            super.setStopBits(stopBits);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setDataBits(final DataBits databits) {
-            this.databits = databits;
+        public RxtxChannelConfig setDataBits(SerialDataBits dataBits) {
+            super.setDataBits(dataBits);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setParityBit(final ParityBit paritybit) {
-            this.paritybit = paritybit;
+        public RxtxChannelConfig setParityBit(SerialParityBit parityBit) {
+            super.setParityBit(parityBit);
             return this;
         }
 
         @Override
-        public int getBaudRate() {
-            return baudRate;
-        }
-
-        @Override
-        public StopBits getStopBits() {
-            return stopbits;
-        }
-
-        @Override
-        public DataBits getDataBits() {
-            return databits;
-        }
-
-        @Override
-        public ParityBit getParityBit() {
-            return paritybit;
-        }
-
-        @Override
-        public boolean getDtr() {
-            return dtr;
-        }
-
-        @Override
-        public RxtxChannelConfig setDtr(final boolean dtr) {
-            this.dtr = dtr;
+        public RxtxChannelConfig setDtr(boolean dtr) {
+            super.setDtr(dtr);
             return this;
         }
 
         @Override
-        public boolean getRts() {
-            return rts;
-        }
-
-        @Override
-        public RxtxChannelConfig setRts(final boolean rts) {
-            this.rts = rts;
+        public RxtxChannelConfig setRts(boolean rts) {
+            super.setRts(rts);
             return this;
         }
 
         @Override
         public RxtxChannelConfig setReadTimeout(int readTimeout) {
-            this.readTimeout = checkPositiveOrZero(readTimeout, "readTimeout");
+            super.setReadTimeout(readTimeout);
             return this;
-        }
-
-        @Override
-        public int getReadTimeout() {
-            return readTimeout;
         }
 
         @Override
@@ -461,13 +238,13 @@ public interface RxtxChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public RxtxChannelConfig setAllocator(ByteBufAllocator allocator) {
+        public RxtxChannelConfig setAllocator(io.netty.buffer.ByteBufAllocator allocator) {
             super.setAllocator(allocator);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator) {
+        public RxtxChannelConfig setRecvByteBufAllocator(io.netty.channel.RecvByteBufAllocator allocator) {
             super.setRecvByteBufAllocator(allocator);
             return this;
         }
@@ -497,13 +274,13 @@ public interface RxtxChannelConfig extends ChannelConfig {
         }
 
         @Override
-        public RxtxChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark) {
+        public RxtxChannelConfig setWriteBufferWaterMark(io.netty.channel.WriteBufferWaterMark writeBufferWaterMark) {
             super.setWriteBufferWaterMark(writeBufferWaterMark);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator) {
+        public RxtxChannelConfig setMessageSizeEstimator(io.netty.channel.MessageSizeEstimator estimator) {
             super.setMessageSizeEstimator(estimator);
             return this;
         }

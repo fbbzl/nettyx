@@ -95,7 +95,7 @@ public @interface ToArray {
             serializer.writeArray(fieldVal, componentType, length, writing, flexible, field.byteOrder());
         }
 
-        static Type getComponentType(Type root, Type type)
+        public static Type getComponentType(Type root, Type type)
         {
             return switch (type)
             {

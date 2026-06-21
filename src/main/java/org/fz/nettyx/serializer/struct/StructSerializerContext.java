@@ -18,6 +18,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.struct.generator.StructReaderWriterGenerator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -155,6 +156,8 @@ public class StructSerializerContext {
                 log.error("scan struct failed please check, struct class is: [{}]", clazz, throwable);
             }
         }
+
+        StructReaderWriterGenerator.generate(STRUCT_DEFINITION_CACHE.values());
     }
 
     protected void scanBasic(Set<Class<?>> classes)
@@ -261,6 +264,8 @@ public class StructSerializerContext {
         @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
         public static class StructField {
 
+            public enum Category { BASIC, STRUCT, HANDLER }
+
             ByteOrder           byteOrder;
             Field               wrapped;
             UnaryOperator<Type> type;
@@ -271,21 +276,73 @@ public class StructSerializerContext {
             @Getter(AccessLevel.NONE)
             Supplier<? extends StructFieldHandler<? extends Annotation>> handleSupplier;
 
+            @Getter(AccessLevel.NONE)
+            Category category;
+
             public StructField(ByteOrder byteOrder, Field field)
             {
-                this(byteOrder,
-                     field,
-                     typeSupplier(field),
-                     LambdaMetas.lambdaGetter(field),
-                     LambdaMetas.lambdaSetter(field),
-                     getHandlerAnnotation(field),
-                     getHandlerSupplier(field));
+                this.byteOrder      = byteOrder;
+                this.wrapped        = field;
+                this.type           = typeSupplier(field);
+                this.getter         = LambdaMetas.lambdaGetter(field);
+                this.setter         = LambdaMetas.lambdaSetter(field);
+                this.annotation     = getHandlerAnnotation(field);
+                this.handleSupplier = getHandlerSupplier(field);
+
+                Category initCategory = Category.HANDLER;
+                Type     rawFieldType = field.getGenericType();
+                if (this.annotation == null && rawFieldType instanceof Class<?> clazz) {
+                    if (Basic.class.isAssignableFrom(clazz) && Basic.class != clazz) {
+                        initCategory = Category.BASIC;
+                    }
+                    else if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
+                        initCategory = Category.STRUCT;
+                    }
+                }
+                this.category = initCategory;
+            }
+
+            public Category category() {
+                return category;
             }
 
             static UnaryOperator<Type> typeSupplier(Field field) {
                 Type fieldType = field.getGenericType();
+                Class<?> declaringClass = field.getDeclaringClass();
                 return fieldType instanceof Class<?> ? root -> (Class<?>) fieldType :
-                       root -> TypeUtil.getActualType(root, fieldType);
+                       root -> {
+                           Type context = resolveContext(root, declaringClass);
+                           return TypeUtil.getActualType(context != null ? context : root, fieldType);
+                       };
+            }
+
+            private static Type resolveContext(Type root, Class<?> declaringClass) {
+                if (root instanceof ParameterizedType pt) {
+                    Class<?> rawType = (Class<?>) pt.getRawType();
+                    if (rawType == declaringClass) return root;
+                    Type superType = rawType.getGenericSuperclass();
+                    if (superType != null) {
+                        Type resolved = resolveContext(superType, declaringClass);
+                        if (resolved != null) return TypeUtil.getActualType(root, resolved);
+                    }
+                    for (Type interfaceType : rawType.getGenericInterfaces()) {
+                        Type resolved = resolveContext(interfaceType, declaringClass);
+                        if (resolved != null) return TypeUtil.getActualType(root, resolved);
+                    }
+                }
+                else if (root instanceof Class<?> clazz) {
+                    if (clazz == declaringClass) return root;
+                    Type superType = clazz.getGenericSuperclass();
+                    if (superType != null) {
+                        Type resolved = resolveContext(superType, declaringClass);
+                        if (resolved != null) return resolved;
+                    }
+                    for (Type interfaceType : clazz.getGenericInterfaces()) {
+                        Type resolved = resolveContext(interfaceType, declaringClass);
+                        if (resolved != null) return resolved;
+                    }
+                }
+                return null;
             }
 
             public Type type(Type root) {

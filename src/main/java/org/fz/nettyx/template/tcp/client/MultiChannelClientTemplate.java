@@ -1,7 +1,5 @@
 package org.fz.nettyx.template.tcp.client;
 
-import cn.hutool.core.map.MapUtil;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannelConfig;
@@ -22,17 +20,10 @@ import java.util.Map;
  */
 @Getter
 public abstract class MultiChannelClientTemplate<K>
-        extends AbstractMultiChannelTemplate<K, NioSocketChannel, SocketChannelConfig> {
-
-    private final Map<K, InetSocketAddress> addressMap;
+        extends AbstractMultiChannelTemplate<K, InetSocketAddress, NioSocketChannel, SocketChannelConfig> {
 
     protected MultiChannelClientTemplate(Map<K, InetSocketAddress> addressMap) {
         super(addressMap);
-        this.addressMap = addressMap;
-    }
-
-    public Map<K, ChannelFuture> connectAll() {
-        return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
     @Override

@@ -20,13 +20,10 @@ set "NETTYX_VERSION="
 set "STARTER_VERSION="
 set "NETTYX_REMOTES=gitee github"
 set "STARTER_REMOTES=gitee github"
-set "NETTYX_FEATURE_BRANCH=feature"
-set "NETTYX_DEV_BRANCH=dev"
 set "NETTYX_RELEASE_BRANCH=release"
 set "NETTYX_MAIN_BRANCH=main"
 set "STARTER_PUBLISH_BRANCH=publish"
 set "STARTER_MAIN_BRANCH=main"
-set "FEATURE_COMMIT_MESSAGE=feat: update nettyx"
 set "DRY_RUN=0"
 set "SKIP_TESTS=0"
 set "SKIP_GIT_PUSH=0"
@@ -54,10 +51,6 @@ if /i "%ARG:~0,15%"=="/nettyxRemotes:" set "NETTYX_REMOTES=%ARG:~15%" & shift & 
 if /i "%ARG:~0,15%"=="-nettyxRemotes:" set "NETTYX_REMOTES=%ARG:~15%" & shift & goto parse_args
 if /i "%ARG:~0,16%"=="/starterRemotes:" set "STARTER_REMOTES=%ARG:~16%" & shift & goto parse_args
 if /i "%ARG:~0,16%"=="-starterRemotes:" set "STARTER_REMOTES=%ARG:~16%" & shift & goto parse_args
-if /i "%ARG:~0,21%"=="/nettyxFeatureBranch:" set "NETTYX_FEATURE_BRANCH=%ARG:~21%" & shift & goto parse_args
-if /i "%ARG:~0,21%"=="-nettyxFeatureBranch:" set "NETTYX_FEATURE_BRANCH=%ARG:~21%" & shift & goto parse_args
-if /i "%ARG:~0,17%"=="/nettyxDevBranch:" set "NETTYX_DEV_BRANCH=%ARG:~17%" & shift & goto parse_args
-if /i "%ARG:~0,17%"=="-nettyxDevBranch:" set "NETTYX_DEV_BRANCH=%ARG:~17%" & shift & goto parse_args
 if /i "%ARG:~0,21%"=="/nettyxReleaseBranch:" set "NETTYX_RELEASE_BRANCH=%ARG:~21%" & shift & goto parse_args
 if /i "%ARG:~0,21%"=="-nettyxReleaseBranch:" set "NETTYX_RELEASE_BRANCH=%ARG:~21%" & shift & goto parse_args
 if /i "%ARG:~0,18%"=="/nettyxMainBranch:" set "NETTYX_MAIN_BRANCH=%ARG:~18%" & shift & goto parse_args
@@ -66,8 +59,6 @@ if /i "%ARG:~0,22%"=="/starterPublishBranch:" set "STARTER_PUBLISH_BRANCH=%ARG:~
 if /i "%ARG:~0,22%"=="-starterPublishBranch:" set "STARTER_PUBLISH_BRANCH=%ARG:~22%" & shift & goto parse_args
 if /i "%ARG:~0,19%"=="/starterMainBranch:" set "STARTER_MAIN_BRANCH=%ARG:~19%" & shift & goto parse_args
 if /i "%ARG:~0,19%"=="-starterMainBranch:" set "STARTER_MAIN_BRANCH=%ARG:~19%" & shift & goto parse_args
-if /i "%ARG:~0,22%"=="/featureCommitMessage:" set "FEATURE_COMMIT_MESSAGE=%ARG:~22%" & shift & goto parse_args
-if /i "%ARG:~0,22%"=="-featureCommitMessage:" set "FEATURE_COMMIT_MESSAGE=%ARG:~22%" & shift & goto parse_args
 if not defined NETTYX_VERSION (
     set "NETTYX_VERSION=%~1"
     shift
@@ -91,15 +82,15 @@ call :assert_path "%PROJECT_NETTYX%" "Project directory" || goto fail
 call :assert_path "%PROJECT_STARTER%" "Project directory" || goto fail
 
 call :get_current_branch "%PROJECT_NETTYX%" CURRENT_NETTYX_BRANCH || goto fail
-if not defined NETTYX_FEATURE_BRANCH set "NETTYX_FEATURE_BRANCH=%CURRENT_NETTYX_BRANCH%"
+if /i not "%CURRENT_NETTYX_BRANCH%"=="%NETTYX_RELEASE_BRANCH%" (
+    echo Current nettyx branch is [%CURRENT_NETTYX_BRANCH%], expected release branch [%NETTYX_RELEASE_BRANCH%]
+    goto fail
+)
 call :first_word "%NETTYX_REMOTES%" NETTYX_PRIMARY_REMOTE || goto fail
 call :first_word "%STARTER_REMOTES%" STARTER_PRIMARY_REMOTE || goto fail
 
 call :git_fetch "%PROJECT_NETTYX%" "%NETTYX_PRIMARY_REMOTE%" || goto fail
 call :git_fetch "%PROJECT_STARTER%" "%STARTER_PRIMARY_REMOTE%" || goto fail
-
-call :nettyx_has_updates "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_DEV_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" NETTYX_HAS_CHANGES || goto fail
-if "%NETTYX_HAS_CHANGES%"=="0" goto nothing_to_release
 
 call :get_project_version "%PROJECT_NETTYX%" "nettyx" CURRENT_NETTYX_VERSION || goto fail
 call :get_project_version "%PROJECT_STARTER%" "spring-boot-starter-nettyx" CURRENT_STARTER_VERSION || goto fail
@@ -121,7 +112,7 @@ echo spring-boot-starter-nettyx: %CURRENT_STARTER_VERSION% -^> %STARTER_VERSION%
 echo starter nettyx.version:     %CURRENT_STARTER_NETTYX_VERSION% -^> %NETTYX_VERSION%
 echo nettyx remotes:             %NETTYX_REMOTES%
 echo starter remotes:            %STARTER_REMOTES%
-echo nettyx branches:            %NETTYX_FEATURE_BRANCH% -^> %NETTYX_DEV_BRANCH% -^> %NETTYX_RELEASE_BRANCH% -^> %NETTYX_MAIN_BRANCH%
+echo nettyx branches:            %NETTYX_RELEASE_BRANCH% -^> %NETTYX_MAIN_BRANCH%
 echo starter branches:           %STARTER_PUBLISH_BRANCH% -^> %STARTER_MAIN_BRANCH%
 if "%DRY_RUN%"=="1" echo DryRun is enabled. No files, git refs, or deployments will be changed.
 
@@ -204,55 +195,17 @@ set "CHECK_PROJECT_PATH=%~1"
 set "CHECK_STATUS_FILE=%TEMP%\nettyx_publish_precheck_%RANDOM%%RANDOM%.txt"
 git -C "%CHECK_PROJECT_PATH%" status --porcelain > "%CHECK_STATUS_FILE%"
 if not "%ERRORLEVEL%"=="0" (
-    del "%CHECK_STATUS_FILE%" >nul 2>nul
+    del "%CHECK_STATUS_FILE%" > nul 2> nul
     echo Failed to check git status: %CHECK_PROJECT_PATH%
     exit /b 1
 )
 for %%S in ("%CHECK_STATUS_FILE%") do set "CHECK_STATUS_SIZE=%%~zS"
-del "%CHECK_STATUS_FILE%" >nul 2>nul
+del "%CHECK_STATUS_FILE%" > nul 2> nul
 if "%CHECK_STATUS_SIZE%"=="0" (
     set "%~2=0"
 ) else (
     set "%~2=1"
 )
-exit /b 0
-
-:resolve_branch_ref
-set "RESOLVE_PROJECT_PATH=%~1"
-set "RESOLVE_BRANCH=%~2"
-set "RESOLVE_REMOTE=%~3"
-git -C "%RESOLVE_PROJECT_PATH%" rev-parse --verify --quiet "%RESOLVE_BRANCH%" >nul
-if "%ERRORLEVEL%"=="0" (
-    set "%~4=%RESOLVE_BRANCH%"
-    exit /b 0
-)
-git -C "%RESOLVE_PROJECT_PATH%" rev-parse --verify --quiet "%RESOLVE_REMOTE%/%RESOLVE_BRANCH%" >nul
-if "%ERRORLEVEL%"=="0" (
-    set "%~4=%RESOLVE_REMOTE%/%RESOLVE_BRANCH%"
-    exit /b 0
-)
-echo Cannot resolve branch ref: %RESOLVE_BRANCH%, project: %RESOLVE_PROJECT_PATH%
-exit /b 1
-
-:branch_has_diff
-call :resolve_branch_ref "%~1" "%~2" "%~4" DIFF_LEFT_REF || exit /b 1
-call :resolve_branch_ref "%~1" "%~3" "%~4" DIFF_RIGHT_REF || exit /b 1
-git -C "%~1" diff --quiet "%DIFF_RIGHT_REF%...%DIFF_LEFT_REF%" --
-if "%ERRORLEVEL%"=="0" (
-    set "%~5=0"
-) else (
-    set "%~5=1"
-)
-exit /b 0
-
-:nettyx_has_updates
-call :repo_has_changes "%~1" NETTYX_WORKTREE_HAS_CHANGES || exit /b 1
-if "%NETTYX_WORKTREE_HAS_CHANGES%"=="1" (
-    set "%~5=1"
-    exit /b 0
-)
-call :branch_has_diff "%~1" "%~2" "%~3" "%~4" NETTYX_BRANCH_HAS_DIFF || exit /b 1
-set "%~5=%NETTYX_BRANCH_HAS_DIFF%"
 exit /b 0
 
 :get_project_version
@@ -277,30 +230,13 @@ exit /b 0
 
 :publish_nettyx
 echo.
-echo ========== nettyx feature commit ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :commit_current_changes "nettyx feature" "%PROJECT_NETTYX%" "%FEATURE_COMMIT_MESSAGE%" || exit /b 1
-call :push_branch "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
-
-echo.
-echo ========== nettyx dev release commit ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_DEV_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :squash_merge_nettyx_feature "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" || exit /b 1
-call :resolve_nettyx_dev_known_paths "%PROJECT_NETTYX%" || exit /b 1
-call :restore_head_paths "%PROJECT_NETTYX%" README.md README_zh.md || exit /b 1
-call :drop_or_restore_head_paths "%PROJECT_NETTYX%" src/test/java || exit /b 1
-call :clean_nettyx_dev_pom "%PROJECT_NETTYX%" || exit /b 1
-call :assert_no_unmerged_paths "%PROJECT_NETTYX%" || exit /b 1
-    call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
-    call :update_readme_version "%PROJECT_NETTYX%" "%NETTYX_VERSION%" || exit /b 1
-    call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
-    call :commit_staged_changes "nettyx dev" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_NETTYX%" "%NETTYX_DEV_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
-
-echo.
-echo ========== nettyx release merge ==========
+echo ========== nettyx release commit ==========
 call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :run_in_dir "%PROJECT_NETTYX%" git -C "%PROJECT_NETTYX%" merge --no-ff "%NETTYX_DEV_BRANCH%" -m "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+call :commit_current_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
+call :update_readme_version "%PROJECT_NETTYX%" "%NETTYX_VERSION%" || exit /b 1
+call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
+call :commit_staged_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
 call :push_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 echo.
@@ -354,7 +290,7 @@ exit /b 0
 :return_work_branches
 echo.
 echo ========== return work branches ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_FEATURE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
+call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
 call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
 exit /b 0
 
@@ -375,7 +311,7 @@ if "%DRY_RUN%"=="1" (
 )
 for %%F in (README.md README_zh.md) do (
     if exist "%README_PROJECT_PATH%\%%F" (
-        powershell -NoProfile -Command "(Get-Content -LiteralPath '%README_PROJECT_PATH%\%%F' -Raw) -replace '\u003cversion\u003e[^^\u003c]*\u003c/version\u003e', '\u003cversion\u003e%README_VERSION%\u003c/version\u003e' | Set-Content -LiteralPath '%README_PROJECT_PATH%\%%F' -NoNewline -Encoding UTF8"
+        powershell -NoProfile -Command "(Get-Content -LiteralPath '%README_PROJECT_PATH%\%%F' -Raw) -replace '<version>[^^<]*</version>', '<version>%README_VERSION%</version>' | Set-Content -LiteralPath '%README_PROJECT_PATH%\%%F' -NoNewline -Encoding UTF8"
     )
 )
 exit /b 0
@@ -385,14 +321,6 @@ if "%DRY_RUN%"=="1" (
     cscript //nologo //E:JScript "%~f0" setPropertyVersion "%~1" "%~2" "%~3" dryRun
 ) else (
     cscript //nologo //E:JScript "%~f0" setPropertyVersion "%~1" "%~2" "%~3"
-)
-exit /b %ERRORLEVEL%
-
-:clean_nettyx_dev_pom
-if "%DRY_RUN%"=="1" (
-    cscript //nologo //E:JScript "%~f0" cleanNettyxDevPom "%~1" dryRun
-) else (
-    cscript //nologo //E:JScript "%~f0" cleanNettyxDevPom "%~1"
 )
 exit /b %ERRORLEVEL%
 
@@ -427,55 +355,6 @@ if "%SKIP_GIT_PUSH%"=="1" (
 )
 for %%R in (%PUSH_REMOTES%) do (
     call :run_in_dir "%PUSH_PROJECT_PATH%" git -C "%PUSH_PROJECT_PATH%" push %%R HEAD:%PUSH_BRANCH% || exit /b 1
-)
-exit /b 0
-
-:squash_merge_nettyx_feature
-set "SQUASH_PROJECT_PATH=%~1"
-set "SQUASH_FEATURE_BRANCH=%~2"
-call :run_in_dir_no_fail "%SQUASH_PROJECT_PATH%" git -C "%SQUASH_PROJECT_PATH%" merge --squash "%SQUASH_FEATURE_BRANCH%"
-set "SQUASH_EXIT=%ERRORLEVEL%"
-if "%DRY_RUN%"=="1" exit /b 0
-if "%SQUASH_EXIT%"=="0" exit /b 0
-echo Squash merge reported conflicts. Known nettyx dev-only paths will be resolved automatically.
-exit /b 0
-
-:resolve_nettyx_dev_known_paths
-set "RESOLVE_KNOWN_PROJECT_PATH=%~1"
-if "%DRY_RUN%"=="1" exit /b 0
-call :checkout_ours_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" README.md || exit /b 1
-call :checkout_ours_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" README_zh.md || exit /b 1
-call :checkout_theirs_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" .gitignore || exit /b 1
-call :checkout_theirs_if_unmerged "%RESOLVE_KNOWN_PROJECT_PATH%" pom.xml || exit /b 1
-call :drop_or_restore_head_paths "%RESOLVE_KNOWN_PROJECT_PATH%" src/test/java || exit /b 1
-exit /b 0
-
-:checkout_ours_if_unmerged
-set "CHECKOUT_PROJECT_PATH=%~1"
-set "CHECKOUT_PATH=%~2"
-git -C "%CHECKOUT_PROJECT_PATH%" ls-files -u -- "%CHECKOUT_PATH%" | findstr . >nul 2>nul
-if not "%ERRORLEVEL%"=="0" exit /b 0
-call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" checkout --ours -- "%CHECKOUT_PATH%" || exit /b 1
-call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" add -- "%CHECKOUT_PATH%" || exit /b 1
-exit /b 0
-
-:checkout_theirs_if_unmerged
-set "CHECKOUT_PROJECT_PATH=%~1"
-set "CHECKOUT_PATH=%~2"
-git -C "%CHECKOUT_PROJECT_PATH%" ls-files -u -- "%CHECKOUT_PATH%" | findstr . >nul 2>nul
-if not "%ERRORLEVEL%"=="0" exit /b 0
-call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" checkout --theirs -- "%CHECKOUT_PATH%" || exit /b 1
-call :run_in_dir "%CHECKOUT_PROJECT_PATH%" git -C "%CHECKOUT_PROJECT_PATH%" add -- "%CHECKOUT_PATH%" || exit /b 1
-exit /b 0
-
-:assert_no_unmerged_paths
-set "UNMERGED_PROJECT_PATH=%~1"
-if "%DRY_RUN%"=="1" exit /b 0
-git -C "%UNMERGED_PROJECT_PATH%" ls-files -u | findstr . >nul 2>nul
-if "%ERRORLEVEL%"=="0" (
-    echo Unresolved merge conflicts remain:
-    git -C "%UNMERGED_PROJECT_PATH%" diff --name-only --diff-filter=U
-    exit /b 1
 )
 exit /b 0
 

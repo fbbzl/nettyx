@@ -5,6 +5,8 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import lombok.experimental.UtilityClass;
 
+import java.util.HexFormat;
+
 /**
  * The Hex util.
  *
@@ -14,35 +16,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HexKit {
 
-    private static final int    LOOKUP_LENGTH        = 16;
-    private static final char[] LOOK_UP_HEX_ALPHABET = new char[LOOKUP_LENGTH];
-
-    static {
-        for (int i = 0; i < 10; i++) {
-            LOOK_UP_HEX_ALPHABET[i] = (char) ('0' + i);
-        }
-        for (int i = 10; i <= 15; i++) {
-            LOOK_UP_HEX_ALPHABET[i] = (char) ('A' + i - 10);
-        }
-    }
+    private static final HexFormat HEX_FORMAT = HexFormat.of().withUpperCase();
 
     public static String encode(byte... bytes)
     {
-        if (bytes == null) return null;
-
-        int    lengthData   = bytes.length;
-        int    lengthEncode = lengthData * 2;
-        char[] encodedData  = new char[lengthEncode];
-        int    temp;
-        for (int i = 0; i < lengthData; i++) {
-            temp = bytes[i];
-            if (temp < 0) {
-                temp += 256;
-            }
-            encodedData[i * 2]     = LOOK_UP_HEX_ALPHABET[temp >> 4];
-            encodedData[i * 2 + 1] = LOOK_UP_HEX_ALPHABET[temp & 0xf];
-        }
-        return new String(encodedData);
+        return bytes == null ? null : HEX_FORMAT.formatHex(bytes);
     }
 
     public static String encode(ByteBuf buf)

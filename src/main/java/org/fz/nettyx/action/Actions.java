@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 
 import java.net.SocketAddress;
+import java.util.function.Consumer;
 
 /**
  * @author fengbinbin
@@ -12,6 +13,12 @@ import java.net.SocketAddress;
  * @since 2023/12/15 14:46
  */
 public interface Actions {
+
+    private static <T> void invokeIfNotNull(T action, Consumer<T> invoker)
+    {
+        if (action != null) invoker.accept(action);
+    }
+
     /**
      * Act.
      *
@@ -22,7 +29,7 @@ public interface Actions {
             ChannelHandlerContextAction channelAction,
             ChannelHandlerContext       ctx)
     {
-        if (channelAction != null) channelAction.act(ctx);
+        invokeIfNotNull(channelAction, a -> a.act(ctx));
     }
 
     /**
@@ -39,7 +46,7 @@ public interface Actions {
             SocketAddress         localAddress,
             ChannelPromise        promise)
     {
-        if (channelBindAction != null) channelBindAction.act(ctx, localAddress, promise);
+        invokeIfNotNull(channelBindAction, a -> a.act(ctx, localAddress, promise));
     }
 
     /**
@@ -58,7 +65,7 @@ public interface Actions {
             SocketAddress         localAddress,
             ChannelPromise        promise)
     {
-        if (channelConnectAction != null) channelConnectAction.act(ctx, remoteAddress, localAddress, promise);
+        invokeIfNotNull(channelConnectAction, a -> a.act(ctx, remoteAddress, localAddress, promise));
     }
 
     /**
@@ -73,7 +80,7 @@ public interface Actions {
             ChannelHandlerContext ctx,
             ChannelPromise        promise)
     {
-        if (channelPromiseAction != null) channelPromiseAction.act(ctx, promise);
+        invokeIfNotNull(channelPromiseAction, a -> a.act(ctx, promise));
     }
 
     /**
@@ -90,14 +97,14 @@ public interface Actions {
             Object                msg,
             ChannelPromise        promise)
     {
-        if (channelWriteAction != null) channelWriteAction.act(ctx, msg, promise);
+        invokeIfNotNull(channelWriteAction, a -> a.act(ctx, msg, promise));
     }
 
     static void invokeAction(
             ChannelFutureAction channelFutureAction,
             ChannelFuture       cf)
     {
-        if (channelFutureAction != null) channelFutureAction.act(cf);
+        invokeIfNotNull(channelFutureAction, a -> a.act(cf));
     }
 
     /**
@@ -112,7 +119,7 @@ public interface Actions {
             ChannelHandlerContext ctx,
             Object                msg)
     {
-        if (channelReadAction != null) channelReadAction.act(ctx, msg);
+        invokeIfNotNull(channelReadAction, a -> a.act(ctx, msg));
     }
 
     static void invokeAction(
@@ -120,7 +127,7 @@ public interface Actions {
             ChannelHandlerContext  ctx,
             Throwable              throwable)
     {
-        if (exceptionAction != null) exceptionAction.act(ctx, throwable);
+        invokeIfNotNull(exceptionAction, a -> a.act(ctx, throwable));
     }
 
     static void invokeActionAndClose(

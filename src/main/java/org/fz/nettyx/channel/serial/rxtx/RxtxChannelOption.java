@@ -16,9 +16,9 @@
 package org.fz.nettyx.channel.serial.rxtx;
 
 import io.netty.channel.ChannelOption;
-import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.DataBits;
-import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.ParityBit;
-import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.StopBits;
+import org.fz.nettyx.channel.serial.SerialDataBits;
+import org.fz.nettyx.channel.serial.SerialParityBit;
+import org.fz.nettyx.channel.serial.SerialStopBits;
 
 /**
  * rxtx channel option
@@ -29,13 +29,13 @@ import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig.StopBits;
  */
 public final class RxtxChannelOption<T> extends ChannelOption<T> {
 
-    public static final ChannelOption<Integer>   BAUD_RATE    = option("BAUD_RATE");
-    public static final ChannelOption<Boolean>   DTR          = option("DTR");
-    public static final ChannelOption<Boolean>   RTS          = option("RTS");
-    public static final ChannelOption<StopBits>  STOP_BITS    = option("STOP_BITS");
-    public static final ChannelOption<DataBits>  DATA_BITS    = option("DATA_BITS");
-    public static final ChannelOption<ParityBit> PARITY_BIT   = option("PARITY_BIT");
-    public static final ChannelOption<Integer>   READ_TIMEOUT = option("READ_TIMEOUT");
+    public static final ChannelOption<Integer>         BAUD_RATE    = option("BAUD_RATE");
+    public static final ChannelOption<Boolean>         DTR          = option("DTR");
+    public static final ChannelOption<Boolean>         RTS          = option("RTS");
+    public static final ChannelOption<SerialStopBits>  STOP_BITS    = option("STOP_BITS");
+    public static final ChannelOption<SerialDataBits>  DATA_BITS    = option("DATA_BITS");
+    public static final ChannelOption<SerialParityBit> PARITY_BIT   = option("PARITY_BIT");
+    public static final ChannelOption<Integer>         READ_TIMEOUT = option("READ_TIMEOUT");
 
     private static <O> ChannelOption<O> option(String secondNameComponent)
     {
