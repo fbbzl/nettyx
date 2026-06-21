@@ -356,8 +356,8 @@ public final class StructReaderWriterGenerator
 
     private static void buildBasicFieldWrite(MethodSpec.Builder writeMethod, StructField field, String vName)
     {
-        Class<?>  basicClass = basicClass(field);
-        ClassName cn         = ClassName.get(basicClass);
+        Class<?> basicClass = basicClass(field);
+        ClassName  cn        = ClassName.get(basicClass);
         writeMethod.beginControlFlow("if ($N != null)", vName);
         writeMethod.addStatement("$T typed = ($T) $N", cn, cn, vName);
         writeMethod.beginControlFlow("if (typed.value() != null)");
