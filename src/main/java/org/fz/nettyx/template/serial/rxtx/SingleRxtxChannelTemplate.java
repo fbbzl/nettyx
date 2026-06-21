@@ -17,9 +17,7 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 @Getter
 @SuppressWarnings("deprecation")
-public abstract class SingleRxtxChannelTemplate extends AbstractSingleChannelTemplate<RxtxChannel, RxtxChannelConfig> {
-
-    private final SerialCommAddress remoteAddress;
+public abstract class SingleRxtxChannelTemplate extends AbstractSingleChannelTemplate<SerialCommAddress, RxtxChannel, RxtxChannelConfig> {
 
     protected SingleRxtxChannelTemplate(String commAddress) {
         this(new SerialCommAddress(commAddress));
@@ -27,7 +25,6 @@ public abstract class SingleRxtxChannelTemplate extends AbstractSingleChannelTem
 
     protected SingleRxtxChannelTemplate(SerialCommAddress commAddress) {
         super(commAddress);
-        this.remoteAddress = commAddress;
     }
 
     @Override
