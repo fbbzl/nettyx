@@ -32,7 +32,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.25</version>
+    <version>2.6.26</version>
 </dependency>
 ```
 
