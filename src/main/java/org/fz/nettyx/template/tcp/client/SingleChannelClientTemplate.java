@@ -18,10 +18,8 @@ import java.net.InetSocketAddress;
  * @since 2021 /5/6 15:22
  */
 @Getter
-public abstract class SingleChannelClientTemplate extends AbstractSingleChannelTemplate<NioSocketChannel,
+public abstract class SingleChannelClientTemplate extends AbstractSingleChannelTemplate<InetSocketAddress, NioSocketChannel,
         SocketChannelConfig> {
-
-    private final InetSocketAddress remoteAddress;
 
     protected SingleChannelClientTemplate(String hostname, int port) {
         this(new InetSocketAddress(hostname, port));
@@ -29,7 +27,6 @@ public abstract class SingleChannelClientTemplate extends AbstractSingleChannelT
 
     protected SingleChannelClientTemplate(InetSocketAddress address) {
         super(address);
-        this.remoteAddress = address;
     }
 
     @Override

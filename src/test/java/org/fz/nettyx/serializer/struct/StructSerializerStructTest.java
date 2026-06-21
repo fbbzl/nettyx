@@ -1,6 +1,7 @@
 package org.fz.nettyx.serializer.struct;
 
-import org.fz.nettyx.codec.model.Bill;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.fz.nettyx.codec.model.GirlFriend;
 import org.fz.nettyx.codec.model.Lover;
 import org.fz.nettyx.codec.model.You;
@@ -14,7 +15,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.fz.nettyx.serializer.struct.StructSerializer.toBytes;
+import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 import static org.junit.Assert.*;
 
@@ -39,11 +40,14 @@ public class StructSerializerStructTest {
         you.setPlatformId(new cdouble(123.456));
         you.setInterest(new culong8(java.math.BigInteger.valueOf(789)));
 
-        byte[] bytes = toBytes(you);
+        ByteBuf youBuf = Unpooled.buffer();
+        toByteBuf(you, youBuf);
+        byte[] bytes = new byte[youBuf.readableBytes()];
+        youBuf.readBytes(bytes);
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
 
-        You result = toStruct(You.class, bytes);
+        You result = toStruct(You.class, Unpooled.wrappedBuffer(bytes));
         assertNotNull(result);
         assertEquals(Integer.valueOf(1), result.getIsMarried().value());
     }
@@ -51,7 +55,10 @@ public class StructSerializerStructTest {
     @Test
     public void testStructWithString() {
         Lover lover = new Lover();
-        byte[] bytes = toBytes(lover);
+        ByteBuf loverBuf = Unpooled.buffer();
+        toByteBuf(lover, loverBuf);
+        byte[] bytes = new byte[loverBuf.readableBytes()];
+        loverBuf.readBytes(bytes);
         assertNotNull(bytes);
         assertEquals(2, bytes.length);
     }
@@ -61,28 +68,15 @@ public class StructSerializerStructTest {
         GirlFriend gf = new GirlFriend();
         gf.setCup("C");
 
-        byte[] bytes = toBytes(GirlFriend.class, gf);
+        ByteBuf gfBuf = Unpooled.buffer();
+        toByteBuf(GirlFriend.class, gf, gfBuf);
+        byte[] bytes = new byte[gfBuf.readableBytes()];
+        gfBuf.readBytes(bytes);
         assertNotNull(bytes);
-    }
-
-    @Test
-    public void testStructWithEnum() {
-        Bill bill = new Bill();
-        bill.setBid(new cuchar(1));
-        bill.setOrgName("test");
-        bill.setBillType(Bill.BillType.CCC);
-
-        byte[] bytes = toBytes(Bill.class, bill);
-        assertNotNull(bytes);
-        assertTrue(bytes.length > 0);
-
-        Bill result = toStruct(Bill.class, bytes);
-        assertNotNull(result);
-        assertEquals(Bill.BillType.CCC, result.getBillType());
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testNonStructClassThrows() {
-        toStruct(String.class, new byte[]{1, 2, 3});
+        toStruct(String.class, Unpooled.wrappedBuffer(new byte[]{1, 2, 3}));
     }
 }

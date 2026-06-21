@@ -1,11 +1,8 @@
 package org.fz.nettyx.template.serial.rxtx;
 
-import cn.hutool.core.map.MapUtil;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.oio.OioEventLoopGroup;
 import lombok.Getter;
-import org.fz.nettyx.channel.serial.SerialCommChannel;
 import org.fz.nettyx.channel.serial.SerialCommChannel.SerialCommAddress;
 import org.fz.nettyx.channel.serial.rxtx.RxtxChannel;
 import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig;
@@ -22,18 +19,11 @@ import java.util.Map;
  **/
 @Getter
 @SuppressWarnings("deprecation")
-public abstract class MultiRxtxChannelTemplate<K> extends AbstractMultiChannelTemplate<K, RxtxChannel,
+public abstract class MultiRxtxChannelTemplate<K> extends AbstractMultiChannelTemplate<K, SerialCommAddress, RxtxChannel,
         RxtxChannelConfig> {
 
-    private final Map<K, SerialCommAddress> addressMap;
-
-    protected MultiRxtxChannelTemplate(Map<K, SerialCommChannel.SerialCommAddress> addressMap) {
+    protected MultiRxtxChannelTemplate(Map<K, SerialCommAddress> addressMap) {
         super(addressMap);
-        this.addressMap = addressMap;
-    }
-
-    public Map<K, ChannelFuture> connectAll() {
-        return MapUtil.map(addressMap, (k, v) -> this.connect(k));
     }
 
     @Override

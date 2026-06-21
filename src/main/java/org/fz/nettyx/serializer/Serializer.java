@@ -16,12 +16,10 @@ public interface Serializer {
      * @param <T> the type parameter
      * @return the t
      */
-    <T> T doDeserialize(ByteBuf byteBuf);
+    <T> T doDeserialize(ByteBuf reading);
 
     /**
      * Do serialize byte buf.
-     *
-     * @return the byte buf
      */
-    <T> ByteBuf doSerialize(T object);
+    <T> void doSerialize(T object, ByteBuf writing);
 }

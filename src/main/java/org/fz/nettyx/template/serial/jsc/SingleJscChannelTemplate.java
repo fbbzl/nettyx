@@ -19,9 +19,7 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
 
 @Getter
 @SuppressWarnings("deprecation")
-public abstract class SingleJscChannelTemplate extends AbstractSingleChannelTemplate<JscChannel, JscChannelConfig> {
-
-    private final SerialCommAddress remoteAddress;
+public abstract class SingleJscChannelTemplate extends AbstractSingleChannelTemplate<SerialCommAddress, JscChannel, JscChannelConfig> {
 
     protected SingleJscChannelTemplate(String commAddress) {
         this(new SerialCommAddress(commAddress));
@@ -29,7 +27,6 @@ public abstract class SingleJscChannelTemplate extends AbstractSingleChannelTemp
 
     protected SingleJscChannelTemplate(SerialCommAddress commAddress) {
         super(commAddress);
-        this.remoteAddress = commAddress;
     }
 
     @Override

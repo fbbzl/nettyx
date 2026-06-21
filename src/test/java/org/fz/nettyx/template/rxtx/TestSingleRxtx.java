@@ -5,6 +5,9 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.fz.nettyx.channel.serial.SerialDataBits;
+import org.fz.nettyx.channel.serial.SerialParityBit;
+import org.fz.nettyx.channel.serial.SerialStopBits;
 import org.fz.nettyx.channel.serial.rxtx.RxtxChannel;
 import org.fz.nettyx.channel.serial.rxtx.RxtxChannelConfig;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
@@ -39,9 +42,9 @@ public class TestSingleRxtx extends SingleRxtxChannelTemplate {
     protected void doChannelConfig(RxtxChannelConfig channelConfig) {
         channelConfig
                 .setBaudRate(115200)
-                .setDataBits(RxtxChannelConfig.DataBits.DATA_BITS_8)
-                .setStopBits(RxtxChannelConfig.StopBits.STOP_BITS_1)
-                .setParityBit(RxtxChannelConfig.ParityBit.NO)
+                .setDataBits(SerialDataBits.DATA_BITS_8)
+                .setStopBits(SerialStopBits.STOP_BITS_1)
+                .setParityBit(SerialParityBit.NO)
                 .setDtr(false)
                 .setRts(false);
     }
