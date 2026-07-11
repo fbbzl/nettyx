@@ -106,7 +106,7 @@ public @interface ToArray {
         }
 
         @Override
-        public void doAnnotationValid(ToArray toArray, Field field) {
+        public void doValid(ToArray toArray, Field field) {
             if (toArray.length() < 0 && !toArray.flexible())
                 throw new StructFieldHandlerException("array field must use @ToArray to assign array length or be flexible");
             if (toArray.flexible()) {

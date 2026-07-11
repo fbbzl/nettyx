@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import com.squareup.javapoet.*;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -21,44 +22,39 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.ByteOrder;
-import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static cn.hutool.core.collection.CollUtil.isEmpty;
 
 /**
- * Runtime code generator for struct serializer using JavaPoet.
+ * Creates, compiles, loads and caches generated struct accessors.
  *
  * @author fengbinbin
  * @version 1.0
  * @since 2021 /10/22 13:18
  */
 @SuppressWarnings("all")
-public final class StructReaderWriterGenerator
+public final class StructAccessorFactory
 {
 
     private static final JavaCompiler                      COMPILER            = ToolProvider.getSystemJavaCompiler();
-    private static final Map<Class<?>, StructReaderWriter> READER_WRITER_CACHE = MapUtil.newHashMap(128);
+    private static final Map<Class<?>, StructAccessor>     STRUCT_ACCESSOR_CACHE = new ConcurrentHashMap<>(128);
 
     private static final ClassName
-            CN_STRUCT_READER_WRITER = ClassName.get(StructReaderWriter.class),
+            CN_STRUCT_ACCESSOR      = ClassName.get(StructAccessor.class),
             CN_STRUCT_SERIALIZER    = ClassName.get(StructSerializer.class),
             CN_BYTE_BUF             = ClassName.get(ByteBuf.class),
             CN_TYPE                 = ClassName.get(Type.class),
             CN_CLASS                = ClassName.get(Class.class),
             CN_BYTE_ORDER           = ClassName.get(ByteOrder.class),
-            CN_SUPPLIER             = ClassName.get(Supplier.class),
-            CN_BICONSUMER           = ClassName.get(BiConsumer.class),
-            CN_FUNCTION             = ClassName.get(Function.class),
             CN_STRUCT_FIELD         = ClassName.get(StructField.class),
             CN_STRUCT_FIELD_HANDLER = ClassName.get(StructFieldHandler.class),
             CN_BASIC                = ClassName.get(Basic.class),
@@ -72,13 +68,13 @@ public final class StructReaderWriterGenerator
     {
     }
 
-    public static StructReaderWriter getReaderWriter(StructDefinition definition)
+    public static StructAccessor get(StructDefinition definition)
     {
-        StructReaderWriter readerWriter = READER_WRITER_CACHE.get(definition.type());
-        if (readerWriter == null) {
-            throw new IllegalStateException("reader-writer not generated for type: " + definition.type());
+        StructAccessor accessor = STRUCT_ACCESSOR_CACHE.get(definition.type());
+        if (accessor == null) {
+            throw new IllegalStateException("struct accessor not generated for type: " + definition.type());
         }
-        return readerWriter;
+        return accessor;
     }
 
     public static void generate(Collection<StructDefinition> definitions)
@@ -89,23 +85,25 @@ public final class StructReaderWriterGenerator
         if (isEmpty(sourceDefs)) return;
 
         Map<String, Class<?>> classes = compileAndLoad(sourceDefs);
+        Map<Class<?>, StructAccessor> accessors = MapUtil.newHashMap(sourceDefs.size());
         for (SourceDef sd : sourceDefs) {
-            StructReaderWriter readerWriter = instantiateReaderWriter(classes.get(sd.className), sd.definition);
-            READER_WRITER_CACHE.put(sd.definition.type(), readerWriter);
+            StructAccessor accessor = instantiateStructAccessor(classes.get(sd.className), sd.definition);
+            accessors.put(sd.definition.type(), accessor);
         }
+        STRUCT_ACCESSOR_CACHE.putAll(accessors);
     }
 
     private static List<SourceDef> buildSourceDefs(Collection<StructDefinition> definitions)
     {
         List<SourceDef> sourceDefs = new ArrayList<>(definitions.size());
         for (StructDefinition definition : definitions) {
-            if (READER_WRITER_CACHE.containsKey(definition.type())) {
+            if (STRUCT_ACCESSOR_CACHE.containsKey(definition.type())) {
                 continue;
             }
             Class<?> type       = definition.type();
-            String   className  = type.getPackageName() + "." + type.getSimpleName() + "_StructReaderWriter";
-            String   simpleName = type.getSimpleName() + "_StructReaderWriter";
-            TypeSpec classSpec  = buildReaderWriterClass(definition, simpleName);
+            String   className  = type.getPackageName() + "." + type.getSimpleName() + "_StructAccessor";
+            String   simpleName = type.getSimpleName() + "_StructAccessor";
+            TypeSpec classSpec  = buildAccessorClass(definition, simpleName);
             String   source     = JavaFile.builder(type.getPackageName(), classSpec).build().toString();
             sourceDefs.add(new SourceDef(definition, className, source));
         }
@@ -114,6 +112,10 @@ public final class StructReaderWriterGenerator
 
     private static Map<String, Class<?>> compileAndLoad(List<SourceDef> sourceDefs)
     {
+        if (COMPILER == null) {
+            throw new SerializeException("struct accessor generation requires a JDK runtime with the jdk.compiler module");
+        }
+
         List<JavaFileObject> compilationUnits = new ArrayList<>(sourceDefs.size());
         StringBuilder        allSources       = new StringBuilder();
         for (SourceDef sd : sourceDefs) {
@@ -124,7 +126,9 @@ public final class StructReaderWriterGenerator
         StandardJavaFileManager stdManager = COMPILER.getStandardFileManager(null, null, null);
         MemoryJavaFileManager   manager    = new MemoryJavaFileManager(stdManager);
 
-        List<String>                        options     = CollUtil.newArrayList("-cp", System.getProperty("java.class.path"), "--release", "21");
+        String runtimeRelease = Integer.toString(Runtime.version().feature());
+        List<String> options = CollUtil.newArrayList("-cp", System.getProperty("java.class.path"),
+                                                     "--release", runtimeRelease);
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
         JavaCompiler.CompilationTask task    = COMPILER.getTask(null, manager, diagnostics, options, null, compilationUnits);
@@ -138,27 +142,34 @@ public final class StructReaderWriterGenerator
             throw new RuntimeException(err.toString());
         }
 
-        SingleClassLoader     loader = new SingleClassLoader(StructReaderWriterGenerator.class.getClassLoader());
         Map<String, Class<?>> result = MapUtil.newHashMap(sourceDefs.size());
         for (SourceDef sd : sourceDefs) {
             byte[] bytes = manager.getClassBytes(sd.className);
             if (bytes == null) {
                 throw new RuntimeException("compiled class bytes not found: " + sd.className);
             }
-            result.put(sd.className, loader.defineClass(sd.className, bytes));
+            try {
+                MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(sd.definition.type(), MethodHandles.lookup());
+                result.put(sd.className, lookup.defineClass(bytes));
+            }
+            catch (IllegalAccessException error) {
+                throw new SerializeException("can not define generated struct accessor in struct runtime package: ["
+                                             + sd.definition.type() + "]", error);
+            }
         }
         return result;
     }
 
-    private static TypeSpec buildReaderWriterClass(StructDefinition definition, String simpleName)
+    private static TypeSpec buildAccessorClass(StructDefinition definition, String simpleName)
     {
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(simpleName)
-                                                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                                                .addSuperinterface(CN_STRUCT_READER_WRITER);
+                                                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                                                 .addSuperinterface(CN_STRUCT_ACCESSOR);
 
         addConstructorAndFields(classBuilder, definition.fields());
-        classBuilder.addMethod(buildReadMethod(definition.fields()));
-        classBuilder.addMethod(buildWriteMethod(definition.fields()));
+        classBuilder.addMethod(buildNewInstanceMethod(definition.type()));
+        classBuilder.addMethod(buildReadMethod(definition));
+        classBuilder.addMethod(buildWriteMethod(definition));
 
         return classBuilder.build();
     }
@@ -167,11 +178,7 @@ public final class StructReaderWriterGenerator
     {
         MethodSpec.Builder ctorBuilder = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
 
-        addClassField(classBuilder, ctorBuilder, "constructor", CN_SUPPLIER);
-
         for (int i = 0; i < fields.length; i++) {
-            addClassField(classBuilder, ctorBuilder, "setter" + i, CN_BICONSUMER);
-            addClassField(classBuilder, ctorBuilder, "getter" + i, CN_FUNCTION);
             addClassField(classBuilder, ctorBuilder, "field" + i, CN_STRUCT_FIELD);
 
             if (fields[i].category() == StructField.Category.HANDLER) {
@@ -193,8 +200,19 @@ public final class StructReaderWriterGenerator
         ctorBuilder.addStatement("this.$N = $N", name, name);
     }
 
-    private static MethodSpec buildReadMethod(StructField[] fields)
+    private static MethodSpec buildNewInstanceMethod(Class<?> structType)
     {
+        return MethodSpec.methodBuilder("newInstance")
+                         .addModifiers(Modifier.PUBLIC)
+                         .addAnnotation(Override.class)
+                         .returns(Object.class)
+                         .addStatement("return new $T()", ClassName.get(structType))
+                         .build();
+    }
+
+    private static MethodSpec buildReadMethod(StructDefinition definition)
+    {
+        StructField[] fields = definition.fields();
         MethodSpec.Builder readMethod =
                 MethodSpec.methodBuilder("read")
                           .addModifiers(Modifier.PUBLIC)
@@ -205,7 +223,7 @@ public final class StructReaderWriterGenerator
                           .addParameter(CN_TYPE, "structType")
                           .addParameter(CN_BYTE_BUF, "buf");
 
-        readMethod.addStatement("Object struct = constructor.get()");
+        readMethod.addStatement("$T struct = new $T()", ClassName.get(definition.type()), ClassName.get(definition.type()));
         readMethod.addStatement("$T actualStructType = (structType instanceof $T) ? structType : $T.getActualType(root, structType)",
                                 CN_TYPE, CN_CLASS, CN_TYPE_UTIL);
 
@@ -231,7 +249,7 @@ public final class StructReaderWriterGenerator
             buildHandlerFieldRead(readMethod, field, i, vName);
         }
 
-        readMethod.addStatement("setter$L.accept(struct, $N)", i, vName);
+        readMethod.addStatement("struct.$N(($T) $N)", field.setterName(), field.wrapped().getType(), vName);
     }
 
     private static void buildBasicFieldRead(MethodSpec.Builder readMethod, StructField field, int i, String vName)
@@ -317,8 +335,9 @@ public final class StructReaderWriterGenerator
         }
     }
 
-    private static MethodSpec buildWriteMethod(StructField[] fields)
+    private static MethodSpec buildWriteMethod(StructDefinition definition)
     {
+        StructField[] fields = definition.fields();
         MethodSpec.Builder writeMethod = MethodSpec.methodBuilder("write")
                                                    .addModifiers(Modifier.PUBLIC)
                                                    .addAnnotation(Override.class)
@@ -330,6 +349,7 @@ public final class StructReaderWriterGenerator
 
         writeMethod.addStatement("$T actualStructType = (structType instanceof $T) ? structType : $T.getActualType(root, structType)",
                                  CN_TYPE, CN_CLASS, CN_TYPE_UTIL);
+        writeMethod.addStatement("$T typedStruct = ($T) struct", ClassName.get(definition.type()), ClassName.get(definition.type()));
 
         for (int i = 0; i < fields.length; i++) {
             writeMethod.addCode("{\n");
@@ -343,7 +363,7 @@ public final class StructReaderWriterGenerator
     private static void buildFieldWrite(MethodSpec.Builder writeMethod, StructField field, int i)
     {
         String vName = "v" + i;
-        writeMethod.addStatement("$T $N = getter$L.apply(struct)", Object.class, vName, i);
+        writeMethod.addStatement("$T $N = typedStruct.$N()", Object.class, vName, field.getterName());
 
         if (field.category() == StructField.Category.BASIC) {
             buildBasicFieldWrite(writeMethod, field, vName);
@@ -448,19 +468,13 @@ public final class StructReaderWriterGenerator
         }
     }
 
-    private static StructReaderWriter instantiateReaderWriter(Class<?> clazz, StructDefinition definition)
+    private static StructAccessor instantiateStructAccessor(Class<?> clazz, StructDefinition definition)
     {
         try {
             StructField[]  fields        = definition.fields();
             List<Class<?>> paramTypeList = new ArrayList<>();
             List<Object>   argList       = new ArrayList<>();
-            paramTypeList.add(Supplier.class);
-            argList.add(definition.constructor());
             for (StructField field : fields) {
-                paramTypeList.add(BiConsumer.class);
-                argList.add(field.setter());
-                paramTypeList.add(Function.class);
-                argList.add(field.getter());
                 paramTypeList.add(StructField.class);
                 argList.add(field);
                 if (field.category() == StructField.Category.HANDLER) {
@@ -471,10 +485,10 @@ public final class StructReaderWriterGenerator
             Class<?>[]                       paramTypes = paramTypeList.toArray(new Class[0]);
             Object[]                         args       = argList.toArray();
             java.lang.reflect.Constructor<?> ctor       = clazz.getConstructor(paramTypes);
-            return (StructReaderWriter) ctor.newInstance(args);
+            return (StructAccessor) ctor.newInstance(args);
         }
         catch (Exception e) {
-            throw new RuntimeException("failed to instantiate generated reader-writer for " + definition.type(), e);
+            throw new RuntimeException("failed to instantiate generated struct accessor for " + definition.type(), e);
         }
     }
 
@@ -555,16 +569,4 @@ public final class StructReaderWriterGenerator
         }
     }
 
-    private static final class SingleClassLoader extends SecureClassLoader
-    {
-        SingleClassLoader(ClassLoader parent)
-        {
-            super(parent);
-        }
-
-        Class<?> defineClass(String name, byte[] bytes)
-        {
-            return defineClass(name, bytes, 0, bytes.length);
-        }
-    }
 }

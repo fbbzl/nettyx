@@ -24,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface Struct {
 
-    Endian endian() default Endian.NATIVE;
+    Endian endian();
 
     @Getter
     @RequiredArgsConstructor

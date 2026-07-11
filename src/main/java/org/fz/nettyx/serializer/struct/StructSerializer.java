@@ -3,7 +3,6 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.util.ReferenceCountUtil;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
@@ -11,7 +10,7 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.serializer.struct.generator.StructReaderWriterGenerator;
+import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -90,12 +89,7 @@ public final class StructSerializer implements Serializer {
     @Override
     public void doSerialize(Object struct, ByteBuf writing)
     {
-        try {
-            writeStruct(root, struct, writing);
-        } catch (Exception error) {
-            ReferenceCountUtil.release(writing);
-            throw error;
-        }
+        writeStruct(root, struct, writing);
     }
 
     public <B extends Basic<?>> B readBasic(
@@ -113,7 +107,7 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(structType);
         Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when read, root type: [" + structType + "]"));
 
-        return (S) StructReaderWriterGenerator.getReaderWriter(structDef).read(this, root, structType, byteBuf);
+        return (S) StructAccessorFactory.get(structDef).read(this, root, structType, byteBuf);
     }
 
     public  <T> T[] readArray(
@@ -142,7 +136,11 @@ public final class StructSerializer implements Serializer {
         }
         else {
             List<B> flexibleBasics = new ArrayList<>();
-            while (byteBuf.isReadable()) flexibleBasics.add(newBasic(elementType, byteOrder, byteBuf));
+            while (byteBuf.isReadable()) {
+                int readerIndex = byteBuf.readerIndex();
+                flexibleBasics.add(newBasic(elementType, byteOrder, byteBuf));
+                ensureReadProgress(elementType, byteBuf, readerIndex);
+            }
             return flexibleBasics.toArray(newArray(elementType, flexibleBasics.size()));
         }
     }
@@ -160,7 +158,11 @@ public final class StructSerializer implements Serializer {
         }
         else {
             List<S> flexibleStructs = new ArrayList<>();
-            while (byteBuf.isReadable()) flexibleStructs.add(readStruct(elementType, byteBuf));
+            while (byteBuf.isReadable()) {
+                int readerIndex = byteBuf.readerIndex();
+                flexibleStructs.add(readStruct(elementType, byteBuf));
+                ensureReadProgress(elementType, byteBuf, readerIndex);
+            }
             return flexibleStructs.toArray(newArray(elementType, flexibleStructs.size()));
         }
     }
@@ -181,7 +183,7 @@ public final class StructSerializer implements Serializer {
         StructDefinition structDef = getStructDefinition(structType);
         Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when write, " + "root type: [" + structType + "]"));
 
-        StructReaderWriterGenerator.getReaderWriter(structDef).write(this, root, structType, struct, writing);
+        StructAccessorFactory.get(structDef).write(this, root, structType, struct, writing);
     }
 
     public void writeArray(
@@ -210,7 +212,7 @@ public final class StructSerializer implements Serializer {
             ByteOrder  byteOrder)
     {
         if (basicArray == null) {
-            writing.writeZero(elementBytesSize * (flexible ? 0 : length));
+            writing.writeZero(computeArrayByteLength(elementBytesSize, flexible ? 0 : length));
             return;
         }
 
@@ -260,6 +262,24 @@ public final class StructSerializer implements Serializer {
             case TypeVariable<?>   ignored           -> isStruct(TypeUtil.getActualType(root, type));
             default                                  -> false;
         };
+    }
+
+    private static void ensureReadProgress(Type elementType, ByteBuf byteBuf, int previousReaderIndex)
+    {
+        if (byteBuf.readerIndex() == previousReaderIndex) {
+            throw new SerializeException("flexible array element did not consume any bytes, element type: [" + elementType + "]");
+        }
+    }
+
+    private static int computeArrayByteLength(int elementBytesSize, int length)
+    {
+        try {
+            return Math.multiplyExact(elementBytesSize, length);
+        }
+        catch (ArithmeticException error) {
+            throw new SerializeException("array byte length exceeds the supported integer range, element size: ["
+                                         + elementBytesSize + "], length: [" + length + "]", error);
+        }
     }
 
     //******************************************      public end       ***********************************************//

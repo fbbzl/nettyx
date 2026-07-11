@@ -19,6 +19,7 @@ import java.nio.ByteOrder;
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
 import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
+import static org.fz.nettyx.serializer.struct.generator.StructAccessorFactory.get;
 
 
 /**
@@ -98,7 +99,9 @@ public class StructHelper {
     {
         try
         {
-            return (S) getStructDefinition(structType).constructor().get();
+            StructSerializerContext.StructDefinition definition = getStructDefinition(structType);
+            if (definition == null) throw new SerializeException("uncached struct type: " + structType);
+            return (S) get(definition).newInstance();
         }
         catch (Exception instanceError)
         {

@@ -30,7 +30,7 @@ public class ActionChannelFutureListener implements ChannelFutureListener {
     {
         if (whenDone      != null && cf.isDone())        whenDone.act(this, cf);
         if (whenSuccess   != null && cf.isSuccess())     whenSuccess.act(this, cf);
-        if (whenFailure   != null && cf.cause() != null) whenFailure.act(this, cf);
+        if (whenFailure   != null && !cf.isCancelled() && cf.cause() != null) whenFailure.act(this, cf);
         if (whenCancelled != null && cf.isCancelled())   whenCancelled.act(this, cf);
     }
 
