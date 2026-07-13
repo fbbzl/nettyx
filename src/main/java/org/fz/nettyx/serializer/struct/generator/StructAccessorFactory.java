@@ -306,10 +306,8 @@ public final class StructAccessorFactory
 
         readMethod.addStatement("$T ann$L = field$L.annotation()", CN_ANNOTATION, i, i);
         if (determinedComponentClass != null && Basic.class.isAssignableFrom(determinedComponentClass)) {
-            readMethod.addStatement("$T $N = serializer.readBasicArray($T.class, $T.$L, buf, $L, $L)",
-                                    Object.class, vName, ClassName.get(determinedComponentClass), CN_BYTE_ORDER,
-                                    byteOrderFieldName(field),
-                                    toArrayLength, toArrayFlexible);
+            buildConcreteBasicArrayRead(readMethod, field, i, vName, determinedComponentClass,
+                                        toArrayLength, toArrayFlexible);
         } else if (determinedComponentClass != null && AnnotationUtil.hasAnnotation(determinedComponentClass, Struct.class)) {
             readMethod.addStatement("$T $N = serializer.readStructArray($T.class, buf, $L, $L)",
                                     Object.class, vName, ClassName.get(determinedComponentClass), toArrayLength, toArrayFlexible);
@@ -333,6 +331,41 @@ public final class StructAccessorFactory
                                     vName, ctName, lenName, flexName);
             readMethod.endControlFlow();
         }
+    }
+
+    private static void buildConcreteBasicArrayRead(
+            MethodSpec.Builder readMethod,
+            StructField        field,
+            int                fieldIndex,
+            String             valueName,
+            Class<?>           componentClass,
+            int                length,
+            boolean            flexible)
+    {
+        ClassName componentType = ClassName.get(componentClass);
+        String    byteOrder     = byteOrderFieldName(field);
+        if (!flexible) {
+            readMethod.addStatement("$T[] $N = new $T[$L]", componentType, valueName, componentType, length);
+            readMethod.beginControlFlow("for (int j = 0; j < $L; j++)", length);
+            readMethod.addStatement("$N[j] = new $T(buf, $T.$L)", valueName, componentType, CN_BYTE_ORDER, byteOrder);
+            readMethod.endControlFlow();
+            return;
+        }
+
+        String listName        = "values" + fieldIndex;
+        String readerIndexName = "readerIndex" + fieldIndex;
+        TypeName listType      = ParameterizedTypeName.get(ClassName.get(List.class), componentType);
+        readMethod.addStatement("$T $N = new $T<>()", listType, listName, ArrayList.class);
+        readMethod.beginControlFlow("while (buf.isReadable())");
+        readMethod.addStatement("int $N = buf.readerIndex()", readerIndexName);
+        readMethod.addStatement("$N.add(new $T(buf, $T.$L))", listName, componentType, CN_BYTE_ORDER, byteOrder);
+        readMethod.beginControlFlow("if (buf.readerIndex() == $N)", readerIndexName);
+        readMethod.addStatement("throw new $T($S)", SerializeException.class,
+                                "flexible array element did not consume any bytes, element type: [" +
+                                componentClass.getTypeName() + "]");
+        readMethod.endControlFlow();
+        readMethod.endControlFlow();
+        readMethod.addStatement("$T[] $N = $N.toArray(new $T[0])", componentType, valueName, listName, componentType);
     }
 
     private static MethodSpec buildWriteMethod(StructDefinition definition)

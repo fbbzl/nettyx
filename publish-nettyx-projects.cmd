@@ -3,7 +3,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 
 set "MAVEN_HOME=%MAVEN_HOME%"
-if not defined MAVEN_HOME set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
+if not exist "%MAVEN_HOME%\bin\mvn.cmd" set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
 set "MAVEN_SETTINGS=%MAVEN_SETTINGS%"
 if not defined MAVEN_SETTINGS set "MAVEN_SETTINGS=D:\maven\settings.xml"
 set "MAVEN_REPO=%MAVEN_REPO%"
@@ -262,7 +262,6 @@ exit /b 0
 echo.
 echo ========== spring-boot-starter-nettyx publish prepare ==========
 call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
-call :set_project_version "%PROJECT_STARTER%" "spring-boot-starter-nettyx" "%STARTER_VERSION%" || exit /b 1
 call :set_property_version "%PROJECT_STARTER%" "nettyx.version" "%NETTYX_VERSION%" || exit /b 1
 call :stage_release_changes "%PROJECT_STARTER%" || exit /b 1
 call :commit_staged_changes "spring-boot-starter-nettyx publish" "%PROJECT_STARTER%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
@@ -660,14 +659,21 @@ function setProjectVersion(projectPath, artifactId, newVersion, dryRun) {
     var path = requirePom(projectPath);
     var doc = loadDoc(path);
     var versionEl = selectNode(doc, "/m:project/m:version");
+    var version = getNodeText(versionEl);
 
-    if (!versionEl || getNodeText(versionEl) === "") {
+    if (!versionEl || version === "") {
+        fail("Cannot find version element for " + artifactId + " in " + path);
+    }
+    if (version === "${revision}") {
         var revisionEl = selectNode(doc, "/m:project/m:properties/m:revision");
-        if (revisionEl) {
+        if (!revisionEl) {
+            fail("Revision property not found in " + path);
+        }
+        if (getNodeText(revisionEl).indexOf("${") < 0) {
             setNodeText(path, doc, revisionEl, newVersion, "property revision", dryRun);
             return;
         }
-        fail("Cannot find version element for " + artifactId + " in " + path);
+        fail("Project version is derived from properties; update its source properties instead: " + path);
     }
     setNodeText(path, doc, versionEl, newVersion, "project version for " + artifactId, dryRun);
 }
@@ -812,7 +818,11 @@ function nextProjectVersion(projectPath, artifactId, nettyxVersion) {
     if (rawVersion === "${revision}") {
         var revision = getNodeText(selectNode(doc, "/m:project/m:properties/m:revision"));
         if (revision && revision.indexOf("${") >= 0) {
-            WScript.Echo(resolvePropertyRefs(text, revision));
+            var nettyxProperty = new RegExp("(<nettyx\\.version>)[^<]*(</nettyx\\.version>)");
+            var releaseText = text.replace(nettyxProperty, function(all, openTag, closeTag) {
+                return openTag + nettyxVersion + closeTag;
+            });
+            WScript.Echo(resolvePropertyRefs(releaseText, revision));
             return;
         }
         WScript.Echo(nextVersionValue(revision || rawVersion));
