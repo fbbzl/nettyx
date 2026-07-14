@@ -1,4 +1,4 @@
-# Nettyx
+﻿# Nettyx
 
 <p align="center">
   <img src="https://img.shields.io/maven-central/v/io.github.fbbzl/nettyx?style=flat-square&label=Maven%20Central" alt="Maven Central">
@@ -8,31 +8,31 @@
 </p>
 
 <p align="center">
-  <b>🚀 基于 Netty 的极简开发框架</b><br>
-  <sub>轻量 · 高效 · 开箱即用 — 支持 TCP、串口、蓝牙</sub>
+  <b>馃殌 鍩轰簬 Netty 鐨勬瀬绠€寮€鍙戞鏋?/b><br>
+  <sub>杞婚噺 路 楂樻晥 路 寮€绠卞嵆鐢?鈥?鏀寔 TCP銆佷覆鍙ｃ€佽摑鐗?/sub>
 </p>
 
 ---
 
-## 🌟 特性
+## 馃専 鐗规€?
 
-| | 特性 | 说明 |
+| | 鐗规€?| 璇存槑 |
 |---|------|------|
-| ⚡ | **超轻量** | Netty 4.2.x 超薄封装，零额外开销 |
-| 🔌 | **多协议** | TCP · 串口(Rxtx/Jsc) · 蓝牙 — 统一模板 API |
-| 🧩 | **结构体序列化** | 声明式二进制协议 — 注解标注 POJO，一步到位 |
-| 🔧 | **函数式优先** | 函数式处理器、拦截器、心跳 — 告别样板代码 |
-| 📡 | **蓝牙就绪** | 基于 OIO 的蓝牙服务端/客户端，嵌入式设备友好 |
+| 鈿?| **瓒呰交閲?* | Netty 4.2.x 瓒呰杽灏佽锛岄浂棰濆寮€閿€ |
+| 馃攲 | **澶氬崗璁?* | TCP 路 涓插彛(Rxtx/Jsc) 路 钃濈墮 鈥?缁熶竴妯℃澘 API |
+| 馃З | **缁撴瀯浣撳簭鍒楀寲** | 澹版槑寮忎簩杩涘埗鍗忚 鈥?娉ㄨВ鏍囨敞 POJO锛屼竴姝ュ埌浣?|
+| 馃敡 | **鍑芥暟寮忎紭鍏?* | 鍑芥暟寮忓鐞嗗櫒銆佹嫤鎴櫒銆佸績璺?鈥?鍛婂埆鏍锋澘浠ｇ爜 |
+| 馃摗 | **钃濈墮灏辩华** | 鍩轰簬 OIO 鐨勮摑鐗欐湇鍔＄/瀹㈡埛绔紝宓屽叆寮忚澶囧弸濂?|
 
 ---
 
-## 📦 安装
+## 馃摝 瀹夎
 
 ```xml
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.26</version>
+    <version>2.6.27</version>
 </dependency>
 ```
 
@@ -42,9 +42,9 @@ implementation 'io.github.fbbzl:nettyx:2.6.25'
 
 ---
 
-## 🧭 快速开始
+## 馃Л 蹇€熷紑濮?
 
-### TCP 服务端 — 3 行代码
+### TCP 鏈嶅姟绔?鈥?3 琛屼唬鐮?
 
 ```java
 ServerTemplate server = new ServerTemplate(8080) {
@@ -61,7 +61,7 @@ ServerTemplate server = new ServerTemplate(8080) {
 server.bind();
 ```
 
-### 结构体序列化 — 声明式协议定义
+### 缁撴瀯浣撳簭鍒楀寲 鈥?澹版槑寮忓崗璁畾涔?
 
 ```java
 @Struct
@@ -77,7 +77,7 @@ Login login = StructSerializer.toStruct(buf, Login.class);
 byte[] bytes = StructSerializer.toBytes(login);
 ```
 
-### 串口 — RXTX
+### 涓插彛 鈥?RXTX
 
 ```java
 SingleRxtxChannelTemplate serial = new SingleRxtxChannelTemplate("COM1") {
@@ -90,7 +90,7 @@ serial.connect();
 serial.writeAndFlush("Hello");
 ```
 
-### 蓝牙服务端
+### 钃濈墮鏈嶅姟绔?
 
 ```java
 BtServerTemplate btServer = new BtServerTemplate("0000110100001000800000805f9b34fb", "MyBtServer") {
@@ -99,7 +99,7 @@ BtServerTemplate btServer = new BtServerTemplate("0000110100001000800000805f9b34
         return ch -> ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
             @Override
             public void channelActive(ChannelHandlerContext ctx) {
-                System.out.println("蓝牙客户端已连接: " + ctx.channel().remoteAddress());
+                System.out.println("钃濈墮瀹㈡埛绔凡杩炴帴: " + ctx.channel().remoteAddress());
             }
         });
     }
@@ -108,73 +108,73 @@ BtServerTemplate btServer = new BtServerTemplate("0000110100001000800000805f9b34
 
 ---
 
-## 📚 模块说明
+## 馃摎 妯″潡璇存槑
 
 ```
-action                               功能接口 & 工具类
-channel                              Channel 扩展
-  ├── bluetooth                      蓝牙 OIO（客户端/服务端）
-  ├── enhanced                       优化的 OIO 字节流
-  └── serial                         Rxtx / Jsc 串口通道
-codec                                编解码器
-  ├── ByteArrayCodec                 字节数组 ↔ ByteBuf
-  ├── DelimiterBasedFrameCodec       基于分隔符的编解码
-  ├── EscapeCodec                    转义 / 敏感词替换
-  ├── StartEndFlagFrameCodec         起始/结束标志编解码
-  ├── StringMessageCodec             字符串编解码
-  └── StructCodec                    结构体编解码
-event                                Netty 事件工具
-exception                            自定义运行时异常
-handler                              管道处理器
-  ├── ChannelInterceptor             读写拦截器
-  ├── ActionIdleStateHandler         可参数化空闲状态处理器
-  ├── ActionReadTimeoutHandler       可参数化读超时处理器
-  ├── ActionWriteTimeoutHandler      可参数化写超时处理器
-  ├── ChannelAdvice                  入站/出站通知
-  ├── IdledHeartBeater               自动心跳
-  └── MessageFilter                  消息过滤器
-serializer                           序列化
-  └── struct                         二进制结构体序列化（注解驱动）
-template                             应用模板
-  ├── serial/jsc                     Jsc 多/单通道客户端
-  ├── serial/rxtx                    Rxtx 多/单通道客户端
-  ├── tcp/client                     TCP 多/单通道客户端 + 服务探测
-  ├── tcp/server                     TCP 服务端
-  └── bluetooth/server               蓝牙服务端
-util                                 工具类
-  ├── Bins                           二进制位/数组工具
-  ├── BtFinder                       蓝牙设备扫描
-  ├── CommPorts                      串口工具
-  ├── EndianKit                      大小端转换
-  ├── HexKit                         十六进制编解码
-  └── ...
+action                               鍔熻兘鎺ュ彛 & 宸ュ叿绫?
+channel                              Channel 鎵╁睍
+  鈹溾攢鈹€ bluetooth                      钃濈墮 OIO锛堝鎴风/鏈嶅姟绔級
+  鈹溾攢鈹€ enhanced                       浼樺寲鐨?OIO 瀛楄妭娴?
+  鈹斺攢鈹€ serial                         Rxtx / Jsc 涓插彛閫氶亾
+codec                                缂栬В鐮佸櫒
+  鈹溾攢鈹€ ByteArrayCodec                 瀛楄妭鏁扮粍 鈫?ByteBuf
+  鈹溾攢鈹€ DelimiterBasedFrameCodec       鍩轰簬鍒嗛殧绗︾殑缂栬В鐮?
+  鈹溾攢鈹€ EscapeCodec                    杞箟 / 鏁忔劅璇嶆浛鎹?
+  鈹溾攢鈹€ StartEndFlagFrameCodec         璧峰/缁撴潫鏍囧織缂栬В鐮?
+  鈹溾攢鈹€ StringMessageCodec             瀛楃涓茬紪瑙ｇ爜
+  鈹斺攢鈹€ StructCodec                    缁撴瀯浣撶紪瑙ｇ爜
+event                                Netty 浜嬩欢宸ュ叿
+exception                            鑷畾涔夎繍琛屾椂寮傚父
+handler                              绠￠亾澶勭悊鍣?
+  鈹溾攢鈹€ ChannelInterceptor             璇诲啓鎷︽埅鍣?
+  鈹溾攢鈹€ ActionIdleStateHandler         鍙弬鏁板寲绌洪棽鐘舵€佸鐞嗗櫒
+  鈹溾攢鈹€ ActionReadTimeoutHandler       鍙弬鏁板寲璇昏秴鏃跺鐞嗗櫒
+  鈹溾攢鈹€ ActionWriteTimeoutHandler      鍙弬鏁板寲鍐欒秴鏃跺鐞嗗櫒
+  鈹溾攢鈹€ ChannelAdvice                  鍏ョ珯/鍑虹珯閫氱煡
+  鈹溾攢鈹€ IdledHeartBeater               鑷姩蹇冭烦
+  鈹斺攢鈹€ MessageFilter                  娑堟伅杩囨护鍣?
+serializer                           搴忓垪鍖?
+  鈹斺攢鈹€ struct                         浜岃繘鍒剁粨鏋勪綋搴忓垪鍖栵紙娉ㄨВ椹卞姩锛?
+template                             搴旂敤妯℃澘
+  鈹溾攢鈹€ serial/jsc                     Jsc 澶?鍗曢€氶亾瀹㈡埛绔?
+  鈹溾攢鈹€ serial/rxtx                    Rxtx 澶?鍗曢€氶亾瀹㈡埛绔?
+  鈹溾攢鈹€ tcp/client                     TCP 澶?鍗曢€氶亾瀹㈡埛绔?+ 鏈嶅姟鎺㈡祴
+  鈹溾攢鈹€ tcp/server                     TCP 鏈嶅姟绔?
+  鈹斺攢鈹€ bluetooth/server               钃濈墮鏈嶅姟绔?
+util                                 宸ュ叿绫?
+  鈹溾攢鈹€ Bins                           浜岃繘鍒朵綅/鏁扮粍宸ュ叿
+  鈹溾攢鈹€ BtFinder                       钃濈墮璁惧鎵弿
+  鈹溾攢鈹€ CommPorts                      涓插彛宸ュ叿
+  鈹溾攢鈹€ EndianKit                      澶у皬绔浆鎹?
+  鈹溾攢鈹€ HexKit                         鍗佸叚杩涘埗缂栬В鐮?
+  鈹斺攢鈹€ ...
 ```
 
 ---
 
-## 🧪 构建
+## 馃И 鏋勫缓
 
 ```bash
 mvn clean install -DskipTests
 ```
 
-> ℹ️ 部分测试依赖硬件（串口、蓝牙适配器），请按需运行。
+> 鈩癸笍 閮ㄥ垎娴嬭瘯渚濊禆纭欢锛堜覆鍙ｃ€佽摑鐗欓€傞厤鍣級锛岃鎸夐渶杩愯銆?
 
 ---
 
-## 🔗 链接
+## 馃敆 閾炬帴
 
 | | |
 |---|------|
-| 🌐 | [GitHub](https://github.com/fbbzl/nettyx) |
-| 🇨🇳 | [Gitee](https://gitee.com/fbbzl/nettyx) |
-| 📖 | [使用案例](https://blog.csdn.net/fbbwht) |
-| 🛠️ | [JetBrains IDEA](https://www.jetbrains.com) — 授权赞助 |
+| 馃寪 | [GitHub](https://github.com/fbbzl/nettyx) |
+| 馃嚚馃嚦 | [Gitee](https://gitee.com/fbbzl/nettyx) |
+| 馃摉 | [浣跨敤妗堜緥](https://blog.csdn.net/fbbwht) |
+| 馃洜锔?| [JetBrains IDEA](https://www.jetbrains.com) 鈥?鎺堟潈璧炲姪 |
 
 ---
 
-## 🙏 鸣谢
+## 馃檹 楦ｈ阿
 
-> 首先谢谢家人，给了我充足的时间专注在此项目上；然后感谢 JetBrains 赠送的 Ultimate Edition 版 IDEA；最后谢谢自己。
+> 棣栧厛璋㈣阿瀹朵汉锛岀粰浜嗘垜鍏呰冻鐨勬椂闂翠笓娉ㄥ湪姝ら」鐩笂锛涚劧鍚庢劅璋?JetBrains 璧犻€佺殑 Ultimate Edition 鐗?IDEA锛涙渶鍚庤阿璋㈣嚜宸便€?
 >
-> 希望此框架能够为大家节省哪怕一分钟的开发时间。
+> 甯屾湜姝ゆ鏋惰兘澶熶负澶у鑺傜渷鍝€曚竴鍒嗛挓鐨勫紑鍙戞椂闂淬€?
