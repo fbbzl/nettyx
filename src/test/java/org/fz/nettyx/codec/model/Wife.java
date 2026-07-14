@@ -6,7 +6,7 @@ import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
 
 
 @Data
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 public class Wife<I, V> {
 
     private I      intt;

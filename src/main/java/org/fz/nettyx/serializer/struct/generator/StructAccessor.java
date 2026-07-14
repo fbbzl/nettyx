@@ -6,12 +6,11 @@ import org.fz.nettyx.serializer.struct.StructSerializer;
 import java.lang.reflect.Type;
 
 /**
- * Generated struct reader and writer.
- * @author fengbinbin
- * @version 1.0
- * @since 2021 /10/22 13:18
+ * Generated constructor, reader and writer for a struct type.
  */
-public interface StructReaderWriter {
+public interface StructAccessor {
+    Object newInstance();
+
     Object read(StructSerializer serializer, Type root, Type structType, ByteBuf buf);
 
     void write(StructSerializer serializer, Type root, Type structType, Object struct, ByteBuf buf);

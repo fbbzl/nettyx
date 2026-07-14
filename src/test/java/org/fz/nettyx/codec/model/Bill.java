@@ -7,7 +7,7 @@ import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
 
 @Data
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 public class Bill {
 
     private cuchar bid;

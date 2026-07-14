@@ -1,7 +1,9 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
 import io.netty.buffer.ByteBuf;
+import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
@@ -9,11 +11,13 @@ import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 
+import static cn.hutool.core.text.CharSequenceUtil.removeAllSuffix;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -71,7 +75,8 @@ public @interface ToCharSequence {
 
             byte[] bytes = new byte[bufferLength];
             reading.readBytes(bytes);
-            return new String(bytes, Charset.forName(charset));
+            String value = new String(bytes, Charset.forName(charset));
+            return removeAllSuffix(value, "\0");
         }
 
         @Override
@@ -95,6 +100,18 @@ public @interface ToCharSequence {
                 int pad = bufferLength - writeLen;
                 if (pad > 0) writing.writeZero(pad);
             } else writing.writeZero(bufferLength);
+        }
+
+        @Override
+        public void doValid(ToCharSequence annotation, Field field)
+        {
+            Throws.ifFalse(CharSequence.class.isAssignableFrom(field.getType()),
+                           () -> new TypeJudgmentException("@ToCharSequence only supports CharSequence fields, but got [" + field.getType() + "]"));
+            Throws.ifTrue(annotation.bufferLength() < 0,
+                          () -> new IllegalArgumentException("char sequence buffer length must not be negative, but got [" + annotation.bufferLength() + "]"));
+            if (!Charset.isSupported(annotation.charset())) {
+                throw new UnsupportedCharsetException("do not support charset [" + annotation.charset() + "]");
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.PropDesc;
 import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Filter;
 import cn.hutool.core.util.ClassUtil;
@@ -13,18 +15,20 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import org.fz.erwin.lambda.LambdaMetas;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.serializer.struct.generator.StructReaderWriterGenerator;
+import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.nio.ByteOrder;
 import java.util.*;
-import java.util.function.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
@@ -48,11 +52,11 @@ public class StructSerializerContext {
     @Getter
     private final String[] basePackages;
 
-    static final Map<Type, Integer>                                                BASIC_SIZE_CACHE        = new HashMap<>(64);
-    static final Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> BASIC_CONSTRUCTOR_CACHE = new HashMap<>(64);
-    static final Map<Class<?>, StructDefinition>                                   STRUCT_DEFINITION_CACHE = new HashMap<>(256);
+    static final Map<Type, Integer>                                                BASIC_SIZE_CACHE        = new ConcurrentHashMap<>(64);
+    static final Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(64);
+    static final Map<Class<?>, StructDefinition>                                   STRUCT_DEFINITION_CACHE = new ConcurrentHashMap<>(256);
 
-    static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new HashMap<>(32);
+    static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>(32);
 
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructSerializerContext.class);
 
@@ -61,13 +65,24 @@ public class StructSerializerContext {
         // will scan all packages if user do not assign
         this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);
 
-        try {
-            synchronized (StructSerializerContext.class) {
+        synchronized (StructSerializerContext.class) {
+            Map<Type, Integer> sizeSnapshot = new HashMap<>(BASIC_SIZE_CACHE);
+            Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> constructorSnapshot =
+                    new HashMap<>(BASIC_CONSTRUCTOR_CACHE);
+            Map<Class<?>, StructDefinition> definitionSnapshot = new HashMap<>(STRUCT_DEFINITION_CACHE);
+            Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> handlerSnapshot =
+                    new HashMap<>(ANNOTATION_HANDLER_MAPPING_CACHE);
+            try {
                 scan();
             }
-        }
-        catch (Exception exception) {
-            log.error("exception occur while scanning classes", exception);
+            catch (RuntimeException | Error exception) {
+                restoreCache(BASIC_SIZE_CACHE, sizeSnapshot);
+                restoreCache(BASIC_CONSTRUCTOR_CACHE, constructorSnapshot);
+                restoreCache(STRUCT_DEFINITION_CACHE, definitionSnapshot);
+                restoreCache(ANNOTATION_HANDLER_MAPPING_CACHE, handlerSnapshot);
+                log.error("exception occur while scanning classes", exception);
+                throw exception;
+            }
         }
     }
 
@@ -81,12 +96,18 @@ public class StructSerializerContext {
         // 1 scan field handler
         this.scanHandler(classes);
 
-        // 2 scan struct
-        this.scanStruct(classes);
-
-        // 3 scan basic
+        // 2 scan basic
         this.scanBasic(classes);
 
+        // 3 validate, generate and publish struct definitions
+        this.scanStruct(classes);
+
+    }
+
+    private static <K, V> void restoreCache(Map<K, V> cache, Map<K, V> snapshot)
+    {
+        cache.clear();
+        cache.putAll(snapshot);
     }
 
     /**
@@ -130,34 +151,46 @@ public class StructSerializerContext {
                     }
                 }
             }
-            catch (Throwable throwable) {
-                log.error("scan struct field handler failed please check, field handler class: [{}]", clazz, throwable);
+            catch (RuntimeException | Error throwable) {
+                throw new SerializeException("scan struct field handler failed: [" + clazz + "]", throwable);
             }
         }
     }
 
     protected void scanStruct(Set<Class<?>> classes)
     {
+        Map<Class<?>, StructDefinition> definitions = new HashMap<>();
         for (Class<?> clazz : classes) {
             try {
                 if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
-                    if (clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers())) {
+                    if (ClassUtil.isAbstractOrInterface(clazz)) {
                         throw new SerializeException("struct class can not be interface or abstract: [" + clazz + "]");
                     }
-                    try {
-                        clazz.getDeclaredConstructor();
-                    } catch (NoSuchMethodException e) {
-                        throw new SerializeException("struct class must have a no-arg constructor: [" + clazz + "]", e);
+                    if (Modifier.isPrivate(clazz.getModifiers())) {
+                        throw new SerializeException("struct class can not be private: [" + clazz + "]");
                     }
-                    STRUCT_DEFINITION_CACHE.put(clazz, new StructDefinition(clazz));
+                    Field[] structFields = getFields(clazz, StructHelper::legalStructField);
+                    if (structFields.length > 0 && !BeanUtil.isBean(clazz)) {
+                        throw new SerializeException("struct class must be a JavaBean: [" + clazz + "]");
+                    }
+                    try {
+                        Constructor<?> constructor = clazz.getDeclaredConstructor();
+                        if (Modifier.isPrivate(constructor.getModifiers())) {
+                            throw new SerializeException("struct no-arg constructor can not be private: [" + clazz + "]");
+                        }
+                    } catch (NoSuchMethodException e) {
+                        throw new SerializeException("struct class must have a non-private no-arg constructor: [" + clazz + "]", e);
+                    }
+                    definitions.put(clazz, new StructDefinition(clazz, structFields));
                 }
             }
-            catch (Throwable throwable) {
-                log.error("scan struct failed please check, struct class is: [{}]", clazz, throwable);
+            catch (RuntimeException | Error throwable) {
+                throw new SerializeException("scan struct failed: [" + clazz + "]", throwable);
             }
         }
 
-        StructReaderWriterGenerator.generate(STRUCT_DEFINITION_CACHE.values());
+        StructAccessorFactory.generate(definitions.values());
+        STRUCT_DEFINITION_CACHE.putAll(definitions);
     }
 
     protected void scanBasic(Set<Class<?>> classes)
@@ -176,8 +209,8 @@ public class StructSerializerContext {
                                                  StructHelper.reflectForSize((Class<? extends Basic<?>>) clazz));
                 }
             }
-            catch (Throwable throwable) {
-                log.error("scan basic failed please check, basic type is: [{}]", clazz, throwable);
+            catch (RuntimeException | Error throwable) {
+                throw new SerializeException("scan basic failed: [" + clazz + "]", throwable);
             }
         }
     }
@@ -191,7 +224,7 @@ public class StructSerializerContext {
                     (Supplier<H>) lambdaConstructor(ANNOTATION_HANDLER_MAPPING_CACHE.get(handlerAnnotation.annotationType()));
 
             StructFieldHandler handler = (StructFieldHandler) handlerSupplier.get();
-            handler.doAnnotationValid(handlerAnnotation, field);
+            handler.doValid(handlerAnnotation, field);
 
             // if is singleton, return singleton instance
             return handler.isSingleton() ? () -> (H) handler : (Supplier<H>) handlerSupplier;
@@ -245,13 +278,11 @@ public class StructSerializerContext {
     @SuppressWarnings("unchecked")
     public record StructDefinition(
             Class<?>      type,
-            Supplier<?>   constructor,
             StructField[] fields
     ) {
-        public StructDefinition(Class<?> clazz) {
+        public StructDefinition(Class<?> clazz, Field[] fields) {
             this(clazz,
-                 lambdaConstructor(clazz),
-                 Stream.of(getFields(clazz, StructHelper::legalStructField))
+                 Stream.of(fields)
                        .map(f -> new StructField(StructHelper.getByteOrder(clazz), f))
                        .toArray(StructField[]::new)
                 );
@@ -269,8 +300,8 @@ public class StructSerializerContext {
             ByteOrder           byteOrder;
             Field               wrapped;
             UnaryOperator<Type> type;
-            Function<?, ?>      getter;
-            BiConsumer<?, ?>    setter;
+            String              getterName;
+            String              setterName;
             Annotation          annotation;
 
             @Getter(AccessLevel.NONE)
@@ -284,8 +315,9 @@ public class StructSerializerContext {
                 this.byteOrder      = byteOrder;
                 this.wrapped        = field;
                 this.type           = typeSupplier(field);
-                this.getter         = LambdaMetas.lambdaGetter(field);
-                this.setter         = LambdaMetas.lambdaSetter(field);
+                PropDesc property   = validateProperty(field);
+                this.getterName     = property.getGetter().getName();
+                this.setterName     = property.getSetter().getName();
                 this.annotation     = getHandlerAnnotation(field);
                 this.handleSupplier = getHandlerSupplier(field);
 
@@ -309,11 +341,13 @@ public class StructSerializerContext {
             static UnaryOperator<Type> typeSupplier(Field field) {
                 Type fieldType = field.getGenericType();
                 Class<?> declaringClass = field.getDeclaringClass();
-                return fieldType instanceof Class<?> ? root -> (Class<?>) fieldType :
-                       root -> {
-                           Type context = resolveContext(root, declaringClass);
-                           return TypeUtil.getActualType(context != null ? context : root, fieldType);
-                       };
+                if (fieldType instanceof Class<?>) return root -> fieldType;
+
+                Map<Type, Type> resolvedTypes = new ConcurrentHashMap<>();
+                return root -> resolvedTypes.computeIfAbsent(root, actualRoot -> {
+                    Type context = resolveContext(actualRoot, declaringClass);
+                    return TypeUtil.getActualType(context != null ? context : actualRoot, fieldType);
+                });
             }
 
             private static Type resolveContext(Type root, Class<?> declaringClass) {
@@ -357,12 +391,25 @@ public class StructSerializerContext {
                 return (H) handleSupplier.get();
             }
 
-            public <O, R> Function<O, R> getter() {
-                return (Function<O, R>) getter;
-            }
+            private static PropDesc validateProperty(Field field)
+            {
+                PropDesc property = BeanUtil.getBeanDesc(field.getDeclaringClass()).getProp(field.getName());
+                if (property == null || property.getGetter() == null || property.getSetter() == null) {
+                    throw new SerializeException("struct field must be a readable and writable bean property: [" + field + "]");
+                }
 
-            public <O, P> BiConsumer<O, P> setter() {
-                return (BiConsumer<O, P>) setter;
+                Method getter = property.getGetter();
+                Method setter = property.getSetter();
+                boolean valid = ClassUtil.isPublic(getter)
+                                && !ClassUtil.isStatic(getter)
+                                && getter.getReturnType() == field.getType()
+                                && ClassUtil.isPublic(setter)
+                                && !ClassUtil.isStatic(setter)
+                                && setter.getReturnType() == void.class
+                                && setter.getParameterCount() == 1
+                                && setter.getParameterTypes()[0] == field.getType();
+                if (!valid) throw new SerializeException("invalid bean getter or setter for struct field: [" + field + "]");
+                return property;
             }
 
             @Override

@@ -4,7 +4,6 @@ import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
@@ -46,32 +45,20 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S>
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out)
     {
-        try {
-            out.add(StructSerializer.toStruct(type, msg));
-            // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes
-            // is true
-            if (skipLeftBytes && msg.readableBytes() > 0) {
-                int readableLength = msg.readableBytes();
-                log.debug("There is still readable bytes in the buffer after serialization, it will be skipped, "
-                          + "length is [{}]", readableLength);
-                msg.skipBytes(readableLength);
-            }
-        }
-        catch (Exception error) {
-            ReferenceCountUtil.release(msg);
-            log.error("struct deserialization failed, channel: {}", ctx.channel(), error);
+        out.add(StructSerializer.toStruct(type, msg));
+        // If there is still readable data in the buffer after serialization, it will be skipped if skipLeftBytes
+        // is true
+        if (skipLeftBytes && msg.readableBytes() > 0) {
+            int readableLength = msg.readableBytes();
+            log.debug("There is still readable bytes in the buffer after serialization, it will be skipped, "
+                      + "length is [{}]", readableLength);
+            msg.skipBytes(readableLength);
         }
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, S struct, ByteBuf out)
     {
-        try {
-            StructSerializer.toByteBuf(type, struct, out);
-        }
-        catch (Exception error) {
-            log.error("struct serialization failed, channel: {} struct: {}", ctx.channel(), struct, error);
-            throw error;
-        }
+        StructSerializer.toByteBuf(type, struct, out);
     }
 }
