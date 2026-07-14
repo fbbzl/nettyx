@@ -230,18 +230,20 @@ exit /b 0
 
 :publish_nettyx
 echo.
-echo ========== nettyx release commit ==========
+echo ========== nettyx release prepare ==========
 call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :commit_current_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
 call :update_readme_version "%PROJECT_NETTYX%" "%NETTYX_VERSION%" || exit /b 1
-call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
-call :commit_staged_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 echo.
 echo ========== nettyx release clean install ==========
 call :run_maven "%PROJECT_NETTYX%" clean install || exit /b 1
+
+echo.
+echo ========== nettyx release commit and push ==========
+call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
+call :commit_staged_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+call :push_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 if "%SKIP_DEPLOY%"=="1" (
     echo Skipped deploy: nettyx
@@ -263,13 +265,16 @@ echo.
 echo ========== spring-boot-starter-nettyx publish prepare ==========
 call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
 call :set_property_version "%PROJECT_STARTER%" "nettyx.version" "%NETTYX_VERSION%" || exit /b 1
-call :stage_release_changes "%PROJECT_STARTER%" || exit /b 1
-call :commit_staged_changes "spring-boot-starter-nettyx publish" "%PROJECT_STARTER%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
 
 echo.
 echo ========== spring-boot-starter-nettyx publish clean install ==========
 call :run_maven "%PROJECT_STARTER%" clean install || exit /b 1
+
+echo.
+echo ========== spring-boot-starter-nettyx publish commit and push ==========
+call :stage_release_changes "%PROJECT_STARTER%" || exit /b 1
+call :commit_staged_changes "spring-boot-starter-nettyx publish" "%PROJECT_STARTER%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
+call :push_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
 
 if "%SKIP_DEPLOY%"=="1" (
     echo Skipped deploy: spring-boot-starter-nettyx
@@ -282,7 +287,7 @@ if "%SKIP_DEPLOY%"=="1" (
 echo.
 echo ========== spring-boot-starter-nettyx main sync ==========
 call :switch_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
-call :merge_no_ff_accept_theirs "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
+call :run_in_dir "%PROJECT_STARTER%" git -C "%PROJECT_STARTER%" merge --no-ff "%STARTER_PUBLISH_BRANCH%" -m "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
 call :push_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
 exit /b 0
 
@@ -357,31 +362,6 @@ for %%R in (%PUSH_REMOTES%) do (
 )
 exit /b 0
 
-:merge_no_ff_accept_theirs
-set "MERGE_PROJECT_PATH=%~1"
-set "MERGE_SOURCE_BRANCH=%~2"
-set "MERGE_MESSAGE=%~3"
-call :run_in_dir_no_fail "%MERGE_PROJECT_PATH%" git -C "%MERGE_PROJECT_PATH%" merge --no-ff "%MERGE_SOURCE_BRANCH%" -m "%MERGE_MESSAGE%"
-set "MERGE_EXIT=%ERRORLEVEL%"
-if "%DRY_RUN%"=="1" exit /b 0
-if "%MERGE_EXIT%"=="0" exit /b 0
-echo Merge reported conflicts. Accepting source branch changes for unresolved paths: %MERGE_SOURCE_BRANCH%
-call :checkout_all_theirs_unmerged "%MERGE_PROJECT_PATH%" || exit /b 1
-call :assert_no_unmerged_paths "%MERGE_PROJECT_PATH%" || exit /b 1
-call :commit_staged_changes "merge %MERGE_SOURCE_BRANCH%" "%MERGE_PROJECT_PATH%" "%MERGE_MESSAGE%" || exit /b 1
-exit /b 0
-
-:checkout_all_theirs_unmerged
-set "ALL_THEIRS_PROJECT_PATH=%~1"
-set "ALL_THEIRS_FILE=%TEMP%\fz_unmerged_%RANDOM%%RANDOM%.txt"
-git -C "%ALL_THEIRS_PROJECT_PATH%" diff --name-only --diff-filter=U > "%ALL_THEIRS_FILE%"
-for /f "usebackq delims=" %%P in ("%ALL_THEIRS_FILE%") do (
-    call :run_in_dir "%ALL_THEIRS_PROJECT_PATH%" git -C "%ALL_THEIRS_PROJECT_PATH%" checkout --theirs -- "%%P" || exit /b 1
-    call :run_in_dir "%ALL_THEIRS_PROJECT_PATH%" git -C "%ALL_THEIRS_PROJECT_PATH%" add -- "%%P" || exit /b 1
-)
-del "%ALL_THEIRS_FILE%" >nul 2>nul
-exit /b 0
-
 :restore_head_paths
 set "RESTORE_PROJECT_PATH=%~1"
 shift
@@ -418,19 +398,6 @@ if "%DRY_RUN%"=="1" (
 )
 shift
 goto drop_or_restore_head_paths_loop
-
-:commit_current_changes
-set "CURRENT_COMMIT_LABEL=%~1"
-set "CURRENT_COMMIT_PROJECT_PATH=%~2"
-set "CURRENT_COMMIT_MESSAGE=%~3"
-call :repo_has_changes "%CURRENT_COMMIT_PROJECT_PATH%" CURRENT_COMMIT_HAS_CHANGES || exit /b 1
-if "%CURRENT_COMMIT_HAS_CHANGES%"=="0" (
-    echo No working tree changes to commit: %CURRENT_COMMIT_LABEL%
-    exit /b 0
-)
-call :stage_release_changes "%CURRENT_COMMIT_PROJECT_PATH%" || exit /b 1
-call :commit_staged_changes "%CURRENT_COMMIT_LABEL%" "%CURRENT_COMMIT_PROJECT_PATH%" "%CURRENT_COMMIT_MESSAGE%"
-exit /b %ERRORLEVEL%
 
 :commit_staged_changes
 set "STAGED_COMMIT_LABEL=%~1"
@@ -490,27 +457,6 @@ if not "%RUN_EXIT%"=="0" (
     exit /b %RUN_EXIT%
 )
 exit /b 0
-
-:run_in_dir_no_fail
-set "WORK_DIR=%~1"
-set "RUN_COMMAND="
-:run_in_dir_no_fail_args
-shift
-if "%~1"=="" goto run_in_dir_no_fail_ready
-if defined RUN_COMMAND (
-    set "RUN_COMMAND=!RUN_COMMAND! "%~1""
-) else (
-    set "RUN_COMMAND="%~1""
-)
-goto run_in_dir_no_fail_args
-:run_in_dir_no_fail_ready
-echo [%WORK_DIR%] !RUN_COMMAND!
-if "%DRY_RUN%"=="1" exit /b 0
-pushd "%WORK_DIR%" || exit /b 1
-call !RUN_COMMAND!
-set "RUN_EXIT=%ERRORLEVEL%"
-popd
-exit /b %RUN_EXIT%
 
 :fail
 echo.
