@@ -21,9 +21,7 @@ set "STARTER_VERSION="
 set "NETTYX_REMOTES=gitee github"
 set "STARTER_REMOTES=gitee github"
 set "NETTYX_RELEASE_BRANCH=release"
-set "NETTYX_MAIN_BRANCH=main"
 set "STARTER_PUBLISH_BRANCH=publish"
-set "STARTER_MAIN_BRANCH=main"
 set "DRY_RUN=0"
 set "SKIP_TESTS=0"
 set "SKIP_GIT_PUSH=0"
@@ -53,12 +51,8 @@ if /i "%ARG:~0,16%"=="/starterRemotes:" set "STARTER_REMOTES=%ARG:~16%" & shift 
 if /i "%ARG:~0,16%"=="-starterRemotes:" set "STARTER_REMOTES=%ARG:~16%" & shift & goto parse_args
 if /i "%ARG:~0,21%"=="/nettyxReleaseBranch:" set "NETTYX_RELEASE_BRANCH=%ARG:~21%" & shift & goto parse_args
 if /i "%ARG:~0,21%"=="-nettyxReleaseBranch:" set "NETTYX_RELEASE_BRANCH=%ARG:~21%" & shift & goto parse_args
-if /i "%ARG:~0,18%"=="/nettyxMainBranch:" set "NETTYX_MAIN_BRANCH=%ARG:~18%" & shift & goto parse_args
-if /i "%ARG:~0,18%"=="-nettyxMainBranch:" set "NETTYX_MAIN_BRANCH=%ARG:~18%" & shift & goto parse_args
 if /i "%ARG:~0,22%"=="/starterPublishBranch:" set "STARTER_PUBLISH_BRANCH=%ARG:~22%" & shift & goto parse_args
 if /i "%ARG:~0,22%"=="-starterPublishBranch:" set "STARTER_PUBLISH_BRANCH=%ARG:~22%" & shift & goto parse_args
-if /i "%ARG:~0,19%"=="/starterMainBranch:" set "STARTER_MAIN_BRANCH=%ARG:~19%" & shift & goto parse_args
-if /i "%ARG:~0,19%"=="-starterMainBranch:" set "STARTER_MAIN_BRANCH=%ARG:~19%" & shift & goto parse_args
 if not defined NETTYX_VERSION (
     set "NETTYX_VERSION=%~1"
     shift
@@ -84,6 +78,11 @@ call :assert_path "%PROJECT_STARTER%" "Project directory" || goto fail
 call :get_current_branch "%PROJECT_NETTYX%" CURRENT_NETTYX_BRANCH || goto fail
 if /i not "%CURRENT_NETTYX_BRANCH%"=="%NETTYX_RELEASE_BRANCH%" (
     echo Current nettyx branch is [%CURRENT_NETTYX_BRANCH%], expected release branch [%NETTYX_RELEASE_BRANCH%]
+    goto fail
+)
+call :get_current_branch "%PROJECT_STARTER%" CURRENT_STARTER_BRANCH || goto fail
+if /i not "%CURRENT_STARTER_BRANCH%"=="%STARTER_PUBLISH_BRANCH%" (
+    echo Current spring-boot-starter-nettyx branch is [%CURRENT_STARTER_BRANCH%], expected publish branch [%STARTER_PUBLISH_BRANCH%]
     goto fail
 )
 call :first_word "%NETTYX_REMOTES%" NETTYX_PRIMARY_REMOTE || goto fail
@@ -112,8 +111,8 @@ echo spring-boot-starter-nettyx: %CURRENT_STARTER_VERSION% -^> %STARTER_VERSION%
 echo starter nettyx.version:     %CURRENT_STARTER_NETTYX_VERSION% -^> %NETTYX_VERSION%
 echo nettyx remotes:             %NETTYX_REMOTES%
 echo starter remotes:            %STARTER_REMOTES%
-echo nettyx branches:            %NETTYX_RELEASE_BRANCH% -^> %NETTYX_MAIN_BRANCH%
-echo starter branches:           %STARTER_PUBLISH_BRANCH% -^> %STARTER_MAIN_BRANCH%
+echo nettyx branch:              %NETTYX_RELEASE_BRANCH%
+echo starter branch:             %STARTER_PUBLISH_BRANCH%
 if "%DRY_RUN%"=="1" echo DryRun is enabled. No files, git refs, or deployments will be changed.
 
 set "OLD_MAVEN_OPTS=%MAVEN_OPTS%"
@@ -122,7 +121,6 @@ echo MAVEN_OPTS=%MAVEN_OPTS%
 
 call :publish_nettyx || goto fail
 call :publish_starter || goto fail
-call :return_work_branches || goto fail
 
 echo.
 echo ========== done ==========
@@ -231,7 +229,6 @@ exit /b 0
 :publish_nettyx
 echo.
 echo ========== nettyx release prepare ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
 call :update_readme_version "%PROJECT_NETTYX%" "%NETTYX_VERSION%" || exit /b 1
 
@@ -253,17 +250,11 @@ if "%SKIP_DEPLOY%"=="1" (
     call :run_maven "%PROJECT_NETTYX%" clean deploy || exit /b 1
 )
 
-echo.
-echo ========== nettyx main sync ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_MAIN_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :run_in_dir "%PROJECT_NETTYX%" git -C "%PROJECT_NETTYX%" merge --no-ff "%NETTYX_RELEASE_BRANCH%" -m "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_NETTYX%" "%NETTYX_MAIN_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 exit /b 0
 
 :publish_starter
 echo.
 echo ========== spring-boot-starter-nettyx publish prepare ==========
-call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
 call :set_property_version "%PROJECT_STARTER%" "nettyx.version" "%NETTYX_VERSION%" || exit /b 1
 
 echo.
@@ -284,18 +275,6 @@ if "%SKIP_DEPLOY%"=="1" (
     call :run_maven "%PROJECT_STARTER%" clean deploy || exit /b 1
 )
 
-echo.
-echo ========== spring-boot-starter-nettyx main sync ==========
-call :switch_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
-call :run_in_dir "%PROJECT_STARTER%" git -C "%PROJECT_STARTER%" merge --no-ff "%STARTER_PUBLISH_BRANCH%" -m "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
-exit /b 0
-
-:return_work_branches
-echo.
-echo ========== return work branches ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
 exit /b 0
 
 :set_project_version
@@ -327,27 +306,6 @@ if "%DRY_RUN%"=="1" (
     cscript //nologo //E:JScript "%~f0" setPropertyVersion "%~1" "%~2" "%~3"
 )
 exit /b %ERRORLEVEL%
-
-:switch_branch
-set "SWITCH_PROJECT_PATH=%~1"
-set "SWITCH_BRANCH=%~2"
-set "SWITCH_REMOTE=%~3"
-if "%DRY_RUN%"=="1" (
-    call :run_in_dir "%SWITCH_PROJECT_PATH%" git -C "%SWITCH_PROJECT_PATH%" switch "%SWITCH_BRANCH%"
-    exit /b %ERRORLEVEL%
-)
-git -C "%SWITCH_PROJECT_PATH%" show-ref --verify --quiet "refs/heads/%SWITCH_BRANCH%"
-if "%ERRORLEVEL%"=="0" (
-    call :run_in_dir "%SWITCH_PROJECT_PATH%" git -C "%SWITCH_PROJECT_PATH%" switch "%SWITCH_BRANCH%"
-    exit /b %ERRORLEVEL%
-)
-git -C "%SWITCH_PROJECT_PATH%" show-ref --verify --quiet "refs/remotes/%SWITCH_REMOTE%/%SWITCH_BRANCH%"
-if "%ERRORLEVEL%"=="0" (
-    call :run_in_dir "%SWITCH_PROJECT_PATH%" git -C "%SWITCH_PROJECT_PATH%" switch -c "%SWITCH_BRANCH%" --track "%SWITCH_REMOTE%/%SWITCH_BRANCH%"
-    exit /b %ERRORLEVEL%
-)
-echo Cannot switch branch because it does not exist locally or on %SWITCH_REMOTE%: %SWITCH_BRANCH%
-exit /b 1
 
 :push_branch
 set "PUSH_PROJECT_PATH=%~1"
