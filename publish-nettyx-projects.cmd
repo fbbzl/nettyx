@@ -3,7 +3,7 @@
 setlocal EnableExtensions EnableDelayedExpansion
 
 set "MAVEN_HOME=%MAVEN_HOME%"
-if not defined MAVEN_HOME set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
+if not exist "%MAVEN_HOME%\bin\mvn.cmd" set "MAVEN_HOME=D:\maven\apache-maven-3.9.14"
 set "MAVEN_SETTINGS=%MAVEN_SETTINGS%"
 if not defined MAVEN_SETTINGS set "MAVEN_SETTINGS=D:\maven\settings.xml"
 set "MAVEN_REPO=%MAVEN_REPO%"
@@ -21,9 +21,7 @@ set "STARTER_VERSION="
 set "NETTYX_REMOTES=gitee github"
 set "STARTER_REMOTES=gitee github"
 set "NETTYX_RELEASE_BRANCH=release"
-set "NETTYX_MAIN_BRANCH=main"
 set "STARTER_PUBLISH_BRANCH=publish"
-set "STARTER_MAIN_BRANCH=main"
 set "DRY_RUN=0"
 set "SKIP_TESTS=0"
 set "SKIP_GIT_PUSH=0"
@@ -53,12 +51,8 @@ if /i "%ARG:~0,16%"=="/starterRemotes:" set "STARTER_REMOTES=%ARG:~16%" & shift 
 if /i "%ARG:~0,16%"=="-starterRemotes:" set "STARTER_REMOTES=%ARG:~16%" & shift & goto parse_args
 if /i "%ARG:~0,21%"=="/nettyxReleaseBranch:" set "NETTYX_RELEASE_BRANCH=%ARG:~21%" & shift & goto parse_args
 if /i "%ARG:~0,21%"=="-nettyxReleaseBranch:" set "NETTYX_RELEASE_BRANCH=%ARG:~21%" & shift & goto parse_args
-if /i "%ARG:~0,18%"=="/nettyxMainBranch:" set "NETTYX_MAIN_BRANCH=%ARG:~18%" & shift & goto parse_args
-if /i "%ARG:~0,18%"=="-nettyxMainBranch:" set "NETTYX_MAIN_BRANCH=%ARG:~18%" & shift & goto parse_args
 if /i "%ARG:~0,22%"=="/starterPublishBranch:" set "STARTER_PUBLISH_BRANCH=%ARG:~22%" & shift & goto parse_args
 if /i "%ARG:~0,22%"=="-starterPublishBranch:" set "STARTER_PUBLISH_BRANCH=%ARG:~22%" & shift & goto parse_args
-if /i "%ARG:~0,19%"=="/starterMainBranch:" set "STARTER_MAIN_BRANCH=%ARG:~19%" & shift & goto parse_args
-if /i "%ARG:~0,19%"=="-starterMainBranch:" set "STARTER_MAIN_BRANCH=%ARG:~19%" & shift & goto parse_args
 if not defined NETTYX_VERSION (
     set "NETTYX_VERSION=%~1"
     shift
@@ -84,6 +78,11 @@ call :assert_path "%PROJECT_STARTER%" "Project directory" || goto fail
 call :get_current_branch "%PROJECT_NETTYX%" CURRENT_NETTYX_BRANCH || goto fail
 if /i not "%CURRENT_NETTYX_BRANCH%"=="%NETTYX_RELEASE_BRANCH%" (
     echo Current nettyx branch is [%CURRENT_NETTYX_BRANCH%], expected release branch [%NETTYX_RELEASE_BRANCH%]
+    goto fail
+)
+call :get_current_branch "%PROJECT_STARTER%" CURRENT_STARTER_BRANCH || goto fail
+if /i not "%CURRENT_STARTER_BRANCH%"=="%STARTER_PUBLISH_BRANCH%" (
+    echo Current spring-boot-starter-nettyx branch is [%CURRENT_STARTER_BRANCH%], expected publish branch [%STARTER_PUBLISH_BRANCH%]
     goto fail
 )
 call :first_word "%NETTYX_REMOTES%" NETTYX_PRIMARY_REMOTE || goto fail
@@ -112,8 +111,8 @@ echo spring-boot-starter-nettyx: %CURRENT_STARTER_VERSION% -^> %STARTER_VERSION%
 echo starter nettyx.version:     %CURRENT_STARTER_NETTYX_VERSION% -^> %NETTYX_VERSION%
 echo nettyx remotes:             %NETTYX_REMOTES%
 echo starter remotes:            %STARTER_REMOTES%
-echo nettyx branches:            %NETTYX_RELEASE_BRANCH% -^> %NETTYX_MAIN_BRANCH%
-echo starter branches:           %STARTER_PUBLISH_BRANCH% -^> %STARTER_MAIN_BRANCH%
+echo nettyx branch:              %NETTYX_RELEASE_BRANCH%
+echo starter branch:             %STARTER_PUBLISH_BRANCH%
 if "%DRY_RUN%"=="1" echo DryRun is enabled. No files, git refs, or deployments will be changed.
 
 set "OLD_MAVEN_OPTS=%MAVEN_OPTS%"
@@ -122,7 +121,6 @@ echo MAVEN_OPTS=%MAVEN_OPTS%
 
 call :publish_nettyx || goto fail
 call :publish_starter || goto fail
-call :return_work_branches || goto fail
 
 echo.
 echo ========== done ==========
@@ -230,18 +228,19 @@ exit /b 0
 
 :publish_nettyx
 echo.
-echo ========== nettyx release commit ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :commit_current_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+echo ========== nettyx release prepare ==========
 call :set_project_version "%PROJECT_NETTYX%" "nettyx" "%NETTYX_VERSION%" || exit /b 1
 call :update_readme_version "%PROJECT_NETTYX%" "%NETTYX_VERSION%" || exit /b 1
-call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
-call :commit_staged_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 echo.
 echo ========== nettyx release clean install ==========
 call :run_maven "%PROJECT_NETTYX%" clean install || exit /b 1
+
+echo.
+echo ========== nettyx release commit and push ==========
+call :stage_release_changes "%PROJECT_NETTYX%" || exit /b 1
+call :commit_staged_changes "nettyx release" "%PROJECT_NETTYX%" "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
+call :push_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 
 if "%SKIP_DEPLOY%"=="1" (
     echo Skipped deploy: nettyx
@@ -251,26 +250,22 @@ if "%SKIP_DEPLOY%"=="1" (
     call :run_maven "%PROJECT_NETTYX%" clean deploy || exit /b 1
 )
 
-echo.
-echo ========== nettyx main sync ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_MAIN_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :run_in_dir "%PROJECT_NETTYX%" git -C "%PROJECT_NETTYX%" merge --no-ff "%NETTYX_RELEASE_BRANCH%" -m "chore release: nettyx %NETTYX_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_NETTYX%" "%NETTYX_MAIN_BRANCH%" "%NETTYX_REMOTES%" || exit /b 1
 exit /b 0
 
 :publish_starter
 echo.
 echo ========== spring-boot-starter-nettyx publish prepare ==========
-call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
-call :set_project_version "%PROJECT_STARTER%" "spring-boot-starter-nettyx" "%STARTER_VERSION%" || exit /b 1
 call :set_property_version "%PROJECT_STARTER%" "nettyx.version" "%NETTYX_VERSION%" || exit /b 1
-call :stage_release_changes "%PROJECT_STARTER%" || exit /b 1
-call :commit_staged_changes "spring-boot-starter-nettyx publish" "%PROJECT_STARTER%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
 
 echo.
 echo ========== spring-boot-starter-nettyx publish clean install ==========
 call :run_maven "%PROJECT_STARTER%" clean install || exit /b 1
+
+echo.
+echo ========== spring-boot-starter-nettyx publish commit and push ==========
+call :stage_release_changes "%PROJECT_STARTER%" || exit /b 1
+call :commit_staged_changes "spring-boot-starter-nettyx publish" "%PROJECT_STARTER%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
+call :push_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
 
 if "%SKIP_DEPLOY%"=="1" (
     echo Skipped deploy: spring-boot-starter-nettyx
@@ -280,18 +275,6 @@ if "%SKIP_DEPLOY%"=="1" (
     call :run_maven "%PROJECT_STARTER%" clean deploy || exit /b 1
 )
 
-echo.
-echo ========== spring-boot-starter-nettyx main sync ==========
-call :switch_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
-call :merge_no_ff_accept_theirs "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "chore release: spring-boot-starter-nettyx %STARTER_VERSION%" || exit /b 1
-call :push_branch "%PROJECT_STARTER%" "%STARTER_MAIN_BRANCH%" "%STARTER_REMOTES%" || exit /b 1
-exit /b 0
-
-:return_work_branches
-echo.
-echo ========== return work branches ==========
-call :switch_branch "%PROJECT_NETTYX%" "%NETTYX_RELEASE_BRANCH%" "%NETTYX_PRIMARY_REMOTE%" || exit /b 1
-call :switch_branch "%PROJECT_STARTER%" "%STARTER_PUBLISH_BRANCH%" "%STARTER_PRIMARY_REMOTE%" || exit /b 1
 exit /b 0
 
 :set_project_version
@@ -324,27 +307,6 @@ if "%DRY_RUN%"=="1" (
 )
 exit /b %ERRORLEVEL%
 
-:switch_branch
-set "SWITCH_PROJECT_PATH=%~1"
-set "SWITCH_BRANCH=%~2"
-set "SWITCH_REMOTE=%~3"
-if "%DRY_RUN%"=="1" (
-    call :run_in_dir "%SWITCH_PROJECT_PATH%" git -C "%SWITCH_PROJECT_PATH%" switch "%SWITCH_BRANCH%"
-    exit /b %ERRORLEVEL%
-)
-git -C "%SWITCH_PROJECT_PATH%" show-ref --verify --quiet "refs/heads/%SWITCH_BRANCH%"
-if "%ERRORLEVEL%"=="0" (
-    call :run_in_dir "%SWITCH_PROJECT_PATH%" git -C "%SWITCH_PROJECT_PATH%" switch "%SWITCH_BRANCH%"
-    exit /b %ERRORLEVEL%
-)
-git -C "%SWITCH_PROJECT_PATH%" show-ref --verify --quiet "refs/remotes/%SWITCH_REMOTE%/%SWITCH_BRANCH%"
-if "%ERRORLEVEL%"=="0" (
-    call :run_in_dir "%SWITCH_PROJECT_PATH%" git -C "%SWITCH_PROJECT_PATH%" switch -c "%SWITCH_BRANCH%" --track "%SWITCH_REMOTE%/%SWITCH_BRANCH%"
-    exit /b %ERRORLEVEL%
-)
-echo Cannot switch branch because it does not exist locally or on %SWITCH_REMOTE%: %SWITCH_BRANCH%
-exit /b 1
-
 :push_branch
 set "PUSH_PROJECT_PATH=%~1"
 set "PUSH_BRANCH=%~2"
@@ -356,31 +318,6 @@ if "%SKIP_GIT_PUSH%"=="1" (
 for %%R in (%PUSH_REMOTES%) do (
     call :run_in_dir "%PUSH_PROJECT_PATH%" git -C "%PUSH_PROJECT_PATH%" push %%R HEAD:%PUSH_BRANCH% || exit /b 1
 )
-exit /b 0
-
-:merge_no_ff_accept_theirs
-set "MERGE_PROJECT_PATH=%~1"
-set "MERGE_SOURCE_BRANCH=%~2"
-set "MERGE_MESSAGE=%~3"
-call :run_in_dir_no_fail "%MERGE_PROJECT_PATH%" git -C "%MERGE_PROJECT_PATH%" merge --no-ff "%MERGE_SOURCE_BRANCH%" -m "%MERGE_MESSAGE%"
-set "MERGE_EXIT=%ERRORLEVEL%"
-if "%DRY_RUN%"=="1" exit /b 0
-if "%MERGE_EXIT%"=="0" exit /b 0
-echo Merge reported conflicts. Accepting source branch changes for unresolved paths: %MERGE_SOURCE_BRANCH%
-call :checkout_all_theirs_unmerged "%MERGE_PROJECT_PATH%" || exit /b 1
-call :assert_no_unmerged_paths "%MERGE_PROJECT_PATH%" || exit /b 1
-call :commit_staged_changes "merge %MERGE_SOURCE_BRANCH%" "%MERGE_PROJECT_PATH%" "%MERGE_MESSAGE%" || exit /b 1
-exit /b 0
-
-:checkout_all_theirs_unmerged
-set "ALL_THEIRS_PROJECT_PATH=%~1"
-set "ALL_THEIRS_FILE=%TEMP%\fz_unmerged_%RANDOM%%RANDOM%.txt"
-git -C "%ALL_THEIRS_PROJECT_PATH%" diff --name-only --diff-filter=U > "%ALL_THEIRS_FILE%"
-for /f "usebackq delims=" %%P in ("%ALL_THEIRS_FILE%") do (
-    call :run_in_dir "%ALL_THEIRS_PROJECT_PATH%" git -C "%ALL_THEIRS_PROJECT_PATH%" checkout --theirs -- "%%P" || exit /b 1
-    call :run_in_dir "%ALL_THEIRS_PROJECT_PATH%" git -C "%ALL_THEIRS_PROJECT_PATH%" add -- "%%P" || exit /b 1
-)
-del "%ALL_THEIRS_FILE%" >nul 2>nul
 exit /b 0
 
 :restore_head_paths
@@ -419,19 +356,6 @@ if "%DRY_RUN%"=="1" (
 )
 shift
 goto drop_or_restore_head_paths_loop
-
-:commit_current_changes
-set "CURRENT_COMMIT_LABEL=%~1"
-set "CURRENT_COMMIT_PROJECT_PATH=%~2"
-set "CURRENT_COMMIT_MESSAGE=%~3"
-call :repo_has_changes "%CURRENT_COMMIT_PROJECT_PATH%" CURRENT_COMMIT_HAS_CHANGES || exit /b 1
-if "%CURRENT_COMMIT_HAS_CHANGES%"=="0" (
-    echo No working tree changes to commit: %CURRENT_COMMIT_LABEL%
-    exit /b 0
-)
-call :stage_release_changes "%CURRENT_COMMIT_PROJECT_PATH%" || exit /b 1
-call :commit_staged_changes "%CURRENT_COMMIT_LABEL%" "%CURRENT_COMMIT_PROJECT_PATH%" "%CURRENT_COMMIT_MESSAGE%"
-exit /b %ERRORLEVEL%
 
 :commit_staged_changes
 set "STAGED_COMMIT_LABEL=%~1"
@@ -491,27 +415,6 @@ if not "%RUN_EXIT%"=="0" (
     exit /b %RUN_EXIT%
 )
 exit /b 0
-
-:run_in_dir_no_fail
-set "WORK_DIR=%~1"
-set "RUN_COMMAND="
-:run_in_dir_no_fail_args
-shift
-if "%~1"=="" goto run_in_dir_no_fail_ready
-if defined RUN_COMMAND (
-    set "RUN_COMMAND=!RUN_COMMAND! "%~1""
-) else (
-    set "RUN_COMMAND="%~1""
-)
-goto run_in_dir_no_fail_args
-:run_in_dir_no_fail_ready
-echo [%WORK_DIR%] !RUN_COMMAND!
-if "%DRY_RUN%"=="1" exit /b 0
-pushd "%WORK_DIR%" || exit /b 1
-call !RUN_COMMAND!
-set "RUN_EXIT=%ERRORLEVEL%"
-popd
-exit /b %RUN_EXIT%
 
 :fail
 echo.
@@ -660,14 +563,21 @@ function setProjectVersion(projectPath, artifactId, newVersion, dryRun) {
     var path = requirePom(projectPath);
     var doc = loadDoc(path);
     var versionEl = selectNode(doc, "/m:project/m:version");
+    var version = getNodeText(versionEl);
 
-    if (!versionEl || getNodeText(versionEl) === "") {
+    if (!versionEl || version === "") {
+        fail("Cannot find version element for " + artifactId + " in " + path);
+    }
+    if (version === "${revision}") {
         var revisionEl = selectNode(doc, "/m:project/m:properties/m:revision");
-        if (revisionEl) {
+        if (!revisionEl) {
+            fail("Revision property not found in " + path);
+        }
+        if (getNodeText(revisionEl).indexOf("${") < 0) {
             setNodeText(path, doc, revisionEl, newVersion, "property revision", dryRun);
             return;
         }
-        fail("Cannot find version element for " + artifactId + " in " + path);
+        fail("Project version is derived from properties; update its source properties instead: " + path);
     }
     setNodeText(path, doc, versionEl, newVersion, "project version for " + artifactId, dryRun);
 }
@@ -812,7 +722,11 @@ function nextProjectVersion(projectPath, artifactId, nettyxVersion) {
     if (rawVersion === "${revision}") {
         var revision = getNodeText(selectNode(doc, "/m:project/m:properties/m:revision"));
         if (revision && revision.indexOf("${") >= 0) {
-            WScript.Echo(resolvePropertyRefs(text, revision));
+            var nettyxProperty = new RegExp("(<nettyx\\.version>)[^<]*(</nettyx\\.version>)");
+            var releaseText = text.replace(nettyxProperty, function(all, openTag, closeTag) {
+                return openTag + nettyxVersion + closeTag;
+            });
+            WScript.Echo(resolvePropertyRefs(releaseText, revision));
             return;
         }
         WScript.Echo(nextVersionValue(revision || rawVersion));

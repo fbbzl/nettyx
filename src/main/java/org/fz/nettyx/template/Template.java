@@ -100,9 +100,7 @@ abstract class Template<C extends Channel> {
     protected ChannelPromise failurePromise(Channel channel, String message)
     {
         if (channel == null) {
-            ChannelPromise promise = new DefaultChannelPromise(null);
-            promise.setFailure(new ChannelException(message));
-            return promise;
+            throw new ChannelException(message);
         }
         return new DefaultChannelPromise(channel).setFailure(new ChannelException(message));
     }

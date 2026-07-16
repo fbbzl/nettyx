@@ -6,7 +6,7 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 public class DerivedGeneric<T, U> extends BaseGeneric<T> {
 
     private U derivedField;

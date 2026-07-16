@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned.cuint8_t;
 import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.cppushort;
 
 @Data
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User<T, W, G> {
 

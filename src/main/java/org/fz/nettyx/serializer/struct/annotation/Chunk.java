@@ -83,10 +83,12 @@ public @interface Chunk {
         }
 
         @Override
-        public void doAnnotationValid(Chunk chunk, Field field) {
+        public void doValid(Chunk chunk, Field field) {
             Class<?> fieldType = field.getType();
             Throws.ifFalse(byte[].class.isAssignableFrom(fieldType),
                            () -> new TypeJudgmentException("chunk only support byte[] type field, but got [" + fieldType + "]"));
+            Throws.ifTrue(chunk.length() < 0,
+                          () -> new IllegalArgumentException("chunk length must not be negative, but got [" + chunk.length() + "]"));
         }
 
         static int computePadding(Chunk chunk, int valueLength)

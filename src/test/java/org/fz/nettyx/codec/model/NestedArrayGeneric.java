@@ -5,7 +5,7 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 
 @Data
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 public class NestedArrayGeneric<T, U> {
 
     @ToArray(length = 3)

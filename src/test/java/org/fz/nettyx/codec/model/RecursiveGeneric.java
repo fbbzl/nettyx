@@ -4,7 +4,7 @@ import lombok.Data;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 
 @Data
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 public class RecursiveGeneric<T> {
 
     private T value;

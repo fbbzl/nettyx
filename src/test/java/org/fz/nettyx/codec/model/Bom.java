@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
  */
 
 @Data
-@Struct
+@Struct(endian = Struct.Endian.NATIVE)
 public class Bom<T, W, U> {
 
     private T t;

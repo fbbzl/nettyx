@@ -29,14 +29,24 @@ public class OpenSslContextFactory {
 
     public SslContext getServerSslContext() throws SSLException
     {
-        return getServerSslContext(Paths.get(openSslConfig.cert()), Paths.get(openSslConfig.key()),
-                                   Paths.get(openSslConfig.root()));
+        Path cert = Paths.get(openSslConfig.cert());
+        Path key  = Paths.get(openSslConfig.key());
+        Path root = Paths.get(openSslConfig.root());
+        String keyPass = openSslConfig.keyPass();
+        return keyPass == null || keyPass.isEmpty()
+               ? getServerSslContext(cert, key, root)
+               : getServerSslContext(cert, key, keyPass, root);
     }
 
     public SslContext getClientSslContext() throws SSLException
     {
-        return getClientSslContext(Paths.get(openSslConfig.cert()), Paths.get(openSslConfig.key()),
-                                   Paths.get(openSslConfig.root()));
+        Path cert = Paths.get(openSslConfig.cert());
+        Path key  = Paths.get(openSslConfig.key());
+        Path root = Paths.get(openSslConfig.root());
+        String keyPass = openSslConfig.keyPass();
+        return keyPass == null || keyPass.isEmpty()
+               ? getClientSslContext(cert, key, root)
+               : getClientSslContext(cert, key, keyPass, root);
     }
 
     //****************************************************************************************************************//
@@ -127,6 +137,10 @@ public class OpenSslContextFactory {
          */
         public String key() {
             return key;
+        }
+
+        public String keyPass() {
+            return keyPass;
         }
 
         /**

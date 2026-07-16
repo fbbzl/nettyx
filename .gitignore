@@ -22,3 +22,5 @@ Thumbs.db
 *.gpg
 .env
 
+/.omo/
+/.opencode/
