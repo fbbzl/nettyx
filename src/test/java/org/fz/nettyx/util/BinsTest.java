@@ -3,6 +3,7 @@ package org.fz.nettyx.util;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 /**
  * @author fengbinbin
@@ -114,5 +115,50 @@ public class BinsTest {
         assertEquals(16, Bins.fromShort(0).length());
         assertEquals(32, Bins.fromInt(0).length());
         assertEquals(64, Bins.fromLong(0).length());
+    }
+
+    @Test
+    public void supportsCharIntLongSlicesAndNegativeLong() {
+        assertEquals(16, Bins.fromChar('A').length());
+        Bins bins = Bins.fromLong(0x0123456789ABCDEFL);
+        assertEquals(0x89ABCDEF, bins.getInt(0, 32));
+        assertEquals(0x0123456789ABCDEFL, bins.getLong(0, 64));
+        assertEquals(0xFFFF, Bins.fromLong(-1L).getShort(0, 16) & 0xFFFF);
+    }
+
+    @Test
+    public void supportsAllMutationAndReplacementOverloads() {
+        Bins bins = Bins.fromShort(0);
+        bins.set(0, 1);
+        bins.set(1, (byte) 1);
+        bins.set1(2, 2);
+        bins.set0(1, 2);
+        bins.replace(0, 1, 0, 1);
+        bins.replace(3, new byte[]{1, 1});
+        bins.replace(5, Bins.fromByte(5));
+
+        assertEquals(1, bins.get(0));
+        assertEquals(0, bins.get(1));
+        assertEquals(1, bins.get(2));
+        assertEquals(1, bins.get(3));
+        assertEquals(1, bins.get(4));
+        assertEquals(1, bins.get(5));
+        assertEquals(0, bins.get(6));
+        assertEquals(1, bins.get(7));
+    }
+
+    @Test
+    public void rejectsOverflowAndInvalidRanges() {
+        assertThrows(IllegalArgumentException.class, () -> Bins.fromByte(256));
+        assertThrows(IllegalArgumentException.class, () -> Bins.fromShort(65536));
+        Bins bins = Bins.fromByte(0);
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.get(-1));
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.get(8));
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.getInt(-1, 1));
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.getInt(0, -1));
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.getInt(7, 2));
+        assertThrows(NullPointerException.class, () -> bins.replace(0, (Bins) null));
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.replace(-1, Bins.fromByte(0)));
+        assertThrows(IndexOutOfBoundsException.class, () -> bins.replace(1, Bins.fromByte(0)));
     }
 }

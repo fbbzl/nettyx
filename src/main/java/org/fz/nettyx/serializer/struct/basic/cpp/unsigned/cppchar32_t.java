@@ -1,10 +1,9 @@
-package org.fz.nettyx.serializer.struct.basic.cpp.signed;
+package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 
 /**
  * this type in Cpp language is char32_t
@@ -13,11 +12,9 @@ import java.nio.charset.Charset;
  * @version 1.0
  * @since 2023/12/27 13:31
  */
-public class cppchar32_t extends cppbasic<Integer> {
+public class cppchar32_t extends cppbasic<Long> {
 
-    private static final Charset UTF_32 = Charset.forName("UTF-32");
-
-    public cppchar32_t(Integer value) {
+    public cppchar32_t(Long value) {
         super(value);
     }
 
@@ -28,27 +25,28 @@ public class cppchar32_t extends cppbasic<Integer> {
     @Override
     public int size() { return 4; }
 
+    @Override
+    public boolean hasSigned() {
+        return false;
+    }
+
     public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            writingBuf.writeIntLE(value);
+            writingBuf.writeIntLE(value.intValue());
         else
-            writingBuf.writeInt(value);
+            writingBuf.writeInt(value.intValue());
     }
 
     @Override
-    protected Integer read(ByteBuf readingBuf, ByteOrder byteOrder) {
+    protected Long read(ByteBuf readingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            return readingBuf.readIntLE();
+            return readingBuf.readUnsignedIntLE();
         else
-            return readingBuf.readInt();
+            return readingBuf.readUnsignedInt();
     }
 
     @Override
     public String toString() {
-        return toString(UTF_32);
-    }
-
-    public String toString(Charset charset) {
         return value != null ? value.toString() : "";
     }
 
