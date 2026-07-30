@@ -19,42 +19,42 @@ public class ComplexGenericStructTest extends AbstractStructSerializerTest {
 
     @Test
     public void testNestedGeneric() {
-        byte[] bytes = new byte[512];
+        byte[] bytes = new byte[9];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<NestedGeneric<cint, cchar>>() {}, bytes);
     }
 
     @Test
     public void testNestedArrayGeneric() {
-        byte[] bytes = new byte[512];
+        byte[] bytes = new byte[22];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<NestedArrayGeneric<cint, cchar>>() {}, bytes);
     }
 
     @Test
     public void testDeepNestedParameterized() {
-        byte[] bytes = new byte[256];
+        byte[] bytes = new byte[10];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<GenericBox<GenericPair<GenericTriple<cint, cchar, clong4>, cchar>>>() {}, bytes);
     }
 
     @Test
     public void testDerivedGeneric() {
-        byte[] bytes = new byte[64];
+        byte[] bytes = new byte[5];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<DerivedGeneric<cint, cchar>>() {}, bytes);
     }
 
     @Test
     public void testStructBoundedGeneric() {
-        byte[] bytes = new byte[256];
+        byte[] bytes = new byte[5];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<StructBoundedGeneric<Bill>>() {}, bytes);
     }
 
     @Test
     public void testInterfaceImplGeneric() {
-        byte[] bytes = new byte[64];
+        byte[] bytes = new byte[4];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<InterfaceImplGeneric<cint>>() {}, bytes);
     }

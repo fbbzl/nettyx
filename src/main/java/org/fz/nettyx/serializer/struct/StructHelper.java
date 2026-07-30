@@ -81,8 +81,8 @@ public class StructHelper {
         catch (Exception instanceError)
         {
             Throwable cause = instanceError.getCause();
-            if (instanceError instanceof TooLessBytesException || cause instanceof TooLessBytesException)
-                throw new SerializeException(instanceError);
+            if (instanceError instanceof TooLessBytesException tooLessBytes) throw tooLessBytes;
+            if (cause instanceof TooLessBytesException tooLessBytes) throw tooLessBytes;
             else
                 throw new SerializeException("basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", instanceError);
         }

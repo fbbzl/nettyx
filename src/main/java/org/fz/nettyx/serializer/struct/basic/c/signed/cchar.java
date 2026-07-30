@@ -1,11 +1,10 @@
 package org.fz.nettyx.serializer.struct.basic.c.signed;
 
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  * this type in C language is char
@@ -21,7 +20,16 @@ public class cchar extends cbasic<Byte> {
     }
 
     public cchar(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+        super(readValue(buf));
+    }
+
+    private static Byte readValue(ByteBuf buf) {
+        try {
+            return buf.readByte();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw new TooLessBytesException(1, buf.readableBytes());
+        }
     }
 
     @Override
@@ -38,10 +46,6 @@ public class cchar extends cbasic<Byte> {
 
     @Override
     public String toString() {
-        return toString(StandardCharsets.US_ASCII);
-    }
-
-    public String toString(Charset charset) {
         return value != null ? value.toString() : "";
     }
 

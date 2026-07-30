@@ -22,5 +22,15 @@ Thumbs.db
 *.gpg
 .env
 
+# AI coding tools
 /.omo/
 /.opencode/
+/.codegraph/
+/.cursor/
+/.claude/
+/.continue/
+/.aider*
+/.cody/
+/.tabnine/
+/.windsurf/
+/.codeium/

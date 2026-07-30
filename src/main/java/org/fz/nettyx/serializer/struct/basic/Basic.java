@@ -24,8 +24,15 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     V value;
 
     protected Basic(ByteBuf byteBuf, ByteOrder byteOrder) {
-        if (byteBuf.readableBytes() < size()) throw new TooLessBytesException(size(), byteBuf.readableBytes());
-        this.value = this.read(byteBuf, byteOrder);
+        try {
+            this.value = this.read(byteBuf, byteOrder);
+        }
+        catch (Exception error) {
+            int readableBytes = byteBuf.readableBytes();
+            int expectedBytes = size();
+            if (readableBytes < expectedBytes) throw new TooLessBytesException(expectedBytes, readableBytes);
+            throw error;
+        }
     }
 
     protected Basic(V value) {
@@ -40,13 +47,13 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
 
     protected abstract V read(ByteBuf readingBuf, ByteOrder byteOrder);
 
-    public final V value() {
+    public V value() {
         return value;
     }
 
     @Override
     public int hashCode() {
-        V v = value != null ? value : null;
+        V v = value();
         return v != null ? v.hashCode() : 0;
     }
 
@@ -61,8 +68,8 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
                 return false;
             }
 
-            V thisVal = value != null ? value : null;
-            Object thatVal = anotherBasic.value != null ? anotherBasic.value : null;
+            V thisVal = value();
+            Object thatVal = anotherBasic.value();
             return Objects.equals(thisVal, thatVal);
         }
         return false;
@@ -70,8 +77,8 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
 
     @Override
     public int compareTo(Basic<V> anotherBasic) {
-        V thisVal = value != null ? value : null;
-        V thatVal = anotherBasic.value != null ? anotherBasic.value : null;
+        V thisVal = value();
+        V thatVal = anotherBasic.value();
         if (thisVal == null) throw new IllegalArgumentException("this value is null");
         if (thatVal == null) throw new IllegalArgumentException("another value is null");
         return thisVal.compareTo(thatVal);

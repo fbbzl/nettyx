@@ -4,8 +4,6 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  * this type in C language is unsigned char
@@ -17,9 +15,13 @@ import java.nio.charset.StandardCharsets;
 public class cuchar extends cbasic<Short> {
 
     public cuchar(Integer value) {
-        super(value.shortValue());
+        super(requireValidValue(value));
+    }
+
+    private static short requireValidValue(Integer value) {
         if (value == null || value < 0 || value > 0xFF)
             throw new IllegalArgumentException("cuchar value out of range [0, 255]: " + value);
+        return value.shortValue();
     }
 
     public cuchar(ByteBuf buf, ByteOrder byteOrder) {
@@ -47,10 +49,6 @@ public class cuchar extends cbasic<Short> {
 
     @Override
     public String toString() {
-        return toString(StandardCharsets.US_ASCII);
-    }
-
-    public String toString(Charset charset) {
         return value != null ? value.toString() : "";
     }
 

@@ -1,6 +1,7 @@
 package org.fz.nettyx.serializer.struct.basic.c.unsigned;
 
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.cbasic;
 
 import java.math.BigInteger;
@@ -15,6 +16,9 @@ import java.nio.ByteOrder;
  */
 public class culong8 extends cbasic<BigInteger> {
 
+    private long    rawValue;
+    private boolean rawValueAvailable;
+
     public culong8(BigInteger value) {
         super(value);
         if (value == null || value.signum() < 0)
@@ -22,7 +26,9 @@ public class culong8 extends cbasic<BigInteger> {
     }
 
     public culong8(ByteBuf buf, ByteOrder byteOrder) {
-        super(buf, byteOrder);
+        super((BigInteger) null);
+        this.rawValue = readRawValue(buf, byteOrder);
+        this.rawValueAvailable = true;
     }
 
     @Override
@@ -33,38 +39,50 @@ public class culong8 extends cbasic<BigInteger> {
     @Override
     public int size() { return 8; }
 
+    @Override
+    public BigInteger value() {
+        if (value == null && rawValueAvailable) value = toUnsignedBigInteger(rawValue);
+        return value;
+    }
+
     public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
-        if (value == null || value.signum() < 0 || value.compareTo(BigInteger.TWO.pow(64)) >= 0)
-            throw new IllegalArgumentException("culong8 value out of range [0, 2^64-1]: " + value);
-        byte[] byteArray = value.toByteArray();
-        int copyLength = Math.min(byteArray.length, size());
-        int copyStart  = byteArray.length - copyLength;
-        int padding    = size() - copyLength;
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            for (int i = byteArray.length - 1; i >= copyStart; i--) {
-                writingBuf.writeByte(byteArray[i]);
-            }
-            if (padding > 0) writingBuf.writeZero(padding);
-        } else {
-            if (padding > 0) writingBuf.writeZero(padding);
-            writingBuf.writeBytes(byteArray, copyStart, copyLength);
+        if (rawValueAvailable) {
+            writeRawValue(writingBuf, byteOrder, rawValue);
+            return;
         }
+
+        BigInteger currentValue = value();
+        if (currentValue == null || currentValue.signum() < 0 || currentValue.bitLength() > Long.SIZE)
+            throw new IllegalArgumentException("culong8 value out of range [0, 2^64-1]: " + currentValue);
+        writeRawValue(writingBuf, byteOrder, currentValue.longValue());
+    }
+
+    private static void writeRawValue(ByteBuf writingBuf, ByteOrder byteOrder, long rawValue) {
+        if (byteOrder == ByteOrder.LITTLE_ENDIAN) writingBuf.writeLongLE(rawValue);
+        else                                      writingBuf.writeLong(rawValue);
     }
 
     @Override
     protected BigInteger read(ByteBuf readingBuf, ByteOrder byteOrder) {
-        byte[] byteArray = new byte[size()];
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
-            for (int i = size() - 1; i >= 0; i--) {
-                byteArray[i] = readingBuf.readByte();
-            }
-        } else {
-            readingBuf.readBytes(byteArray);
-        }
+        return toUnsignedBigInteger(readRawValue(readingBuf, byteOrder));
+    }
 
-        // the no sign in BigInteger is 1
-        final int noSign = 1;
-        return new BigInteger(noSign, byteArray);
+    private static long readRawValue(ByteBuf readingBuf, ByteOrder byteOrder) {
+        int readableBytes = readingBuf.readableBytes();
+        if (readableBytes < Long.BYTES) throw new TooLessBytesException(Long.BYTES, readableBytes);
+        return byteOrder == ByteOrder.LITTLE_ENDIAN
+               ? readingBuf.readLongLE()
+               : readingBuf.readLong();
+    }
+
+    private static BigInteger toUnsignedBigInteger(long rawValue) {
+        BigInteger value = BigInteger.valueOf(rawValue & Long.MAX_VALUE);
+        return rawValue < 0 ? value.setBit(Long.SIZE - 1) : value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value());
     }
 
 }

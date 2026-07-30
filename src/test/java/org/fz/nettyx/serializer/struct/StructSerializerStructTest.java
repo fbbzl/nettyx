@@ -2,10 +2,12 @@ package org.fz.nettyx.serializer.struct;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import org.fz.nettyx.beanmodel.valid.FlexibleBasicArrayBean;
 import org.fz.nettyx.codec.model.GirlFriend;
 import org.fz.nettyx.codec.model.Lover;
 import org.fz.nettyx.codec.model.You;
 import org.fz.nettyx.exception.StructDefinitionException;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
@@ -23,7 +25,7 @@ public class StructSerializerStructTest {
 
     @BeforeClass
     public static void init() {
-        new StructSerializerContext("org.fz.nettyx.codec.model");
+        new StructSerializerContext("org.fz.nettyx.codec.model", "org.fz.nettyx.beanmodel.valid");
     }
 
     @Test
@@ -73,6 +75,27 @@ public class StructSerializerStructTest {
         byte[] bytes = new byte[gfBuf.readableBytes()];
         gfBuf.readBytes(bytes);
         assertNotNull(bytes);
+    }
+
+    @Test
+    public void flexibleBasicArrayUsesAllCompleteElements() {
+        FlexibleBasicArrayBean empty = toStruct(FlexibleBasicArrayBean.class, Unpooled.EMPTY_BUFFER);
+        assertEquals(0, empty.getValues().length);
+
+        ByteBuf input = Unpooled.wrappedBuffer(new byte[]{1, 0, 0, 0, 2, 0, 0, 0});
+        FlexibleBasicArrayBean decoded = toStruct(FlexibleBasicArrayBean.class, input);
+        assertEquals(2, decoded.getValues().length);
+        assertEquals(Integer.valueOf(1), decoded.getValues()[0].value());
+        assertEquals(Integer.valueOf(2), decoded.getValues()[1].value());
+        assertEquals(8, input.readerIndex());
+    }
+
+    @Test
+    public void flexibleBasicArrayRejectsPartialLastElement() {
+        ByteBuf input = Unpooled.wrappedBuffer(new byte[]{1, 0, 0, 0, 2, 0});
+        assertThrows(TooLessBytesException.class,
+                     () -> toStruct(FlexibleBasicArrayBean.class, input));
+        assertEquals(4, input.readerIndex());
     }
 
     @Test(expected = StructDefinitionException.class)
