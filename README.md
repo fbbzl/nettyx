@@ -37,7 +37,7 @@
 ```
 
 ```groovy
-implementation 'io.github.fbbzl:nettyx:2.6.25'
+implementation 'io.github.fbbzl:nettyx:2.6.28'
 ```
 
 ---
