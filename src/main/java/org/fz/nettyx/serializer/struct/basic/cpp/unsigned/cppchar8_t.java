@@ -1,7 +1,7 @@
-package org.fz.nettyx.serializer.struct.basic.cpp.signed;
+package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
 
 import java.nio.ByteOrder;
 
@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
  * @version 1.0
  * @since 2023/12/27 13:12
  */
-public class cppchar8_t extends cchar {
+public class cppchar8_t extends cuchar {
 
     public cppchar8_t(Integer value) {
         super(value);

@@ -7,7 +7,11 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.AttributeKey;
 import org.junit.Test;
 
+import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -56,5 +60,48 @@ public class ChannelEventTest {
         assertNotNull(new ChannelEvent.Close<>(ctx, promise).getChannelPromise());
         assertNotNull(new ChannelEvent.Deregister<>(ctx, promise).getChannelPromise());
         channel.finishAndReleaseAll();
+    }
+
+    @Test
+    public void everyEventConstructorRetainsContext() throws Exception {
+        EmbeddedChannel channel = new EmbeddedChannel(new ChannelInboundHandlerAdapter());
+        ChannelHandlerContext ctx = channel.pipeline().firstContext();
+        ChannelPromise promise = channel.newPromise();
+        SocketAddress address = new InetSocketAddress(10003);
+        Throwable error = new IllegalStateException("test");
+        Object payload = new Object();
+        List<Class<?>> coveredTypes = new ArrayList<>();
+
+        for (Class<?> eventType : ChannelEvent.class.getDeclaredClasses()) {
+            if (!ChannelEvent.class.isAssignableFrom(eventType)) continue;
+            coveredTypes.add(eventType);
+            for (Constructor<?> constructor : eventType.getConstructors()) {
+                Object[] arguments = new Object[constructor.getParameterCount()];
+                Class<?>[] parameterTypes = constructor.getParameterTypes();
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    arguments[i] = argument(parameterTypes[i], ctx, promise, address, error, payload);
+                }
+
+                ChannelEvent<?> event = (ChannelEvent<?>) constructor.newInstance(arguments);
+                assertSame(eventType.getName(), ctx, event.getCtx());
+            }
+        }
+
+        assertFalse(coveredTypes.isEmpty());
+        channel.finishAndReleaseAll();
+    }
+
+    private static Object argument(
+            Class<?> type,
+            ChannelHandlerContext ctx,
+            ChannelPromise promise,
+            SocketAddress address,
+            Throwable error,
+            Object payload) {
+        if (type == ChannelHandlerContext.class) return ctx;
+        if (type == ChannelPromise.class) return promise;
+        if (type == SocketAddress.class) return address;
+        if (type == Throwable.class) return error;
+        return payload;
     }
 }

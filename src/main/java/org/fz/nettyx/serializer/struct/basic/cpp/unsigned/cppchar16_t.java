@@ -1,11 +1,9 @@
-package org.fz.nettyx.serializer.struct.basic.cpp.signed;
+package org.fz.nettyx.serializer.struct.basic.cpp.unsigned;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.struct.basic.cpp.cppbasic;
 
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 /**
  * this type in Cpp language is char16_t
@@ -27,6 +25,11 @@ public class cppchar16_t extends cppbasic<Character> {
     @Override
     public int size() { return 2; }
 
+    @Override
+    public boolean hasSigned() {
+        return false;
+    }
+
     public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
             writingBuf.writeShortLE((short) value.charValue());
@@ -44,10 +47,6 @@ public class cppchar16_t extends cppbasic<Character> {
 
     @Override
     public String toString() {
-        return toString(StandardCharsets.UTF_16);
-    }
-
-    public String toString(Charset charset) {
         return value != null ? value.toString() : "";
     }
 

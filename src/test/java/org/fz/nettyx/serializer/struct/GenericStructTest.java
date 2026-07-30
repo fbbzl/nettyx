@@ -15,21 +15,21 @@ public class GenericStructTest extends AbstractStructSerializerTest {
 
     @Test
     public void testGenericBox() {
-        byte[] bytes = new byte[32];
+        byte[] bytes = new byte[4];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<GenericBox<cint>>() {}, bytes);
     }
 
     @Test
     public void testGenericPair() {
-        byte[] bytes = new byte[64];
+        byte[] bytes = new byte[5];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<GenericPair<cint, cchar>>() {}, bytes);
     }
 
     @Test
     public void testGenericTriple() {
-        byte[] bytes = new byte[128];
+        byte[] bytes = new byte[9];
         Arrays.fill(bytes, (byte) 67);
         assertRoundTrip(new TypeReference<GenericTriple<cint, cchar, clong4>>() {}, bytes);
     }

@@ -122,13 +122,12 @@ public enum EndianKit {
 
         @Override
         public byte[] fromUnsignedLong(BigInteger l) {
-            return l.toByteArray();
+            return fromLong(l.longValue());
         }
 
         @Override
         public BigInteger toUnsignedLong(byte[] bytes) {
-            checkLength(bytes, 8);
-            return new BigInteger(1, bytes);
+            return toUnsignedBigInteger(toLong(bytes));
         }
 
         public float toFloat(byte[] bytes) {
@@ -343,13 +342,12 @@ public enum EndianKit {
 
         @Override
         public byte[] fromUnsignedLong(BigInteger l) {
-            return PrimitiveArrayUtil.reverse(l.toByteArray());
+            return fromLong(l.longValue());
         }
 
         @Override
         public BigInteger toUnsignedLong(byte[] bytes) {
-            checkLength(bytes, 8);
-            return new BigInteger(1, PrimitiveArrayUtil.reverse(bytes));
+            return toUnsignedBigInteger(toLong(bytes));
         }
 
         @Override
@@ -494,6 +492,11 @@ public enum EndianKit {
     public abstract byte[] fromUnsignedLong(BigInteger l);
 
     public abstract BigInteger toUnsignedLong(byte[] bytes);
+
+    private static BigInteger toUnsignedBigInteger(long value) {
+        if (value >= 0) return BigInteger.valueOf(value);
+        return BigInteger.valueOf(value & Long.MAX_VALUE).setBit(Long.SIZE - 1);
+    }
 
     // float
     public byte[] fromFloat(float f) {

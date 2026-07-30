@@ -112,7 +112,7 @@ public @interface ToArray {
             if (toArray.flexible()) {
                 Field[] structFields = getFields(field.getDeclaringClass(), StructHelper::legalStructField);
 
-                if (structFields[structFields.length - 1] != field) {
+                if (!structFields[structFields.length - 1].equals(field)) {
                     throw new StructFieldHandlerException("flexible array field must be the last field");
                 }
             }
