@@ -107,6 +107,9 @@ public @interface ToArray {
 
         @Override
         public void doValid(ToArray toArray, Field field) {
+            if (!field.getType().isArray()) {
+                throw new StructFieldHandlerException("@ToArray only supports array fields, but got [" + field.getType() + "]");
+            }
             if (toArray.length() < 0 && !toArray.flexible())
                 throw new StructFieldHandlerException("array field must use @ToArray to assign array length or be flexible");
             if (toArray.flexible()) {

@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct;
 
+import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.invalidmodel.cycle.CycleStructs;
 import org.junit.BeforeClass;
@@ -74,10 +75,10 @@ public class StructCycleValidationTest {
     }
 
     @Test
-    public void ignoresNonArrayToArrayFieldDuringCycleAnalysis() {
-        context.scanStructTypes(types(CycleStructs.NonArrayAnnotation.class));
-
-        assertNotNull(StructSerializerContext.getStructDefinition(CycleStructs.NonArrayAnnotation.class));
+    public void rejectsToArrayOnNonArrayFieldBeforeCycleAnalysis() {
+        assertThrows(SerializeException.class,
+                     () -> context.scanStructTypes(types(CycleStructs.NonArrayAnnotation.class)));
+        assertNull(StructSerializerContext.getStructDefinition(CycleStructs.NonArrayAnnotation.class));
     }
 
     @Test
