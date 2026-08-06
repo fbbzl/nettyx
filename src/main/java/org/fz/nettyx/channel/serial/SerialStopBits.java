@@ -24,11 +24,8 @@ public enum SerialStopBits {
     }
 
     public static SerialStopBits valueOf(int value) {
-        for (SerialStopBits stopBit : values()) {
-            if (stopBit.value == value) {
-                return stopBit;
-            }
-        }
+        for (SerialStopBits stopBit : values()) if (stopBit.value == value) return stopBit;
+
         throw new UnknownConfigException(SerialStopBits.class.getSimpleName(), value);
     }
 }
