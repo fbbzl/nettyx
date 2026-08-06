@@ -114,7 +114,6 @@ public interface RxtxChannelConfig extends SerialChannelConfig {
      * @version 1.0
      * @since 2024/3/1 14:44
      */
-    @SuppressWarnings("deprecation")
     final class DefaultRxtxChannelConfig extends AbstractSerialChannelConfig implements RxtxChannelConfig {
 
         DefaultRxtxChannelConfig(RxtxChannel channel) {

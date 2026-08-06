@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 /**
@@ -32,10 +33,13 @@ public final class BtFinder {
         private final Object             completedTag = new Object();
         private final List<RemoteDevice> devices      = new ArrayList<>(64);
         private volatile boolean         completed    = false;
-        private       DiscoveryListener  listener     = new DiscoveryListenerAdapter() {
+        private final DiscoveryListener  listener     = new DiscoveryListenerAdapter() {
             @Override
             public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
                 synchronized (completedTag) { devices.add(btDevice); }
+                if (delegate != null) {
+                    delegate.deviceDiscovered(btDevice, cod);
+                }
             }
 
             @Override
@@ -44,12 +48,16 @@ public final class BtFinder {
                     completed = true;
                     completedTag.notifyAll();
                 }
+                if (delegate != null) {
+                    delegate.inquiryCompleted(discType);
+                }
             }
         };
+        private DiscoveryListener delegate;
 
         public DeviceFinder(DiscoveryListener listener)
         {
-            this.listener = listener;
+            this.delegate = listener;
         }
 
         public List<RemoteDevice> getDevices()
@@ -63,16 +71,20 @@ public final class BtFinder {
             try {
                 synchronized (completedTag) {
                     devices.clear();
-                    DiscoveryAgent discoveryAgent = LocalDevice.getLocalDevice().getDiscoveryAgent();
-                    boolean        started        = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, listener);
+                    completed = false;
+                    boolean started = startInquiry(listener);
 
                     if (started) {
-                        completed = false;
-                        long deadline = System.currentTimeMillis() + 30_000;
-                        while (!completed && System.currentTimeMillis() < deadline) {
-                            completedTag.wait(deadline - System.currentTimeMillis());
+                        try {
+                            long remainingNanos = timeoutNanos();
+                            long deadline = System.nanoTime() + remainingNanos;
+                            while (!completed && remainingNanos > 0) {
+                                TimeUnit.NANOSECONDS.timedWait(completedTag, remainingNanos);
+                                remainingNanos = deadline - System.nanoTime();
+                            }
+                        } finally {
+                            cancelInquiry(listener);
                         }
-                        discoveryAgent.cancelInquiry(listener);
                     }
                     devices.removeIf(condition.negate());
                 }
@@ -83,20 +95,40 @@ public final class BtFinder {
 
             return devices;
         }
+
+        boolean startInquiry(DiscoveryListener listener) throws BluetoothStateException
+        {
+            return LocalDevice.getLocalDevice().getDiscoveryAgent().startInquiry(DiscoveryAgent.GIAC, listener);
+        }
+
+        boolean cancelInquiry(DiscoveryListener listener) throws BluetoothStateException
+        {
+            return LocalDevice.getLocalDevice().getDiscoveryAgent().cancelInquiry(listener);
+        }
+
+        long timeoutNanos()
+        {
+            return TimeUnit.SECONDS.toNanos(30);
+        }
     }
 
     @RequiredArgsConstructor
     public static class ServiceFinder {
 
-        private static final int               DEFAULT_ATTR_ID = 0x0100;
+        private static final int               DEFAULT_ATTR_ID       = 0x0100;
+        private static final int               NO_ACTIVE_TRANSACTION = -1;
         private final        Object            completedTag    = new Object();
         private final List<String>             services        = new ArrayList<>(32);
         private volatile boolean                completed      = false;
-        private              DiscoveryListener  listener       = new DiscoveryListenerAdapter() {
+        private int                             activeTransactionId = NO_ACTIVE_TRANSACTION;
+        private final        DiscoveryListener  listener       = new DiscoveryListenerAdapter() {
             @Override
             public void servicesDiscovered(int transID, ServiceRecord[] servRecord)
             {
                 synchronized (completedTag) {
+                    if (transID != activeTransactionId) {
+                        return;
+                    }
                     for (ServiceRecord serviceRecord : servRecord) {
                         String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
                         if (CharSequenceUtil.isEmpty(url)) {
@@ -105,21 +137,31 @@ public final class BtFinder {
                         services.add(url);
                     }
                 }
+                if (delegate != null) {
+                    delegate.servicesDiscovered(transID, servRecord);
+                }
             }
 
             @Override
             public void serviceSearchCompleted(int transID, int respCode)
             {
                 synchronized (completedTag) {
+                    if (transID != activeTransactionId) {
+                        return;
+                    }
                     completed = true;
                     completedTag.notifyAll();
                 }
+                if (delegate != null) {
+                    delegate.serviceSearchCompleted(transID, respCode);
+                }
             }
         };
+        private DiscoveryListener delegate;
 
         public ServiceFinder(DiscoveryListener listener)
         {
-            this.listener = listener;
+            this.delegate = listener;
         }
 
         public List<String> getServices(RemoteDevice btDevice, String serviceUUID) throws IOException, InterruptedException
@@ -134,15 +176,39 @@ public final class BtFinder {
             synchronized (completedTag) {
                 services.clear();
                 completed = false;
-                LocalDevice.getLocalDevice().getDiscoveryAgent().searchServices(new int[]{ DEFAULT_ATTR_ID }, searchUuidSet, btDevice, listener);
-                long deadline = System.currentTimeMillis() + 30_000;
-                while (!completed && System.currentTimeMillis() < deadline) {
-                    completedTag.wait(deadline - System.currentTimeMillis());
+                int transactionId = searchServices(searchUuidSet, btDevice, listener);
+                activeTransactionId = transactionId;
+                try {
+                    long remainingNanos = timeoutNanos();
+                    long deadline = System.nanoTime() + remainingNanos;
+                    while (!completed && remainingNanos > 0) {
+                        TimeUnit.NANOSECONDS.timedWait(completedTag, remainingNanos);
+                        remainingNanos = deadline - System.nanoTime();
+                    }
+                    services.removeIf(condition.negate());
+                } finally {
+                    activeTransactionId = NO_ACTIVE_TRANSACTION;
+                    cancelServiceSearch(transactionId);
                 }
-                services.removeIf(condition.negate());
             }
 
             return services;
+        }
+
+        int searchServices(UUID[] searchUuidSet, RemoteDevice btDevice, DiscoveryListener listener) throws BluetoothStateException
+        {
+            return LocalDevice.getLocalDevice().getDiscoveryAgent()
+                              .searchServices(new int[]{ DEFAULT_ATTR_ID }, searchUuidSet, btDevice, listener);
+        }
+
+        boolean cancelServiceSearch(int transId) throws BluetoothStateException
+        {
+            return LocalDevice.getLocalDevice().getDiscoveryAgent().cancelServiceSearch(transId);
+        }
+
+        long timeoutNanos()
+        {
+            return TimeUnit.SECONDS.toNanos(30);
         }
     }
 

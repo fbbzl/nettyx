@@ -250,11 +250,8 @@ public class StructSerializerContext {
 
     private static Type arrayComponentType(Type type)
     {
-        return switch (type) {
-            case Class<?> clazz when clazz.isArray() -> clazz.getComponentType();
-            case GenericArrayType array              -> array.getGenericComponentType();
-            default                                  -> null;
-        };
+        if (type instanceof Class<?> clazz) return clazz.getComponentType();
+        return ((GenericArrayType) type).getGenericComponentType();
     }
 
     private static Class<?> rawStructClass(Type type)

@@ -125,4 +125,16 @@ public class StructBeanValidationTest {
         assertThrows(SerializeException.class,
                      () -> new StructSerializerContext("org.fz.nettyx.beanmodel.wrongsetter"));
     }
+
+    @Test
+    public void toArrayOnNonArrayFieldIsRejectedDuringScan() {
+        assertThrows(SerializeException.class,
+                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.invalidarray"));
+    }
+
+    @Test
+    public void incompatibleCharSequenceFieldIsRejectedDuringScan() {
+        assertThrows(SerializeException.class,
+                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.invalidcharsequence"));
+    }
 }
