@@ -105,8 +105,9 @@ public @interface ToCharSequence {
         @Override
         public void doValid(ToCharSequence annotation, Field field)
         {
-            Throws.ifFalse(CharSequence.class.isAssignableFrom(field.getType()),
-                           () -> new TypeJudgmentException("@ToCharSequence only supports CharSequence fields, but got [" + field.getType() + "]"));
+            Class<?> fieldType = field.getType();
+            Throws.ifFalse(CharSequence.class.isAssignableFrom(fieldType) && fieldType.isAssignableFrom(String.class),
+                           () -> new TypeJudgmentException("@ToCharSequence field must accept String values, but got [" + fieldType + "]"));
             Throws.ifTrue(annotation.bufferLength() < 0,
                           () -> new IllegalArgumentException("char sequence buffer length must not be negative, but got [" + annotation.bufferLength() + "]"));
             if (!Charset.isSupported(annotation.charset())) {

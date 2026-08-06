@@ -17,7 +17,6 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
@@ -251,8 +250,8 @@ public class StructCoreCoverageTest {
 
     @Test
     public void handlerAnnotationResolutionIgnoresUnrelatedInterfacesAndSupportsInheritance() {
-        assertEquals(ToArray.class, StructSerializerContext.getTargetAnnotationType(MultiInterfaceHandler.class));
-        assertEquals(ToArray.class, StructSerializerContext.getTargetAnnotationType(InheritedHandler.class));
+        assertEquals(TestHandlerAnnotation.class, StructSerializerContext.getTargetAnnotationType(MultiInterfaceHandler.class));
+        assertEquals(TestHandlerAnnotation.class, StructSerializerContext.getTargetAnnotationType(InheritedHandler.class));
         assertNull(StructSerializerContext.getTargetAnnotationType(GenericHandler.class));
         assertNull(StructSerializerContext.getTargetAnnotationType(StructFieldHandler.class));
     }
@@ -386,8 +385,11 @@ public class StructCoreCoverageTest {
         transient int transientValue;
     }
 
+    private @interface TestHandlerAnnotation {
+    }
+
     private static class MultiInterfaceHandler
-            implements Comparable<MultiInterfaceHandler>, StructFieldHandler<ToArray> {
+            implements Comparable<MultiInterfaceHandler>, StructFieldHandler<TestHandlerAnnotation> {
         @Override
         public int compareTo(MultiInterfaceHandler other) {
             return 0;
@@ -397,7 +399,7 @@ public class StructCoreCoverageTest {
     private static class GenericHandler<A extends Annotation> implements StructFieldHandler<A> {
     }
 
-    private static class InheritedHandler extends GenericHandler<ToArray> {
+    private static class InheritedHandler extends GenericHandler<TestHandlerAnnotation> {
     }
 
     private static class ExposedContext extends StructSerializerContext {
