@@ -15,13 +15,13 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 @SuppressWarnings("deprecation")
 public abstract class AbstractSerialChannelConfig extends DefaultChannelConfig implements SerialChannelConfig {
 
-    private volatile int             baudRate    = 115200;
-    private volatile SerialStopBits  stopBits    = SerialStopBits.STOP_BITS_1;
-    private volatile SerialDataBits  dataBits    = SerialDataBits.DATA_BITS_8;
-    private volatile SerialParityBit parityBit   = SerialParityBit.NO;
-    private volatile int             readTimeout = 1000;
-    private volatile boolean         dtr;
-    private volatile boolean         rts;
+    volatile int             baudRate    = 115200;
+    volatile SerialStopBits  stopBits    = SerialStopBits.STOP_BITS_1;
+    volatile SerialDataBits  dataBits    = SerialDataBits.DATA_BITS_8;
+    volatile SerialParityBit parityBit   = SerialParityBit.NO;
+    volatile int             readTimeout = 1000;
+    volatile boolean         dtr;
+    volatile boolean         rts;
 
     protected AbstractSerialChannelConfig(Channel channel) {
         super(channel);
