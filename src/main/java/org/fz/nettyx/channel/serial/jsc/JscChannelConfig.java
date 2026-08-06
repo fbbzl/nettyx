@@ -74,7 +74,6 @@ public interface JscChannelConfig extends SerialChannelConfig {
      * @version 1.0
      * @since 2024/3/2 13:29
      */
-    @SuppressWarnings("deprecation")
     final class DefaultJscChannelConfig extends AbstractSerialChannelConfig implements JscChannelConfig {
 
         DefaultJscChannelConfig(JscChannel channel) {
