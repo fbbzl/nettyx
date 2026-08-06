@@ -113,7 +113,6 @@ public class SerialChannelConfigTest {
         assertThrows(UnknownConfigException.class, () -> SerialStopBits.valueOf(0));
     }
 
-    @SuppressWarnings("deprecation")
     private static void assertCommonConfiguration(SerialChannelConfig config) {
         FixedRecvByteBufAllocator recvAllocator = new FixedRecvByteBufAllocator(256);
         WriteBufferWaterMark waterMark = new WriteBufferWaterMark(32, 64);
