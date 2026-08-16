@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<structs namespace="a">
+    <struct name="Point" endian="BE">
+        <field name="v" type="cint"/>
+    </struct>
+</structs>

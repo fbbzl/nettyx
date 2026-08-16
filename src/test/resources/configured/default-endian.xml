@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<structs namespace="defs">
+    <struct name="NoEndian">
+        <field name="v" type="cint"/>
+    </struct>
+</structs>

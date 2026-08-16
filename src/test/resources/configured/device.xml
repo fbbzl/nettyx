@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
+<structs namespace="device">
+    <struct name="Device" endian="LE">
+        <field name="id"          type="cint"/>
+        <field name="speed"       type="cushort"/>
+        <field name="temperature" type="cdouble"/>
+        <field name="name"        type="char" length="8"/>
+        <field name="raw"         type="byte" length="2"/>
+        <field name="values"      type="cshort" array="3"/>
+        <field name="gps"         struct="geo.GpsPoint"/>
+    </struct>
+    <struct name="Flexible" endian="BE">
+        <field name="head" type="cuchar"/>
+        <field name="tail" type="cushort" array="*"/>
+    </struct>
+    <struct name="TextMsg" endian="BE">
+        <field name="title" type="char" length="8" charset="GBK"/>
+        <field name="note"  type="char" length="8"/>
+    </struct>
+    <struct name="Track" endian="BE">
+        <field name="count"  type="cuchar"/>
+        <field name="points" struct="geo.GpsPoint" array="2"/>
+    </struct>
+    <struct name="Stream" endian="BE">
+        <field name="head"   type="cuchar"/>
+        <field name="points" struct="geo.GpsPoint" array="*"/>
+    </struct>
+</structs>

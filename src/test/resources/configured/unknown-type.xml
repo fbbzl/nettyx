@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<structs namespace="bad">
+    <struct name="U" endian="BE">
+        <field name="v" type="notexist"/>
+    </struct>
+</structs>

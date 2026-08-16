@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<structs namespace="badboth">
+    <struct name="C" endian="BE">
+        <field name="v" type="cint" struct="badboth.C"/>
+    </struct>
+</structs>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
+<structs namespace="geo">
+    <struct name="GpsPoint" endian="BE">
+        <field name="longitude" type="cint"/>
+        <field name="latitude"  type="cint"/>
+    </struct>
+</structs>

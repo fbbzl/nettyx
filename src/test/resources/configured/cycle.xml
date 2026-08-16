@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
+<structs namespace="cycle">
+    <struct name="A">
+        <field name="b" struct="cycle.B"/>
+    </struct>
+    <struct name="B">
+        <field name="a" struct="cycle.A"/>
+    </struct>
+</structs>

