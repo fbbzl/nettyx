@@ -31,6 +31,7 @@ public class ConfigField {
     private final String name;
 
     private final Class<? extends Basic<?>> basicType;
+    private final BasicTypeResolver.BasicValueReader basicValueReader;
     private final Integer length;
     private final boolean flexible;
     private final String structRef;
@@ -52,6 +53,7 @@ public class ConfigField {
         this.kind = kind;
         this.name = name;
         this.basicType = basicType;
+        this.basicValueReader = basicType == null ? null : BasicTypeResolver.valueReaderFor(basicType);
         this.length = length;
         this.flexible = flexible;
         this.structRef = structRef;

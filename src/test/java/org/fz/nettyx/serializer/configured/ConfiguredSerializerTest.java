@@ -1,7 +1,10 @@
 package org.fz.nettyx.serializer.configured;
 
+import cn.hutool.core.date.StopWatch;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
@@ -15,6 +18,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -24,8 +28,50 @@ import static org.junit.Assert.*;
  */
 public class ConfiguredSerializerTest {
 
+    private static final InternalLogger log = InternalLoggerFactory.getInstance(ConfiguredSerializerTest.class);
+
     static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
+
+    @Test
+    public void testConfiguredSerializerView()
+    {
+        byte[] bytes = Arrays.copyOf(new byte[]{
+                0x44, 0x33, 0x22, 0x11,
+                (byte) 0xBB, (byte) 0xAA,
+                (byte) 0xCD, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, 0x4C, 0x42, 0x40,
+                'n', 'e', 't', 't', 'y', 0, 0, 0,
+                0x11, 0x22,
+                1, 0, 2, 0, 3, 0,
+                0, 0, 0, 100,
+                0, 0, 0, (byte) 200
+        }, 122);
+        ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.BenchmarkDevice");
+        ConfigStructView view = serializer.newView();
+        ByteBuf buffer = Unpooled.wrappedBuffer(bytes);
+
+        assertEquals(122, bytes.length);
+
+        // Keep JIT compilation and profile collection outside the reported throughput.
+        for (int j = 0; j < 2_000_000; j++) {
+            buffer.readerIndex(0);
+            serializer.viewIntoUnchecked(buffer, view);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            StopWatch stopWatch = StopWatch.create("XML零拷贝视图任务");
+            stopWatch.start();
+            for (int j = 0; j < 1_000_000; j++) {
+                buffer.readerIndex(0);
+                serializer.viewIntoUnchecked(buffer, view);
+            }
+            stopWatch.stop();
+            log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+        }
+        assertEquals(0x11223344, view.get("id"));
+        assertEquals("netty", view.get("name"));
+        assertEquals(bytes.length, buffer.readerIndex());
+    }
 
     @Test
     public void testDeserialize()

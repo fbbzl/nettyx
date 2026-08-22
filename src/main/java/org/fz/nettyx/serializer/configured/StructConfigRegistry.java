@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * registry of configured structs, loads config files, resolves cross-namespace struct references
@@ -23,6 +24,7 @@ import java.util.Set;
 public class StructConfigRegistry {
 
     private final Map<String, ConfigStruct> structCache;
+    private final Map<String, ConfiguredSerializer> serializerCache = new ConcurrentHashMap<>();
 
     private StructConfigRegistry(Map<String, ConfigStruct> structCache)
     {
@@ -86,6 +88,11 @@ public class StructConfigRegistry {
     public boolean contains(String structName)
     {
         return structCache.containsKey(structName);
+    }
+
+    ConfiguredSerializer serializer(String structName)
+    {
+        return serializerCache.computeIfAbsent(structName, name -> new ConfiguredSerializer(this, name));
     }
 
     private static void resolveReferences(Map<String, ConfigStruct> structs)

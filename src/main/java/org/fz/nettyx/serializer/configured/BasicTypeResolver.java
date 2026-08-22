@@ -11,9 +11,23 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.LambdaMetafactory;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.ByteOrder;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +48,8 @@ public class BasicTypeResolver {
 
     private static final Map<String, Class<? extends Basic<?>>> BASIC_TYPE_CACHE = new ConcurrentHashMap<>(64);
     private static final Map<Class<? extends Basic<?>>, Integer> BASIC_SIZE_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, BasicReader> READING_READER_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, BasicValueReader> VALUE_READER_CACHE = new ConcurrentHashMap<>(64);
     private static final Map<Class<? extends Basic<?>>, Constructor<?>> VALUE_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(64);
 
     static {
@@ -68,17 +84,17 @@ public class BasicTypeResolver {
      */
     public static <B extends Basic<?>> B readBasic(Class<? extends Basic<?>> basicClass, ByteOrder byteOrder, ByteBuf byteBuf)
     {
-        try {
-            return (B) basicClass.getConstructor(ByteBuf.class, ByteOrder.class).newInstance(byteBuf, byteOrder);
-        }
-        catch (Exception instanceError) {
-            Throwable cause = instanceError.getCause();
-            if (instanceError instanceof TooLessBytesException tooLessBytes)
-                throw tooLessBytes;
-            if (cause instanceof TooLessBytesException tooLessBytes)
-                throw tooLessBytes;
-            throw new SerializeException("basic [" + basicClass.getName() + "] instantiate failed while reading", instanceError);
-        }
+        return (B) readerFor(basicClass).read(byteBuf, byteOrder);
+    }
+
+    static BasicReader readerFor(Class<? extends Basic<?>> basicClass)
+    {
+        return READING_READER_CACHE.computeIfAbsent(basicClass, BasicTypeResolver::newReadingReader);
+    }
+
+    static BasicValueReader valueReaderFor(Class<? extends Basic<?>> basicClass)
+    {
+        return VALUE_READER_CACHE.computeIfAbsent(basicClass, BasicTypeResolver::newValueReader);
     }
 
     /**
@@ -108,6 +124,135 @@ public class BasicTypeResolver {
                 return constructor;
         }
         throw new SerializeException("no value constructor found on basic [" + basicClass.getName() + "]");
+    }
+
+    private static BasicReader newReadingReader(Class<? extends Basic<?>> basicClass)
+    {
+        try {
+            Constructor<?> constructor = basicClass.getConstructor(ByteBuf.class, ByteOrder.class);
+            MethodHandle constructorHandle = MethodHandles.lookup().unreflectConstructor(constructor);
+            CallSite callSite = LambdaMetafactory.metafactory(
+                    MethodHandles.lookup(),
+                    "read",
+                    MethodType.methodType(BasicReader.class),
+                    MethodType.methodType(Basic.class, ByteBuf.class, ByteOrder.class),
+                    constructorHandle,
+                    MethodType.methodType(Basic.class, ByteBuf.class, ByteOrder.class));
+            return (BasicReader) callSite.getTarget().invokeExact();
+        }
+        catch (Throwable error) {
+            throw new SerializeException("basic [" + basicClass.getName() + "] reader initialization failed", error);
+        }
+    }
+
+    private static BasicValueReader newValueReader(Class<? extends Basic<?>> basicClass)
+    {
+        if (basicClass == cchar.class)  return BasicTypeResolver::readByte;
+        if (basicClass == cuchar.class) return BasicTypeResolver::readUnsignedByte;
+        if (basicClass == cshort.class) return BasicTypeResolver::readShort;
+        if (basicClass == cushort.class) return BasicTypeResolver::readUnsignedShort;
+        if (basicClass == cint.class || basicClass == clong4.class) return BasicTypeResolver::readInt;
+        if (basicClass == clong8.class) return BasicTypeResolver::readLong;
+        if (basicClass == cfloat.class) return BasicTypeResolver::readFloat;
+        if (basicClass == cdouble.class) return BasicTypeResolver::readDouble;
+
+        BasicReader reader = readerFor(basicClass);
+        return (byteBuf, byteOrder) -> reader.read(byteBuf, byteOrder).value();
+    }
+
+    private static Byte readByte(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteBuf.readByte();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Byte.BYTES);
+        }
+    }
+
+    private static Short readUnsignedByte(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteBuf.readUnsignedByte();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Byte.BYTES);
+        }
+    }
+
+    private static Short readShort(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readShortLE() : byteBuf.readShort();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Short.BYTES);
+        }
+    }
+
+    private static Integer readUnsignedShort(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readUnsignedShortLE() : byteBuf.readUnsignedShort();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Short.BYTES);
+        }
+    }
+
+    private static Integer readInt(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readIntLE() : byteBuf.readInt();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Integer.BYTES);
+        }
+    }
+
+    private static Long readLong(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readLongLE() : byteBuf.readLong();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Long.BYTES);
+        }
+    }
+
+    private static Float readFloat(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readFloatLE() : byteBuf.readFloat();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Float.BYTES);
+        }
+    }
+
+    private static Double readDouble(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        try {
+            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readDoubleLE() : byteBuf.readDouble();
+        }
+        catch (IndexOutOfBoundsException error) {
+            throw tooLessBytes(byteBuf, Double.BYTES);
+        }
+    }
+
+    private static TooLessBytesException tooLessBytes(ByteBuf byteBuf, int expectedBytes)
+    {
+        return new TooLessBytesException(expectedBytes, byteBuf.readableBytes());
+    }
+
+    @FunctionalInterface
+    interface BasicReader {
+        Basic<?> read(ByteBuf byteBuf, ByteOrder byteOrder);
+    }
+
+    @FunctionalInterface
+    interface BasicValueReader {
+        Object read(ByteBuf byteBuf, ByteOrder byteOrder);
     }
 
     /**

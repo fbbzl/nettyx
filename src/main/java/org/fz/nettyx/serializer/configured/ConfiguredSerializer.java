@@ -11,9 +11,9 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * the configured struct serializer, parses binary data into {@link Map} by struct definitions
@@ -24,6 +24,8 @@ import java.util.Map;
  */
 @SuppressWarnings("unchecked")
 public final class ConfiguredSerializer implements Serializer {
+
+    private static final Map<ConfigStruct, Integer> FIXED_SIZE_CACHE = new ConcurrentHashMap<>();
 
     private final StructConfigRegistry registry;
     private final ConfigStruct root;
@@ -41,12 +43,39 @@ public final class ConfiguredSerializer implements Serializer {
 
     public static Map<String, Object> toStruct(StructConfigRegistry registry, String structName, ByteBuf byteBuf)
     {
-        return new ConfiguredSerializer(registry, structName).doDeserialize(byteBuf);
+        return registry.serializer(structName).doDeserialize(byteBuf);
     }
 
     public static void toByteBuf(StructConfigRegistry registry, String structName, Map<String, Object> structMap, ByteBuf writing)
     {
-        new ConfiguredSerializer(registry, structName).doSerialize(structMap, writing);
+        registry.serializer(structName).doSerialize(structMap, writing);
+    }
+
+    /**
+     * Creates a result map that can be reused by {@link #deserializeInto(ByteBuf, Map)}.
+     */
+    public static Map<String, Object> newReusableStruct(StructConfigRegistry registry, String structName)
+    {
+        return registry.serializer(structName).newReusableStruct();
+    }
+
+    /**
+     * Deserializes into a reusable target created by {@link #newReusableStruct(StructConfigRegistry, String)}.
+     * Values such as byte arrays, nested maps and lists are updated in place and must not be retained across calls.
+     */
+    public static void deserializeInto(StructConfigRegistry registry, String structName, ByteBuf reading, Map<String, Object> target)
+    {
+        registry.serializer(structName).deserializeInto(reading, target);
+    }
+
+    public static ConfigStructView newView(StructConfigRegistry registry, String structName)
+    {
+        return registry.serializer(structName).newView();
+    }
+
+    public static void viewInto(StructConfigRegistry registry, String structName, ByteBuf reading, ConfigStructView target)
+    {
+        registry.serializer(structName).viewInto(reading, target);
     }
 
     //*************************************      working code splitter      ******************************************//
@@ -55,6 +84,50 @@ public final class ConfiguredSerializer implements Serializer {
     public <S> S doDeserialize(ByteBuf reading)
     {
         return (S) readStruct(root, reading);
+    }
+
+    public Map<String, Object> newReusableStruct()
+    {
+        return new ConfigStructMap(root);
+    }
+
+    public void deserializeInto(ByteBuf reading, Map<String, Object> target)
+    {
+        if (target instanceof ConfigStructMap reusable) {
+            readStructInto(root, reusable, reading);
+            return;
+        }
+
+        target.clear();
+        target.putAll(readStruct(root, reading));
+    }
+
+    public ConfigStructView newView()
+    {
+        int byteLength = fixedSizeOf(root);
+        if (byteLength < 0)
+            throw new SerializeException("zero-copy view only supports fixed-length struct: [" + root.fqName() + "]");
+        return new ConfigStructView(this, root, byteLength);
+    }
+
+    public void viewInto(ByteBuf reading, ConfigStructView target)
+    {
+        if (!target.belongsTo(this))
+            throw new SerializeException("view belongs to a different configured serializer");
+        if (reading.readableBytes() < target.byteLength())
+            throw new TooLessBytesException(target.byteLength(), reading.readableBytes());
+
+        viewIntoUnchecked(reading, target);
+    }
+
+    /**
+     * Binds a reusable view without validating ownership or available bytes.
+     * Call this only after the framing layer has verified a complete fixed-length message.
+     */
+    public void viewIntoUnchecked(ByteBuf reading, ConfigStructView target)
+    {
+        target.reset(reading, reading.readerIndex());
+        reading.skipBytes(target.byteLength());
     }
 
     @Override
@@ -68,16 +141,28 @@ public final class ConfiguredSerializer implements Serializer {
 
     public Map<String, Object> readStruct(ConfigStruct struct, ByteBuf byteBuf)
     {
-        Map<String, Object> structMap = new LinkedHashMap<>(struct.fields().size() * 2);
-        for (ConfigField field : struct.fields())
-            structMap.put(field.name(), readField(field, struct.byteOrder(), byteBuf));
+        List<ConfigField> fields = struct.fields();
+        ConfigStructMap structMap = new ConfigStructMap(struct);
+        for (int i = 0; i < fields.size(); i++) {
+            ConfigField field = fields.get(i);
+            structMap.put(i, readField(field, struct.byteOrder(), byteBuf));
+        }
         return structMap;
+    }
+
+    private void readStructInto(ConfigStruct struct, ConfigStructMap target, ByteBuf byteBuf)
+    {
+        List<ConfigField> fields = struct.fields();
+        for (int i = 0; i < fields.size(); i++) {
+            ConfigField field = fields.get(i);
+            target.put(i, readFieldInto(field, struct.byteOrder(), byteBuf, target, i));
+        }
     }
 
     public Object readField(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return switch (field.kind()) {
-            case BASIC  -> readBasicValue(field.basicType(), byteOrder, byteBuf);
+            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
             case CHAR   -> readCharString(field.length(), field.charset(), byteBuf);
             case BYTES  -> readBytes(field.length(), byteBuf);
             case STRUCT -> readStruct(registry.require(field.resolvedStructRef()), byteBuf);
@@ -85,9 +170,26 @@ public final class ConfiguredSerializer implements Serializer {
         };
     }
 
+    private Object readFieldInto(
+            ConfigField field,
+            ByteOrder byteOrder,
+            ByteBuf byteBuf,
+            ConfigStructMap target,
+            int index)
+    {
+        Object previous = target.valueAt(index);
+        return switch (field.kind()) {
+            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
+            case CHAR   -> readCharStringInto(field.length(), field.charset(), byteBuf, target, index, (String) previous);
+            case BYTES  -> readBytesInto(field.length(), byteBuf, (byte[]) previous);
+            case STRUCT -> readNestedStructInto(field.resolvedStructRef(), byteBuf, previous);
+            case ARRAY  -> readArrayInto(field, byteOrder, byteBuf, previous);
+        };
+    }
+
     public Object readArray(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
-        List<Object> elements = new ArrayList<>();
+        List<Object> elements = new ArrayList<>(field.flexible() ? 10 : field.length());
 
         if (field.flexible()) {
             while (byteBuf.isReadable()) {
@@ -105,27 +207,93 @@ public final class ConfiguredSerializer implements Serializer {
         return elements;
     }
 
+    @SuppressWarnings("unchecked")
+    private List<Object> readArrayInto(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
+    {
+        ArrayList<Object> elements = previous instanceof ArrayList<?> existing
+                                     ? (ArrayList<Object>) existing
+                                     : new ArrayList<>(field.flexible() ? 10 : field.length());
+        int previousSize = elements.size();
+        int count = field.flexible() ? -1 : field.length();
+        int i = 0;
+        for (; count < 0 ? byteBuf.isReadable() : i < count; i++) {
+            Object previousElement = i < previousSize ? elements.get(i) : null;
+            Object element = readArrayElementInto(field, byteOrder, byteBuf, previousElement);
+            if (i < previousSize) elements.set(i, element);
+            else                  elements.add(element);
+        }
+        if (i < previousSize) elements.subList(i, previousSize).clear();
+        return elements;
+    }
+
     private Object readArrayElement(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return switch (field.elementKind()) {
-            case BASIC  -> readBasicValue(field.basicType(), byteOrder, byteBuf);
+            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
             case STRUCT -> readStruct(registry.require(field.resolvedStructRef()), byteBuf);
         };
     }
 
-    private Object readBasicValue(Class<? extends Basic<?>> basicType, ByteOrder byteOrder, ByteBuf byteBuf)
+    private Object readArrayElementInto(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
     {
-        return BasicTypeResolver.readBasic(basicType, byteOrder, byteBuf).value();
+        return switch (field.elementKind()) {
+            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
+            case STRUCT -> readNestedStructInto(field.resolvedStructRef(), byteBuf, previous);
+        };
+    }
+
+    private Object readBasicValue(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
+    {
+        return field.basicValueReader().read(byteBuf, byteOrder);
     }
 
     private String readCharString(int length, Charset charset, ByteBuf byteBuf)
     {
-        byte[] bytes = readBytes(length, byteBuf);
+        if (byteBuf.readableBytes() < length)
+            throw new TooLessBytesException(length, byteBuf.readableBytes());
 
-        int end = bytes.length;
-        while (end > 0 && bytes[end - 1] == 0) end--;
+        int readerIndex = byteBuf.readerIndex();
+        int end = readerIndex + length;
+        while (end > readerIndex && byteBuf.getByte(end - 1) == 0) end--;
 
-        return new String(bytes, 0, end, charset);
+        String value;
+        if (byteBuf.hasArray()) {
+            value = new String(byteBuf.array(), byteBuf.arrayOffset() + readerIndex, end - readerIndex, charset);
+            byteBuf.skipBytes(length);
+        }
+        else {
+            byte[] bytes = readBytes(length, byteBuf);
+            value = new String(bytes, 0, end - readerIndex, charset);
+        }
+
+        return value;
+    }
+
+    private String readCharStringInto(
+            int length,
+            Charset charset,
+            ByteBuf byteBuf,
+            ConfigStructMap target,
+            int index,
+            String previous)
+    {
+        if (byteBuf.readableBytes() < length)
+            throw new TooLessBytesException(length, byteBuf.readableBytes());
+
+        int readerIndex = byteBuf.readerIndex();
+        byte[] cachedBytes = target.charBuffer(index, length);
+        boolean unchanged = previous != null;
+        for (int i = 0; i < length; i++) {
+            byte value = byteBuf.getByte(readerIndex + i);
+            if (cachedBytes[i] != value) unchanged = false;
+            cachedBytes[i] = value;
+        }
+        byteBuf.skipBytes(length);
+        if (unchanged) return previous;
+
+        int end = cachedBytes.length;
+        while (end > 0 && cachedBytes[end - 1] == 0) end--;
+        return new String(cachedBytes, 0, end, charset);
     }
 
     private byte[] readBytes(int length, ByteBuf byteBuf)
@@ -136,6 +304,69 @@ public final class ConfiguredSerializer implements Serializer {
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
         return bytes;
+    }
+
+    private byte[] readBytesInto(int length, ByteBuf byteBuf, byte[] previous)
+    {
+        if (byteBuf.readableBytes() < length)
+            throw new TooLessBytesException(length, byteBuf.readableBytes());
+
+        byte[] bytes = previous != null && previous.length == length ? previous : new byte[length];
+        byteBuf.readBytes(bytes);
+        return bytes;
+    }
+
+    private Map<String, Object> readNestedStructInto(String structName, ByteBuf byteBuf, Object previous)
+    {
+        ConfigStruct nestedStruct = registry.require(structName);
+        ConfigStructMap nested = previous instanceof ConfigStructMap reusable
+                                 ? reusable
+                                 : new ConfigStructMap(nestedStruct);
+        readStructInto(nestedStruct, nested, byteBuf);
+        return nested;
+    }
+
+    private int fixedSizeOf(ConfigStruct struct)
+    {
+        return FIXED_SIZE_CACHE.computeIfAbsent(struct, this::computeFixedSize);
+    }
+
+    private int computeFixedSize(ConfigStruct struct)
+    {
+        int size = 0;
+        for (ConfigField field : struct.fields()) {
+            int fieldSize = switch (field.kind()) {
+                case BASIC -> BasicTypeResolver.sizeOf(field.basicType());
+                case CHAR, BYTES -> field.length();
+                case STRUCT -> fixedSizeOf(registry.require(field.resolvedStructRef()));
+                case ARRAY -> fixedArraySize(field);
+            };
+            if (fieldSize < 0) return -1;
+            try {
+                size = Math.addExact(size, fieldSize);
+            }
+            catch (ArithmeticException error) {
+                throw new SerializeException("fixed struct size exceeds supported integer range: [" + struct.fqName() + "]", error);
+            }
+        }
+        return size;
+    }
+
+    private int fixedArraySize(ConfigField field)
+    {
+        if (field.flexible()) return -1;
+
+        int elementSize = switch (field.elementKind()) {
+            case BASIC -> BasicTypeResolver.sizeOf(field.basicType());
+            case STRUCT -> fixedSizeOf(registry.require(field.resolvedStructRef()));
+        };
+        if (elementSize < 0) return -1;
+        try {
+            return Math.multiplyExact(elementSize, field.length());
+        }
+        catch (ArithmeticException error) {
+            throw new SerializeException("fixed array size exceeds supported integer range: field [" + field.name() + "]", error);
+        }
     }
 
     public void writeStruct(ConfigStruct struct, Map<String, Object> structMap, ByteBuf writing)

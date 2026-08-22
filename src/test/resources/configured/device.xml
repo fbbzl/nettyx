@@ -10,6 +10,16 @@
         <field name="values"      type="cshort" array="3"/>
         <field name="gps"         struct="geo.GpsPoint"/>
     </struct>
+    <struct name="BenchmarkDevice" endian="LE">
+        <field name="id"          type="cint"/>
+        <field name="speed"       type="cushort"/>
+        <field name="temperature" type="cdouble"/>
+        <field name="name"        type="char" length="8"/>
+        <field name="raw"         type="byte" length="2"/>
+        <field name="values"      type="cshort" array="3"/>
+        <field name="gps"         struct="geo.GpsPoint"/>
+        <field name="payload"     type="byte" length="84"/>
+    </struct>
     <struct name="Flexible" endian="BE">
         <field name="head" type="cuchar"/>
         <field name="tail" type="cushort" array="*"/>

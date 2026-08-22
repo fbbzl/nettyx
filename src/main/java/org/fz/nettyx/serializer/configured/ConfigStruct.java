@@ -20,6 +20,7 @@ public class ConfigStruct {
     private final String name;
     private final ByteOrder byteOrder;
     private final List<ConfigField> fields;
+    private final String[] fieldNames;
 
     public ConfigStruct(String namespace, String name, ByteOrder byteOrder, List<ConfigField> fields)
     {
@@ -27,6 +28,7 @@ public class ConfigStruct {
         this.name = name;
         this.byteOrder = byteOrder;
         this.fields = fields;
+        this.fieldNames = fields.stream().map(ConfigField::name).toArray(String[]::new);
     }
 
     /**
