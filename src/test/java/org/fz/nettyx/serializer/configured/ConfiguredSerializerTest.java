@@ -8,8 +8,18 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
 import org.junit.Test;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -34,7 +44,7 @@ public class ConfiguredSerializerTest {
             "configured/device.xml", "configured/geo.xml");
 
     @Test
-    public void testConfiguredSerializerView()
+    public void testConfiguredSerializer()
     {
         byte[] bytes = Arrays.copyOf(new byte[]{
                 0x44, 0x33, 0x22, 0x11,
@@ -46,31 +56,155 @@ public class ConfiguredSerializerTest {
                 0, 0, 0, 100,
                 0, 0, 0, (byte) 200
         }, 122);
-        ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.BenchmarkDevice");
-        ConfigStructView view = serializer.newView();
-        ByteBuf buffer = Unpooled.wrappedBuffer(bytes);
+        ByteBuf reading = Unpooled.wrappedBuffer(bytes);
+        ByteBuf writing = Unpooled.buffer(bytes.length);
 
         assertEquals(122, bytes.length);
+        Map<String, Object> message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
+        assertEquals(0x11223344, message.get("id"));
+        assertEquals("netty", message.get("name"));
+        ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
+        assertEquals(bytes.length, writing.readableBytes());
 
         // Keep JIT compilation and profile collection outside the reported throughput.
         for (int j = 0; j < 2_000_000; j++) {
-            buffer.readerIndex(0);
-            serializer.viewIntoUnchecked(buffer, view);
+            reading.readerIndex(0);
+            message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
+            writing.clear();
+            ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
         }
 
         for (int i = 0; i < 10; i++) {
-            StopWatch stopWatch = StopWatch.create("XML零拷贝视图任务");
+            StopWatch stopWatch = StopWatch.create("XML完整反序列任务");
             stopWatch.start();
             for (int j = 0; j < 1_000_000; j++) {
-                buffer.readerIndex(0);
-                serializer.viewIntoUnchecked(buffer, view);
+                reading.readerIndex(0);
+                message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
             }
             stopWatch.stop();
             log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
         }
+        assertEquals(0x11223344, message.get("id"));
+        assertEquals("netty", message.get("name"));
+
+        for (int i = 0; i < 10; i++) {
+            StopWatch stopWatch = StopWatch.create("XML完整序列任务");
+            stopWatch.start();
+            for (int j = 0; j < 1_000_000; j++) {
+                writing.clear();
+                ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
+            }
+            stopWatch.stop();
+            log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
+        }
+        assertEquals(bytes.length, writing.readableBytes());
+    }
+
+    @Test
+    public void testConfiguredSerializerView()
+    {
+        ByteBuf reading = Unpooled.wrappedBuffer(new byte[]{
+                0x44, 0x33, 0x22, 0x11,
+                (byte) 0xBB, (byte) 0xAA,
+                (byte) 0xCD, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, 0x4C, 0x42, 0x40,
+                'n', 'e', 't', 't', 'y', 0, 0, 0,
+                0x11, 0x22,
+                1, 0, 2, 0, 3, 0,
+                0, 0, 0, 100,
+                0, 0, 0, (byte) 200
+        });
+        ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.Device");
+        ConfigStructView view = serializer.newView();
+
+        serializer.viewInto(reading, view);
+
         assertEquals(0x11223344, view.get("id"));
         assertEquals("netty", view.get("name"));
-        assertEquals(bytes.length, buffer.readerIndex());
+        assertEquals(0, reading.readableBytes());
+    }
+
+    @Test
+    public void testConfiguredStructMapSerializesByNameForDifferentStruct()
+    {
+        ByteBuf reading = Unpooled.buffer();
+        reading.writeIntLE(0x11223344);
+        reading.writeShortLE(0xAABB);
+        reading.writeDoubleLE(36.6D);
+        reading.writeBytes(new byte[]{ 'n', 'e', 't', 't', 'y', 0, 0, 0 });
+        reading.writeBytes(new byte[]{ 0x11, 0x22 });
+        reading.writeShortLE(1);
+        reading.writeShortLE(2);
+        reading.writeShortLE(3);
+        reading.writeInt(100);
+        reading.writeInt(200);
+
+        Map<String, Object> device = ConfiguredSerializer.toStruct(REGISTRY, "device.Device", reading);
+        ByteBuf writing = Unpooled.buffer();
+
+        ConfiguredSerializer.toByteBuf(REGISTRY, "device.Track", device, writing);
+
+        byte[] actual = new byte[writing.readableBytes()];
+        writing.readBytes(actual);
+        assertArrayEquals(new byte[17], actual);
+    }
+
+    @Test
+    public void testConfiguredStructMapSerializesSameStructWithoutChangingBytes()
+    {
+        byte[] expected = {
+                0x44, 0x33, 0x22, 0x11,
+                (byte) 0xBB, (byte) 0xAA,
+                (byte) 0xCD, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, 0x4C, 0x42, 0x40,
+                'n', 'e', 't', 't', 'y', 0, 0, 0,
+                0x11, 0x22,
+                1, 0, 2, 0, 3, 0,
+                0, 0, 0, 100,
+                0, 0, 0, (byte) 200
+        };
+        Map<String, Object> device = ConfiguredSerializer.toStruct(
+                REGISTRY, "device.Device", Unpooled.wrappedBuffer(expected));
+        ByteBuf writing = Unpooled.buffer(expected.length);
+
+        ConfiguredSerializer.toByteBuf(REGISTRY, "device.Device", device, writing);
+
+        byte[] actual = new byte[writing.readableBytes()];
+        writing.readBytes(actual);
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testBasicValueWriterPreservesWireValuesAndBounds()
+    {
+        ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.Device");
+        ByteBuf writing = Unpooled.buffer();
+
+        serializer.writeField(ConfigField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
+        serializer.writeField(ConfigField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
+
+        byte[] actual = new byte[writing.readableBytes()];
+        writing.readBytes(actual);
+        assertArrayEquals(new byte[]{
+                (byte) 0xFF, (byte) 0xFF,
+                0x34, 0x12,
+                (byte) 0xAB, (byte) 0xCD,
+                0x40, 0x30, 0x20, 0x10,
+                0x50, 0x60, 0x70, (byte) 0x80,
+                0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01,
+                0x3F, (byte) 0x80, 0, 0,
+                0, 0, 0, 0, 0, 0, (byte) 0xF0, 0x3F
+        }, actual);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> serializer.writeField(ConfigField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+        assertThrows(IllegalArgumentException.class,
+                () -> serializer.writeField(ConfigField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
     }
 
     @Test

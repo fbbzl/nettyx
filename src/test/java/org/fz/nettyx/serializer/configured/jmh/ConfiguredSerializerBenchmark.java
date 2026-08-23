@@ -19,6 +19,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 @Fork(1)
 @Warmup(iterations = 3, time = 1)
 @Measurement(iterations = 5, time = 1)
@@ -39,15 +40,15 @@ public class ConfiguredSerializerBenchmark {
     private static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
 
-    private ConfiguredSerializer serializer;
     private byte[] bytes;
     private ByteBuf reading;
+    private ByteBuf writing;
+    private Map<String, Object> message;
 
     @Setup
     public void setup()
     {
-        serializer = new ConfiguredSerializer(REGISTRY, "device.Device");
-        bytes = new byte[]{
+        bytes = Arrays.copyOf(new byte[]{
                 0x44, 0x33, 0x22, 0x11,
                 (byte) 0xBB, (byte) 0xAA,
                 (byte) 0xCD, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, 0x4C, 0x42, 0x40,
@@ -56,15 +57,25 @@ public class ConfiguredSerializerBenchmark {
                 1, 0, 2, 0, 3, 0,
                 0, 0, 0, 100,
                 0, 0, 0, (byte) 200
-        };
+        }, 122);
         reading = Unpooled.wrappedBuffer(bytes);
+        writing = Unpooled.buffer(bytes.length);
+        message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
     }
 
     @Benchmark
     public Map<String, Object> benchmarkDeserialize()
     {
         reading.readerIndex(0);
-        return serializer.doDeserialize(reading);
+        return ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
+    }
+
+    @Benchmark
+    public ByteBuf benchmarkSerialize()
+    {
+        writing.clear();
+        ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
+        return writing;
     }
 
     public static void main(String[] args) throws RunnerException

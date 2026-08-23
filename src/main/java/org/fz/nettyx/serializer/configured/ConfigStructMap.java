@@ -12,6 +12,7 @@ import java.util.Set;
  */
 final class ConfigStructMap extends AbstractMap<String, Object> {
 
+    private final ConfigStruct struct;
     private final String[] fieldNames;
     private final Object[] values;
     private final byte[][] charBuffers;
@@ -19,6 +20,7 @@ final class ConfigStructMap extends AbstractMap<String, Object> {
 
     ConfigStructMap(ConfigStruct struct)
     {
+        this.struct = struct;
         fieldNames = struct.fieldNames();
         values = new Object[fieldNames.length];
         charBuffers = new byte[fieldNames.length][];
@@ -33,6 +35,11 @@ final class ConfigStructMap extends AbstractMap<String, Object> {
     Object valueAt(int index)
     {
         return materialized == null ? values[index] : materialized.get(fieldNames[index]);
+    }
+
+    boolean belongsTo(ConfigStruct struct)
+    {
+        return this.struct == struct;
     }
 
     byte[] charBuffer(int index, int length)

@@ -124,7 +124,7 @@ public final class ConfiguredSerializer implements Serializer {
      * Binds a reusable view without validating ownership or available bytes.
      * Call this only after the framing layer has verified a complete fixed-length message.
      */
-    public void viewIntoUnchecked(ByteBuf reading, ConfigStructView target)
+    void viewIntoUnchecked(ByteBuf reading, ConfigStructView target)
     {
         target.reset(reading, reading.readerIndex());
         reading.skipBytes(target.byteLength());
@@ -371,14 +371,21 @@ public final class ConfiguredSerializer implements Serializer {
 
     public void writeStruct(ConfigStruct struct, Map<String, Object> structMap, ByteBuf writing)
     {
-        for (ConfigField field : struct.fields())
+        List<ConfigField> fields = struct.fields();
+        if (structMap instanceof ConfigStructMap configuredMap && configuredMap.belongsTo(struct)) {
+            for (int i = 0; i < fields.size(); i++)
+                writeField(fields.get(i), configuredMap.valueAt(i), struct.byteOrder(), writing);
+            return;
+        }
+
+        for (ConfigField field : fields)
             writeField(field, structMap == null ? null : structMap.get(field.name()), struct.byteOrder(), writing);
     }
 
     public void writeField(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
         switch (field.kind()) {
-            case BASIC  -> writeBasicValue(field.basicType(), value, byteOrder, writing);
+            case BASIC  -> writeBasicValue(field, value, byteOrder, writing);
             case CHAR   -> writeCharString(field.length(), (String) value, field.charset(), writing);
             case BYTES  -> writeBytes(field.length(), (byte[]) value, writing);
             case STRUCT -> writeStruct(registry.require(field.resolvedStructRef()), (Map<String, Object>) value, writing);
@@ -400,15 +407,15 @@ public final class ConfiguredSerializer implements Serializer {
     private void writeArrayElement(ConfigField field, Object element, ByteOrder byteOrder, ByteBuf writing)
     {
         switch (field.elementKind()) {
-            case BASIC  -> writeBasicValue(field.basicType(), element, byteOrder, writing);
+            case BASIC  -> writeBasicValue(field, element, byteOrder, writing);
             case STRUCT -> writeStruct(registry.require(field.resolvedStructRef()), (Map<String, Object>) element, writing);
         }
     }
 
-    private void writeBasicValue(Class<? extends Basic<?>> basicType, Object value, ByteOrder byteOrder, ByteBuf writing)
+    private void writeBasicValue(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
-        if (value == null) writing.writeZero(BasicTypeResolver.sizeOf(basicType));
-        else               BasicTypeResolver.valueBasic(basicType, value).write(writing, byteOrder);
+        if (value == null) writing.writeZero(BasicTypeResolver.sizeOf(field.basicType()));
+        else               field.basicValueWriter().write(writing, byteOrder, value);
     }
 
     private void writeCharString(int length, String value, Charset charset, ByteBuf writing)
