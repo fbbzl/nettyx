@@ -1,6 +1,7 @@
 package org.fz.nettyx.serializer.configured;
 
 import lombok.Getter;
+import lombok.AccessLevel;
 import lombok.experimental.Accessors;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
@@ -31,7 +32,9 @@ public class ConfigField {
     private final String name;
 
     private final Class<? extends Basic<?>> basicType;
+    @Getter(AccessLevel.PACKAGE)
     private final BasicTypeResolver.BasicValueReader basicValueReader;
+    @Getter(AccessLevel.PACKAGE)
     private final BasicTypeResolver.BasicValueWriter basicValueWriter;
     private final Integer length;
     private final boolean flexible;

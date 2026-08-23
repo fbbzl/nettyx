@@ -1,10 +1,7 @@
 package org.fz.nettyx.serializer.configured;
 
-import cn.hutool.core.date.StopWatch;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.util.internal.logging.InternalLogger;
-import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
@@ -28,7 +25,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -37,8 +33,6 @@ import static org.junit.Assert.*;
  * @since 2026-08-16
  */
 public class ConfiguredSerializerTest {
-
-    private static final InternalLogger log = InternalLoggerFactory.getInstance(ConfiguredSerializerTest.class);
 
     static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
@@ -66,38 +60,7 @@ public class ConfiguredSerializerTest {
         ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
         assertEquals(bytes.length, writing.readableBytes());
 
-        // Keep JIT compilation and profile collection outside the reported throughput.
-        for (int j = 0; j < 2_000_000; j++) {
-            reading.readerIndex(0);
-            message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
-            writing.clear();
-            ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
-        }
-
-        for (int i = 0; i < 10; i++) {
-            StopWatch stopWatch = StopWatch.create("XML完整反序列任务");
-            stopWatch.start();
-            for (int j = 0; j < 1_000_000; j++) {
-                reading.readerIndex(0);
-                message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
-            }
-            stopWatch.stop();
-            log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-        }
-        assertEquals(0x11223344, message.get("id"));
-        assertEquals("netty", message.get("name"));
-
-        for (int i = 0; i < 10; i++) {
-            StopWatch stopWatch = StopWatch.create("XML完整序列任务");
-            stopWatch.start();
-            for (int j = 0; j < 1_000_000; j++) {
-                writing.clear();
-                ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
-            }
-            stopWatch.stop();
-            log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-        }
-        assertEquals(bytes.length, writing.readableBytes());
+        assertArrayEquals(bytes, writing.array());
     }
 
     @Test

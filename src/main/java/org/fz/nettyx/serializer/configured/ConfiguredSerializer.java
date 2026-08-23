@@ -11,9 +11,10 @@ import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * the configured struct serializer, parses binary data into {@link Map} by struct definitions
@@ -25,10 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unchecked")
 public final class ConfiguredSerializer implements Serializer {
 
-    private static final Map<ConfigStruct, Integer> FIXED_SIZE_CACHE = new ConcurrentHashMap<>();
-
     private final StructConfigRegistry registry;
     private final ConfigStruct root;
+    private final Map<ConfigStruct, Integer> fixedSizeCache = new HashMap<>();
 
     public ConfiguredSerializer(StructConfigRegistry registry, String structName)
     {
@@ -94,6 +94,8 @@ public final class ConfiguredSerializer implements Serializer {
     public void deserializeInto(ByteBuf reading, Map<String, Object> target)
     {
         if (target instanceof ConfigStructMap reusable) {
+            if (!reusable.belongsTo(root))
+                throw new SerializeException("reusable target belongs to a different configured struct");
             readStructInto(root, reusable, reading);
             return;
         }
@@ -319,16 +321,21 @@ public final class ConfiguredSerializer implements Serializer {
     private Map<String, Object> readNestedStructInto(String structName, ByteBuf byteBuf, Object previous)
     {
         ConfigStruct nestedStruct = registry.require(structName);
-        ConfigStructMap nested = previous instanceof ConfigStructMap reusable
-                                 ? reusable
-                                 : new ConfigStructMap(nestedStruct);
+        ConfigStructMap nested = previous instanceof ConfigStructMap reusable && reusable.belongsTo(nestedStruct)
+                                  ? reusable
+                                  : new ConfigStructMap(nestedStruct);
         readStructInto(nestedStruct, nested, byteBuf);
         return nested;
     }
 
-    private int fixedSizeOf(ConfigStruct struct)
+    private synchronized int fixedSizeOf(ConfigStruct struct)
     {
-        return FIXED_SIZE_CACHE.computeIfAbsent(struct, this::computeFixedSize);
+        Integer cached = fixedSizeCache.get(struct);
+        if (cached != null) return cached;
+
+        int computed = computeFixedSize(struct);
+        fixedSizeCache.put(struct, computed);
+        return computed;
     }
 
     private int computeFixedSize(ConfigStruct struct)
@@ -397,9 +404,14 @@ public final class ConfiguredSerializer implements Serializer {
     {
         int valueCount = elementCount(value);
         int writeCount = field.flexible() ? valueCount : field.length();
+        Iterator<?> iterator = value instanceof Collection<?> collection && !(value instanceof List<?>)
+                               ? collection.iterator()
+                               : null;
 
         for (int i = 0; i < writeCount; i++) {
-            Object element = i < valueCount ? elementAt(value, i) : null;
+            Object element = i < valueCount
+                             ? iterator == null ? elementAt(value, i) : iterator.next()
+                             : null;
             writeArrayElement(field, element, byteOrder, writing);
         }
     }
@@ -447,7 +459,6 @@ public final class ConfiguredSerializer implements Serializer {
     private static Object elementAt(Object value, int index)
     {
         if (value instanceof List<?>)         return ((List<?>) value).get(index);
-        if (value instanceof Collection<?>)   return ((Collection<?>) value).toArray()[index];
         return Array.get(value, index);
     }
 }

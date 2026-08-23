@@ -17,6 +17,9 @@ import org.junit.Test;
 
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -101,6 +104,46 @@ public class ConfiguredSerializerCoverageTest {
         serializer.writeArray(shortArray, new int[]{ 3, 4 }, ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{ 3, 0, 4, 0 }, readableBytes(writing));
         assertThrows(SerializeException.class, () -> serializer.writeArray(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
+    }
+
+    @Test
+    public void reusableTargetsMustMatchTheirStructAndGenericCollectionsUseIterators()
+    {
+        Map<String, Object> deviceTarget = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
+        assertThrows(SerializeException.class, () -> ConfiguredSerializer.deserializeInto(
+                REGISTRY, "device.Flexible", flexibleBuffer(1), deviceTarget));
+
+        Map<String, Object> wrongNestedTarget = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
+        deviceTarget.put("gps", wrongNestedTarget);
+        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{ 1, 2 }), deviceTarget);
+        Map<?, ?> gps = (Map<?, ?>) deviceTarget.get("gps");
+        assertNotSame(wrongNestedTarget, gps);
+        assertEquals(100, gps.get("longitude"));
+        assertEquals(200, gps.get("latitude"));
+
+        Collection<Integer> iteratorOnly = new AbstractCollection<>() {
+            @Override
+            public Iterator<Integer> iterator()
+            {
+                return List.of(5, 6).iterator();
+            }
+
+            @Override
+            public int size()
+            {
+                return 2;
+            }
+
+            @Override
+            public Object[] toArray()
+            {
+                throw new AssertionError("writeArray must iterate generic collections");
+            }
+        };
+        ByteBuf writing = Unpooled.buffer();
+        new ConfiguredSerializer(REGISTRY, "device.Device").writeArray(
+                ConfigField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
+        assertArrayEquals(new byte[]{ 5, 0, 6, 0 }, readableBytes(writing));
     }
 
     @Test
