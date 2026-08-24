@@ -43,7 +43,7 @@ public class StructConfigRegistry {
         Map<String, ConfigStruct> structs = new LinkedHashMap<>();
         for (String location : locations) {
             try (InputStream input = openStream(location)) {
-                Map<String, ConfigStruct> parsed = new XmlStructConfigParser().parse(location, input);
+                Map<String, ConfigStruct> parsed = new org.fz.nettyx.serializer.configured.parser.XmlStructConfigParser().parse(location, input);
                 for (Map.Entry<String, ConfigStruct> entry : parsed.entrySet()) {
                     if (structs.put(entry.getKey(), entry.getValue()) != null)
                         throw new StructDefinitionException("duplicated struct [" + entry.getKey() + "], location: [" + location + "]");

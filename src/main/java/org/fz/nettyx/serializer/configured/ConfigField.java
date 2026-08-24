@@ -1,10 +1,14 @@
 package org.fz.nettyx.serializer.configured;
 
+import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.AccessLevel;
 import lombok.experimental.Accessors;
+import org.fz.nettyx.serializer.configured.type.BasicTypeResolver.BasicValueReader;
+import org.fz.nettyx.serializer.configured.type.BasicTypeResolver.BasicValueWriter;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -33,9 +37,9 @@ public class ConfigField {
 
     private final Class<? extends Basic<?>> basicType;
     @Getter(AccessLevel.PACKAGE)
-    private final BasicTypeResolver.BasicValueReader basicValueReader;
+    private final BasicValueReader basicValueReader;
     @Getter(AccessLevel.PACKAGE)
-    private final BasicTypeResolver.BasicValueWriter basicValueWriter;
+    private final BasicValueWriter basicValueWriter;
     private final Integer length;
     private final boolean flexible;
     private final String structRef;
@@ -57,8 +61,8 @@ public class ConfigField {
         this.kind = kind;
         this.name = name;
         this.basicType = basicType;
-        this.basicValueReader = basicType == null ? null : BasicTypeResolver.valueReaderFor(basicType);
-        this.basicValueWriter = basicType == null ? null : BasicTypeResolver.valueWriterFor(basicType);
+        this.basicValueReader = basicType == null ? null : org.fz.nettyx.serializer.configured.type.BasicTypeResolver.valueReaderFor(basicType);
+        this.basicValueWriter = basicType == null ? null : org.fz.nettyx.serializer.configured.type.BasicTypeResolver.valueWriterFor(basicType);
         this.length = length;
         this.flexible = flexible;
         this.structRef = structRef;
@@ -94,6 +98,16 @@ public class ConfigField {
     public static ConfigField structArray(String name, String structRef, Integer length, boolean flexible)
     {
         return new ConfigField(Kind.ARRAY, name, null, length, flexible, structRef, ElementKind.STRUCT, null);
+    }
+
+    public Object readBasicValue(ByteBuf byteBuf, ByteOrder byteOrder)
+    {
+        return basicValueReader.read(byteBuf, byteOrder);
+    }
+
+    public void writeBasicValue(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
+    {
+        basicValueWriter.write(byteBuf, byteOrder, value);
     }
 
     void resolvedStructRef(String resolvedStructRef)

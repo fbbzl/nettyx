@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.configured.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;

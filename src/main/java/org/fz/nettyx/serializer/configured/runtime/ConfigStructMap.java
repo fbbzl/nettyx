@@ -1,4 +1,6 @@
-package org.fz.nettyx.serializer.configured;
+package org.fz.nettyx.serializer.configured.runtime;
+
+import org.fz.nettyx.serializer.configured.ConfigStruct;
 
 import java.util.AbstractMap;
 import java.util.LinkedHashMap;
@@ -10,7 +12,7 @@ import java.util.Set;
  * does not allocate a hash-table entry for every field. The map is materialized only when a
  * caller needs entry iteration or mutation.
  */
-final class ConfigStructMap extends AbstractMap<String, Object> {
+public final class ConfigStructMap extends AbstractMap<String, Object> {
 
     private final ConfigStruct struct;
     private final String[] fieldNames;
@@ -18,7 +20,7 @@ final class ConfigStructMap extends AbstractMap<String, Object> {
     private final byte[][] charBuffers;
     private Map<String, Object> materialized;
 
-    ConfigStructMap(ConfigStruct struct)
+    public ConfigStructMap(ConfigStruct struct)
     {
         this.struct = struct;
         fieldNames = struct.fieldNames();
@@ -26,23 +28,23 @@ final class ConfigStructMap extends AbstractMap<String, Object> {
         charBuffers = new byte[fieldNames.length][];
     }
 
-    void put(int index, Object value)
+    public void put(int index, Object value)
     {
         if (materialized == null) values[index] = value;
         else                      materialized.put(fieldNames[index], value);
     }
 
-    Object valueAt(int index)
+    public Object valueAt(int index)
     {
         return materialized == null ? values[index] : materialized.get(fieldNames[index]);
     }
 
-    boolean belongsTo(ConfigStruct struct)
+    public boolean belongsTo(ConfigStruct struct)
     {
         return this.struct == struct;
     }
 
-    byte[] charBuffer(int index, int length)
+    public byte[] charBuffer(int index, int length)
     {
         byte[] buffer = charBuffers[index];
         if (buffer == null || buffer.length != length) {
