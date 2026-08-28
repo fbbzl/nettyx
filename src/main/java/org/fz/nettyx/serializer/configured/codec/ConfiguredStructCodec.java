@@ -6,7 +6,6 @@ import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.configured.ConfigField;
 import org.fz.nettyx.serializer.configured.ConfigStruct;
 import org.fz.nettyx.serializer.configured.StructConfigRegistry;
-import org.fz.nettyx.serializer.configured.runtime.ConfigStructMap;
 import org.fz.nettyx.serializer.configured.type.BasicTypeResolver;
 
 import java.lang.reflect.Array;
@@ -125,8 +124,11 @@ public final class ConfiguredStructCodec {
         int count = field.flexible() ? -1 : field.length();
         int i = 0;
         for (; count < 0 ? byteBuf.isReadable() : i < count; i++) {
+            int readerIndex = byteBuf.readerIndex();
             Object previousElement = i < previousSize ? elements.get(i) : null;
             Object element = readArrayElementInto(field, byteOrder, byteBuf, previousElement);
+            if (count < 0 && byteBuf.readerIndex() == readerIndex)
+                throw new SerializeException("flexible array element did not consume any bytes, field: [" + field.name() + "]");
             if (i < previousSize) elements.set(i, element);
             else                  elements.add(element);
         }
