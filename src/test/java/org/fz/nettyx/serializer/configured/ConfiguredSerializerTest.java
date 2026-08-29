@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.configured.codec.ConfiguredStructCodec;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
@@ -36,6 +37,7 @@ public class ConfiguredSerializerTest {
 
     static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
+    static final ConfiguredStructCodec CODEC = new ConfiguredStructCodec(REGISTRY);
 
     @Test
     public void testConfiguredSerializer()
@@ -138,18 +140,17 @@ public class ConfiguredSerializerTest {
     @Test
     public void testBasicValueWriterPreservesWireValuesAndBounds()
     {
-        ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.Device");
         ByteBuf writing = Unpooled.buffer();
 
-        serializer.writeField(ConfigField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
-        serializer.writeField(ConfigField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(ConfigField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
 
         byte[] actual = new byte[writing.readableBytes()];
         writing.readBytes(actual);
@@ -165,9 +166,9 @@ public class ConfiguredSerializerTest {
         }, actual);
 
         assertThrows(IllegalArgumentException.class,
-                () -> serializer.writeField(ConfigField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                () -> CODEC.writeField(ConfigField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
         assertThrows(IllegalArgumentException.class,
-                () -> serializer.writeField(ConfigField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                () -> CODEC.writeField(ConfigField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
     }
 
     @Test

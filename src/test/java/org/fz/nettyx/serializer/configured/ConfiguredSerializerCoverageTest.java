@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.configured.codec.ConfiguredStructCodec;
 import org.fz.nettyx.serializer.configured.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
@@ -32,6 +33,7 @@ public class ConfiguredSerializerCoverageTest {
 
     private static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
+    private static final ConfiguredStructCodec CODEC = new ConfiguredStructCodec(REGISTRY);
 
     @Test
     public void reusableStructUpdatesValuesInPlaceAndRegularMapsAreReplaced()
@@ -86,11 +88,10 @@ public class ConfiguredSerializerCoverageTest {
                 () -> ConfiguredSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
                         ConfiguredSerializer.newView(REGISTRY, "device.Device")));
 
-        ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.Device");
         ByteBuf direct = Unpooled.directBuffer(4);
         try {
             direct.writeBytes(new byte[]{ 'o', 'k', 0, 0 });
-            assertEquals("ok", serializer.readField(
+            assertEquals("ok", CODEC.readField(
                     ConfigField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
         }
         finally {
@@ -99,12 +100,12 @@ public class ConfiguredSerializerCoverageTest {
 
         ConfigField shortArray = ConfigField.basicArray("values", cshort.class, 2, false);
         ByteBuf writing = Unpooled.buffer();
-        serializer.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{ 1, 0, 2, 0 }, readableBytes(writing));
         writing.clear();
-        serializer.writeArray(shortArray, new int[]{ 3, 4 }, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeArray(shortArray, new int[]{ 3, 4 }, ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{ 3, 0, 4, 0 }, readableBytes(writing));
-        assertThrows(SerializeException.class, () -> serializer.writeArray(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
+        assertThrows(SerializeException.class, () -> CODEC.writeArray(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
     }
 
     @Test
@@ -142,8 +143,7 @@ public class ConfiguredSerializerCoverageTest {
             }
         };
         ByteBuf writing = Unpooled.buffer();
-        new ConfiguredSerializer(REGISTRY, "device.Device").writeArray(
-                ConfigField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeArray(ConfigField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{ 5, 0, 6, 0 }, readableBytes(writing));
     }
 

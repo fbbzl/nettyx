@@ -33,11 +33,12 @@ import java.util.Map;
 public final class ConfiguredStructCodec {
 
     StructConfigRegistry       registry;
-    Map<ConfigStruct, Integer> fixedSizeCache = new HashMap<>();
+    Map<ConfigStruct, Integer> fixedSizeCache;
 
     public ConfiguredStructCodec(StructConfigRegistry registry)
     {
         this.registry = registry;
+        this.fixedSizeCache = new HashMap<>();
     }
 
     public Map<String, Object> newReusableStruct(ConfigStruct struct)

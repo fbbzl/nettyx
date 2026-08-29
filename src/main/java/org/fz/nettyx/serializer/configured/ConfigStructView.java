@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.serializer.configured.codec.ConfiguredStructCodec;
 
 /**
  * A reusable, zero-copy view over one fixed-length configured struct.
@@ -18,6 +19,7 @@ import org.fz.nettyx.exception.SerializeException;
 public final class ConfigStructView {
 
     ConfiguredSerializer serializer;
+    ConfiguredStructCodec codec;
     ConfigStruct         struct;
     int                  byteLength;
 
@@ -26,9 +28,10 @@ public final class ConfigStructView {
     @NonFinal
     int                  startIndex;
 
-    ConfigStructView(ConfiguredSerializer serializer, ConfigStruct struct, int byteLength)
+    ConfigStructView(ConfiguredSerializer serializer, ConfiguredStructCodec codec, ConfigStruct struct, int byteLength)
     {
         this.serializer  = serializer;
+        this.codec       = codec;
         this.struct      = struct;
         this.byteLength  = byteLength;
     }
@@ -45,7 +48,7 @@ public final class ConfigStructView {
         ByteBuf reading = source.duplicate();
         reading.readerIndex(startIndex);
         for (ConfigField field : struct.fields()) {
-            Object value = serializer.readField(field, struct.byteOrder(), reading);
+            Object value = codec.readField(field, struct.byteOrder(), reading);
             if (field.name().equals(fieldName)) return value;
         }
         throw new SerializeException("field [" + fieldName + "] does not exist in struct [" + struct.fqName() + "]");

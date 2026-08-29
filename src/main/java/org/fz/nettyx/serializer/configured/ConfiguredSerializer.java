@@ -8,7 +8,6 @@ import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.configured.codec.ConfiguredStructCodec;
 
-import java.nio.ByteOrder;
 import java.util.Map;
 
 /**
@@ -77,7 +76,7 @@ public final class ConfiguredSerializer implements Serializer {
     @Override
     public <S> S doDeserialize(ByteBuf reading)
     {
-        return (S) readStruct(root, reading);
+        return (S) codec.readStruct(root, reading);
     }
 
     public Map<String, Object> newReusableStruct()
@@ -95,7 +94,7 @@ public final class ConfiguredSerializer implements Serializer {
         int byteLength = codec.fixedSizeOf(root);
         if (byteLength < 0)
             throw new SerializeException("zero-copy view only supports fixed-length struct: [" + root.fqName() + "]");
-        return new ConfigStructView(this, root, byteLength);
+        return new ConfigStructView(this, codec, root, byteLength);
     }
 
     public void viewInto(ByteBuf reading, ConfigStructView target)
@@ -124,36 +123,6 @@ public final class ConfiguredSerializer implements Serializer {
         if (struct != null && !(struct instanceof Map))
             throw new SerializeException("configured serializer only accepts java.util.Map, but got [" + struct.getClass().getName() + "]");
 
-        writeStruct(root, (Map<String, Object>) struct, writing);
-    }
-
-    public Map<String, Object> readStruct(ConfigStruct struct, ByteBuf byteBuf)
-    {
-        return codec.readStruct(struct, byteBuf);
-    }
-
-    public Object readField(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
-    {
-        return codec.readField(field, byteOrder, byteBuf);
-    }
-
-    public Object readArray(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
-    {
-        return codec.readArray(field, byteOrder, byteBuf);
-    }
-
-    public void writeStruct(ConfigStruct struct, Map<String, Object> structMap, ByteBuf writing)
-    {
-        codec.writeStruct(struct, structMap, writing);
-    }
-
-    public void writeField(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
-    {
-        codec.writeField(field, value, byteOrder, writing);
-    }
-
-    public void writeArray(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
-    {
-        codec.writeArray(field, value, byteOrder, writing);
+        codec.writeStruct(root, (Map<String, Object>) struct, writing);
     }
 }
