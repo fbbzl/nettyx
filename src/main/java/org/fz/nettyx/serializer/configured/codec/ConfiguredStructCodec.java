@@ -1,6 +1,8 @@
 package org.fz.nettyx.serializer.configured.codec;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.configured.ConfigField;
@@ -18,11 +20,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Configured struct binary codec implementation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/3/27 14:27
+ */
+
 @SuppressWarnings("unchecked")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class ConfiguredStructCodec {
 
-    private final StructConfigRegistry registry;
-    private final Map<ConfigStruct, Integer> fixedSizeCache = new HashMap<>();
+    StructConfigRegistry       registry;
+    Map<ConfigStruct, Integer> fixedSizeCache = new HashMap<>();
 
     public ConfiguredStructCodec(StructConfigRegistry registry)
     {

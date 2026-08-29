@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * reusing the {@link Basic} type system of struct package
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-08-16
  */
 @UtilityClass

@@ -1,5 +1,8 @@
 package org.fz.nettyx.serializer.configured.codec;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.fz.nettyx.serializer.configured.ConfigStruct;
 
 import java.util.AbstractMap;
@@ -11,20 +14,27 @@ import java.util.Set;
  * Map result for a configured struct. Fixed XML fields are written by index so deserialization
  * does not allocate a hash-table entry for every field. The map is materialized only when a
  * caller needs entry iteration or mutation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024/3/27 14:27
  */
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 final class ConfigStructMap extends AbstractMap<String, Object> {
 
-    private final ConfigStruct struct;
-    private final String[] fieldNames;
-    private final Object[] values;
-    private final byte[][] charBuffers;
-    private Map<String, Object> materialized;
+    ConfigStruct          struct;
+    String[]              fieldNames;
+    Object[]              values;
+    byte[][]              charBuffers;
+    @NonFinal
+    Map<String, Object>   materialized;
 
     ConfigStructMap(ConfigStruct struct)
     {
         this.struct = struct;
-        fieldNames = struct.fieldNames();
-        values = new Object[fieldNames.length];
+        fieldNames  = struct.fieldNames();
+        values      = new Object[fieldNames.length];
         charBuffers = new byte[fieldNames.length][];
     }
 

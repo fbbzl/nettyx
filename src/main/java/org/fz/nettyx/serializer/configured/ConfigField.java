@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.AccessLevel;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.fz.nettyx.serializer.configured.type.BasicTypeResolver.BasicValueReader;
 import org.fz.nettyx.serializer.configured.type.BasicTypeResolver.BasicValueWriter;
 import org.fz.nettyx.serializer.struct.basic.Basic;
@@ -16,10 +18,12 @@ import java.nio.charset.StandardCharsets;
  * field definition of a configured struct
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-08-16
  */
 @Getter
 @Accessors(fluent = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ConfigField {
 
     /**
@@ -32,21 +36,21 @@ public class ConfigField {
      */
     public enum ElementKind { BASIC, STRUCT }
 
-    private final Kind kind;
-    private final String name;
-
-    private final Class<? extends Basic<?>> basicType;
+    Kind                      kind;
+    String                    name;
+    Class<? extends Basic<?>> basicType;
     @Getter(AccessLevel.PACKAGE)
-    private final BasicValueReader basicValueReader;
+    BasicValueReader          basicValueReader;
     @Getter(AccessLevel.PACKAGE)
-    private final BasicValueWriter basicValueWriter;
-    private final Integer length;
-    private final boolean flexible;
-    private final String structRef;
-    private final ElementKind elementKind;
-    private final Charset charset;
+    BasicValueWriter          basicValueWriter;
+    Integer                   length;
+    boolean                   flexible;
+    String                    structRef;
+    ElementKind               elementKind;
+    Charset                   charset;
 
-    private String resolvedStructRef;
+    @NonFinal
+    String                   resolvedStructRef;
 
     private ConfigField(
             Kind kind,
@@ -58,16 +62,16 @@ public class ConfigField {
             ElementKind elementKind,
             Charset charset)
     {
-        this.kind = kind;
-        this.name = name;
-        this.basicType = basicType;
+        this.kind             = kind;
+        this.name             = name;
+        this.basicType        = basicType;
         this.basicValueReader = basicType == null ? null : org.fz.nettyx.serializer.configured.type.BasicTypeResolver.valueReaderFor(basicType);
         this.basicValueWriter = basicType == null ? null : org.fz.nettyx.serializer.configured.type.BasicTypeResolver.valueWriterFor(basicType);
-        this.length = length;
-        this.flexible = flexible;
-        this.structRef = structRef;
-        this.elementKind = elementKind;
-        this.charset = charset;
+        this.length           = length;
+        this.flexible         = flexible;
+        this.structRef        = structRef;
+        this.elementKind      = elementKind;
+        this.charset          = charset;
     }
 
     public static ConfigField basicField(String name, Class<? extends Basic<?>> basicType)

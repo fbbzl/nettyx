@@ -1,6 +1,8 @@
 package org.fz.nettyx.serializer.configured;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.Serializer;
@@ -14,19 +16,19 @@ import java.util.Map;
  * loaded from config files, no POJO and no annotation required
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-08-16
  */
 @SuppressWarnings("unchecked")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class ConfiguredSerializer implements Serializer {
 
-    private final StructConfigRegistry registry;
-    private final ConfigStruct root;
-    private final ConfiguredStructCodec codec;
+    ConfigStruct          root;
+    ConfiguredStructCodec codec;
 
     public ConfiguredSerializer(StructConfigRegistry registry, String structName)
     {
-        this.registry = registry;
-        this.root = registry.require(structName);
+        this.root  = registry.require(structName);
         this.codec = new ConfiguredStructCodec(registry);
     }
 

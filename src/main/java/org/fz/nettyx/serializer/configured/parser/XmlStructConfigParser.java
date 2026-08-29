@@ -41,6 +41,7 @@ import java.util.Map;
  * the DOCTYPE is optional, the dtd is bundled in the jar and resolved locally like mybatis mappers
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-08-16
  */
 public class XmlStructConfigParser {

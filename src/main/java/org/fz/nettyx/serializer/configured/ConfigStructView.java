@@ -1,26 +1,36 @@
 package org.fz.nettyx.serializer.configured;
 
 import io.netty.buffer.ByteBuf;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import org.fz.nettyx.exception.SerializeException;
 
 /**
  * A reusable, zero-copy view over one fixed-length configured struct.
  * The view is overwritten by the next {@link ConfiguredSerializer#viewInto(ByteBuf, ConfigStructView)} call.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-08-16
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public final class ConfigStructView {
 
-    private final ConfiguredSerializer serializer;
-    private final ConfigStruct struct;
-    private final int byteLength;
+    ConfiguredSerializer serializer;
+    ConfigStruct         struct;
+    int                  byteLength;
 
-    private ByteBuf source;
-    private int startIndex;
+    @NonFinal
+    ByteBuf              source;
+    @NonFinal
+    int                  startIndex;
 
     ConfigStructView(ConfiguredSerializer serializer, ConfigStruct struct, int byteLength)
     {
-        this.serializer = serializer;
-        this.struct = struct;
-        this.byteLength = byteLength;
+        this.serializer  = serializer;
+        this.struct      = struct;
+        this.byteLength  = byteLength;
     }
 
     public int byteLength()

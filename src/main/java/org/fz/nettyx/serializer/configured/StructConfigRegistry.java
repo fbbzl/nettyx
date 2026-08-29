@@ -2,6 +2,8 @@ package org.fz.nettyx.serializer.configured;
 
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,12 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * like mybatis mapper statement: {@code namespace.name}
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-08-16
  */
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StructConfigRegistry {
 
-    private final Map<String, ConfigStruct> structCache;
-    private final Map<String, ConfiguredSerializer> serializerCache = new ConcurrentHashMap<>();
+    Map<String, ConfigStruct>           structCache;
+    Map<String, ConfiguredSerializer> serializerCache = new ConcurrentHashMap<>();
 
     private StructConfigRegistry(Map<String, ConfigStruct> structCache)
     {
@@ -81,7 +85,8 @@ public class StructConfigRegistry {
             matched = candidate;
         }
 
-        if (matched == null) throw new StructDefinitionException("struct [" + structName + "] is not configured");
+        if (matched == null)
+            throw new StructDefinitionException("struct [" + structName + "] is not configured");
         return matched;
     }
 
