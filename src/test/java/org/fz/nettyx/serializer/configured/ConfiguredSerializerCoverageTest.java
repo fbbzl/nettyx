@@ -41,9 +41,9 @@ public class ConfiguredSerializerCoverageTest {
         Map<String, Object> reusable = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
         ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{ 1, 2 }), reusable);
 
-        byte[] raw = (byte[]) reusable.get("raw");
-        List<?> values = (List<?>) reusable.get("values");
-        Map<?, ?> gps = (Map<?, ?>) reusable.get("gps");
+        byte[]    raw    = (byte[]) reusable.get("raw");
+        List<?>   values = (List<?>) reusable.get("values");
+        Map<?, ?> gps    = (Map<?, ?>) reusable.get("gps");
 
         ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{ 3, 4 }), reusable);
 
@@ -99,7 +99,7 @@ public class ConfiguredSerializerCoverageTest {
         }
 
         ConfigField shortArray = ConfigField.basicArray("values", cshort.class, 2, false);
-        ByteBuf writing = Unpooled.buffer();
+        ByteBuf     writing    = Unpooled.buffer();
         CODEC.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{ 1, 0, 2, 0 }, readableBytes(writing));
         writing.clear();

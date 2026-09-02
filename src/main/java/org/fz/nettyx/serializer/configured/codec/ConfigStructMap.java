@@ -58,7 +58,7 @@ final class ConfigStructMap extends AbstractMap<String, Object> {
     {
         byte[] buffer = charBuffers[index];
         if (buffer == null || buffer.length != length) {
-            buffer = new byte[length];
+            buffer             = new byte[length];
             charBuffers[index] = buffer;
         }
         return buffer;

@@ -47,12 +47,12 @@ public class BasicTypeResolver {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(BasicTypeResolver.class);
 
-    private static final Map<String, Class<? extends Basic<?>>> BASIC_TYPE_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Class<? extends Basic<?>>, Integer> BASIC_SIZE_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Class<? extends Basic<?>>, BasicReader> READING_READER_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Class<? extends Basic<?>>, BasicValueReader> VALUE_READER_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Class<? extends Basic<?>>, BasicValueWriter> VALUE_WRITER_CACHE = new ConcurrentHashMap<>(64);
-    private static final Map<Class<? extends Basic<?>>, Constructor<?>> VALUE_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(64);
+    private static final Map<String, Class<? extends Basic<?>>>           BASIC_TYPE_CACHE        = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, Integer>          BASIC_SIZE_CACHE        = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, BasicReader>      READING_READER_CACHE    = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, BasicValueReader> VALUE_READER_CACHE      = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, BasicValueWriter> VALUE_WRITER_CACHE      = new ConcurrentHashMap<>(64);
+    private static final Map<Class<? extends Basic<?>>, Constructor<?>>   VALUE_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(64);
 
     static {
         Set<Class<?>> scanned = ClassScanner.scanPackage(
@@ -136,9 +136,9 @@ public class BasicTypeResolver {
     private static BasicReader newReadingReader(Class<? extends Basic<?>> basicClass)
     {
         try {
-            Constructor<?> constructor = basicClass.getConstructor(ByteBuf.class, ByteOrder.class);
-            MethodHandle constructorHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-            CallSite callSite = LambdaMetafactory.metafactory(
+            Constructor<?> constructor       = basicClass.getConstructor(ByteBuf.class, ByteOrder.class);
+            MethodHandle   constructorHandle = MethodHandles.lookup().unreflectConstructor(constructor);
+            CallSite       callSite          = LambdaMetafactory.metafactory(
                     MethodHandles.lookup(),
                     "read",
                     MethodType.methodType(BasicReader.class),

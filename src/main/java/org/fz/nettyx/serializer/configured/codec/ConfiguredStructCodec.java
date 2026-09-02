@@ -48,8 +48,8 @@ public final class ConfiguredStructCodec {
 
     public Map<String, Object> readStruct(ConfigStruct struct, ByteBuf byteBuf)
     {
-        List<ConfigField> fields = struct.fields();
-        ConfigStructMap structMap = new ConfigStructMap(struct);
+        List<ConfigField> fields    = struct.fields();
+        ConfigStructMap   structMap = new ConfigStructMap(struct);
         for (int i = 0; i < fields.size(); i++) {
             ConfigField field = fields.get(i);
             structMap.put(i, readField(field, struct.byteOrder(), byteBuf));
@@ -133,12 +133,12 @@ public final class ConfiguredStructCodec {
                                      ? (ArrayList<Object>) existing
                                      : new ArrayList<>(field.flexible() ? 10 : field.length());
         int previousSize = elements.size();
-        int count = field.flexible() ? -1 : field.length();
-        int i = 0;
+        int count        = field.flexible() ? -1 : field.length();
+        int i            = 0;
         for (; count < 0 ? byteBuf.isReadable() : i < count; i++) {
-            int readerIndex = byteBuf.readerIndex();
+            int    readerIndex     = byteBuf.readerIndex();
             Object previousElement = i < previousSize ? elements.get(i) : null;
-            Object element = readArrayElementInto(field, byteOrder, byteBuf, previousElement);
+            Object element         = readArrayElementInto(field, byteOrder, byteBuf, previousElement);
             if (count < 0 && byteBuf.readerIndex() == readerIndex)
                 throw new SerializeException("flexible array element did not consume any bytes, field: [" + field.name() + "]");
             if (i < previousSize) elements.set(i, element);
@@ -175,7 +175,7 @@ public final class ConfiguredStructCodec {
             throw new TooLessBytesException(length, byteBuf.readableBytes());
 
         int readerIndex = byteBuf.readerIndex();
-        int end = readerIndex + length;
+        int end         = readerIndex + length;
         while (end > readerIndex && byteBuf.getByte(end - 1) == 0) end--;
 
         String value;
@@ -202,9 +202,9 @@ public final class ConfiguredStructCodec {
         if (byteBuf.readableBytes() < length)
             throw new TooLessBytesException(length, byteBuf.readableBytes());
 
-        int readerIndex = byteBuf.readerIndex();
-        byte[] cachedBytes = target.charBuffer(index, length);
-        boolean unchanged = previous != null;
+        int     readerIndex = byteBuf.readerIndex();
+        byte[]  cachedBytes = target.charBuffer(index, length);
+        boolean unchanged   = previous != null;
         for (int i = 0; i < length; i++) {
             byte value = byteBuf.getByte(readerIndex + i);
             if (cachedBytes[i] != value) unchanged = false;
@@ -240,8 +240,8 @@ public final class ConfiguredStructCodec {
 
     private Map<String, Object> readNestedStructInto(String structName, ByteBuf byteBuf, Object previous)
     {
-        ConfigStruct nestedStruct = registry.require(structName);
-        ConfigStructMap nested = previous instanceof ConfigStructMap reusable && reusable.belongsTo(nestedStruct)
+        ConfigStruct    nestedStruct = registry.require(structName);
+        ConfigStructMap nested       = previous instanceof ConfigStructMap reusable && reusable.belongsTo(nestedStruct)
                                   ? reusable
                                   : new ConfigStructMap(nestedStruct);
         readStructInto(nestedStruct, nested, byteBuf);
@@ -322,9 +322,9 @@ public final class ConfiguredStructCodec {
 
     public void writeArray(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
-        int valueCount = elementCount(value);
-        int writeCount = field.flexible() ? valueCount : field.length();
-        Iterator<?> iterator = value instanceof Collection<?> collection && !(value instanceof List<?>)
+        int         valueCount = elementCount(value);
+        int         writeCount = field.flexible() ? valueCount : field.length();
+        Iterator<?> iterator   = value instanceof Collection<?> collection && !(value instanceof List<?>)
                                ? collection.iterator()
                                : null;
 

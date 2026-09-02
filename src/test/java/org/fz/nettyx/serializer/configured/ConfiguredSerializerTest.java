@@ -79,7 +79,7 @@ public class ConfiguredSerializerTest {
                 0, 0, 0, (byte) 200
         });
         ConfiguredSerializer serializer = new ConfiguredSerializer(REGISTRY, "device.Device");
-        ConfigStructView view = serializer.newView();
+        ConfigStructView     view       = serializer.newView();
 
         serializer.viewInto(reading, view);
 
@@ -103,8 +103,8 @@ public class ConfiguredSerializerTest {
         reading.writeInt(100);
         reading.writeInt(200);
 
-        Map<String, Object> device = ConfiguredSerializer.toStruct(REGISTRY, "device.Device", reading);
-        ByteBuf writing = Unpooled.buffer();
+        Map<String, Object> device  = ConfiguredSerializer.toStruct(REGISTRY, "device.Device", reading);
+        ByteBuf             writing = Unpooled.buffer();
 
         ConfiguredSerializer.toByteBuf(REGISTRY, "device.Track", device, writing);
 
@@ -317,8 +317,8 @@ public class ConfiguredSerializerTest {
     @Test
     public void testCharset()
     {
-        ByteBuf buf = Unpooled.buffer();
-        byte[] gbkTitle = "串口".getBytes(Charset.forName("GBK"));
+        ByteBuf buf      = Unpooled.buffer();
+        byte[]  gbkTitle = "串口".getBytes(Charset.forName("GBK"));
         buf.writeBytes(gbkTitle);
         buf.writeZero(8 - gbkTitle.length);
         buf.writeBytes("abc".getBytes(StandardCharsets.UTF_8));
@@ -469,7 +469,7 @@ public class ConfiguredSerializerTest {
                     """);
 
             StructConfigRegistry registry = StructConfigRegistry.load(tempFile.toAbsolutePath().toString());
-            Map<String, Object> map = ConfiguredSerializer.toStruct(
+            Map<String, Object>  map      = ConfiguredSerializer.toStruct(
                     registry, "temp.T", Unpooled.wrappedBuffer(new byte[]{ 0, 0, 0, 7 }));
             assertEquals(7, map.get("v"));
         }
@@ -502,7 +502,7 @@ public class ConfiguredSerializerTest {
         buf.writeInt(8);
 
         Map<String, Object> device = ConfiguredSerializer.toStruct(REGISTRY, "device.Device", buf);
-        Map<?, ?> gps = (Map<?, ?>) device.get("gps");
+        Map<?, ?>           gps    = (Map<?, ?>) device.get("gps");
         assertEquals(7, gps.get("longitude"));
         assertEquals(8, gps.get("latitude"));
     }

@@ -84,8 +84,8 @@ public class XmlStructConfigParser {
 
             String namespace = requiredAttr(structsEl, ATTR_NAMESPACE, location);
 
-            Map<String, ConfigStruct> structs = new LinkedHashMap<>();
-            NodeList structNodes = structsEl.getElementsByTagName(TAG_STRUCT);
+            Map<String, ConfigStruct> structs     = new LinkedHashMap<>();
+            NodeList                  structNodes = structsEl.getElementsByTagName(TAG_STRUCT);
             for (int i = 0; i < structNodes.getLength(); i++) {
                 ConfigStruct struct = parseStruct(namespace, (Element) structNodes.item(i), location);
                 if (structs.put(struct.fqName(), struct) != null)
@@ -103,11 +103,11 @@ public class XmlStructConfigParser {
 
     private ConfigStruct parseStruct(String namespace, Element structEl, String location)
     {
-        String name = requiredAttr(structEl, ATTR_NAME, location);
+        String    name      = requiredAttr(structEl, ATTR_NAME, location);
         ByteOrder byteOrder = parseEndian(attr(structEl, ATTR_ENDIAN), namespace + "." + name, location);
 
-        List<ConfigField> fields = new ArrayList<>();
-        NodeList fieldNodes = structEl.getElementsByTagName(TAG_FIELD);
+        List<ConfigField> fields     = new ArrayList<>();
+        NodeList          fieldNodes = structEl.getElementsByTagName(TAG_FIELD);
         for (int i = 0; i < fieldNodes.getLength(); i++)
             fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
 
