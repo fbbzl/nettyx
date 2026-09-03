@@ -24,33 +24,36 @@ import java.nio.charset.StandardCharsets;
 @Getter
 @Accessors(fluent = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ConfigField {
+public class ConfigField
+{
 
     /**
      * field kind
      */
-    public enum Kind { BASIC, CHAR, BYTES, STRUCT, ARRAY }
+    public enum Kind
+    {BASIC, CHAR, BYTES, STRUCT, ARRAY}
 
     /**
      * array element kind
      */
-    public enum ElementKind { BASIC, STRUCT }
+    public enum ElementKind
+    {BASIC, STRUCT}
 
     Kind                      kind;
     String                    name;
     Class<? extends Basic<?>> basicType;
     @Getter(AccessLevel.PACKAGE)
-    BasicValueReader          basicValueReader;
+    BasicValueReader basicValueReader;
     @Getter(AccessLevel.PACKAGE)
-    BasicValueWriter          basicValueWriter;
-    Integer                   length;
-    boolean                   flexible;
-    String                    structRef;
-    ElementKind               elementKind;
-    Charset                   charset;
+    BasicValueWriter basicValueWriter;
+    Integer     length;
+    boolean     flexible;
+    String      structRef;
+    ElementKind elementKind;
+    Charset     charset;
 
     @NonFinal
-    String                   resolvedStructRef;
+    String resolvedStructRef;
 
     private ConfigField(
             Kind kind,

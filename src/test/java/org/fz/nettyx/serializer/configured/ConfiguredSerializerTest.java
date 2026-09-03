@@ -33,11 +33,12 @@ import static org.junit.Assert.*;
  * @author fengbinbin
  * @since 2026-08-16
  */
-public class ConfiguredSerializerTest {
+public class ConfiguredSerializerTest
+{
 
-    static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
+    static final StructConfigRegistry  REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
-    static final ConfiguredStructCodec CODEC = new ConfiguredStructCodec(REGISTRY);
+    static final ConfiguredStructCodec CODEC    = new ConfiguredStructCodec(REGISTRY);
 
     @Test
     public void testConfiguredSerializer()
@@ -95,8 +96,8 @@ public class ConfiguredSerializerTest {
         reading.writeIntLE(0x11223344);
         reading.writeShortLE(0xAABB);
         reading.writeDoubleLE(36.6D);
-        reading.writeBytes(new byte[]{ 'n', 'e', 't', 't', 'y', 0, 0, 0 });
-        reading.writeBytes(new byte[]{ 0x11, 0x22 });
+        reading.writeBytes(new byte[]{'n', 'e', 't', 't', 'y', 0, 0, 0});
+        reading.writeBytes(new byte[]{0x11, 0x22});
         reading.writeShortLE(1);
         reading.writeShortLE(2);
         reading.writeShortLE(3);
@@ -166,9 +167,9 @@ public class ConfiguredSerializerTest {
         }, actual);
 
         assertThrows(IllegalArgumentException.class,
-                () -> CODEC.writeField(ConfigField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                     () -> CODEC.writeField(ConfigField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
         assertThrows(IllegalArgumentException.class,
-                () -> CODEC.writeField(ConfigField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                     () -> CODEC.writeField(ConfigField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
     }
 
     @Test
@@ -178,8 +179,8 @@ public class ConfiguredSerializerTest {
         buf.writeIntLE(0x11223344);
         buf.writeShortLE(0xAABB);
         buf.writeDoubleLE(36.6D);
-        buf.writeBytes(new byte[]{ 'n', 'e', 't', 't', 'y', 0, 0, 0 });
-        buf.writeBytes(new byte[]{ 0x11, 0x22 });
+        buf.writeBytes(new byte[]{'n', 'e', 't', 't', 'y', 0, 0, 0});
+        buf.writeBytes(new byte[]{0x11, 0x22});
         buf.writeShortLE(1);
         buf.writeShortLE(2);
         buf.writeShortLE(3);
@@ -192,7 +193,7 @@ public class ConfiguredSerializerTest {
         assertEquals(0xAABB, device.get("speed"));
         assertEquals(36.6D, (Double) device.get("temperature"), 0.0D);
         assertEquals("netty", device.get("name"));
-        assertArrayEquals(new byte[]{ 0x11, 0x22 }, (byte[]) device.get("raw"));
+        assertArrayEquals(new byte[]{0x11, 0x22}, (byte[]) device.get("raw"));
         assertEquals(List.of((short) 1, (short) 2, (short) 3), device.get("values"));
 
         Object gps = device.get("gps");
@@ -214,7 +215,7 @@ public class ConfiguredSerializerTest {
         device.put("speed", 0xAABB);
         device.put("temperature", 36.6D);
         device.put("name", "netty");
-        device.put("raw", new byte[]{ 0x11, 0x22 });
+        device.put("raw", new byte[]{0x11, 0x22});
         device.put("values", Arrays.asList((short) 1, (short) 2, (short) 3));
         device.put("gps", gps);
 
@@ -269,7 +270,7 @@ public class ConfiguredSerializerTest {
 
         byte[] written = new byte[writing.readableBytes()];
         writing.readBytes(written);
-        assertArrayEquals(new byte[]{ 0x7F, 0, 11, 0, 22, 0, 33 }, written);
+        assertArrayEquals(new byte[]{0x7F, 0, 11, 0, 22, 0, 33}, written);
     }
 
     @Test
@@ -441,7 +442,7 @@ public class ConfiguredSerializerTest {
 
         byte[] written = new byte[writing.readableBytes()];
         writing.readBytes(written);
-        assertArrayEquals(new byte[]{ 9, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4 }, written);
+        assertArrayEquals(new byte[]{9, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0, 4}, written);
     }
 
     @Test
@@ -450,7 +451,7 @@ public class ConfiguredSerializerTest {
         StructConfigRegistry registry = StructConfigRegistry.load("configured/default-endian.xml");
 
         Map<String, Object> map = ConfiguredSerializer.toStruct(
-                registry, "defs.NoEndian", Unpooled.wrappedBuffer(new byte[]{ 0x11, 0x22, 0x33, 0x44 }));
+                registry, "defs.NoEndian", Unpooled.wrappedBuffer(new byte[]{0x11, 0x22, 0x33, 0x44}));
         assertEquals(0x11223344, map.get("v"));
     }
 
@@ -469,8 +470,8 @@ public class ConfiguredSerializerTest {
                     """);
 
             StructConfigRegistry registry = StructConfigRegistry.load(tempFile.toAbsolutePath().toString());
-            Map<String, Object>  map      = ConfiguredSerializer.toStruct(
-                    registry, "temp.T", Unpooled.wrappedBuffer(new byte[]{ 0, 0, 0, 7 }));
+            Map<String, Object> map = ConfiguredSerializer.toStruct(
+                    registry, "temp.T", Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 7}));
             assertEquals(7, map.get("v"));
         }
         finally {
@@ -479,12 +480,68 @@ public class ConfiguredSerializerTest {
     }
 
     @Test
+    public void testJsonAndYamlConfigLoading()
+    {
+        StructConfigRegistry registry = StructConfigRegistry.load("configured/device.json", "configured/geo.yml");
+
+        ByteBuf flexibleBuffer = Unpooled.buffer();
+        flexibleBuffer.writeByte(0x7F);
+        flexibleBuffer.writeShort(11);
+        flexibleBuffer.writeShort(22);
+        Map<String, Object> flexible = ConfiguredSerializer.toStruct(registry, "device.Flexible", flexibleBuffer);
+        assertEquals(List.of(11, 22), flexible.get("tail"));
+
+        ByteBuf flexibleWriting = Unpooled.buffer();
+        ConfiguredSerializer.toByteBuf(registry, "device.Flexible", flexible, flexibleWriting);
+        byte[] flexibleBytes = new byte[flexibleWriting.readableBytes()];
+        flexibleWriting.readBytes(flexibleBytes);
+        assertArrayEquals(new byte[]{0x7F, 0, 11, 0, 22}, flexibleBytes);
+
+        ByteBuf gpsBuffer = Unpooled.buffer();
+        gpsBuffer.writeInt(100);
+        gpsBuffer.writeInt(200);
+        assertEquals(Map.of("longitude", 100, "latitude", 200),
+                     ConfiguredSerializer.toStruct(registry, "geo.GpsPoint", gpsBuffer));
+        assertEquals(Map.of(), ConfiguredSerializer.toStruct(registry, "device.Empty", Unpooled.EMPTY_BUFFER));
+    }
+
+    @Test
+    public void testUnknownJsonConfigFieldRejected()
+    {
+        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/invalid-property.json"));
+    }
+
+    @Test
+    public void testDuplicateJsonConfigFieldRejected()
+    {
+        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/duplicate-property.json"));
+    }
+
+    @Test
+    public void testDuplicateYamlConfigFieldRejected()
+    {
+        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/duplicate-property.yml"));
+    }
+
+    @Test
+    public void testTrailingJsonRootRejected()
+    {
+        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/trailing-root.json"));
+    }
+
+    @Test
+    public void testTrailingYamlDocumentRejected()
+    {
+        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/trailing-document.yml"));
+    }
+
+    @Test
     public void testExternalDtdBlockedAndIgnored()
     {
         StructConfigRegistry registry = StructConfigRegistry.load("configured/xxe-external-dtd.xml");
 
         Map<String, Object> map = ConfiguredSerializer.toStruct(
-                registry, "xxe.X", Unpooled.wrappedBuffer(new byte[]{ 0x7F }));
+                registry, "xxe.X", Unpooled.wrappedBuffer(new byte[]{0x7F}));
         assertEquals((short) 0x7F, map.get("v"));
     }
 

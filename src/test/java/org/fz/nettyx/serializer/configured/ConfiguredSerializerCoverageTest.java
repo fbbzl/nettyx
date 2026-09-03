@@ -29,32 +29,37 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class ConfiguredSerializerCoverageTest {
+/**
+ * @author fengbinbin
+ * @since 2026-09-02
+ */
+public class ConfiguredSerializerCoverageTest
+{
 
-    private static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
+    private static final StructConfigRegistry  REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
-    private static final ConfiguredStructCodec CODEC = new ConfiguredStructCodec(REGISTRY);
+    private static final ConfiguredStructCodec CODEC    = new ConfiguredStructCodec(REGISTRY);
 
     @Test
     public void reusableStructUpdatesValuesInPlaceAndRegularMapsAreReplaced()
     {
         Map<String, Object> reusable = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{ 1, 2 }), reusable);
+        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{1, 2}), reusable);
 
         byte[]    raw    = (byte[]) reusable.get("raw");
         List<?>   values = (List<?>) reusable.get("values");
         Map<?, ?> gps    = (Map<?, ?>) reusable.get("gps");
 
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{ 3, 4 }), reusable);
+        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{3, 4}), reusable);
 
         assertEquals(2, reusable.get("id"));
         assertSame(raw, reusable.get("raw"));
         assertSame(values, reusable.get("values"));
         assertSame(gps, reusable.get("gps"));
-        assertArrayEquals(new byte[]{ 3, 4 }, (byte[]) reusable.get("raw"));
+        assertArrayEquals(new byte[]{3, 4}, (byte[]) reusable.get("raw"));
 
         reusable.put("marker", true);
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(3, "second", new byte[]{ 5, 6 }), reusable);
+        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(3, "second", new byte[]{5, 6}), reusable);
         assertEquals(3, reusable.get("id"));
         assertTrue(reusable.containsKey("marker"));
         assertEquals(Boolean.TRUE, reusable.remove("marker"));
@@ -62,7 +67,7 @@ public class ConfiguredSerializerCoverageTest {
         assertTrue(reusable.isEmpty());
 
         Map<String, Object> regular = new LinkedHashMap<>(Map.of("stale", true));
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(4, "plain", new byte[]{ 7, 8 }), regular);
+        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(4, "plain", new byte[]{7, 8}), regular);
         assertFalse(regular.containsKey("stale"));
         assertEquals(4, regular.get("id"));
     }
@@ -78,19 +83,19 @@ public class ConfiguredSerializerCoverageTest {
         assertEquals(List.of(44), reusable.get("tail"));
 
         ConfigStructView view = ConfiguredSerializer.newView(REGISTRY, "device.Device");
-        ConfiguredSerializer.viewInto(REGISTRY, "device.Device", deviceBuffer(5, "view", new byte[]{ 9, 10 }), view);
+        ConfiguredSerializer.viewInto(REGISTRY, "device.Device", deviceBuffer(5, "view", new byte[]{9, 10}), view);
         assertEquals(5, view.get("id"));
         assertThrows(SerializeException.class, () -> ConfiguredSerializer.newView(REGISTRY, "device.Flexible"));
         assertThrows(SerializeException.class, () -> ConfiguredSerializer.viewInto(
-                REGISTRY, "device.Device", deviceBuffer(6, "other", new byte[]{ 1, 1 }),
+                REGISTRY, "device.Device", deviceBuffer(6, "other", new byte[]{1, 1}),
                 ConfiguredSerializer.newView(REGISTRY, "device.BenchmarkDevice")));
         assertThrows(TooLessBytesException.class,
-                () -> ConfiguredSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
-                        ConfiguredSerializer.newView(REGISTRY, "device.Device")));
+                     () -> ConfiguredSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
+                                                         ConfiguredSerializer.newView(REGISTRY, "device.Device")));
 
         ByteBuf direct = Unpooled.directBuffer(4);
         try {
-            direct.writeBytes(new byte[]{ 'o', 'k', 0, 0 });
+            direct.writeBytes(new byte[]{'o', 'k', 0, 0});
             assertEquals("ok", CODEC.readField(
                     ConfigField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
         }
@@ -101,10 +106,10 @@ public class ConfiguredSerializerCoverageTest {
         ConfigField shortArray = ConfigField.basicArray("values", cshort.class, 2, false);
         ByteBuf     writing    = Unpooled.buffer();
         CODEC.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
-        assertArrayEquals(new byte[]{ 1, 0, 2, 0 }, readableBytes(writing));
+        assertArrayEquals(new byte[]{1, 0, 2, 0}, readableBytes(writing));
         writing.clear();
-        CODEC.writeArray(shortArray, new int[]{ 3, 4 }, ByteOrder.LITTLE_ENDIAN, writing);
-        assertArrayEquals(new byte[]{ 3, 0, 4, 0 }, readableBytes(writing));
+        CODEC.writeArray(shortArray, new int[]{3, 4}, ByteOrder.LITTLE_ENDIAN, writing);
+        assertArrayEquals(new byte[]{3, 0, 4, 0}, readableBytes(writing));
         assertThrows(SerializeException.class, () -> CODEC.writeArray(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
     }
 
@@ -117,13 +122,14 @@ public class ConfiguredSerializerCoverageTest {
 
         Map<String, Object> wrongNestedTarget = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
         deviceTarget.put("gps", wrongNestedTarget);
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{ 1, 2 }), deviceTarget);
+        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{1, 2}), deviceTarget);
         Map<?, ?> gps = (Map<?, ?>) deviceTarget.get("gps");
         assertNotSame(wrongNestedTarget, gps);
         assertEquals(100, gps.get("longitude"));
         assertEquals(200, gps.get("latitude"));
 
-        Collection<Integer> iteratorOnly = new AbstractCollection<>() {
+        Collection<Integer> iteratorOnly = new AbstractCollection<>()
+        {
             @Override
             public Iterator<Integer> iterator()
             {
@@ -144,7 +150,7 @@ public class ConfiguredSerializerCoverageTest {
         };
         ByteBuf writing = Unpooled.buffer();
         CODEC.writeArray(ConfigField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
-        assertArrayEquals(new byte[]{ 5, 0, 6, 0 }, readableBytes(writing));
+        assertArrayEquals(new byte[]{5, 0, 6, 0}, readableBytes(writing));
     }
 
     @Test
@@ -161,7 +167,7 @@ public class ConfiguredSerializerCoverageTest {
 
         assertEquals(Boolean.TRUE, BasicTypeResolver.valueBasic(cppbool.class, true).value());
         assertEquals(1, BasicTypeResolver.sizeOf(cppbool.class));
-        ByteBuf input = Unpooled.wrappedBuffer(new byte[]{ 1 });
+        ByteBuf input = Unpooled.wrappedBuffer(new byte[]{1});
         assertEquals(Boolean.TRUE, BasicTypeResolver.readBasic(cppbool.class, ByteOrder.BIG_ENDIAN, input).value());
     }
 

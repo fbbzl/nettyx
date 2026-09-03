@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -44,7 +45,8 @@ import java.util.Map;
  * @version 1.0
  * @since 2026-08-16
  */
-public class XmlStructConfigParser {
+public class XmlStructConfigParser implements StructConfigParser
+{
 
     public static final String DOCTYPE_PUBLIC_ID = "-//fbbzl//DTD Nettyx Struct Config 1.0//EN";
     public static final String DOCTYPE_SYSTEM_ID = "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd";
@@ -109,7 +111,7 @@ public class XmlStructConfigParser {
         List<ConfigField> fields     = new ArrayList<>();
         NodeList          fieldNodes = structEl.getElementsByTagName(TAG_FIELD);
         for (int i = 0; i < fieldNodes.getLength(); i++)
-            fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
+             fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
 
         return new ConfigStruct(namespace, name, byteOrder, fields);
     }
@@ -132,29 +134,37 @@ public class XmlStructConfigParser {
             throw definitionError("field must declare exactly one of [" + ATTR_TYPE + "] or [" + ATTR_STRUCT + "]", fieldEl, structName, location);
 
         if (hasStruct) {
-            if (hasLength)     throw definitionError("struct field can not declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
-            if (charset != null) throw definitionError("struct field can not declare [" + ATTR_CHARSET + "]", fieldEl, structName, location);
+            if (hasLength)
+                throw definitionError("struct field can not declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+            if (charset != null)
+                throw definitionError("struct field can not declare [" + ATTR_CHARSET + "]", fieldEl, structName, location);
             return hasArray
                    ? ConfigField.structArray(name, structRef, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
                    : ConfigField.structField(name, structRef);
         }
 
         if (TYPE_CHAR.equals(type)) {
-            if (!hasLength) throw definitionError("char field must declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
-            if (hasArray)   throw definitionError("char field can not declare [" + ATTR_ARRAY + "]", fieldEl, structName, location);
+            if (!hasLength)
+                throw definitionError("char field must declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+            if (hasArray)
+                throw definitionError("char field can not declare [" + ATTR_ARRAY + "]", fieldEl, structName, location);
             return ConfigField.charField(name, parseLength(length, fieldEl, structName, location),
                                          parseCharset(charset, fieldEl, structName, location));
         }
 
-        if (charset != null) throw definitionError("only char field can declare [" + ATTR_CHARSET + "]", fieldEl, structName, location);
+        if (charset != null)
+            throw definitionError("only char field can declare [" + ATTR_CHARSET + "]", fieldEl, structName, location);
 
         if (TYPE_BYTE.equals(type)) {
-            if (!hasLength) throw definitionError("byte field must declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
-            if (hasArray)   throw definitionError("byte field can not declare [" + ATTR_ARRAY + "]", fieldEl, structName, location);
+            if (!hasLength)
+                throw definitionError("byte field must declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+            if (hasArray)
+                throw definitionError("byte field can not declare [" + ATTR_ARRAY + "]", fieldEl, structName, location);
             return ConfigField.bytesField(name, parseLength(length, fieldEl, structName, location));
         }
 
-        if (hasLength) throw definitionError("basic field can not declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+        if (hasLength)
+            throw definitionError("basic field can not declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
 
         Class<? extends Basic<?>> basicType = BasicTypeResolver.resolve(type);
         return hasArray
@@ -178,10 +188,10 @@ public class XmlStructConfigParser {
     {
         if (endian == null) return ByteOrder.BIG_ENDIAN;
 
-        return switch (endian.toUpperCase()) {
-            case "BE", "BIG_ENDIAN"    -> ByteOrder.BIG_ENDIAN;
+        return switch (endian.toUpperCase(Locale.ROOT)) {
+            case "BE", "BIG_ENDIAN" -> ByteOrder.BIG_ENDIAN;
             case "LE", "LITTLE_ENDIAN" -> ByteOrder.LITTLE_ENDIAN;
-            case "NATIVE"              -> ByteOrder.nativeOrder();
+            case "NATIVE" -> ByteOrder.nativeOrder();
             default -> throw new StructDefinitionException(
                     "unknown endian [" + endian + "] of struct [" + structName + "], location: [" + location + "]");
         };

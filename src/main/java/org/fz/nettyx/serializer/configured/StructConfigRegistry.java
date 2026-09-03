@@ -4,6 +4,10 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import org.fz.nettyx.serializer.configured.parser.JsonStructConfigParser;
+import org.fz.nettyx.serializer.configured.parser.StructConfigParser;
+import org.fz.nettyx.serializer.configured.parser.XmlStructConfigParser;
+import org.fz.nettyx.serializer.configured.parser.YamlStructConfigParser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +16,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,9 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2026-08-16
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class StructConfigRegistry {
+public class StructConfigRegistry
+{
 
-    Map<String, ConfigStruct>           structCache;
+    Map<String, ConfigStruct>         structCache;
     Map<String, ConfiguredSerializer> serializerCache = new ConcurrentHashMap<>();
 
     private StructConfigRegistry(Map<String, ConfigStruct> structCache)
@@ -36,8 +42,9 @@ public class StructConfigRegistry {
     }
 
     /**
-     * load struct config files, locations may be classpath resources, {@code classpath:} prefixed
-     * resources or file paths
+     * Loads XML, JSON, or YAML struct config files. Locations may be classpath resources,
+     * {@code classpath:} prefixed resources, or file paths; the extension selects JSON for
+     * {@code .json}, YAML for {@code .yaml}/{@code .yml}, and XML otherwise.
      */
     public static StructConfigRegistry load(String... locations)
     {
@@ -47,7 +54,7 @@ public class StructConfigRegistry {
         Map<String, ConfigStruct> structs = new LinkedHashMap<>();
         for (String location : locations) {
             try (InputStream input = openStream(location)) {
-                Map<String, ConfigStruct> parsed = new org.fz.nettyx.serializer.configured.parser.XmlStructConfigParser().parse(location, input);
+                Map<String, ConfigStruct> parsed = parserFor(location).parse(location, input);
                 for (Map.Entry<String, ConfigStruct> entry : parsed.entrySet()) {
                     if (structs.put(entry.getKey(), entry.getValue()) != null)
                         throw new StructDefinitionException("duplicated struct [" + entry.getKey() + "], location: [" + location + "]");
@@ -164,5 +171,14 @@ public class StructConfigRegistry {
         if (input != null) return input;
 
         throw new SerializeException("struct config location not found: [" + location + "]");
+    }
+
+    private static StructConfigParser parserFor(String location)
+    {
+        String normalizedLocation = location.toLowerCase(Locale.ROOT);
+        if (normalizedLocation.endsWith(".json")) return new JsonStructConfigParser();
+        if (normalizedLocation.endsWith(".yaml") || normalizedLocation.endsWith(".yml"))
+            return new YamlStructConfigParser();
+        return new XmlStructConfigParser();
     }
 }

@@ -20,7 +20,8 @@ import java.util.Map;
  */
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ConfiguredSerializer implements Serializer {
+public final class ConfiguredSerializer implements Serializer
+{
 
     ConfigStruct          root;
     ConfiguredStructCodec codec;

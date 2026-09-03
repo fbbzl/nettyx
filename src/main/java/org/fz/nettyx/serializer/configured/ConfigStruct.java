@@ -18,13 +18,14 @@ import java.util.List;
 @Getter
 @Accessors(fluent = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ConfigStruct {
+public class ConfigStruct
+{
 
-    String             namespace;
-    String             name;
-    ByteOrder          byteOrder;
+    String            namespace;
+    String            name;
+    ByteOrder         byteOrder;
     List<ConfigField> fields;
-    String[]           fieldNames;
+    String[]          fieldNames;
 
     public ConfigStruct(String namespace, String name, ByteOrder byteOrder, List<ConfigField> fields)
     {

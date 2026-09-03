@@ -16,24 +16,25 @@ import org.fz.nettyx.serializer.configured.codec.ConfiguredStructCodec;
  * @since 2026-08-16
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ConfigStructView {
+public final class ConfigStructView
+{
 
-    ConfiguredSerializer serializer;
+    ConfiguredSerializer  serializer;
     ConfiguredStructCodec codec;
-    ConfigStruct         struct;
-    int                  byteLength;
+    ConfigStruct          struct;
+    int                   byteLength;
 
     @NonFinal
-    ByteBuf              source;
+    ByteBuf source;
     @NonFinal
-    int                  startIndex;
+    int     startIndex;
 
     ConfigStructView(ConfiguredSerializer serializer, ConfiguredStructCodec codec, ConfigStruct struct, int byteLength)
     {
-        this.serializer  = serializer;
-        this.codec       = codec;
-        this.struct      = struct;
-        this.byteLength  = byteLength;
+        this.serializer = serializer;
+        this.codec      = codec;
+        this.struct     = struct;
+        this.byteLength = byteLength;
     }
 
     public int byteLength()
@@ -56,7 +57,7 @@ public final class ConfigStructView {
 
     void reset(ByteBuf source, int startIndex)
     {
-        this.source = source;
+        this.source     = source;
         this.startIndex = startIndex;
     }
 

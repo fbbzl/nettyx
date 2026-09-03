@@ -1,0 +1,9 @@
+namespace: geo
+structs:
+  - name: GpsPoint
+    endian: BE
+    fields:
+      - name: longitude
+        type: cint
+      - name: latitude
+        type: cint

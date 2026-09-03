@@ -30,14 +30,15 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ConfiguredStructCodec {
+public final class ConfiguredStructCodec
+{
 
     StructConfigRegistry       registry;
     Map<ConfigStruct, Integer> fixedSizeCache;
 
     public ConfiguredStructCodec(StructConfigRegistry registry)
     {
-        this.registry = registry;
+        this.registry       = registry;
         this.fixedSizeCache = new HashMap<>();
     }
 
@@ -82,11 +83,11 @@ public final class ConfiguredStructCodec {
     public Object readField(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return switch (field.kind()) {
-            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
-            case CHAR   -> readCharString(field.length(), field.charset(), byteBuf);
-            case BYTES  -> readBytes(field.length(), byteBuf);
+            case BASIC -> readBasicValue(field, byteOrder, byteBuf);
+            case CHAR -> readCharString(field.length(), field.charset(), byteBuf);
+            case BYTES -> readBytes(field.length(), byteBuf);
             case STRUCT -> readStruct(registry.require(field.resolvedStructRef()), byteBuf);
-            case ARRAY  -> readArray(field, byteOrder, byteBuf);
+            case ARRAY -> readArray(field, byteOrder, byteBuf);
         };
     }
 
@@ -99,11 +100,11 @@ public final class ConfiguredStructCodec {
     {
         Object previous = target.valueAt(index);
         return switch (field.kind()) {
-            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
-            case CHAR   -> readCharStringInto(field.length(), field.charset(), byteBuf, target, index, (String) previous);
-            case BYTES  -> readBytesInto(field.length(), byteBuf, (byte[]) previous);
+            case BASIC -> readBasicValue(field, byteOrder, byteBuf);
+            case CHAR -> readCharStringInto(field.length(), field.charset(), byteBuf, target, index, (String) previous);
+            case BYTES -> readBytesInto(field.length(), byteBuf, (byte[]) previous);
             case STRUCT -> readNestedStructInto(field.resolvedStructRef(), byteBuf, previous);
-            case ARRAY  -> readArrayInto(field, byteOrder, byteBuf, previous);
+            case ARRAY -> readArrayInto(field, byteOrder, byteBuf, previous);
         };
     }
 
@@ -118,10 +119,9 @@ public final class ConfiguredStructCodec {
                 if (byteBuf.readerIndex() == readerIndex)
                     throw new SerializeException("flexible array element did not consume any bytes, field: [" + field.name() + "]");
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < field.length(); i++)
-                elements.add(readArrayElement(field, byteOrder, byteBuf));
+                 elements.add(readArrayElement(field, byteOrder, byteBuf));
         }
 
         return elements;
@@ -142,7 +142,7 @@ public final class ConfiguredStructCodec {
             if (count < 0 && byteBuf.readerIndex() == readerIndex)
                 throw new SerializeException("flexible array element did not consume any bytes, field: [" + field.name() + "]");
             if (i < previousSize) elements.set(i, element);
-            else                  elements.add(element);
+            else elements.add(element);
         }
         if (i < previousSize) elements.subList(i, previousSize).clear();
         return elements;
@@ -151,7 +151,7 @@ public final class ConfiguredStructCodec {
     private Object readArrayElement(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return switch (field.elementKind()) {
-            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
+            case BASIC -> readBasicValue(field, byteOrder, byteBuf);
             case STRUCT -> readStruct(registry.require(field.resolvedStructRef()), byteBuf);
         };
     }
@@ -159,7 +159,7 @@ public final class ConfiguredStructCodec {
     private Object readArrayElementInto(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
     {
         return switch (field.elementKind()) {
-            case BASIC  -> readBasicValue(field, byteOrder, byteBuf);
+            case BASIC -> readBasicValue(field, byteOrder, byteBuf);
             case STRUCT -> readNestedStructInto(field.resolvedStructRef(), byteBuf, previous);
         };
     }
@@ -182,8 +182,7 @@ public final class ConfiguredStructCodec {
         if (byteBuf.hasArray()) {
             value = new String(byteBuf.array(), byteBuf.arrayOffset() + readerIndex, end - readerIndex, charset);
             byteBuf.skipBytes(length);
-        }
-        else {
+        } else {
             byte[] bytes = readBytes(length, byteBuf);
             value = new String(bytes, 0, end - readerIndex, charset);
         }
@@ -240,10 +239,10 @@ public final class ConfiguredStructCodec {
 
     private Map<String, Object> readNestedStructInto(String structName, ByteBuf byteBuf, Object previous)
     {
-        ConfigStruct    nestedStruct = registry.require(structName);
-        ConfigStructMap nested       = previous instanceof ConfigStructMap reusable && reusable.belongsTo(nestedStruct)
-                                  ? reusable
-                                  : new ConfigStructMap(nestedStruct);
+        ConfigStruct nestedStruct = registry.require(structName);
+        ConfigStructMap nested = previous instanceof ConfigStructMap reusable && reusable.belongsTo(nestedStruct)
+                                 ? reusable
+                                 : new ConfigStructMap(nestedStruct);
         readStructInto(nestedStruct, nested, byteBuf);
         return nested;
     }
@@ -301,7 +300,7 @@ public final class ConfiguredStructCodec {
         List<ConfigField> fields = struct.fields();
         if (structMap instanceof ConfigStructMap configuredMap && configuredMap.belongsTo(struct)) {
             for (int i = 0; i < fields.size(); i++)
-                writeField(fields.get(i), configuredMap.valueAt(i), struct.byteOrder(), writing);
+                 writeField(fields.get(i), configuredMap.valueAt(i), struct.byteOrder(), writing);
             return;
         }
 
@@ -312,19 +311,19 @@ public final class ConfiguredStructCodec {
     public void writeField(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
         switch (field.kind()) {
-            case BASIC  -> writeBasicValue(field, value, byteOrder, writing);
-            case CHAR   -> writeCharString(field.length(), (String) value, field.charset(), writing);
-            case BYTES  -> writeBytes(field.length(), (byte[]) value, writing);
+            case BASIC -> writeBasicValue(field, value, byteOrder, writing);
+            case CHAR -> writeCharString(field.length(), (String) value, field.charset(), writing);
+            case BYTES -> writeBytes(field.length(), (byte[]) value, writing);
             case STRUCT -> writeStruct(registry.require(field.resolvedStructRef()), (Map<String, Object>) value, writing);
-            case ARRAY  -> writeArray(field, value, byteOrder, writing);
+            case ARRAY -> writeArray(field, value, byteOrder, writing);
         }
     }
 
     public void writeArray(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
-        int         valueCount = elementCount(value);
-        int         writeCount = field.flexible() ? valueCount : field.length();
-        Iterator<?> iterator   = value instanceof Collection<?> collection && !(value instanceof List<?>)
+        int valueCount = elementCount(value);
+        int writeCount = field.flexible() ? valueCount : field.length();
+        Iterator<?> iterator = value instanceof Collection<?> collection && !(value instanceof List<?>)
                                ? collection.iterator()
                                : null;
 
@@ -339,7 +338,7 @@ public final class ConfiguredStructCodec {
     private void writeArrayElement(ConfigField field, Object element, ByteOrder byteOrder, ByteBuf writing)
     {
         switch (field.elementKind()) {
-            case BASIC  -> writeBasicValue(field, element, byteOrder, writing);
+            case BASIC -> writeBasicValue(field, element, byteOrder, writing);
             case STRUCT -> writeStruct(registry.require(field.resolvedStructRef()), (Map<String, Object>) element, writing);
         }
     }
@@ -347,7 +346,7 @@ public final class ConfiguredStructCodec {
     private void writeBasicValue(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
         if (value == null) writing.writeZero(BasicTypeResolver.sizeOf(field.basicType()));
-        else               field.writeBasicValue(writing, byteOrder, value);
+        else field.writeBasicValue(writing, byteOrder, value);
     }
 
     private void writeCharString(int length, String value, Charset charset, ByteBuf writing)
@@ -369,9 +368,9 @@ public final class ConfiguredStructCodec {
 
     private static int elementCount(Object value)
     {
-        if (value == null)                  return 0;
+        if (value == null) return 0;
         if (value instanceof Collection<?>) return ((Collection<?>) value).size();
-        if (value.getClass().isArray())     return Array.getLength(value);
+        if (value.getClass().isArray()) return Array.getLength(value);
 
         throw new SerializeException("array field value must be a collection or an array, but got [" + value.getClass().getName() + "]");
     }

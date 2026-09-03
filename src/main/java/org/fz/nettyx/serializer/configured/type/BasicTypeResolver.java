@@ -43,7 +43,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @UtilityClass
 @SuppressWarnings("unchecked")
-public class BasicTypeResolver {
+public class BasicTypeResolver
+{
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(BasicTypeResolver.class);
 
@@ -77,7 +78,8 @@ public class BasicTypeResolver {
     public static Class<? extends Basic<?>> resolve(String typeName)
     {
         Class<? extends Basic<?>> basicClass = BASIC_TYPE_CACHE.get(typeName);
-        if (basicClass == null) throw new TypeJudgmentException("unknown basic type [" + typeName + "] in struct config");
+        if (basicClass == null)
+            throw new TypeJudgmentException("unknown basic type [" + typeName + "] in struct config");
         return basicClass;
     }
 
@@ -138,7 +140,7 @@ public class BasicTypeResolver {
         try {
             Constructor<?> constructor       = basicClass.getConstructor(ByteBuf.class, ByteOrder.class);
             MethodHandle   constructorHandle = MethodHandles.lookup().unreflectConstructor(constructor);
-            CallSite       callSite          = LambdaMetafactory.metafactory(
+            CallSite callSite = LambdaMetafactory.metafactory(
                     MethodHandles.lookup(),
                     "read",
                     MethodType.methodType(BasicReader.class),
@@ -154,7 +156,7 @@ public class BasicTypeResolver {
 
     private static BasicValueReader newValueReader(Class<? extends Basic<?>> basicClass)
     {
-        if (basicClass == cchar.class)  return BasicTypeResolver::readByte;
+        if (basicClass == cchar.class) return BasicTypeResolver::readByte;
         if (basicClass == cuchar.class) return BasicTypeResolver::readUnsignedByte;
         if (basicClass == cshort.class) return BasicTypeResolver::readShort;
         if (basicClass == cushort.class) return BasicTypeResolver::readUnsignedShort;
@@ -169,7 +171,7 @@ public class BasicTypeResolver {
 
     private static BasicValueWriter newValueWriter(Class<? extends Basic<?>> basicClass)
     {
-        if (basicClass == cchar.class)  return BasicTypeResolver::writeByte;
+        if (basicClass == cchar.class) return BasicTypeResolver::writeByte;
         if (basicClass == cuchar.class) return BasicTypeResolver::writeUnsignedByte;
         if (basicClass == cshort.class) return BasicTypeResolver::writeShort;
         if (basicClass == cushort.class) return BasicTypeResolver::writeUnsignedShort;
@@ -278,7 +280,7 @@ public class BasicTypeResolver {
     {
         int number = intValue(value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeShortLE(number);
-        else                                      byteBuf.writeShort(number);
+        else byteBuf.writeShort(number);
     }
 
     private static void writeUnsignedShort(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
@@ -287,35 +289,35 @@ public class BasicTypeResolver {
         if (unsigned < 0 || unsigned > 0xFFFF)
             throw new IllegalArgumentException("cushort value out of range [0, 65535]: " + unsigned);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeShortLE(unsigned);
-        else                                      byteBuf.writeShort(unsigned);
+        else byteBuf.writeShort(unsigned);
     }
 
     private static void writeInt(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
     {
         int number = intValue(value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeIntLE(number);
-        else                                      byteBuf.writeInt(number);
+        else byteBuf.writeInt(number);
     }
 
     private static void writeLong(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
     {
         long number = longValue(value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeLongLE(number);
-        else                                      byteBuf.writeLong(number);
+        else byteBuf.writeLong(number);
     }
 
     private static void writeFloat(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
     {
         float number = floatValue(value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeFloatLE(number);
-        else                                      byteBuf.writeFloat(number);
+        else byteBuf.writeFloat(number);
     }
 
     private static void writeDouble(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
     {
         double number = doubleValue(value);
         if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeDoubleLE(number);
-        else                                      byteBuf.writeDouble(number);
+        else byteBuf.writeDouble(number);
     }
 
     private static int intValue(Object value)
@@ -344,17 +346,20 @@ public class BasicTypeResolver {
     }
 
     @FunctionalInterface
-    public interface BasicReader {
+    public interface BasicReader
+    {
         Basic<?> read(ByteBuf byteBuf, ByteOrder byteOrder);
     }
 
     @FunctionalInterface
-    public interface BasicValueReader {
+    public interface BasicValueReader
+    {
         Object read(ByteBuf byteBuf, ByteOrder byteOrder);
     }
 
     @FunctionalInterface
-    public interface BasicValueWriter {
+    public interface BasicValueWriter
+    {
         void write(ByteBuf byteBuf, ByteOrder byteOrder, Object value);
     }
 

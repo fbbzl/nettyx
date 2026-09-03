@@ -35,20 +35,21 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @Warmup(iterations = 3, time = 1)
 @Measurement(iterations = 5, time = 1)
-public class ConfiguredSerializerBenchmark {
+public class ConfiguredSerializerBenchmark
+{
 
     private static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
             "configured/device.xml", "configured/geo.xml");
 
-    private byte[] bytes;
-    private ByteBuf reading;
-    private ByteBuf writing;
+    private byte[]              bytes;
+    private ByteBuf             reading;
+    private ByteBuf             writing;
     private Map<String, Object> message;
 
     @Setup
     public void setup()
     {
-        bytes = Arrays.copyOf(new byte[]{
+        bytes   = Arrays.copyOf(new byte[]{
                 0x44, 0x33, 0x22, 0x11,
                 (byte) 0xBB, (byte) 0xAA,
                 (byte) 0xCD, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, (byte) 0xCC, 0x4C, 0x42, 0x40,

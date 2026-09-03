@@ -21,14 +21,15 @@ import java.util.Set;
  */
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class ConfigStructMap extends AbstractMap<String, Object> {
+final class ConfigStructMap extends AbstractMap<String, Object>
+{
 
-    ConfigStruct          struct;
-    String[]              fieldNames;
-    Object[]              values;
-    byte[][]              charBuffers;
+    ConfigStruct struct;
+    String[]     fieldNames;
+    Object[]     values;
+    byte[][]     charBuffers;
     @NonFinal
-    Map<String, Object>   materialized;
+    Map<String, Object> materialized;
 
     ConfigStructMap(ConfigStruct struct)
     {
@@ -41,7 +42,7 @@ final class ConfigStructMap extends AbstractMap<String, Object> {
     void put(int index, Object value)
     {
         if (materialized == null) values[index] = value;
-        else                      materialized.put(fieldNames[index], value);
+        else materialized.put(fieldNames[index], value);
     }
 
     Object valueAt(int index)
