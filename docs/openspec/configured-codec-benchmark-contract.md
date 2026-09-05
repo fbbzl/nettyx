@@ -28,6 +28,8 @@ next_action: Implement the confirmed benchmark and API visibility changes.
 
 ## 目标与非目标
 
+`source_artifacts` 为 `reference_version` 对应的历史路径。当前源码及测试中的 `serializer/configured/` 已迁移为 `serializer/schema/`，类名不变。
+
 目标：使性能基准代表实际通信期的完整编解码，且避免公开的无校验视图 API 被误用于生产代码。
 
 非目标：不改变 XML 配置格式、字段编解码语义或现有安全的 `viewInto` API。

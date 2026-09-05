@@ -1,0 +1,40 @@
+package org.fz.nettyx.serializer.schema.parser;
+
+import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import org.fz.nettyx.exception.StructDefinitionException;
+import org.fz.nettyx.serializer.schema.ConfigStruct;
+
+import java.io.InputStream;
+import java.util.Map;
+
+/**
+ * Parses YAML configured-struct resources.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-02
+ */
+public final class YamlStructConfigParser extends StructuredStructConfigParser
+{
+
+    private static final YAMLMapper MAPPER = YAMLMapper.builder()
+                                                       .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                                                       .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                                                       .build();
+
+    @Override
+    public Map<String, ConfigStruct> parse(String location, InputStream input)
+    {
+        try {
+            return parseTree(location, MAPPER.readTree(input));
+        }
+        catch (StructDefinitionException definitionError) {
+            throw definitionError;
+        }
+        catch (Exception parseError) {
+            throw new StructDefinitionException("failed to parse struct config, location: [" + location + "]", parseError);
+        }
+    }
+}

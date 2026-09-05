@@ -6,15 +6,15 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.codec.model.*;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.type.StructSerializerContext;
+import org.fz.nettyx.serializer.type.basic.c.signed.cint;
+import org.fz.nettyx.serializer.type.basic.c.signed.clong4;
 import org.junit.Before;
 
 import java.util.Arrays;
 
-import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
-import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
+import static org.fz.nettyx.serializer.type.StructSerializer.toByteBuf;
+import static org.fz.nettyx.serializer.type.StructSerializer.toStruct;
 
 
 /**

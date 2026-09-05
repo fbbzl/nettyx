@@ -1,8 +1,8 @@
 package org.fz.nettyx.beanmodel.coverage;
 
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.type.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.ToArray;
+import org.fz.nettyx.serializer.type.basic.c.signed.cchar;
 
 @Struct(endian = Struct.Endian.BE)
 public class BytecodeCoverageStruct {

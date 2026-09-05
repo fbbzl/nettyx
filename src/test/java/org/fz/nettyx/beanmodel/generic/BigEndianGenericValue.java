@@ -1,6 +1,6 @@
 package org.fz.nettyx.beanmodel.generic;
 
-import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.Struct;
 
 @Struct(endian = Struct.Endian.BE)
 public class BigEndianGenericValue<T> {

@@ -1,18 +1,18 @@
 package org.fz.nettyx.codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.struct.annotation.Chunk;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
+import org.fz.nettyx.serializer.type.annotation.Chunk;
+import org.fz.nettyx.serializer.type.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.ToArray;
+import org.fz.nettyx.serializer.type.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.type.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.type.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.type.basic.c.signed.cint;
+import org.fz.nettyx.serializer.type.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.type.basic.c.unsigned.culong8;
 
-import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.BE;
-import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.LE;
+import static org.fz.nettyx.serializer.type.annotation.Struct.Endian.BE;
+import static org.fz.nettyx.serializer.type.annotation.Struct.Endian.LE;
 
 /**
  * @author fengbinbin

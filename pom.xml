@@ -268,7 +268,7 @@
                                 <rule>
                                     <element>PACKAGE</element>
                                     <includes>
-                                        <include>org.fz.nettyx.serializer.struct*</include>
+                                        <include>org.fz.nettyx.serializer.type*</include>
                                     </includes>
                                     <limits>
                                         <limit>

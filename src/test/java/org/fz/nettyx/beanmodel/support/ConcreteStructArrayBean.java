@@ -1,7 +1,7 @@
 package org.fz.nettyx.beanmodel.support;
 
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
+import org.fz.nettyx.serializer.type.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.ToArray;
 
 @Struct(endian = Struct.Endian.BE)
 public class ConcreteStructArrayBean {

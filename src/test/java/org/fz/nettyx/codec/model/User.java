@@ -3,12 +3,12 @@ package org.fz.nettyx.codec.model;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
-import org.fz.nettyx.serializer.struct.basic.c.stdint.unsigned.cuint8_t;
-import org.fz.nettyx.serializer.struct.basic.cpp.unsigned.cppushort;
+import org.fz.nettyx.serializer.type.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.ToArray;
+import org.fz.nettyx.serializer.type.annotation.ToCharSequence;
+import org.fz.nettyx.serializer.type.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.type.basic.c.stdint.unsigned.cuint8_t;
+import org.fz.nettyx.serializer.type.basic.cpp.unsigned.cppushort;
 
 @Data
 @Struct(endian = Struct.Endian.NATIVE)

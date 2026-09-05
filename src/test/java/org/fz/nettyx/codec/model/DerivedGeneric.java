@@ -2,7 +2,7 @@ package org.fz.nettyx.codec.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.Struct;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

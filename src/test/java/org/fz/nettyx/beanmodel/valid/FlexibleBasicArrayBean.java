@@ -1,8 +1,8 @@
 package org.fz.nettyx.beanmodel.valid;
 
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.type.annotation.Struct;
+import org.fz.nettyx.serializer.type.annotation.ToArray;
+import org.fz.nettyx.serializer.type.basic.c.signed.cint;
 
 @Struct(endian = Struct.Endian.LE)
 public class FlexibleBasicArrayBean {

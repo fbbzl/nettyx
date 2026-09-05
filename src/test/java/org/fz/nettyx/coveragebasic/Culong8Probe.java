@@ -1,7 +1,7 @@
 package org.fz.nettyx.coveragebasic;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
+import org.fz.nettyx.serializer.type.basic.c.unsigned.culong8;
 
 import java.math.BigInteger;
 import java.nio.ByteOrder;

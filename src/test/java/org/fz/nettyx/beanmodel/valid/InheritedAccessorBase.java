@@ -1,6 +1,6 @@
 package org.fz.nettyx.beanmodel.valid;
 
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.type.basic.c.signed.cint;
 
 public class InheritedAccessorBase {
     private cint inherited;

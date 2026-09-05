@@ -7,7 +7,7 @@ import io.netty.handler.codec.ByteToMessageCodec;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import org.fz.nettyx.serializer.struct.StructSerializer;
+import org.fz.nettyx.serializer.type.StructSerializer;
 
 import java.lang.reflect.Type;
 import java.util.List;
