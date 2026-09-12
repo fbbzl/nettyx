@@ -15,7 +15,13 @@ import java.nio.ByteOrder;
 public class cuint8_t extends cbasic<Short> {
 
     public cuint8_t(Integer value) {
-        super(value.shortValue());
+        super(requireValidValue(value));
+    }
+
+    private static short requireValidValue(Integer value) {
+        if (value == null || value < 0 || value > 0xFF)
+            throw new IllegalArgumentException("cuint8_t value out of range [0, 255]: " + value);
+        return value.shortValue();
     }
 
     public cuint8_t(ByteBuf buf, ByteOrder byteOrder) {
@@ -31,6 +37,8 @@ public class cuint8_t extends cbasic<Short> {
     public int size() { return 1; }
 
     public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
+        if (value == null || value < 0 || value > 0xFF)
+            throw new IllegalArgumentException("cuint8_t value out of range [0, 255]: " + value);
         writingBuf.writeByte(value);
     }
 

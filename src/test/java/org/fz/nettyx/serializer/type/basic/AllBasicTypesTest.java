@@ -12,6 +12,7 @@ import org.fz.nettyx.serializer.type.basic.cpp.unsigned.cppchar16_t;
 import org.fz.nettyx.serializer.type.basic.cpp.unsigned.cppchar32_t;
 import org.fz.nettyx.serializer.type.basic.cpp.unsigned.cppchar8_t;
 import org.fz.nettyx.serializer.type.basic.cpp.unsigned.cppuchar;
+import org.fz.nettyx.serializer.type.basic.c.stdint.unsigned.cuint8_t;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
@@ -109,6 +110,22 @@ public class AllBasicTypesTest {
         assertThrows(IllegalArgumentException.class, () -> new cuchar(null));
         assertThrows(IllegalArgumentException.class, () -> new cuchar(-1));
         assertThrows(IllegalArgumentException.class, () -> new cuchar(256));
+
+        assertThrows(IllegalArgumentException.class, () -> new cuint8_t(-1));
+        assertThrows(IllegalArgumentException.class, () -> new cuint8_t(256));
+        cuint8_t invalidUint8 = new cuint8_t(1);
+        invalidUint8.value = null;
+        assertWriteRejected(invalidUint8);
+        invalidUint8.value = (short) 256;
+        assertWriteRejected(invalidUint8);
+
+        assertThrows(IllegalArgumentException.class, () -> new cppchar32_t(-1L));
+        assertThrows(IllegalArgumentException.class, () -> new cppchar32_t(0x1_0000_0000L));
+        cppchar32_t invalidChar32 = new cppchar32_t(1L);
+        invalidChar32.value = null;
+        assertWriteRejected(invalidChar32);
+        invalidChar32.value = 0x1_0000_0000L;
+        assertWriteRejected(invalidChar32);
 
         cuchar invalid = new cuchar(1);
         invalid.value = null;

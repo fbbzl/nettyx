@@ -15,7 +15,13 @@ import java.nio.ByteOrder;
 public class cppchar32_t extends cppbasic<Long> {
 
     public cppchar32_t(Long value) {
-        super(value);
+        super(requireValidValue(value));
+    }
+
+    private static Long requireValidValue(Long value) {
+        if (value != null && (value < 0 || value > 0xFFFF_FFFFL))
+            throw new IllegalArgumentException("cppchar32_t value out of range [0, 2^32-1]: " + value);
+        return value;
     }
 
     public cppchar32_t(ByteBuf buf, ByteOrder byteOrder) {
@@ -31,10 +37,13 @@ public class cppchar32_t extends cppbasic<Long> {
     }
 
     public void write(ByteBuf writingBuf, ByteOrder byteOrder) {
+        Long currentValue = requireValidValue(value);
+        if (currentValue == null)
+            throw new IllegalArgumentException("cppchar32_t value can not be null");
         if (byteOrder == ByteOrder.LITTLE_ENDIAN)
-            writingBuf.writeIntLE(value.intValue());
+            writingBuf.writeIntLE(currentValue.intValue());
         else
-            writingBuf.writeInt(value.intValue());
+            writingBuf.writeInt(currentValue.intValue());
     }
 
     @Override
