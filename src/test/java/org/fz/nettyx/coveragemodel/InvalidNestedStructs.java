@@ -1,6 +1,6 @@
 package org.fz.nettyx.coveragemodel;
 
-import org.fz.nettyx.serializer.type.annotation.Struct;
+import org.fz.nettyx.serializer.annotated.annotation.Struct;
 
 public final class InvalidNestedStructs {
 

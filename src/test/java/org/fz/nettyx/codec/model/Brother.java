@@ -1,10 +1,10 @@
 package org.fz.nettyx.codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.type.annotation.Struct;
-import org.fz.nettyx.serializer.type.annotation.Struct.Endian;
-import org.fz.nettyx.serializer.type.annotation.ToArray;
-import org.fz.nettyx.serializer.type.basic.c.signed.cint;
+import org.fz.nettyx.serializer.annotated.annotation.Struct;
+import org.fz.nettyx.serializer.annotated.annotation.Struct.Endian;
+import org.fz.nettyx.serializer.annotated.annotation.ToArray;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
 
 /**
  * @author fengbinbin

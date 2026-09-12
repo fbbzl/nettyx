@@ -1,8 +1,8 @@
 package org.fz.nettyx.codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.type.annotation.Struct;
-import org.fz.nettyx.serializer.type.annotation.ToArray;
+import org.fz.nettyx.serializer.annotated.annotation.Struct;
+import org.fz.nettyx.serializer.annotated.annotation.ToArray;
 
 @Data
 @Struct(endian = Struct.Endian.NATIVE)

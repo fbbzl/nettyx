@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver.BasicValueReader;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver.BasicValueWriter;
-import org.fz.nettyx.serializer.type.basic.Basic;
+import org.fz.nettyx.serializer.annotated.basic.Basic;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;

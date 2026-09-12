@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.schema.jmh;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.serializer.schema.ConfiguredSerializer;
-import org.fz.nettyx.serializer.schema.StructConfigRegistry;
+import org.fz.nettyx.serializer.schema.ConfiguredStructRegistry;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class ConfiguredSerializerBenchmark
 {
 
-    private static final StructConfigRegistry REGISTRY = StructConfigRegistry.load(
+    private static final ConfiguredStructRegistry REGISTRY = ConfiguredStructRegistry.load(
             "configured/device.xml", "configured/geo.xml");
 
     private byte[]              bytes;

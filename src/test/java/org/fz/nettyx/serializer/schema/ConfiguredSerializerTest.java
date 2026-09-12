@@ -6,15 +6,15 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
-import org.fz.nettyx.serializer.type.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.type.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.type.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.type.basic.c.signed.cint;
-import org.fz.nettyx.serializer.type.basic.c.signed.clong4;
-import org.fz.nettyx.serializer.type.basic.c.signed.clong8;
-import org.fz.nettyx.serializer.type.basic.c.signed.cshort;
-import org.fz.nettyx.serializer.type.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.type.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cushort;
 import org.junit.Test;
 
 import java.nio.ByteOrder;
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 public class ConfiguredSerializerTest
 {
 
-    static final StructConfigRegistry  REGISTRY = StructConfigRegistry.load(
+    static final ConfiguredStructRegistry  REGISTRY = ConfiguredStructRegistry.load(
             "configured/device.xml", "configured/geo.xml");
     static final ConfiguredStructCodec CODEC    = new ConfiguredStructCodec(REGISTRY);
 
@@ -288,7 +288,7 @@ public class ConfiguredSerializerTest
     @Test
     public void testSameNamespaceReference()
     {
-        StructConfigRegistry registry = StructConfigRegistry.load("configured/sibling.xml");
+        ConfiguredStructRegistry registry = ConfiguredStructRegistry.load("configured/sibling.xml");
 
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(0xCAFE);
@@ -300,7 +300,7 @@ public class ConfiguredSerializerTest
     @Test(expected = StructDefinitionException.class)
     public void testCycleDetection()
     {
-        StructConfigRegistry.load("configured/cycle.xml");
+        ConfiguredStructRegistry.load("configured/cycle.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
@@ -340,7 +340,7 @@ public class ConfiguredSerializerTest
     @Test(expected = StructDefinitionException.class)
     public void testCharsetOnNonCharFieldRejected()
     {
-        StructConfigRegistry.load("configured/invalid-charset.xml");
+        ConfiguredStructRegistry.load("configured/invalid-charset.xml");
     }
 
     @Test(expected = TooLessBytesException.class)
@@ -364,32 +364,32 @@ public class ConfiguredSerializerTest
     @Test(expected = StructDefinitionException.class)
     public void testAmbiguousBareNameRejected()
     {
-        StructConfigRegistry registry = StructConfigRegistry.load("configured/ambiguous-a.xml", "configured/ambiguous-b.xml");
+        ConfiguredStructRegistry registry = ConfiguredStructRegistry.load("configured/ambiguous-a.xml", "configured/ambiguous-b.xml");
         registry.require("Point");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testUnknownBasicTypeRejected()
     {
-        StructConfigRegistry.load("configured/unknown-type.xml");
+        ConfiguredStructRegistry.load("configured/unknown-type.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testInvalidCharsetValueRejected()
     {
-        StructConfigRegistry.load("configured/invalid-charset-value.xml");
+        ConfiguredStructRegistry.load("configured/invalid-charset-value.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testCharMissingLengthRejected()
     {
-        StructConfigRegistry.load("configured/invalid-char-nolength.xml");
+        ConfiguredStructRegistry.load("configured/invalid-char-nolength.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testTypeAndStructBothDeclaredRejected()
     {
-        StructConfigRegistry.load("configured/invalid-both.xml");
+        ConfiguredStructRegistry.load("configured/invalid-both.xml");
     }
 
     @Test
@@ -448,7 +448,7 @@ public class ConfiguredSerializerTest
     @Test
     public void testDefaultEndianIsBigEndian()
     {
-        StructConfigRegistry registry = StructConfigRegistry.load("configured/default-endian.xml");
+        ConfiguredStructRegistry registry = ConfiguredStructRegistry.load("configured/default-endian.xml");
 
         Map<String, Object> map = ConfiguredSerializer.toStruct(
                 registry, "defs.NoEndian", Unpooled.wrappedBuffer(new byte[]{0x11, 0x22, 0x33, 0x44}));
@@ -469,7 +469,7 @@ public class ConfiguredSerializerTest
                     </structs>
                     """);
 
-            StructConfigRegistry registry = StructConfigRegistry.load(tempFile.toAbsolutePath().toString());
+            ConfiguredStructRegistry registry = ConfiguredStructRegistry.load(tempFile.toAbsolutePath().toString());
             Map<String, Object> map = ConfiguredSerializer.toStruct(
                     registry, "temp.T", Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 7}));
             assertEquals(7, map.get("v"));
@@ -482,7 +482,7 @@ public class ConfiguredSerializerTest
     @Test
     public void testJsonAndYamlConfigLoading()
     {
-        StructConfigRegistry registry = StructConfigRegistry.load("configured/device.json", "configured/geo.yml");
+        ConfiguredStructRegistry registry = ConfiguredStructRegistry.load("configured/device.json", "configured/geo.yml");
 
         ByteBuf flexibleBuffer = Unpooled.buffer();
         flexibleBuffer.writeByte(0x7F);
@@ -508,37 +508,37 @@ public class ConfiguredSerializerTest
     @Test
     public void testUnknownJsonConfigFieldRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/invalid-property.json"));
+        assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/invalid-property.json"));
     }
 
     @Test
     public void testDuplicateJsonConfigFieldRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/duplicate-property.json"));
+        assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/duplicate-property.json"));
     }
 
     @Test
     public void testDuplicateYamlConfigFieldRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/duplicate-property.yml"));
+        assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/duplicate-property.yml"));
     }
 
     @Test
     public void testTrailingJsonRootRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/trailing-root.json"));
+        assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/trailing-root.json"));
     }
 
     @Test
     public void testTrailingYamlDocumentRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> StructConfigRegistry.load("configured/trailing-document.yml"));
+        assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/trailing-document.yml"));
     }
 
     @Test
     public void testExternalDtdBlockedAndIgnored()
     {
-        StructConfigRegistry registry = StructConfigRegistry.load("configured/xxe-external-dtd.xml");
+        ConfiguredStructRegistry registry = ConfiguredStructRegistry.load("configured/xxe-external-dtd.xml");
 
         Map<String, Object> map = ConfiguredSerializer.toStruct(
                 registry, "xxe.X", Unpooled.wrappedBuffer(new byte[]{0x7F}));

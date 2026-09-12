@@ -18,7 +18,7 @@ evidence:
 confirmation_evidence:
   - User confirmed the API visibility and benchmark contract in the current conversation on 2026-08-23.
 impact_chain:
-  - StructConfigRegistry -> cached ConfiguredSerializer -> ConfiguredSerializer.toStruct/toByteBuf
+  - ConfiguredStructRegistry -> cached ConfiguredSerializer -> ConfiguredSerializer.toStruct/toByteBuf
   - ConfiguredSerializer -> ConfigStructView -> ByteBuf lifecycle
 unverified_scope:
   - External consumers of the public viewIntoUnchecked API.

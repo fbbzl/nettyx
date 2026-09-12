@@ -16,7 +16,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2026-09-02
  */
-public final class YamlStructConfigParser extends StructuredStructConfigParser
+public final class YamlStructConfigParser implements StructConfigParser
 {
 
     private static final YAMLMapper MAPPER = YAMLMapper.builder()

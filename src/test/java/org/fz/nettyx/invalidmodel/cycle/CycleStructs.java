@@ -1,9 +1,9 @@
 package org.fz.nettyx.invalidmodel.cycle;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.type.annotation.Struct;
-import org.fz.nettyx.serializer.type.annotation.ToArray;
-import org.fz.nettyx.serializer.type.basic.c.signed.cint;
+import org.fz.nettyx.serializer.annotated.annotation.Struct;
+import org.fz.nettyx.serializer.annotated.annotation.ToArray;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
 
 public final class CycleStructs {
 

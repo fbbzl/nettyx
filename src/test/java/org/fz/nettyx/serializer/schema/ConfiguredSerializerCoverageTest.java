@@ -6,15 +6,15 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.type.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.type.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.type.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.type.basic.c.signed.cint;
-import org.fz.nettyx.serializer.type.basic.c.signed.clong8;
-import org.fz.nettyx.serializer.type.basic.c.signed.cshort;
-import org.fz.nettyx.serializer.type.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.type.basic.c.unsigned.cushort;
-import org.fz.nettyx.serializer.type.basic.cpp.cppbool;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.annotated.basic.cpp.cppbool;
 import org.junit.Test;
 
 import java.nio.ByteOrder;
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 public class ConfiguredSerializerCoverageTest
 {
 
-    private static final StructConfigRegistry  REGISTRY = StructConfigRegistry.load(
+    private static final ConfiguredStructRegistry  REGISTRY = ConfiguredStructRegistry.load(
             "configured/device.xml", "configured/geo.xml");
     private static final ConfiguredStructCodec CODEC    = new ConfiguredStructCodec(REGISTRY);
 

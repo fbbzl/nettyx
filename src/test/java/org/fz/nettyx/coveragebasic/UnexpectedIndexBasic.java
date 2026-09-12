@@ -1,7 +1,7 @@
 package org.fz.nettyx.coveragebasic;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.type.basic.Basic;
+import org.fz.nettyx.serializer.annotated.basic.Basic;
 
 import java.nio.ByteOrder;
 

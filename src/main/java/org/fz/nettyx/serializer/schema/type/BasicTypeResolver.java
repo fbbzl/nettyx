@@ -10,16 +10,16 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.type.basic.Basic;
-import org.fz.nettyx.serializer.type.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.type.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.type.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.type.basic.c.signed.cint;
-import org.fz.nettyx.serializer.type.basic.c.signed.clong4;
-import org.fz.nettyx.serializer.type.basic.c.signed.clong8;
-import org.fz.nettyx.serializer.type.basic.c.signed.cshort;
-import org.fz.nettyx.serializer.type.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.type.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.annotated.basic.Basic;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.annotated.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cushort;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -57,7 +57,7 @@ public class BasicTypeResolver
 
     static {
         Set<Class<?>> scanned = ClassScanner.scanPackage(
-                "org.fz.nettyx.serializer.type.basic",
+                "org.fz.nettyx.serializer.annotated.basic",
                 clazz -> Basic.class.isAssignableFrom(clazz)
                          && clazz != Basic.class
                          && !Modifier.isAbstract(clazz.getModifiers()));

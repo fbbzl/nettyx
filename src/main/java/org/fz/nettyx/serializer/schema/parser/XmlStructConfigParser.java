@@ -5,7 +5,7 @@ import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.serializer.schema.ConfigField;
 import org.fz.nettyx.serializer.schema.ConfigStruct;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.type.basic.Basic;
+import org.fz.nettyx.serializer.annotated.basic.Basic;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
@@ -46,7 +46,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2026-08-16
  */
-public class XmlStructConfigParser implements StructConfigParser
+public class XmlStructConfigParser
 {
 
     public static final String DOCTYPE_PUBLIC_ID = "-//fbbzl//DTD Nettyx Struct Config 1.0//EN";
@@ -57,24 +57,25 @@ public class XmlStructConfigParser implements StructConfigParser
     @UtilityClass
     private class Tag
     {
-
-        private static final String STRUCTS = "structs";
-        private static final String STRUCT  = "struct";
-        private static final String FIELD   = "field";
+        private static final String
+                STRUCTS = "structs",
+                STRUCT  = "struct",
+                FIELD   = "field";
     }
 
     @UtilityClass
     private class Attributes
     {
 
-        private static final String NAMESPACE = "namespace";
-        private static final String NAME      = "name";
-        private static final String ENDIAN    = "endian";
-        private static final String TYPE      = "type";
-        private static final String STRUCT    = "struct";
-        private static final String LENGTH    = "length";
-        private static final String ARRAY     = "array";
-        private static final String CHARSET   = "charset";
+        private static final String
+                NAMESPACE = "namespace",
+                NAME      = "name",
+                ENDIAN    = "endian",
+                TYPE      = "type",
+                STRUCT    = "struct",
+                LENGTH    = "length",
+                ARRAY     = "array",
+                CHARSET   = "charset";
     }
 
     static final String TYPE_CHAR = "char";

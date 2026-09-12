@@ -7,7 +7,7 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.schema.ConfigField;
 import org.fz.nettyx.serializer.schema.ConfigStruct;
-import org.fz.nettyx.serializer.schema.StructConfigRegistry;
+import org.fz.nettyx.serializer.schema.ConfiguredStructRegistry;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 
 import java.lang.reflect.Array;
@@ -33,10 +33,10 @@ import java.util.Map;
 public final class ConfiguredStructCodec
 {
 
-    StructConfigRegistry       registry;
+    ConfiguredStructRegistry       registry;
     Map<ConfigStruct, Integer> fixedSizeCache;
 
-    public ConfiguredStructCodec(StructConfigRegistry registry)
+    public ConfiguredStructCodec(ConfiguredStructRegistry registry)
     {
         this.registry       = registry;
         this.fixedSizeCache = new HashMap<>();

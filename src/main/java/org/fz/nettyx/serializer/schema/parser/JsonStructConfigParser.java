@@ -17,7 +17,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2026-09-02
  */
-public final class JsonStructConfigParser extends StructuredStructConfigParser
+public final class JsonStructConfigParser implements StructConfigParser
 {
 
     private static final ObjectMapper MAPPER = JsonMapper.builder()

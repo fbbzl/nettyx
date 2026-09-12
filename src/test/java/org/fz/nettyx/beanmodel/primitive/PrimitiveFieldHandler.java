@@ -1,9 +1,9 @@
 package org.fz.nettyx.beanmodel.primitive;
 
 import io.netty.buffer.ByteBuf;
-import org.fz.nettyx.serializer.type.StructFieldHandler;
-import org.fz.nettyx.serializer.type.StructSerializer;
-import org.fz.nettyx.serializer.type.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.annotated.StructFieldHandler;
+import org.fz.nettyx.serializer.annotated.StructSerializer;
+import org.fz.nettyx.serializer.annotated.AnnotatedStructContext.StructDefinition.StructField;
 
 import java.lang.reflect.Type;
 
