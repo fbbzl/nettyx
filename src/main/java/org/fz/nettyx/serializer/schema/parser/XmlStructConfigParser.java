@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.schema.parser;
 
+import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.serializer.schema.ConfigField;
 import org.fz.nettyx.serializer.schema.ConfigStruct;
@@ -53,18 +54,28 @@ public class XmlStructConfigParser implements StructConfigParser
 
     static final String DTD_RESOURCE = "org/fz/nettyx/serializer/schema/struct-config.dtd";
 
-    static final String TAG_STRUCTS = "structs";
-    static final String TAG_STRUCT  = "struct";
-    static final String TAG_FIELD   = "field";
+    @UtilityClass
+    private class Tag
+    {
 
-    static final String ATTR_NAMESPACE = "namespace";
-    static final String ATTR_NAME      = "name";
-    static final String ATTR_ENDIAN    = "endian";
-    static final String ATTR_TYPE      = "type";
-    static final String ATTR_STRUCT    = "struct";
-    static final String ATTR_LENGTH    = "length";
-    static final String ATTR_ARRAY     = "array";
-    static final String ATTR_CHARSET   = "charset";
+        private static final String STRUCTS = "structs";
+        private static final String STRUCT  = "struct";
+        private static final String FIELD   = "field";
+    }
+
+    @UtilityClass
+    private class Attributes
+    {
+
+        private static final String NAMESPACE = "namespace";
+        private static final String NAME      = "name";
+        private static final String ENDIAN    = "endian";
+        private static final String TYPE      = "type";
+        private static final String STRUCT    = "struct";
+        private static final String LENGTH    = "length";
+        private static final String ARRAY     = "array";
+        private static final String CHARSET   = "charset";
+    }
 
     static final String TYPE_CHAR = "char";
     static final String TYPE_BYTE = "byte";
@@ -81,13 +92,13 @@ public class XmlStructConfigParser implements StructConfigParser
             builder.setEntityResolver(structDtdResolver());
 
             Element structsEl = builder.parse(input).getDocumentElement();
-            if (!TAG_STRUCTS.equals(structsEl.getTagName()))
+            if (!Tag.STRUCTS.equals(structsEl.getTagName()))
                 throw new StructDefinitionException("root element must be <structs>, location: [" + location + "]");
 
-            String namespace = requiredAttr(structsEl, ATTR_NAMESPACE, location);
+            String namespace = requiredAttr(structsEl, Attributes.NAMESPACE, location);
 
             Map<String, ConfigStruct> structs     = new LinkedHashMap<>();
-            NodeList                  structNodes = structsEl.getElementsByTagName(TAG_STRUCT);
+            NodeList                  structNodes = structsEl.getElementsByTagName(Tag.STRUCT);
             for (int i = 0; i < structNodes.getLength(); i++) {
                 ConfigStruct struct = parseStruct(namespace, (Element) structNodes.item(i), location);
                 if (structs.put(struct.fqName(), struct) != null)
@@ -105,11 +116,11 @@ public class XmlStructConfigParser implements StructConfigParser
 
     private ConfigStruct parseStruct(String namespace, Element structEl, String location)
     {
-        String    name      = requiredAttr(structEl, ATTR_NAME, location);
-        ByteOrder byteOrder = parseEndian(attr(structEl, ATTR_ENDIAN), namespace + "." + name, location);
+        String    name      = requiredAttr(structEl, Attributes.NAME, location);
+        ByteOrder byteOrder = parseEndian(attr(structEl, Attributes.ENDIAN), namespace + "." + name, location);
 
         List<ConfigField> fields     = new ArrayList<>();
-        NodeList          fieldNodes = structEl.getElementsByTagName(TAG_FIELD);
+        NodeList          fieldNodes = structEl.getElementsByTagName(Tag.FIELD);
         for (int i = 0; i < fieldNodes.getLength(); i++)
              fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
 
@@ -118,12 +129,12 @@ public class XmlStructConfigParser implements StructConfigParser
 
     private ConfigField parseField(Element fieldEl, String structName, String location)
     {
-        String name      = requiredAttr(fieldEl, ATTR_NAME, location);
-        String type      = attr(fieldEl, ATTR_TYPE);
-        String structRef = attr(fieldEl, ATTR_STRUCT);
-        String length    = attr(fieldEl, ATTR_LENGTH);
-        String array     = attr(fieldEl, ATTR_ARRAY);
-        String charset   = attr(fieldEl, ATTR_CHARSET);
+        String name      = requiredAttr(fieldEl, Attributes.NAME, location);
+        String type      = attr(fieldEl, Attributes.TYPE);
+        String structRef = attr(fieldEl, Attributes.STRUCT);
+        String length    = attr(fieldEl, Attributes.LENGTH);
+        String array     = attr(fieldEl, Attributes.ARRAY);
+        String charset   = attr(fieldEl, Attributes.CHARSET);
 
         boolean hasType   = type != null;
         boolean hasStruct = structRef != null;
@@ -131,13 +142,13 @@ public class XmlStructConfigParser implements StructConfigParser
         boolean hasArray  = array != null;
 
         if (hasType == hasStruct)
-            throw definitionError("field must declare exactly one of [" + ATTR_TYPE + "] or [" + ATTR_STRUCT + "]", fieldEl, structName, location);
+            throw definitionError("field must declare exactly one of [" + Attributes.TYPE + "] or [" + Attributes.STRUCT + "]", fieldEl, structName, location);
 
         if (hasStruct) {
             if (hasLength)
-                throw definitionError("struct field can not declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+                throw definitionError("struct field can not declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
             if (charset != null)
-                throw definitionError("struct field can not declare [" + ATTR_CHARSET + "]", fieldEl, structName, location);
+                throw definitionError("struct field can not declare [" + Attributes.CHARSET + "]", fieldEl, structName, location);
             return hasArray
                    ? ConfigField.structArray(name, structRef, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
                    : ConfigField.structField(name, structRef);
@@ -145,26 +156,26 @@ public class XmlStructConfigParser implements StructConfigParser
 
         if (TYPE_CHAR.equals(type)) {
             if (!hasLength)
-                throw definitionError("char field must declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+                throw definitionError("char field must declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
             if (hasArray)
-                throw definitionError("char field can not declare [" + ATTR_ARRAY + "]", fieldEl, structName, location);
+                throw definitionError("char field can not declare [" + Attributes.ARRAY + "]", fieldEl, structName, location);
             return ConfigField.charField(name, parseLength(length, fieldEl, structName, location),
                                          parseCharset(charset, fieldEl, structName, location));
         }
 
         if (charset != null)
-            throw definitionError("only char field can declare [" + ATTR_CHARSET + "]", fieldEl, structName, location);
+            throw definitionError("only char field can declare [" + Attributes.CHARSET + "]", fieldEl, structName, location);
 
         if (TYPE_BYTE.equals(type)) {
             if (!hasLength)
-                throw definitionError("byte field must declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+                throw definitionError("byte field must declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
             if (hasArray)
-                throw definitionError("byte field can not declare [" + ATTR_ARRAY + "]", fieldEl, structName, location);
+                throw definitionError("byte field can not declare [" + Attributes.ARRAY + "]", fieldEl, structName, location);
             return ConfigField.bytesField(name, parseLength(length, fieldEl, structName, location));
         }
 
         if (hasLength)
-            throw definitionError("basic field can not declare [" + ATTR_LENGTH + "]", fieldEl, structName, location);
+            throw definitionError("basic field can not declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
 
         Class<? extends Basic<?>> basicType = BasicTypeResolver.resolve(type);
         return hasArray
@@ -180,7 +191,7 @@ public class XmlStructConfigParser implements StructConfigParser
             return Charset.forName(charset);
         }
         catch (Exception charsetError) {
-            throw definitionError("unknown [" + ATTR_CHARSET + "] value [" + charset + "]", fieldEl, structName, location);
+            throw definitionError("unknown [" + Attributes.CHARSET + "] value [" + charset + "]", fieldEl, structName, location);
         }
     }
 
@@ -210,7 +221,7 @@ public class XmlStructConfigParser implements StructConfigParser
             return value;
         }
         catch (NumberFormatException formatError) {
-            throw definitionError("invalid [" + ATTR_LENGTH + "] value [" + length + "]", fieldEl, structName, location);
+            throw definitionError("invalid [" + Attributes.LENGTH + "] value [" + length + "]", fieldEl, structName, location);
         }
     }
 
@@ -224,7 +235,7 @@ public class XmlStructConfigParser implements StructConfigParser
             return value;
         }
         catch (NumberFormatException formatError) {
-            throw definitionError("invalid [" + ATTR_ARRAY + "] value [" + array + "], use positive number or *", fieldEl, structName, location);
+            throw definitionError("invalid [" + Attributes.ARRAY + "] value [" + array + "], use positive number or *", fieldEl, structName, location);
         }
     }
 
@@ -246,7 +257,7 @@ public class XmlStructConfigParser implements StructConfigParser
     private static StructDefinitionException definitionError(String message, Element fieldEl, String structName, String location)
     {
         return new StructDefinitionException(
-                message + ", field [" + attr(fieldEl, ATTR_NAME) + "] of struct [" + structName + "], location: [" + location + "]");
+                message + ", field [" + attr(fieldEl, Attributes.NAME) + "] of struct [" + structName + "], location: [" + location + "]");
     }
 
     private static void harden(DocumentBuilderFactory factory)
