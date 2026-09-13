@@ -1,8 +1,8 @@
 package org.fz.nettyx.codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.annotated.annotation.Struct;
-import org.fz.nettyx.serializer.annotated.annotation.ToCharSequence;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
 
 
 @Data

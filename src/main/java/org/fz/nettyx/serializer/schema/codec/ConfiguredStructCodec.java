@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.schema.ConfigField;
+import org.fz.nettyx.serializer.schema.SchemaField;
 import org.fz.nettyx.serializer.schema.ConfigStruct;
 import org.fz.nettyx.serializer.schema.ConfiguredStructRegistry;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
@@ -49,10 +49,10 @@ public final class ConfiguredStructCodec
 
     public Map<String, Object> readStruct(ConfigStruct struct, ByteBuf byteBuf)
     {
-        List<ConfigField> fields    = struct.fields();
+        List<SchemaField> fields    = struct.fields();
         ConfigStructMap   structMap = new ConfigStructMap(struct);
         for (int i = 0; i < fields.size(); i++) {
-            ConfigField field = fields.get(i);
+            SchemaField field = fields.get(i);
             structMap.put(i, readField(field, struct.byteOrder(), byteBuf));
         }
         return structMap;
@@ -73,14 +73,14 @@ public final class ConfiguredStructCodec
 
     private void readStructInto(ConfigStruct struct, ConfigStructMap target, ByteBuf byteBuf)
     {
-        List<ConfigField> fields = struct.fields();
+        List<SchemaField> fields = struct.fields();
         for (int i = 0; i < fields.size(); i++) {
-            ConfigField field = fields.get(i);
+            SchemaField field = fields.get(i);
             target.put(i, readFieldInto(field, struct.byteOrder(), byteBuf, target, i));
         }
     }
 
-    public Object readField(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
+    public Object readField(SchemaField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return switch (field.kind()) {
             case BASIC -> readBasicValue(field, byteOrder, byteBuf);
@@ -92,7 +92,7 @@ public final class ConfiguredStructCodec
     }
 
     private Object readFieldInto(
-            ConfigField field,
+            SchemaField field,
             ByteOrder byteOrder,
             ByteBuf byteBuf,
             ConfigStructMap target,
@@ -108,7 +108,7 @@ public final class ConfiguredStructCodec
         };
     }
 
-    public Object readArray(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
+    public Object readArray(SchemaField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         List<Object> elements = new ArrayList<>(field.flexible() ? 10 : field.length());
 
@@ -127,7 +127,7 @@ public final class ConfiguredStructCodec
         return elements;
     }
 
-    private List<Object> readArrayInto(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
+    private List<Object> readArrayInto(SchemaField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
     {
         ArrayList<Object> elements = previous instanceof ArrayList<?> existing
                                      ? (ArrayList<Object>) existing
@@ -148,7 +148,7 @@ public final class ConfiguredStructCodec
         return elements;
     }
 
-    private Object readArrayElement(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
+    private Object readArrayElement(SchemaField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return switch (field.elementKind()) {
             case BASIC -> readBasicValue(field, byteOrder, byteBuf);
@@ -156,7 +156,7 @@ public final class ConfiguredStructCodec
         };
     }
 
-    private Object readArrayElementInto(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
+    private Object readArrayElementInto(SchemaField field, ByteOrder byteOrder, ByteBuf byteBuf, Object previous)
     {
         return switch (field.elementKind()) {
             case BASIC -> readBasicValue(field, byteOrder, byteBuf);
@@ -164,7 +164,7 @@ public final class ConfiguredStructCodec
         };
     }
 
-    private Object readBasicValue(ConfigField field, ByteOrder byteOrder, ByteBuf byteBuf)
+    private Object readBasicValue(SchemaField field, ByteOrder byteOrder, ByteBuf byteBuf)
     {
         return field.readBasicValue(byteBuf, byteOrder);
     }
@@ -260,7 +260,7 @@ public final class ConfiguredStructCodec
     private int computeFixedSize(ConfigStruct struct)
     {
         int size = 0;
-        for (ConfigField field : struct.fields()) {
+        for (SchemaField field : struct.fields()) {
             int fieldSize = switch (field.kind()) {
                 case BASIC -> BasicTypeResolver.sizeOf(field.basicType());
                 case CHAR, BYTES -> field.length();
@@ -278,7 +278,7 @@ public final class ConfiguredStructCodec
         return size;
     }
 
-    private int fixedArraySize(ConfigField field)
+    private int fixedArraySize(SchemaField field)
     {
         if (field.flexible()) return -1;
 
@@ -297,18 +297,18 @@ public final class ConfiguredStructCodec
 
     public void writeStruct(ConfigStruct struct, Map<String, Object> structMap, ByteBuf writing)
     {
-        List<ConfigField> fields = struct.fields();
+        List<SchemaField> fields = struct.fields();
         if (structMap instanceof ConfigStructMap configuredMap && configuredMap.belongsTo(struct)) {
             for (int i = 0; i < fields.size(); i++)
                  writeField(fields.get(i), configuredMap.valueAt(i), struct.byteOrder(), writing);
             return;
         }
 
-        for (ConfigField field : fields)
+        for (SchemaField field : fields)
             writeField(field, structMap == null ? null : structMap.get(field.name()), struct.byteOrder(), writing);
     }
 
-    public void writeField(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
+    public void writeField(SchemaField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
         switch (field.kind()) {
             case BASIC -> writeBasicValue(field, value, byteOrder, writing);
@@ -319,7 +319,7 @@ public final class ConfiguredStructCodec
         }
     }
 
-    public void writeArray(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
+    public void writeArray(SchemaField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
         int valueCount = elementCount(value);
         int writeCount = field.flexible() ? valueCount : field.length();
@@ -335,7 +335,7 @@ public final class ConfiguredStructCodec
         }
     }
 
-    private void writeArrayElement(ConfigField field, Object element, ByteOrder byteOrder, ByteBuf writing)
+    private void writeArrayElement(SchemaField field, Object element, ByteOrder byteOrder, ByteBuf writing)
     {
         switch (field.elementKind()) {
             case BASIC -> writeBasicValue(field, element, byteOrder, writing);
@@ -343,7 +343,7 @@ public final class ConfiguredStructCodec
         }
     }
 
-    private void writeBasicValue(ConfigField field, Object value, ByteOrder byteOrder, ByteBuf writing)
+    private void writeBasicValue(SchemaField field, Object value, ByteOrder byteOrder, ByteBuf writing)
     {
         if (value == null) writing.writeZero(BasicTypeResolver.sizeOf(field.basicType()));
         else field.writeBasicValue(writing, byteOrder, value);

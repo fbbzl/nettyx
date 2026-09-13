@@ -1,7 +1,7 @@
 package org.fz.nettyx.beanmodel.invalidarray;
 
-import org.fz.nettyx.serializer.annotated.annotation.Struct;
-import org.fz.nettyx.serializer.annotated.annotation.ToArray;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
 
 @Struct(endian = Struct.Endian.BE)
 public class NonArrayFieldBean {

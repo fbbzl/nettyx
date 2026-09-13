@@ -2,10 +2,10 @@ package org.fz.nettyx.serializer.schema.parser;
 
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.StructDefinitionException;
-import org.fz.nettyx.serializer.schema.ConfigField;
+import org.fz.nettyx.serializer.schema.SchemaField;
 import org.fz.nettyx.serializer.schema.ConfigStruct;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.annotated.basic.Basic;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
@@ -120,7 +120,7 @@ public class XmlStructConfigParser
         String    name      = requiredAttr(structEl, Attributes.NAME, location);
         ByteOrder byteOrder = parseEndian(attr(structEl, Attributes.ENDIAN), namespace + "." + name, location);
 
-        List<ConfigField> fields     = new ArrayList<>();
+        List<SchemaField> fields     = new ArrayList<>();
         NodeList          fieldNodes = structEl.getElementsByTagName(Tag.FIELD);
         for (int i = 0; i < fieldNodes.getLength(); i++)
              fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
@@ -128,7 +128,7 @@ public class XmlStructConfigParser
         return new ConfigStruct(namespace, name, byteOrder, fields);
     }
 
-    private ConfigField parseField(Element fieldEl, String structName, String location)
+    private SchemaField parseField(Element fieldEl, String structName, String location)
     {
         String name      = requiredAttr(fieldEl, Attributes.NAME, location);
         String type      = attr(fieldEl, Attributes.TYPE);
@@ -151,8 +151,8 @@ public class XmlStructConfigParser
             if (charset != null)
                 throw definitionError("struct field can not declare [" + Attributes.CHARSET + "]", fieldEl, structName, location);
             return hasArray
-                   ? ConfigField.structArray(name, structRef, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
-                   : ConfigField.structField(name, structRef);
+                   ? SchemaField.structArray(name, structRef, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
+                   : SchemaField.structField(name, structRef);
         }
 
         if (TYPE_CHAR.equals(type)) {
@@ -160,7 +160,7 @@ public class XmlStructConfigParser
                 throw definitionError("char field must declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
             if (hasArray)
                 throw definitionError("char field can not declare [" + Attributes.ARRAY + "]", fieldEl, structName, location);
-            return ConfigField.charField(name, parseLength(length, fieldEl, structName, location),
+            return SchemaField.charField(name, parseLength(length, fieldEl, structName, location),
                                          parseCharset(charset, fieldEl, structName, location));
         }
 
@@ -172,7 +172,7 @@ public class XmlStructConfigParser
                 throw definitionError("byte field must declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
             if (hasArray)
                 throw definitionError("byte field can not declare [" + Attributes.ARRAY + "]", fieldEl, structName, location);
-            return ConfigField.bytesField(name, parseLength(length, fieldEl, structName, location));
+            return SchemaField.bytesField(name, parseLength(length, fieldEl, structName, location));
         }
 
         if (hasLength)
@@ -180,8 +180,8 @@ public class XmlStructConfigParser
 
         Class<? extends Basic<?>> basicType = BasicTypeResolver.resolve(type);
         return hasArray
-               ? ConfigField.basicArray(name, basicType, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
-               : ConfigField.basicField(name, basicType);
+               ? SchemaField.basicArray(name, basicType, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
+               : SchemaField.basicField(name, basicType);
     }
 
     private static Charset parseCharset(String charset, Element fieldEl, String structName, String location)

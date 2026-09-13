@@ -3,8 +3,8 @@ package org.fz.nettyx.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.beanmodel.valid.AccessorBean;
-import org.fz.nettyx.serializer.annotated.AnnotatedStructContext;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.StructContext;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class StructCodecTest {
 
     @BeforeClass
     public static void scanStructs() {
-        new AnnotatedStructContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
     }
 
     @Test

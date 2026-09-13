@@ -1,7 +1,7 @@
 package org.fz.nettyx.beanmodel.invalidcharsequence;
 
-import org.fz.nettyx.serializer.annotated.annotation.Struct;
-import org.fz.nettyx.serializer.annotated.annotation.ToCharSequence;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
 
 @Struct(endian = Struct.Endian.BE)
 public class StringBuilderFieldBean {

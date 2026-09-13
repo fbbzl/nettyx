@@ -1,8 +1,8 @@
 package org.fz.nettyx.codec.model;
 
 import lombok.Data;
-import org.fz.nettyx.serializer.annotated.annotation.Struct;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
 
 /**
  * @author fengbinbin

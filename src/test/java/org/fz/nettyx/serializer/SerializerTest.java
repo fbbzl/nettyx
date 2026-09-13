@@ -6,15 +6,14 @@ import io.netty.buffer.Unpooled;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.codec.model.*;
-import org.fz.nettyx.serializer.annotated.AnnotatedStructContext;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.StructContext;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
 import org.junit.Before;
 
 import java.util.Arrays;
 
-import static org.fz.nettyx.serializer.annotated.StructSerializer.toByteBuf;
-import static org.fz.nettyx.serializer.annotated.StructSerializer.toStruct;
+import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
+import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 
 
 /**
@@ -27,9 +26,9 @@ public class SerializerTest {
     private static final InternalLogger log = InternalLoggerFactory.getInstance(SerializerTest.class);
 
     static final TypeReference<You> youTypeRefer = new TypeReference<>() {};
-    static final TypeReference<Brother> brotherRefer = new TypeReference<>() {};
-    private static final AnnotatedStructContext context      =
-            new AnnotatedStructContext("org.fz.nettyx.codec.model");
+    static final         TypeReference<Brother> brotherRefer = new TypeReference<>() {};
+    private static final StructContext          context      =
+            new StructContext("org.fz.nettyx.codec.model");
 
     @Before
     public void correctnessTest() {

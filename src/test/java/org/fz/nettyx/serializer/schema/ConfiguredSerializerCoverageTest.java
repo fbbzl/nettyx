@@ -6,15 +6,15 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.clong8;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cshort;
-import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cushort;
-import org.fz.nettyx.serializer.annotated.basic.cpp.cppbool;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.struct.basic.cpp.cppbool;
 import org.junit.Test;
 
 import java.nio.ByteOrder;
@@ -97,13 +97,13 @@ public class ConfiguredSerializerCoverageTest
         try {
             direct.writeBytes(new byte[]{'o', 'k', 0, 0});
             assertEquals("ok", CODEC.readField(
-                    ConfigField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
+                    SchemaField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
         }
         finally {
             direct.release();
         }
 
-        ConfigField shortArray = ConfigField.basicArray("values", cshort.class, 2, false);
+        SchemaField shortArray = SchemaField.basicArray("values", cshort.class, 2, false);
         ByteBuf     writing    = Unpooled.buffer();
         CODEC.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{1, 0, 2, 0}, readableBytes(writing));
@@ -149,7 +149,7 @@ public class ConfiguredSerializerCoverageTest
             }
         };
         ByteBuf writing = Unpooled.buffer();
-        CODEC.writeArray(ConfigField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeArray(SchemaField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{5, 0, 6, 0}, readableBytes(writing));
     }
 

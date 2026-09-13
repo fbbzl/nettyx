@@ -268,7 +268,7 @@
                                 <rule>
                                     <element>PACKAGE</element>
                                     <includes>
-                                        <include>org.fz.nettyx.serializer.annotated*</include>
+                                        <include>org.fz.nettyx.serializer.struct*</include>
                                     </includes>
                                     <limits>
                                         <limit>

@@ -6,15 +6,15 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cint;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.clong4;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.clong8;
-import org.fz.nettyx.serializer.annotated.basic.c.signed.cshort;
-import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.annotated.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
 import org.junit.Test;
 
 import java.nio.ByteOrder;
@@ -143,15 +143,15 @@ public class ConfiguredSerializerTest
     {
         ByteBuf writing = Unpooled.buffer();
 
-        CODEC.writeField(ConfigField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(ConfigField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
+        CODEC.writeField(SchemaField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
 
         byte[] actual = new byte[writing.readableBytes()];
         writing.readBytes(actual);
@@ -167,9 +167,9 @@ public class ConfiguredSerializerTest
         }, actual);
 
         assertThrows(IllegalArgumentException.class,
-                     () -> CODEC.writeField(ConfigField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                     () -> CODEC.writeField(SchemaField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
         assertThrows(IllegalArgumentException.class,
-                     () -> CODEC.writeField(ConfigField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                     () -> CODEC.writeField(SchemaField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
     }
 
     @Test
@@ -506,19 +506,19 @@ public class ConfiguredSerializerTest
     }
 
     @Test
-    public void testUnknownJsonConfigFieldRejected()
+    public void testUnknownJsonSchemaFieldRejected()
     {
         assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/invalid-property.json"));
     }
 
     @Test
-    public void testDuplicateJsonConfigFieldRejected()
+    public void testDuplicateJsonSchemaFieldRejected()
     {
         assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/duplicate-property.json"));
     }
 
     @Test
-    public void testDuplicateYamlConfigFieldRejected()
+    public void testDuplicateYamlSchemaFieldRejected()
     {
         assertThrows(StructDefinitionException.class, () -> ConfiguredStructRegistry.load("configured/duplicate-property.yml"));
     }

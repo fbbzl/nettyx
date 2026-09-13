@@ -104,7 +104,7 @@ public class ConfiguredStructRegistry
     private static void resolveReferences(Map<String, ConfigStruct> structs)
     {
         for (ConfigStruct struct : structs.values()) {
-            for (ConfigField field : struct.fields()) {
+            for (SchemaField field : struct.fields()) {
                 String structRef = structRefOf(field);
                 if (structRef == null) continue;
 
@@ -131,7 +131,7 @@ public class ConfiguredStructRegistry
             throw new StructDefinitionException("cyclic struct reference detected: " + String.join(" -> ", path) + " -> " + fqName);
 
         path.addLast(fqName);
-        for (ConfigField field : structs.get(fqName).fields()) {
+        for (SchemaField field : structs.get(fqName).fields()) {
             String resolved = field.resolvedStructRef();
             if (resolved != null) visit(resolved, structs, visited, path);
         }
@@ -139,11 +139,11 @@ public class ConfiguredStructRegistry
         visited.add(fqName);
     }
 
-    private static String structRefOf(ConfigField field)
+    private static String structRefOf(SchemaField field)
     {
         return switch (field.kind()) {
             case STRUCT -> field.structRef();
-            case ARRAY -> field.elementKind() == ConfigField.ElementKind.STRUCT ? field.structRef() : null;
+            case ARRAY -> field.elementKind() == SchemaField.ElementKind.STRUCT ? field.structRef() : null;
             default -> null;
         };
     }

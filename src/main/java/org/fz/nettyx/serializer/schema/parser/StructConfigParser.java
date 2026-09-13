@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.fz.nettyx.exception.StructDefinitionException;
-import org.fz.nettyx.serializer.schema.ConfigField;
+import org.fz.nettyx.serializer.schema.SchemaField;
 import org.fz.nettyx.serializer.schema.ConfigStruct;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.annotated.basic.Basic;
+import org.fz.nettyx.serializer.struct.basic.Basic;
 
 import java.io.InputStream;
 import java.nio.ByteOrder;
@@ -69,14 +69,14 @@ interface StructConfigParser
         ByteOrder byteOrder = parseEndian(optionalText(structObject, "endian", context, location), namespace + "." + name, location);
         ArrayNode fields    = arrayOrEmpty(structObject.get("fields"), context + " field [fields]", location);
 
-        List<ConfigField> parsedFields = new ArrayList<>();
+        List<SchemaField> parsedFields = new ArrayList<>();
         for (int fieldIndex = 0; fieldIndex < fields.size(); fieldIndex++)
              parsedFields.add(parseField(fields.get(fieldIndex), fieldIndex, namespace + "." + name, location));
 
         return new ConfigStruct(namespace, name, byteOrder, parsedFields);
     }
 
-    private ConfigField parseField(JsonNode node, int index, String structName, String location)
+    private SchemaField parseField(JsonNode node, int index, String structName, String location)
     {
         String     context     = "field at index [" + index + "] of struct [" + structName + "]";
         ObjectNode fieldObject = object(node, context, location);
@@ -102,14 +102,14 @@ interface StructConfigParser
             if (charset != null)
                 throw definitionError("struct field can not declare [charset]", name, structName, location);
             return hasArray
-                   ? ConfigField.structArray(name, structRef, parseArrayLength(array, name, structName, location), isFlexible(array))
-                   : ConfigField.structField(name, structRef);
+                   ? SchemaField.structArray(name, structRef, parseArrayLength(array, name, structName, location), isFlexible(array))
+                   : SchemaField.structField(name, structRef);
         }
 
         if (TYPE_CHAR.equals(type)) {
             if (!hasLength) throw definitionError("char field must declare [length]", name, structName, location);
             if (hasArray) throw definitionError("char field can not declare [array]", name, structName, location);
-            return ConfigField.charField(name, parseLength(length, name, structName, location),
+            return SchemaField.charField(name, parseLength(length, name, structName, location),
                                          parseCharset(charset, name, structName, location));
         }
 
@@ -118,15 +118,15 @@ interface StructConfigParser
         if (TYPE_BYTE.equals(type)) {
             if (!hasLength) throw definitionError("byte field must declare [length]", name, structName, location);
             if (hasArray) throw definitionError("byte field can not declare [array]", name, structName, location);
-            return ConfigField.bytesField(name, parseLength(length, name, structName, location));
+            return SchemaField.bytesField(name, parseLength(length, name, structName, location));
         }
 
         if (hasLength) throw definitionError("basic field can not declare [length]", name, structName, location);
 
         Class<? extends Basic<?>> basicType = BasicTypeResolver.resolve(type);
         return hasArray
-               ? ConfigField.basicArray(name, basicType, parseArrayLength(array, name, structName, location), isFlexible(array))
-               : ConfigField.basicField(name, basicType);
+               ? SchemaField.basicArray(name, basicType, parseArrayLength(array, name, structName, location), isFlexible(array))
+               : SchemaField.basicField(name, basicType);
     }
 
     private static ObjectNode object(JsonNode node, String context, String location)

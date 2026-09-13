@@ -48,7 +48,7 @@ public final class ConfigStructView
 
         ByteBuf reading = source.duplicate();
         reading.readerIndex(startIndex);
-        for (ConfigField field : struct.fields()) {
+        for (SchemaField field : struct.fields()) {
             Object value = codec.readField(field, struct.byteOrder(), reading);
             if (field.name().equals(fieldName)) return value;
         }
