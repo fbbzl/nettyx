@@ -238,6 +238,16 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
+                            <excludes>
+                                <!-- Hardware/driver adapters require physical devices and are not unit-testable. -->
+                                <exclude>org/fz/nettyx/channel/bluetooth/**</exclude>
+                                <exclude>org/fz/nettyx/channel/serial/**</exclude>
+                                <exclude>org/fz/nettyx/channel/enhanced/**</exclude>
+                                <exclude>org/fz/nettyx/util/CommPorts*</exclude>
+                                <exclude>org/fz/nettyx/util/BtFinder*</exclude>
+                                <exclude>org/fz/nettyx/template/bluetooth/**</exclude>
+                                <exclude>org/fz/nettyx/template/serial/**</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
@@ -245,12 +255,12 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
+                                            <minimum>1.0</minimum>
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.70</minimum>
+                                            <minimum>1.0</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

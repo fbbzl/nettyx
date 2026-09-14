@@ -171,6 +171,19 @@ public class SchemaSerializerCoverageTest
         assertEquals(Boolean.TRUE, BasicTypeResolver.readBasic(cppbool.class, ByteOrder.BIG_ENDIAN, input).value());
     }
 
+    @Test
+    public void resolverRejectsUnknownNamesAndConvertsWriterInputs()
+    {
+        assertThrows(org.fz.nettyx.exception.TypeJudgmentException.class,
+                     () -> BasicTypeResolver.resolve("does_not_exist"));
+
+        ByteBuf writing = Unpooled.buffer();
+        BasicTypeResolver.valueWriterFor(cint.class).write(writing, ByteOrder.BIG_ENDIAN, "42");
+        BasicTypeResolver.valueWriterFor(cshort.class).write(writing, ByteOrder.LITTLE_ENDIAN, "258");
+        assertEquals(42, writing.readInt());
+        assertEquals((short) 258, writing.readShortLE());
+    }
+
     private static void assertUnderflow(BasicTypeResolver.BasicValueReader reader)
     {
         assertThrows(TooLessBytesException.class, () -> reader.read(Unpooled.EMPTY_BUFFER, ByteOrder.BIG_ENDIAN));

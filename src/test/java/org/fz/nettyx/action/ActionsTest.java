@@ -81,6 +81,11 @@ public class ActionsTest {
         Actions.invokeAction((ChannelHandlerContextAction) null, ctx);
         Actions.invokeAction((ChannelPromiseAction) null, ctx, promise);
         Actions.invokeAction((ChannelFutureAction) null, promise);
+        Actions.invokeAction((ChannelBindAction) null, ctx, null, promise);
+        Actions.invokeAction((ChannelConnectAction) null, ctx, null, null, promise);
+        Actions.invokeAction((ChannelWriteAction) null, ctx, new Object(), promise);
+        Actions.invokeAction((ChannelReadAction) null, ctx, new Object());
+        Actions.invokeAction((ChannelExceptionAction) null, ctx, new RuntimeException());
         Actions.invokeActionAndClose(null, ctx, new RuntimeException());
 
         assertFalse(channel.isOpen());
