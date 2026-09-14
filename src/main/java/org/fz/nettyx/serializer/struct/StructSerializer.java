@@ -10,7 +10,7 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
 
 import java.lang.reflect.ParameterizedType;

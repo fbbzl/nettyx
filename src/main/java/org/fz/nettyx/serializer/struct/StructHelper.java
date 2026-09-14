@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBufUtil;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 
 import java.lang.reflect.*;
 import java.nio.ByteOrder;

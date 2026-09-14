@@ -11,7 +11,7 @@ import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

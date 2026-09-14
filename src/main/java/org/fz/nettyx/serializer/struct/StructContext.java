@@ -22,7 +22,7 @@ import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
 
 import java.lang.annotation.Annotation;
@@ -139,6 +139,9 @@ public class StructContext {
         for (String pack : append(basePackages, ClassUtil.getPackage(this.getClass()))) {
             classesForScan.addAll(ClassScanner.scanAllPackage(pack, scanCondition));
         }
+        // Basic wire types are shared by the schema and struct serializers and
+        // must be available even when callers scan only their model packages.
+        classesForScan.addAll(ClassScanner.scanAllPackage("org.fz.nettyx.serializer.basic", scanCondition));
 
         log.debug("serializer context finished scanning, base-packages: {}", Arrays.toString(basePackages));
 

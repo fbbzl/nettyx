@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.struct;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

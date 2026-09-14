@@ -12,7 +12,7 @@ import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructFiel
 import org.fz.nettyx.serializer.struct.annotation.Chunk;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

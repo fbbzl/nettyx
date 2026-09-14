@@ -10,16 +10,16 @@ import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong8;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cshort;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.basic.Basic;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.basic.c.unsigned.cushort;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * resolves basic wire types (like cint, cushort) by simple class name,
- * reusing the {@link Basic} type system of struct package
+ * reusing the shared {@link Basic} type system
  *
  * @author fengbinbin
  * @version 1.0
@@ -57,7 +57,7 @@ public class BasicTypeResolver
 
     static {
         Set<Class<?>> scanned = ClassScanner.scanPackage(
-                "org.fz.nettyx.serializer.struct.basic",
+                "org.fz.nettyx.serializer.basic",
                 clazz -> Basic.class.isAssignableFrom(clazz)
                          && clazz != Basic.class
                          && !Modifier.isAbstract(clazz.getModifiers()));

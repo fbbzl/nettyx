@@ -10,8 +10,8 @@ import org.fz.nettyx.codec.model.You;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -1,6 +1,7 @@
 package org.fz.nettyx.channel.enhanced;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.oio.AbstractOioChannel;
 import io.netty.channel.oio.OioByteStreamChannel;
@@ -35,7 +36,7 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
         super(null);
     }
 
-    protected EnhancedOioByteStreamChannel(io.netty.channel.Channel parent)
+    protected EnhancedOioByteStreamChannel(Channel parent)
     {
         super(parent);
     }

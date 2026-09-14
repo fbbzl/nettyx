@@ -1,6 +1,7 @@
 package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ public class StringMessageCodecTest {
         encoded.release();
         assertArrayEquals(message.getBytes(StandardCharsets.UTF_16LE), actual);
 
-        assertTrue(channel.writeInbound(io.netty.buffer.Unpooled.wrappedBuffer(actual)));
+        assertTrue(channel.writeInbound(Unpooled.wrappedBuffer(actual)));
         assertEquals(message, channel.readInbound());
         channel.finishAndReleaseAll();
     }

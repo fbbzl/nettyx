@@ -7,8 +7,8 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.codec.model.*;
 import org.fz.nettyx.serializer.struct.StructContext;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
+import org.fz.nettyx.serializer.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.basic.c.unsigned.culong8;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

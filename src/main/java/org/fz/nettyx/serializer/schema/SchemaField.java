@@ -6,9 +6,10 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver.BasicValueReader;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver.BasicValueWriter;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
@@ -42,34 +43,31 @@ public class SchemaField
     Kind                      kind;
     String                    name;
     Class<? extends Basic<?>> basicType;
-    @Getter(AccessLevel.PACKAGE)
-    BasicValueReader basicValueReader;
-    @Getter(AccessLevel.PACKAGE)
-    BasicValueWriter basicValueWriter;
-    Integer     length;
-    boolean     flexible;
-    String      structRef;
-    ElementKind elementKind;
-    Charset     charset;
+    Integer                   length;
+    boolean                   flexible;
+    String                    structRef;
+    ElementKind               elementKind;
+    Charset                   charset;
 
-    @NonFinal
-    String resolvedStructRef;
+    @Getter(AccessLevel.PACKAGE) BasicValueReader basicValueReader;
+    @Getter(AccessLevel.PACKAGE) BasicValueWriter basicValueWriter;
+    @NonFinal                    String           resolvedStructRef;
 
     private SchemaField(
-            Kind kind,
-            String name,
+            Kind                      kind,
+            String                    name,
             Class<? extends Basic<?>> basicType,
-            Integer length,
-            boolean flexible,
-            String structRef,
-            ElementKind elementKind,
-            Charset charset)
+            Integer                   length,
+            boolean                   flexible,
+            String                    structRef,
+            ElementKind               elementKind,
+            Charset                   charset)
     {
         this.kind             = kind;
         this.name             = name;
         this.basicType        = basicType;
-        this.basicValueReader = basicType == null ? null : org.fz.nettyx.serializer.schema.type.BasicTypeResolver.valueReaderFor(basicType);
-        this.basicValueWriter = basicType == null ? null : org.fz.nettyx.serializer.schema.type.BasicTypeResolver.valueWriterFor(basicType);
+        this.basicValueReader = basicType == null ? null : BasicTypeResolver.valueReaderFor(basicType);
+        this.basicValueWriter = basicType == null ? null : BasicTypeResolver.valueWriterFor(basicType);
         this.length           = length;
         this.flexible         = flexible;
         this.structRef        = structRef;

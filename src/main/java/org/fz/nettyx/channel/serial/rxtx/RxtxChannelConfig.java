@@ -15,7 +15,12 @@
  */
 package org.fz.nettyx.channel.serial.rxtx;
 
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.MessageSizeEstimator;
+import io.netty.channel.RecvByteBufAllocator;
+import io.netty.channel.WriteBufferWaterMark;
 import org.fz.nettyx.channel.serial.*;
 
 import java.util.Map;
@@ -25,7 +30,7 @@ import java.util.Map;
  *
  * <h3>Available options</h3>
  * <p>
- * In addition to the options provided by {@link io.netty.channel.ChannelConfig},
+ * In addition to the options provided by {@link ChannelConfig},
  * {@link DefaultRxtxChannelConfig} allows the following options in the option map:
  *
  * <table border="1" cellspacing="0" cellpadding="6">
@@ -84,10 +89,10 @@ public interface RxtxChannelConfig extends SerialChannelConfig {
     RxtxChannelConfig setWriteSpinCount(int writeSpinCount);
 
     @Override
-    RxtxChannelConfig setAllocator(io.netty.buffer.ByteBufAllocator allocator);
+    RxtxChannelConfig setAllocator(ByteBufAllocator allocator);
 
     @Override
-    RxtxChannelConfig setRecvByteBufAllocator(io.netty.channel.RecvByteBufAllocator allocator);
+    RxtxChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator);
 
     @Override
     RxtxChannelConfig setAutoRead(boolean autoRead);
@@ -102,10 +107,10 @@ public interface RxtxChannelConfig extends SerialChannelConfig {
     RxtxChannelConfig setWriteBufferLowWaterMark(int writeBufferLowWaterMark);
 
     @Override
-    RxtxChannelConfig setWriteBufferWaterMark(io.netty.channel.WriteBufferWaterMark writeBufferWaterMark);
+    RxtxChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark);
 
     @Override
-    RxtxChannelConfig setMessageSizeEstimator(io.netty.channel.MessageSizeEstimator estimator);
+    RxtxChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator);
 
     /**
      * Default configuration class for RXTX device connections.
@@ -237,13 +242,13 @@ public interface RxtxChannelConfig extends SerialChannelConfig {
         }
 
         @Override
-        public RxtxChannelConfig setAllocator(io.netty.buffer.ByteBufAllocator allocator) {
+        public RxtxChannelConfig setAllocator(ByteBufAllocator allocator) {
             super.setAllocator(allocator);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setRecvByteBufAllocator(io.netty.channel.RecvByteBufAllocator allocator) {
+        public RxtxChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator) {
             super.setRecvByteBufAllocator(allocator);
             return this;
         }
@@ -273,13 +278,13 @@ public interface RxtxChannelConfig extends SerialChannelConfig {
         }
 
         @Override
-        public RxtxChannelConfig setWriteBufferWaterMark(io.netty.channel.WriteBufferWaterMark writeBufferWaterMark) {
+        public RxtxChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark) {
             super.setWriteBufferWaterMark(writeBufferWaterMark);
             return this;
         }
 
         @Override
-        public RxtxChannelConfig setMessageSizeEstimator(io.netty.channel.MessageSizeEstimator estimator) {
+        public RxtxChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator) {
             super.setMessageSizeEstimator(estimator);
             return this;
         }

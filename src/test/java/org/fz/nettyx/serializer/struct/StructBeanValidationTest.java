@@ -7,7 +7,7 @@ import org.fz.nettyx.beanmodel.valid.BasicArrayBean;
 import org.fz.nettyx.beanmodel.valid.FlexibleBasicArrayBean;
 import org.fz.nettyx.beanmodel.valid.InheritedAccessorBean;
 import org.fz.nettyx.exception.SerializeException;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.Test;
 
 import java.nio.ByteOrder;

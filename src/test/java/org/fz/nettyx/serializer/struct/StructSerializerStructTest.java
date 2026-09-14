@@ -8,14 +8,16 @@ import org.fz.nettyx.codec.model.Lover;
 import org.fz.nettyx.codec.model.You;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cfloat;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.cuchar;
-import org.fz.nettyx.serializer.struct.basic.c.unsigned.culong8;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.basic.c.unsigned.culong8;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.math.BigInteger;
 
 import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
@@ -40,7 +42,7 @@ public class StructSerializerStructTest {
         you.setSex(new cuchar(1));
         you.setAddress(new cfloat(1.5f));
         you.setPlatformId(new cdouble(123.456));
-        you.setInterest(new culong8(java.math.BigInteger.valueOf(789)));
+        you.setInterest(new culong8(BigInteger.valueOf(789)));
 
         ByteBuf youBuf = Unpooled.buffer();
         toByteBuf(you, youBuf);

@@ -4,9 +4,9 @@ import cn.hutool.core.lang.TypeReference;
 import org.fz.nettyx.codec.model.GenericBox;
 import org.fz.nettyx.codec.model.GenericPair;
 import org.fz.nettyx.codec.model.GenericTriple;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.clong4;
 import org.junit.Test;
 
 import java.util.Arrays;

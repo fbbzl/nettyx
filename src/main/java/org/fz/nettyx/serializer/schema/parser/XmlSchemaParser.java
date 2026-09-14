@@ -5,7 +5,7 @@ import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.serializer.schema.SchemaField;
 import org.fz.nettyx.serializer.schema.Schema;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;

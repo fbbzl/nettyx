@@ -20,13 +20,14 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.Basic;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -291,7 +292,7 @@ public class StructCoreCoverageTest {
         assertEquals(StructDefinition.Category.HANDLER, plain.category());
         assertEquals(StructDefinition.Category.HANDLER, handled.category());
 
-        java.lang.reflect.Field typeResolver = StructField.class.getDeclaredField("type");
+        Field typeResolver = StructField.class.getDeclaredField("type");
         typeResolver.setAccessible(true);
         Object original = typeResolver.get(basicField);
         try {
@@ -365,7 +366,7 @@ public class StructCoreCoverageTest {
     }
 
     private static void assertInvalidProperty(Class<?> beanType) throws Exception {
-        java.lang.reflect.Field field = beanType.getDeclaredField("value");
+        Field field = beanType.getDeclaredField("value");
         assertThrows(SerializeException.class, () -> new StructField(ByteOrder.BIG_ENDIAN, field));
     }
 
@@ -374,7 +375,7 @@ public class StructCoreCoverageTest {
     }
 
     private static class WildcardHolder {
-        java.util.List<? extends BigEndianLeaf> values;
+        List<? extends BigEndianLeaf> values;
     }
 
     private static class Unannotated {
