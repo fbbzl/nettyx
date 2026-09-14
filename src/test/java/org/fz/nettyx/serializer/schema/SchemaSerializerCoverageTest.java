@@ -154,6 +154,22 @@ public class SchemaSerializerCoverageTest
     }
 
     @Test
+    public void codecReportsMissingBytesAndFixedSizeCacheHandlesNestedShapes()
+    {
+        SchemaField bytes = SchemaField.bytesField("bytes", 2);
+        assertThrows(TooLessBytesException.class,
+                     () -> CODEC.readField(bytes, ByteOrder.BIG_ENDIAN, Unpooled.wrappedBuffer(new byte[]{1})));
+        assertThrows(TooLessBytesException.class,
+                     () -> CODEC.readField(SchemaField.charField("text", 2, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN,
+                                           Unpooled.wrappedBuffer(new byte[]{1})));
+
+        assertTrue(CODEC.fixedSizeOf(REGISTRY.require("device.Device")) > 0);
+        assertEquals(CODEC.fixedSizeOf(REGISTRY.require("device.Device")),
+                     CODEC.fixedSizeOf(REGISTRY.require("device.Device")));
+        assertEquals(-1, CODEC.fixedSizeOf(REGISTRY.require("device.Flexible")));
+    }
+
+    @Test
     public void basicReadersReportUnderflowAndFallbackTypesStillUseTheirConstructors()
     {
         assertUnderflow(BasicTypeResolver.valueReaderFor(cchar.class));

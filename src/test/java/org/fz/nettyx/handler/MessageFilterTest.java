@@ -2,6 +2,8 @@ package org.fz.nettyx.handler;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
 import org.fz.nettyx.handler.MessageFilter.InboundFilter;
 import org.fz.nettyx.handler.MessageFilter.OutboundFilter;
 import org.junit.Test;
@@ -109,5 +111,28 @@ public class MessageFilterTest {
         assertNull(channel.readInbound());
 
         assertFalse(channel.finish());
+    }
+
+    @Test
+    public void predicateFailuresAreReportedAndPromisesFail() throws Exception {
+        EmbeddedChannel inbound = new EmbeddedChannel(new InboundFilter<>(msg -> {
+            throw new IllegalStateException("inbound");
+        }), new ChannelInboundHandlerAdapter() {
+            @Override
+            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+            }
+        });
+        assertFalse(inbound.writeInbound("message"));
+        assertNotNull(inbound.pipeline().firstContext());
+        inbound.finishAndReleaseAll();
+
+        OutboundFilter<String> outboundFilter = new OutboundFilter<>(msg -> {
+            throw new IllegalStateException("outbound");
+        });
+        EmbeddedChannel outbound = new EmbeddedChannel(outboundFilter);
+        io.netty.channel.ChannelPromise outboundPromise = outbound.newPromise();
+        outboundFilter.write(outbound.pipeline().context(outboundFilter), "message", outboundPromise);
+        assertFalse(outboundPromise.isSuccess());
+        outbound.finishAndReleaseAll();
     }
 }

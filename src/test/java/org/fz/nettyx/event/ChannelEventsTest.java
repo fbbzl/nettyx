@@ -26,4 +26,14 @@ public class ChannelEventsTest {
         assertFalse(ChannelEvents.isWriteIdle(IdleStateEvent.FIRST_ALL_IDLE_STATE_EVENT));
         assertFalse(ChannelEvents.isAllIdle("not an idle event"));
     }
+
+    @Test
+    public void recognizesObjectOverloadsForEveryIdleState() {
+        assertTrue(ChannelEvents.isReadIdle((Object) IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT));
+        assertTrue(ChannelEvents.isWriteIdle((Object) IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT));
+        assertTrue(ChannelEvents.isAllIdle((Object) IdleStateEvent.FIRST_ALL_IDLE_STATE_EVENT));
+        assertTrue(ChannelEvents.isReadIdle((Object) IdleState.READER_IDLE));
+        assertTrue(ChannelEvents.isWriteIdle((Object) IdleState.WRITER_IDLE));
+        assertTrue(ChannelEvents.isAllIdle((Object) IdleState.ALL_IDLE));
+    }
 }

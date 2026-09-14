@@ -91,4 +91,22 @@ public class ActionsTest {
         assertFalse(channel.isOpen());
         channel.finishAndReleaseAll();
     }
+
+    @Test
+    public void predefinedNoOpActionsCanBeInvoked() {
+        EmbeddedChannel channel = new EmbeddedChannel();
+        ChannelHandlerContext ctx = channel.pipeline().firstContext();
+        ChannelPromise promise = channel.newPromise();
+        ChannelAction.DO_NOTHING.act(channel);
+        ChannelBindAction.DO_NOTHING.act(ctx, null, promise);
+        ChannelConnectAction.DO_NOTHING.act(ctx, null, null, promise);
+        ChannelEventAction.DO_NOTHING.act(ctx, "event");
+        ChannelExceptionAction.DO_NOTHING.act(ctx, new RuntimeException());
+        ChannelFutureAction.DO_NOTHING.act(promise);
+        ChannelHandlerContextAction.DO_NOTHING.act(ctx);
+        ChannelPromiseAction.DO_NOTHING.act(ctx, promise);
+        ChannelReadAction.DO_NOTHING.act(ctx, "message");
+        ChannelWriteAction.DO_NOTHING.act(ctx, "message", promise);
+        channel.finishAndReleaseAll();
+    }
 }

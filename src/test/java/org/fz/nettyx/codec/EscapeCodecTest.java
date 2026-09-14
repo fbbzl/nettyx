@@ -154,4 +154,24 @@ public class EscapeCodecTest {
 
         assertFalse(channel.finish());
     }
+
+    @Test
+    public void escapeMapSupportsBuffersAndRejectsInvalidMappings()
+    {
+        EscapeMap map = new EscapeMap();
+        ByteBuf real = Unpooled.wrappedBuffer(new byte[]{0x01});
+        ByteBuf replacement = Unpooled.wrappedBuffer(new byte[]{0x02});
+        map.putBuf(real, replacement);
+        assertEquals(1, real.readerIndex());
+        assertEquals(1, replacement.readerIndex());
+        assertEquals(1, map.size());
+        assertEquals(1, map.getInverse().size());
+        assertThrows(IllegalArgumentException.class, () -> map.putHex("", "01"));
+        assertThrows(IllegalArgumentException.class, () -> map.putHex("03", ""));
+        assertThrows(IllegalArgumentException.class, () -> {
+            EscapeMap conflicting = new EscapeMap();
+            conflicting.putHex("01", "02");
+            conflicting.putHex("03", "01");
+        });
+    }
 }

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class OpenSslContextFactoryTest {
 
@@ -36,6 +37,22 @@ public class OpenSslContextFactoryTest {
 
         assertFalse(factory.serverPasswordOverload);
         assertFalse(factory.clientPasswordOverload);
+    }
+
+    @Test
+    public void configAccessorsAndEqualityFollowLombokContract()
+    {
+        OpenSslConfig config = config();
+        config.setKeyPass("secret");
+        config.setHandshakeTimeoutSeconds(9);
+        assertEquals("cert.pem", config.cert());
+        assertEquals("key.pem", config.key());
+        assertEquals("secret", config.keyPass());
+        assertEquals("root.pem", config.root());
+        assertEquals(9, config.handshakeTimeoutSeconds());
+        assertEquals(config, config);
+        assertEquals(config.hashCode(), config.hashCode());
+        assertTrue(config.toString().contains("cert.pem"));
     }
 
     private static OpenSslConfig config()

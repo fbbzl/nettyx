@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -38,6 +39,9 @@ public class ExceptionConstructorTest
         org.junit.Assert.assertEquals(4, error.getExpectLength());
         org.junit.Assert.assertEquals(2, error.getProvideLength());
         assertNotNull(new UnknownConfigException("mode", "value"));
+        assertNotNull(new TypeJudgmentException("message", new Exception()));
+        assertNotNull(new TypeJudgmentException((Type) null));
+        assertNotNull(new TypeJudgmentException((Field) null));
     }
 
     private static final class Holder

@@ -3,6 +3,7 @@ package org.fz.nettyx.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
@@ -126,6 +127,26 @@ public class ChannelAdviceTest {
         assertEquals(1, failures.get());
         assertNotNull(new OutboundAdvice.SimpleOutboundExceptionHandler());
         assertNotNull(new OutboundAdvice.SimpleOutboundExceptionHandler((actual, error) -> {}));
+        channel.finishAndReleaseAll();
+    }
+
+    @Test
+    public void simpleOutboundHandlerObservesFailedOperations() throws Exception {
+        EmbeddedChannel channel = new EmbeddedChannel(new ChannelOutboundHandlerAdapter());
+        ChannelHandlerContext ctx = channel.pipeline().firstContext();
+        AtomicInteger failures = new AtomicInteger();
+        OutboundAdvice.SimpleOutboundExceptionHandler handler =
+                new OutboundAdvice.SimpleOutboundExceptionHandler((actual, error) -> failures.incrementAndGet());
+        channel.pipeline().addLast("observer", handler);
+
+        handler.bind(ctx, new InetSocketAddress(10001), channel.newPromise());
+        handler.connect(ctx, new InetSocketAddress(10001), null, channel.newPromise());
+        handler.disconnect(ctx, channel.newPromise());
+        handler.close(ctx, channel.newPromise());
+        handler.deregister(ctx, channel.newPromise());
+        handler.write(ctx, "message", channel.newPromise());
+
+        assertTrue(failures.get() >= 1);
         channel.finishAndReleaseAll();
     }
 }

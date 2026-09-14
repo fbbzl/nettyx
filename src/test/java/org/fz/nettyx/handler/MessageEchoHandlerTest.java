@@ -26,4 +26,5 @@ public class MessageEchoHandlerTest {
         assertNull(channel.readOutbound());
         assertFalse(channel.finish());
     }
+
 }
