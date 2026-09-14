@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.schema.parser;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.serializer.schema.SchemaField;
-import org.fz.nettyx.serializer.schema.ConfigStruct;
+import org.fz.nettyx.serializer.schema.Schema;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 import org.w3c.dom.Element;
@@ -46,7 +46,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2026-08-16
  */
-public class XmlStructConfigParser
+public class XmlSchemaParser
 {
 
     public static final String DOCTYPE_PUBLIC_ID = "-//fbbzl//DTD Nettyx Struct Config 1.0//EN";
@@ -83,7 +83,7 @@ public class XmlStructConfigParser
 
     static final String ARRAY_FLEXIBLE = "*";
 
-    public Map<String, ConfigStruct> parse(String location, InputStream input)
+    public Map<String, Schema> parse(String location, InputStream input)
     {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -98,10 +98,10 @@ public class XmlStructConfigParser
 
             String namespace = requiredAttr(structsEl, Attributes.NAMESPACE, location);
 
-            Map<String, ConfigStruct> structs     = new LinkedHashMap<>();
+            Map<String, Schema> structs     = new LinkedHashMap<>();
             NodeList                  structNodes = structsEl.getElementsByTagName(Tag.STRUCT);
             for (int i = 0; i < structNodes.getLength(); i++) {
-                ConfigStruct struct = parseStruct(namespace, (Element) structNodes.item(i), location);
+                Schema struct = parseStruct(namespace, (Element) structNodes.item(i), location);
                 if (structs.put(struct.fqName(), struct) != null)
                     throw new StructDefinitionException("duplicated struct [" + struct.fqName() + "], location: [" + location + "]");
             }
@@ -115,7 +115,7 @@ public class XmlStructConfigParser
         }
     }
 
-    private ConfigStruct parseStruct(String namespace, Element structEl, String location)
+    private Schema parseStruct(String namespace, Element structEl, String location)
     {
         String    name      = requiredAttr(structEl, Attributes.NAME, location);
         ByteOrder byteOrder = parseEndian(attr(structEl, Attributes.ENDIAN), namespace + "." + name, location);
@@ -125,7 +125,7 @@ public class XmlStructConfigParser
         for (int i = 0; i < fieldNodes.getLength(); i++)
              fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
 
-        return new ConfigStruct(namespace, name, byteOrder, fields);
+        return new Schema(namespace, name, byteOrder, fields);
     }
 
     private SchemaField parseField(Element fieldEl, String structName, String location)

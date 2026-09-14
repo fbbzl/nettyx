@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
+import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 
 import java.util.Map;
 
@@ -20,29 +20,29 @@ import java.util.Map;
  */
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ConfiguredSerializer implements Serializer
+public final class SchemaSerializer implements Serializer
 {
 
-    ConfigStruct          root;
-    ConfiguredStructCodec codec;
+    Schema          root;
+    SchemaCodec codec;
 
-    public ConfiguredSerializer(ConfiguredStructRegistry registry, String structName)
+    public SchemaSerializer(SchemaRegistry registry, String structName)
     {
         this.root  = registry.require(structName);
-        this.codec = new ConfiguredStructCodec(registry);
+        this.codec = new SchemaCodec(registry);
     }
 
-    public ConfigStruct getStruct()
+    public Schema getStruct()
     {
         return root;
     }
 
-    public static Map<String, Object> toStruct(ConfiguredStructRegistry registry, String structName, ByteBuf byteBuf)
+    public static Map<String, Object> toStruct(SchemaRegistry registry, String structName, ByteBuf byteBuf)
     {
         return registry.serializer(structName).doDeserialize(byteBuf);
     }
 
-    public static void toByteBuf(ConfiguredStructRegistry registry, String structName, Map<String, Object> structMap, ByteBuf writing)
+    public static void toByteBuf(SchemaRegistry registry, String structName, Map<String, Object> structMap, ByteBuf writing)
     {
         registry.serializer(structName).doSerialize(structMap, writing);
     }
@@ -50,26 +50,26 @@ public final class ConfiguredSerializer implements Serializer
     /**
      * Creates a result map that can be reused by {@link #deserializeInto(ByteBuf, Map)}.
      */
-    public static Map<String, Object> newReusableStruct(ConfiguredStructRegistry registry, String structName)
+    public static Map<String, Object> newReusableStruct(SchemaRegistry registry, String structName)
     {
         return registry.serializer(structName).newReusableStruct();
     }
 
     /**
-     * Deserializes into a reusable target created by {@link #newReusableStruct(ConfiguredStructRegistry, String)}.
+     * Deserializes into a reusable target created by {@link #newReusableStruct(SchemaRegistry, String)}.
      * Values such as byte arrays, nested maps and lists are updated in place and must not be retained across calls.
      */
-    public static void deserializeInto(ConfiguredStructRegistry registry, String structName, ByteBuf reading, Map<String, Object> target)
+    public static void deserializeInto(SchemaRegistry registry, String structName, ByteBuf reading, Map<String, Object> target)
     {
         registry.serializer(structName).deserializeInto(reading, target);
     }
 
-    public static ConfigStructView newView(ConfiguredStructRegistry registry, String structName)
+    public static SchemaView newView(SchemaRegistry registry, String structName)
     {
         return registry.serializer(structName).newView();
     }
 
-    public static void viewInto(ConfiguredStructRegistry registry, String structName, ByteBuf reading, ConfigStructView target)
+    public static void viewInto(SchemaRegistry registry, String structName, ByteBuf reading, SchemaView target)
     {
         registry.serializer(structName).viewInto(reading, target);
     }
@@ -90,15 +90,15 @@ public final class ConfiguredSerializer implements Serializer
         codec.readStructInto(root, reading, target);
     }
 
-    public ConfigStructView newView()
+    public SchemaView newView()
     {
         int byteLength = codec.fixedSizeOf(root);
         if (byteLength < 0)
             throw new SerializeException("zero-copy view only supports fixed-length struct: [" + root.fqName() + "]");
-        return new ConfigStructView(this, codec, root, byteLength);
+        return new SchemaView(this, codec, root, byteLength);
     }
 
-    public void viewInto(ByteBuf reading, ConfigStructView target)
+    public void viewInto(ByteBuf reading, SchemaView target)
     {
         if (!target.belongsTo(this))
             throw new SerializeException("view belongs to a different configured serializer");
@@ -112,7 +112,7 @@ public final class ConfiguredSerializer implements Serializer
      * Binds a reusable view without validating ownership or available bytes.
      * Call this only after the framing layer has verified a complete fixed-length message.
      */
-    void viewIntoUnchecked(ByteBuf reading, ConfigStructView target)
+    void viewIntoUnchecked(ByteBuf reading, SchemaView target)
     {
         target.reset(reading, reading.readerIndex());
         reading.skipBytes(target.byteLength());

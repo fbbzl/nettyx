@@ -26,7 +26,7 @@ next_action: Remove both compatibility facades and verify repository references.
 
 ## 目标与非目标
 
-本文记录 `reference_version` 对应的历史变更，旧路径按当时版本保留。后续包迁移将 `serializer.configured` 改为 `serializer.schema`；当前替代类位于 `schema.type.BasicTypeResolver` 和 `schema.parser.XmlStructConfigParser`。
+本文记录 `reference_version` 对应的历史变更，旧路径按当时版本保留。后续包迁移将 `serializer.configured` 改为 `serializer.schema`；当前替代类位于 `schema.type.BasicTypeResolver` 和 `schema.parser.XmlSchemaParser`。
 
 目标：删除已废弃的根包兼容类，完成 `configured` 包结构迁移。
 

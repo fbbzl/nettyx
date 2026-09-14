@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.schema.SchemaField;
-import org.fz.nettyx.serializer.schema.ConfigStruct;
-import org.fz.nettyx.serializer.schema.ConfiguredStructRegistry;
+import org.fz.nettyx.serializer.schema.Schema;
+import org.fz.nettyx.serializer.schema.SchemaRegistry;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 
 import java.lang.reflect.Array;
@@ -30,27 +30,27 @@ import java.util.Map;
 
 @SuppressWarnings("unchecked")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ConfiguredStructCodec
+public final class SchemaCodec
 {
 
-    ConfiguredStructRegistry       registry;
-    Map<ConfigStruct, Integer> fixedSizeCache;
+    SchemaRegistry       registry;
+    Map<Schema, Integer> fixedSizeCache;
 
-    public ConfiguredStructCodec(ConfiguredStructRegistry registry)
+    public SchemaCodec(SchemaRegistry registry)
     {
         this.registry       = registry;
         this.fixedSizeCache = new HashMap<>();
     }
 
-    public Map<String, Object> newReusableStruct(ConfigStruct struct)
+    public Map<String, Object> newReusableStruct(Schema struct)
     {
-        return new ConfigStructMap(struct);
+        return new SchemaMap(struct);
     }
 
-    public Map<String, Object> readStruct(ConfigStruct struct, ByteBuf byteBuf)
+    public Map<String, Object> readStruct(Schema struct, ByteBuf byteBuf)
     {
         List<SchemaField> fields    = struct.fields();
-        ConfigStructMap   structMap = new ConfigStructMap(struct);
+        SchemaMap   structMap = new SchemaMap(struct);
         for (int i = 0; i < fields.size(); i++) {
             SchemaField field = fields.get(i);
             structMap.put(i, readField(field, struct.byteOrder(), byteBuf));
@@ -58,9 +58,9 @@ public final class ConfiguredStructCodec
         return structMap;
     }
 
-    public void readStructInto(ConfigStruct struct, ByteBuf byteBuf, Map<String, Object> target)
+    public void readStructInto(Schema struct, ByteBuf byteBuf, Map<String, Object> target)
     {
-        if (target instanceof ConfigStructMap reusable) {
+        if (target instanceof SchemaMap reusable) {
             if (!reusable.belongsTo(struct))
                 throw new SerializeException("reusable target belongs to a different configured struct");
             readStructInto(struct, reusable, byteBuf);
@@ -71,7 +71,7 @@ public final class ConfiguredStructCodec
         target.putAll(readStruct(struct, byteBuf));
     }
 
-    private void readStructInto(ConfigStruct struct, ConfigStructMap target, ByteBuf byteBuf)
+    private void readStructInto(Schema struct, SchemaMap target, ByteBuf byteBuf)
     {
         List<SchemaField> fields = struct.fields();
         for (int i = 0; i < fields.size(); i++) {
@@ -95,7 +95,7 @@ public final class ConfiguredStructCodec
             SchemaField field,
             ByteOrder byteOrder,
             ByteBuf byteBuf,
-            ConfigStructMap target,
+            SchemaMap target,
             int index)
     {
         Object previous = target.valueAt(index);
@@ -194,7 +194,7 @@ public final class ConfiguredStructCodec
             int length,
             Charset charset,
             ByteBuf byteBuf,
-            ConfigStructMap target,
+            SchemaMap target,
             int index,
             String previous)
     {
@@ -239,15 +239,15 @@ public final class ConfiguredStructCodec
 
     private Map<String, Object> readNestedStructInto(String structName, ByteBuf byteBuf, Object previous)
     {
-        ConfigStruct nestedStruct = registry.require(structName);
-        ConfigStructMap nested = previous instanceof ConfigStructMap reusable && reusable.belongsTo(nestedStruct)
+        Schema nestedStruct = registry.require(structName);
+        SchemaMap nested = previous instanceof SchemaMap reusable && reusable.belongsTo(nestedStruct)
                                  ? reusable
-                                 : new ConfigStructMap(nestedStruct);
+                                 : new SchemaMap(nestedStruct);
         readStructInto(nestedStruct, nested, byteBuf);
         return nested;
     }
 
-    public synchronized int fixedSizeOf(ConfigStruct struct)
+    public synchronized int fixedSizeOf(Schema struct)
     {
         Integer cached = fixedSizeCache.get(struct);
         if (cached != null) return cached;
@@ -257,7 +257,7 @@ public final class ConfiguredStructCodec
         return computed;
     }
 
-    private int computeFixedSize(ConfigStruct struct)
+    private int computeFixedSize(Schema struct)
     {
         int size = 0;
         for (SchemaField field : struct.fields()) {
@@ -295,10 +295,10 @@ public final class ConfiguredStructCodec
         }
     }
 
-    public void writeStruct(ConfigStruct struct, Map<String, Object> structMap, ByteBuf writing)
+    public void writeStruct(Schema struct, Map<String, Object> structMap, ByteBuf writing)
     {
         List<SchemaField> fields = struct.fields();
-        if (structMap instanceof ConfigStructMap configuredMap && configuredMap.belongsTo(struct)) {
+        if (structMap instanceof SchemaMap configuredMap && configuredMap.belongsTo(struct)) {
             for (int i = 0; i < fields.size(); i++)
                  writeField(fields.get(i), configuredMap.valueAt(i), struct.byteOrder(), writing);
             return;

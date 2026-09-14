@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
+import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.struct.basic.c.signed.cdouble;
@@ -33,24 +33,24 @@ import static org.junit.Assert.*;
  * @author fengbinbin
  * @since 2026-09-02
  */
-public class ConfiguredSerializerCoverageTest
+public class SchemaSerializerCoverageTest
 {
 
-    private static final ConfiguredStructRegistry  REGISTRY = ConfiguredStructRegistry.load(
+    private static final SchemaRegistry  REGISTRY = SchemaRegistry.load(
             "configured/device.xml", "configured/geo.xml");
-    private static final ConfiguredStructCodec CODEC    = new ConfiguredStructCodec(REGISTRY);
+    private static final SchemaCodec CODEC    = new SchemaCodec(REGISTRY);
 
     @Test
     public void reusableStructUpdatesValuesInPlaceAndRegularMapsAreReplaced()
     {
-        Map<String, Object> reusable = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{1, 2}), reusable);
+        Map<String, Object> reusable = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{1, 2}), reusable);
 
         byte[]    raw    = (byte[]) reusable.get("raw");
         List<?>   values = (List<?>) reusable.get("values");
         Map<?, ?> gps    = (Map<?, ?>) reusable.get("gps");
 
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{3, 4}), reusable);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{3, 4}), reusable);
 
         assertEquals(2, reusable.get("id"));
         assertSame(raw, reusable.get("raw"));
@@ -59,7 +59,7 @@ public class ConfiguredSerializerCoverageTest
         assertArrayEquals(new byte[]{3, 4}, (byte[]) reusable.get("raw"));
 
         reusable.put("marker", true);
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(3, "second", new byte[]{5, 6}), reusable);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(3, "second", new byte[]{5, 6}), reusable);
         assertEquals(3, reusable.get("id"));
         assertTrue(reusable.containsKey("marker"));
         assertEquals(Boolean.TRUE, reusable.remove("marker"));
@@ -67,7 +67,7 @@ public class ConfiguredSerializerCoverageTest
         assertTrue(reusable.isEmpty());
 
         Map<String, Object> regular = new LinkedHashMap<>(Map.of("stale", true));
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(4, "plain", new byte[]{7, 8}), regular);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(4, "plain", new byte[]{7, 8}), regular);
         assertFalse(regular.containsKey("stale"));
         assertEquals(4, regular.get("id"));
     }
@@ -75,23 +75,23 @@ public class ConfiguredSerializerCoverageTest
     @Test
     public void flexibleArraysViewsDirectBuffersAndArrayInputsFollowTheirContracts()
     {
-        Map<String, Object> reusable = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Flexible");
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(11, 22, 33), reusable);
+        Map<String, Object> reusable = SchemaSerializer.newReusableStruct(REGISTRY, "device.Flexible");
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(11, 22, 33), reusable);
         List<?> tail = (List<?>) reusable.get("tail");
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(44), reusable);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(44), reusable);
         assertSame(tail, reusable.get("tail"));
         assertEquals(List.of(44), reusable.get("tail"));
 
-        ConfigStructView view = ConfiguredSerializer.newView(REGISTRY, "device.Device");
-        ConfiguredSerializer.viewInto(REGISTRY, "device.Device", deviceBuffer(5, "view", new byte[]{9, 10}), view);
+        SchemaView view = SchemaSerializer.newView(REGISTRY, "device.Device");
+        SchemaSerializer.viewInto(REGISTRY, "device.Device", deviceBuffer(5, "view", new byte[]{9, 10}), view);
         assertEquals(5, view.get("id"));
-        assertThrows(SerializeException.class, () -> ConfiguredSerializer.newView(REGISTRY, "device.Flexible"));
-        assertThrows(SerializeException.class, () -> ConfiguredSerializer.viewInto(
+        assertThrows(SerializeException.class, () -> SchemaSerializer.newView(REGISTRY, "device.Flexible"));
+        assertThrows(SerializeException.class, () -> SchemaSerializer.viewInto(
                 REGISTRY, "device.Device", deviceBuffer(6, "other", new byte[]{1, 1}),
-                ConfiguredSerializer.newView(REGISTRY, "device.BenchmarkDevice")));
+                SchemaSerializer.newView(REGISTRY, "device.BenchmarkDevice")));
         assertThrows(TooLessBytesException.class,
-                     () -> ConfiguredSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
-                                                         ConfiguredSerializer.newView(REGISTRY, "device.Device")));
+                     () -> SchemaSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
+                                                         SchemaSerializer.newView(REGISTRY, "device.Device")));
 
         ByteBuf direct = Unpooled.directBuffer(4);
         try {
@@ -116,13 +116,13 @@ public class ConfiguredSerializerCoverageTest
     @Test
     public void reusableTargetsMustMatchTheirStructAndGenericCollectionsUseIterators()
     {
-        Map<String, Object> deviceTarget = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
-        assertThrows(SerializeException.class, () -> ConfiguredSerializer.deserializeInto(
+        Map<String, Object> deviceTarget = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
+        assertThrows(SerializeException.class, () -> SchemaSerializer.deserializeInto(
                 REGISTRY, "device.Flexible", flexibleBuffer(1), deviceTarget));
 
-        Map<String, Object> wrongNestedTarget = ConfiguredSerializer.newReusableStruct(REGISTRY, "device.Device");
+        Map<String, Object> wrongNestedTarget = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
         deviceTarget.put("gps", wrongNestedTarget);
-        ConfiguredSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{1, 2}), deviceTarget);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{1, 2}), deviceTarget);
         Map<?, ?> gps = (Map<?, ?>) deviceTarget.get("gps");
         assertNotSame(wrongNestedTarget, gps);
         assertEquals(100, gps.get("longitude"));

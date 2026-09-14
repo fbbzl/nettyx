@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.serializer.schema.SchemaField;
-import org.fz.nettyx.serializer.schema.ConfigStruct;
+import org.fz.nettyx.serializer.schema.Schema;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.struct.basic.Basic;
 
@@ -29,7 +29,7 @@ import java.util.Set;
  * @version 1.0
  * @since 2026-09-02
  */
-interface StructConfigParser
+interface SchemaParser
 {
 
     Set<String> ROOT_KEYS   = Set.of("namespace", "structs");
@@ -40,9 +40,9 @@ interface StructConfigParser
     String TYPE_BYTE      = "byte";
     String ARRAY_FLEXIBLE = "*";
 
-    Map<String, ConfigStruct> parse(String location, InputStream input);
+    Map<String, Schema> parse(String location, InputStream input);
 
-    default Map<String, ConfigStruct> parseTree(String location, JsonNode root)
+    default Map<String, Schema> parseTree(String location, JsonNode root)
     {
         ObjectNode rootObject = object(root, "root", location);
         rejectUnknownKeys(rootObject, ROOT_KEYS, "root", location);
@@ -50,16 +50,16 @@ interface StructConfigParser
         String    namespace = requiredText(rootObject, "namespace", "root", location);
         ArrayNode structs   = arrayOrEmpty(rootObject.get("structs"), "root field [structs]", location);
 
-        Map<String, ConfigStruct> parsed = new LinkedHashMap<>();
+        Map<String, Schema> parsed = new LinkedHashMap<>();
         for (int index = 0; index < structs.size(); index++) {
-            ConfigStruct struct = parseStruct(namespace, structs.get(index), index, location);
+            Schema struct = parseStruct(namespace, structs.get(index), index, location);
             if (parsed.put(struct.fqName(), struct) != null)
                 throw new StructDefinitionException("duplicated struct [" + struct.fqName() + "], location: [" + location + "]");
         }
         return parsed;
     }
 
-    private ConfigStruct parseStruct(String namespace, JsonNode node, int index, String location)
+    private Schema parseStruct(String namespace, JsonNode node, int index, String location)
     {
         String     context      = "struct at index [" + index + "]";
         ObjectNode structObject = object(node, context, location);
@@ -73,7 +73,7 @@ interface StructConfigParser
         for (int fieldIndex = 0; fieldIndex < fields.size(); fieldIndex++)
              parsedFields.add(parseField(fields.get(fieldIndex), fieldIndex, namespace + "." + name, location));
 
-        return new ConfigStruct(namespace, name, byteOrder, parsedFields);
+        return new Schema(namespace, name, byteOrder, parsedFields);
     }
 
     private SchemaField parseField(JsonNode node, int index, String structName, String location)

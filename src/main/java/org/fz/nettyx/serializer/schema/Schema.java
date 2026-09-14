@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Accessors(fluent = true)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ConfigStruct
+public class Schema
 {
 
     String            namespace;
@@ -27,7 +27,7 @@ public class ConfigStruct
     List<SchemaField> fields;
     String[]          fieldNames;
 
-    public ConfigStruct(String namespace, String name, ByteOrder byteOrder, List<SchemaField> fields)
+    public Schema(String namespace, String name, ByteOrder byteOrder, List<SchemaField> fields)
     {
         this.namespace  = namespace;
         this.name       = name;

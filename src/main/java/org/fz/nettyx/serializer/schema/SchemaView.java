@@ -5,23 +5,23 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.fz.nettyx.exception.SerializeException;
-import org.fz.nettyx.serializer.schema.codec.ConfiguredStructCodec;
+import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 
 /**
  * A reusable, zero-copy view over one fixed-length configured struct.
- * The view is overwritten by the next {@link ConfiguredSerializer#viewInto(ByteBuf, ConfigStructView)} call.
+ * The view is overwritten by the next {@link SchemaSerializer#viewInto(ByteBuf, SchemaView)} call.
  *
  * @author fengbinbin
  * @version 1.0
  * @since 2026-08-16
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class ConfigStructView
+public final class SchemaView
 {
 
-    ConfiguredSerializer  serializer;
-    ConfiguredStructCodec codec;
-    ConfigStruct          struct;
+    SchemaSerializer  serializer;
+    SchemaCodec codec;
+    Schema          struct;
     int                   byteLength;
 
     @NonFinal
@@ -29,7 +29,7 @@ public final class ConfigStructView
     @NonFinal
     int     startIndex;
 
-    ConfigStructView(ConfiguredSerializer serializer, ConfiguredStructCodec codec, ConfigStruct struct, int byteLength)
+    SchemaView(SchemaSerializer serializer, SchemaCodec codec, Schema struct, int byteLength)
     {
         this.serializer = serializer;
         this.codec      = codec;
@@ -61,7 +61,7 @@ public final class ConfigStructView
         this.startIndex = startIndex;
     }
 
-    boolean belongsTo(ConfiguredSerializer serializer)
+    boolean belongsTo(SchemaSerializer serializer)
     {
         return this.serializer == serializer;
     }

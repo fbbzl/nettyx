@@ -2,30 +2,31 @@ package org.fz.nettyx.serializer.schema.parser;
 
 import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.fz.nettyx.exception.StructDefinitionException;
-import org.fz.nettyx.serializer.schema.ConfigStruct;
+import org.fz.nettyx.serializer.schema.Schema;
 
 import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Parses YAML configured-struct resources.
+ * Parses JSON configured-struct resources.
  *
  * @author fengbinbin
  * @version 1.0
  * @since 2026-09-02
  */
-public final class YamlStructConfigParser implements StructConfigParser
+public final class JsonSchemaParser implements SchemaParser
 {
 
-    private static final YAMLMapper MAPPER = YAMLMapper.builder()
-                                                       .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
-                                                       .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
-                                                       .build();
+    private static final ObjectMapper MAPPER = JsonMapper.builder()
+                                                         .enable(StreamReadFeature.STRICT_DUPLICATE_DETECTION)
+                                                         .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                                                         .build();
 
     @Override
-    public Map<String, ConfigStruct> parse(String location, InputStream input)
+    public Map<String, Schema> parse(String location, InputStream input)
     {
         try {
             return parseTree(location, MAPPER.readTree(input));

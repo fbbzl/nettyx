@@ -3,7 +3,7 @@ package org.fz.nettyx.serializer.schema.codec;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import org.fz.nettyx.serializer.schema.ConfigStruct;
+import org.fz.nettyx.serializer.schema.Schema;
 
 import java.util.AbstractMap;
 import java.util.LinkedHashMap;
@@ -21,17 +21,17 @@ import java.util.Set;
  */
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-final class ConfigStructMap extends AbstractMap<String, Object>
+final class SchemaMap extends AbstractMap<String, Object>
 {
 
-    ConfigStruct struct;
+    Schema struct;
     String[]     fieldNames;
     Object[]     values;
     byte[][]     charBuffers;
     @NonFinal
     Map<String, Object> materialized;
 
-    ConfigStructMap(ConfigStruct struct)
+    SchemaMap(Schema struct)
     {
         this.struct = struct;
         fieldNames  = struct.fieldNames();
@@ -50,7 +50,7 @@ final class ConfigStructMap extends AbstractMap<String, Object>
         return materialized == null ? values[index] : materialized.get(fieldNames[index]);
     }
 
-    boolean belongsTo(ConfigStruct struct)
+    boolean belongsTo(Schema struct)
     {
         return this.struct == struct;
     }

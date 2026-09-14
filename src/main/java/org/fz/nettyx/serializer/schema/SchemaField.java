@@ -1,8 +1,8 @@
 package org.fz.nettyx.serializer.schema;
 
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;

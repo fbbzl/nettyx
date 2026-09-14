@@ -2,8 +2,8 @@ package org.fz.nettyx.serializer.schema.jmh;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.schema.ConfiguredSerializer;
-import org.fz.nettyx.serializer.schema.ConfiguredStructRegistry;
+import org.fz.nettyx.serializer.schema.SchemaSerializer;
+import org.fz.nettyx.serializer.schema.SchemaRegistry;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -35,10 +35,10 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @Warmup(iterations = 3, time = 1)
 @Measurement(iterations = 5, time = 1)
-public class ConfiguredSerializerBenchmark
+public class SchemaSerializerBenchmark
 {
 
-    private static final ConfiguredStructRegistry REGISTRY = ConfiguredStructRegistry.load(
+    private static final SchemaRegistry REGISTRY = SchemaRegistry.load(
             "configured/device.xml", "configured/geo.xml");
 
     private byte[]              bytes;
@@ -61,28 +61,28 @@ public class ConfiguredSerializerBenchmark
         }, 122);
         reading = Unpooled.wrappedBuffer(bytes);
         writing = Unpooled.buffer(bytes.length);
-        message = ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
+        message = SchemaSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
     }
 
     @Benchmark
     public Map<String, Object> benchmarkDeserialize()
     {
         reading.readerIndex(0);
-        return ConfiguredSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
+        return SchemaSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
     }
 
     @Benchmark
     public ByteBuf benchmarkSerialize()
     {
         writing.clear();
-        ConfiguredSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
+        SchemaSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
         return writing;
     }
 
     public static void main(String[] args) throws RunnerException
     {
         Options options = new OptionsBuilder()
-                .include(ConfiguredSerializerBenchmark.class.getSimpleName())
+                .include(SchemaSerializerBenchmark.class.getSimpleName())
                 .build();
         new Runner(options).run();
     }

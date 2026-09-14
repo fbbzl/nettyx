@@ -4,9 +4,9 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.fz.nettyx.serializer.schema.parser.JsonStructConfigParser;
-import org.fz.nettyx.serializer.schema.parser.XmlStructConfigParser;
-import org.fz.nettyx.serializer.schema.parser.YamlStructConfigParser;
+import org.fz.nettyx.serializer.schema.parser.JsonSchemaParser;
+import org.fz.nettyx.serializer.schema.parser.XmlSchemaParser;
+import org.fz.nettyx.serializer.schema.parser.YamlSchemaParser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,13 +29,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2026-08-16
  */
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ConfiguredStructRegistry
+public class SchemaRegistry
 {
 
-    Map<String, ConfigStruct>         structCache;
-    Map<String, ConfiguredSerializer> serializerCache = new ConcurrentHashMap<>();
+    Map<String, Schema>         structCache;
+    Map<String, SchemaSerializer> serializerCache = new ConcurrentHashMap<>();
 
-    private ConfiguredStructRegistry(Map<String, ConfigStruct> structCache)
+    private SchemaRegistry(Map<String, Schema> structCache)
     {
         this.structCache = structCache;
     }
@@ -45,16 +45,16 @@ public class ConfiguredStructRegistry
      * {@code classpath:} prefixed resources, or file paths; the extension selects JSON for
      * {@code .json}, YAML for {@code .yaml}/{@code .yml}, and XML otherwise.
      */
-    public static ConfiguredStructRegistry load(String... locations)
+    public static SchemaRegistry load(String... locations)
     {
         if (locations == null || locations.length == 0)
             throw new StructDefinitionException("at least one struct config location is required");
 
-        Map<String, ConfigStruct> structs = new LinkedHashMap<>();
+        Map<String, Schema> structs = new LinkedHashMap<>();
         for (String location : locations) {
             try (InputStream input = openStream(location)) {
-                Map<String, ConfigStruct> parsed = parseResource(location, input);
-                for (Map.Entry<String, ConfigStruct> entry : parsed.entrySet()) {
+                Map<String, Schema> parsed = parseResource(location, input);
+                for (Map.Entry<String, Schema> entry : parsed.entrySet()) {
                     if (structs.put(entry.getKey(), entry.getValue()) != null)
                         throw new StructDefinitionException("duplicated struct [" + entry.getKey() + "], location: [" + location + "]");
                 }
@@ -70,20 +70,20 @@ public class ConfiguredStructRegistry
         resolveReferences(structs);
         checkCycles(structs);
 
-        return new ConfiguredStructRegistry(structs);
+        return new SchemaRegistry(structs);
     }
 
     /**
      * get struct by fully qualified name {@code namespace.name}, a bare name is also accepted
      * when it is unique among all namespaces
      */
-    public ConfigStruct require(String structName)
+    public Schema require(String structName)
     {
-        ConfigStruct struct = structCache.get(structName);
+        Schema struct = structCache.get(structName);
         if (struct != null) return struct;
 
-        ConfigStruct matched = null;
-        for (ConfigStruct candidate : structCache.values()) {
+        Schema matched = null;
+        for (Schema candidate : structCache.values()) {
             if (!candidate.name().equals(structName)) continue;
             if (matched != null)
                 throw new StructDefinitionException(
@@ -96,14 +96,14 @@ public class ConfiguredStructRegistry
         return matched;
     }
 
-    ConfiguredSerializer serializer(String structName)
+    SchemaSerializer serializer(String structName)
     {
-        return serializerCache.computeIfAbsent(structName, name -> new ConfiguredSerializer(this, name));
+        return serializerCache.computeIfAbsent(structName, name -> new SchemaSerializer(this, name));
     }
 
-    private static void resolveReferences(Map<String, ConfigStruct> structs)
+    private static void resolveReferences(Map<String, Schema> structs)
     {
-        for (ConfigStruct struct : structs.values()) {
+        for (Schema struct : structs.values()) {
             for (SchemaField field : struct.fields()) {
                 String structRef = structRefOf(field);
                 if (structRef == null) continue;
@@ -118,13 +118,13 @@ public class ConfiguredStructRegistry
         }
     }
 
-    private static void checkCycles(Map<String, ConfigStruct> structs)
+    private static void checkCycles(Map<String, Schema> structs)
     {
         Set<String> visited = new HashSet<>();
         for (String fqName : structs.keySet()) visit(fqName, structs, visited, new ArrayDeque<>());
     }
 
-    private static void visit(String fqName, Map<String, ConfigStruct> structs, Set<String> visited, Deque<String> path)
+    private static void visit(String fqName, Map<String, Schema> structs, Set<String> visited, Deque<String> path)
     {
         if (visited.contains(fqName)) return;
         if (path.contains(fqName))
@@ -167,12 +167,12 @@ public class ConfiguredStructRegistry
         throw new SerializeException("struct config location not found: [" + location + "]");
     }
 
-    private static Map<String, ConfigStruct> parseResource(String location, InputStream input)
+    private static Map<String, Schema> parseResource(String location, InputStream input)
     {
         String normalizedLocation = location.toLowerCase(Locale.ROOT);
-        if (normalizedLocation.endsWith(".json")) return new JsonStructConfigParser().parse(location, input);
+        if (normalizedLocation.endsWith(".json")) return new JsonSchemaParser().parse(location, input);
         if (normalizedLocation.endsWith(".yaml") || normalizedLocation.endsWith(".yml"))
-            return new YamlStructConfigParser().parse(location, input);
-        return new XmlStructConfigParser().parse(location, input);
+            return new YamlSchemaParser().parse(location, input);
+        return new XmlSchemaParser().parse(location, input);
     }
 }

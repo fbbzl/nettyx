@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class XmlStructConfigParserTest {
+public class XmlSchemaParserTest {
 
     @Test
     public void declaredDoctypeLoadsBundledDtd() throws Exception {
@@ -25,12 +25,12 @@ public class XmlStructConfigParserTest {
                 return resource;
             }
         };
-        String xml = "<!DOCTYPE structs PUBLIC \"" + XmlStructConfigParser.DOCTYPE_PUBLIC_ID
-                     + "\" \"" + XmlStructConfigParser.DOCTYPE_SYSTEM_ID + "\">"
+        String xml = "<!DOCTYPE structs PUBLIC \"" + XmlSchemaParser.DOCTYPE_PUBLIC_ID
+                     + "\" \"" + XmlSchemaParser.DOCTYPE_SYSTEM_ID + "\">"
                      + "<structs namespace=\"bundled\"><struct name=\"Empty\"/></structs>";
         try (InputStream input = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
             thread.setContextClassLoader(tracking);
-            assertNotNull(new XmlStructConfigParser().parse("bundled-dtd-test", input).get("bundled.Empty"));
+            assertNotNull(new XmlSchemaParser().parse("bundled-dtd-test", input).get("bundled.Empty"));
             assertTrue("Parsing must open the bundled DTD, not silently use an empty fallback", loaded.get());
         }
         finally {
