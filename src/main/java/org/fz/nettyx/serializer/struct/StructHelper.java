@@ -1,24 +1,18 @@
 package org.fz.nettyx.serializer.struct;
 
-import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.util.ModifierUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.struct.annotation.Ignore;
-import org.fz.nettyx.serializer.struct.annotation.Struct;
-import org.fz.nettyx.serializer.struct.annotation.Struct.Endian;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 
 import java.lang.reflect.*;
 import java.nio.ByteOrder;
 
 import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.*;
+import static org.fz.nettyx.serializer.struct.StructContext.*;
 import static org.fz.nettyx.serializer.struct.generator.StructAccessorFactory.get;
 
 
@@ -32,33 +26,6 @@ import static org.fz.nettyx.serializer.struct.generator.StructAccessorFactory.ge
 @SuppressWarnings("unchecked")
 @UtilityClass
 public class StructHelper {
-
-    public static int findBasicSize(Type basicClass) {
-        Type raw = basicClass instanceof ParameterizedType parameterizedtype ? parameterizedtype.getRawType() : basicClass;
-        Integer size = BASIC_SIZE_CACHE.get(raw);
-        if (size == null) throw new SerializeException("uncached basic type: " + basicClass);
-        return size;
-    }
-
-    public static ByteOrder getByteOrder(Class<?> clazz) {
-        Struct annotation = AnnotationUtil.getAnnotation(clazz, Struct.class);
-        if (annotation == null) return Endian.NATIVE.getByteOrder();
-
-        return annotation.endian().getByteOrder();
-    }
-
-    public static int reflectForSize(Class<? extends Basic<?>> basicClass)
-    {
-        ByteBuf fillingBuf = Unpooled.wrappedBuffer(new byte[128]);
-        try
-        {
-            return newBasic(basicClass, ByteOrder.nativeOrder(), fillingBuf).size();
-        }
-        finally
-        {
-            fillingBuf.skipBytes(fillingBuf.readableBytes()).release();
-        }
-    }
 
     /**
      * New basic instance t.
@@ -81,8 +48,10 @@ public class StructHelper {
         catch (Exception instanceError)
         {
             Throwable cause = instanceError.getCause();
-            if (instanceError instanceof TooLessBytesException tooLessBytes) throw tooLessBytes;
-            if (cause instanceof TooLessBytesException tooLessBytes) throw tooLessBytes;
+            if (instanceError instanceof TooLessBytesException tooLessBytes)
+                throw tooLessBytes;
+            if (cause instanceof TooLessBytesException tooLessBytes)
+                throw tooLessBytes;
             else
                 throw new SerializeException("basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", instanceError);
         }
@@ -99,9 +68,11 @@ public class StructHelper {
     {
         try
         {
-            StructSerializerContext.StructDefinition definition = getStructDefinition(structType);
-            if (definition == null) throw new SerializeException("uncached struct type: " + structType);
-            return (S) get(definition).newInstance();
+            StructContext.StructDefinition definition = getStructDefinition(structType);
+            if (definition == null)
+                throw new SerializeException("uncached struct type: " + structType);
+            return
+                (S) get(definition).newInstance();
         }
         catch (Exception instanceError)
         {
@@ -109,23 +80,4 @@ public class StructHelper {
         }
     }
 
-    public static boolean legalStructField(Field field)
-    {
-        return !Modifier.isStatic(field.getModifiers()) && !isIgnore(field);
-    }
-
-    public static boolean isIgnore(Field field)
-    {
-        return hasAnnotation(field, Ignore.class) || hasModifier(field, ModifierUtil.ModifierType.TRANSIENT);
-    }
-
-    public static <T> T[] newArray(Type componentType, int length)
-    {
-        return switch (componentType)
-        {
-            case Class<?>          clazz             -> (T[]) Array.newInstance(clazz, length);
-            case ParameterizedType parameterizedType -> (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
-            default                                  -> (T[]) Array.newInstance(Object.class, length);
-        };
-    }
 }

@@ -10,10 +10,10 @@ import org.fz.nettyx.beanmodel.valid.BasicArrayBean;
 import org.fz.nettyx.beanmodel.valid.FlexibleBasicArrayBean;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.struct.StructContext;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,14 +23,14 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
+import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
 public class StructAccessorSupportCoverageTest {
 
     @BeforeClass
     public static void scanModels() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.support", "org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.support", "org.fz.nettyx.beanmodel.valid");
     }
 
     @Test

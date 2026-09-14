@@ -15,7 +15,7 @@ public class PrimitiveStructAccessorTest {
 
     @BeforeClass
     public static void scanPrimitiveModels() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.primitive");
+        new StructContext("org.fz.nettyx.beanmodel.primitive");
     }
 
     @Test

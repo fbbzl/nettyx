@@ -1,5 +1,6 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,11 @@ public @interface Struct {
 
         ByteOrder byteOrder;
 
+        public static ByteOrder getByteOrder(Class<?> clazz) {
+            Struct annotation = AnnotationUtil.getAnnotation(clazz, Struct.class);
+            if (annotation == null) return NATIVE.getByteOrder();
+
+            return annotation.endian().getByteOrder();
+        }
     }
 }

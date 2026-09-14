@@ -26,11 +26,8 @@ public enum SerialParityBit {
     }
 
     public static SerialParityBit valueOf(int value) {
-        for (SerialParityBit parityBit : values()) {
-            if (parityBit.value == value) {
-                return parityBit;
-            }
-        }
+        for (SerialParityBit parityBit : values()) if (parityBit.value == value) return parityBit;
+
         throw new UnknownConfigException(SerialParityBit.class.getSimpleName(), value);
     }
 }

@@ -1,0 +1,29 @@
+{
+  "namespace": "device",
+  "structs": [
+    {
+      "name": "Device",
+      "endian": "LE",
+      "fields": [
+        { "name": "id", "type": "cint" },
+        { "name": "speed", "type": "cushort" },
+        { "name": "temperature", "type": "cdouble" },
+        { "name": "name", "type": "char", "length": 8 },
+        { "name": "raw", "type": "byte", "length": 2 },
+        { "name": "values", "type": "cshort", "array": 3 },
+        { "name": "gps", "struct": "geo.GpsPoint" }
+      ]
+    },
+    {
+      "name": "Flexible",
+      "endian": "BE",
+      "fields": [
+        { "name": "head", "type": "cuchar" },
+        { "name": "tail", "type": "cushort", "array": "*" }
+      ]
+    },
+    {
+      "name": "Empty"
+    }
+  ]
+}

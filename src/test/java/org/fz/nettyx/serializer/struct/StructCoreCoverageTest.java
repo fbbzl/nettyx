@@ -14,17 +14,20 @@ import org.fz.nettyx.coveragemodel.InvalidNestedStructs;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.Ignore;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
-import org.fz.nettyx.serializer.struct.basic.Basic;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.Basic;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -36,16 +39,16 @@ import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_FIELD_HANDLER;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
+import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
 public class StructCoreCoverageTest {
 
     @BeforeClass
     public static void scanModels() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.support",
-                                    "org.fz.nettyx.beanmodel.valid",
-                                    "org.fz.nettyx.codec.model");
+        new StructContext("org.fz.nettyx.beanmodel.support",
+                          "org.fz.nettyx.beanmodel.valid",
+                          "org.fz.nettyx.codec.model");
     }
 
     @Test
@@ -173,39 +176,39 @@ public class StructCoreCoverageTest {
     @Test
     public void helperCoversLookupConstructionFieldAndArraySemantics() throws Exception {
         ParameterizedType parameterizedCint = parameterized(cint.class);
-        assertEquals(4, StructHelper.findBasicSize(cint.class));
-        assertEquals(4, StructHelper.findBasicSize(parameterizedCint));
-        assertThrows(SerializeException.class, () -> StructHelper.findBasicSize(String.class));
-        assertEquals(ByteOrder.nativeOrder(), StructHelper.getByteOrder(Unannotated.class));
-        assertEquals(ByteOrder.BIG_ENDIAN, StructHelper.getByteOrder(BigEndianLeaf.class));
+        assertEquals(4, StructContext.getBasicSize(cint.class));
+        assertEquals(4, StructContext.getBasicSize(parameterizedCint));
+        assertThrows(SerializeException.class, () -> StructContext.getBasicSize(String.class));
+        assertEquals(ByteOrder.nativeOrder(), Struct.Endian.getByteOrder(Unannotated.class));
+        assertEquals(ByteOrder.BIG_ENDIAN, Struct.Endian.getByteOrder(BigEndianLeaf.class));
 
-        assertEquals(cint[].class, StructHelper.newArray(cint.class, 2).getClass());
-        assertEquals(GenericBox[].class, StructHelper.newArray(parameterized(GenericBox.class), 1).getClass());
-        assertEquals(Object[].class, StructHelper.newArray(unknownType(), 0).getClass());
+        assertEquals(cint[].class, ToArray.ToArrayHandler.newArray(cint.class, 2).getClass());
+        assertEquals(GenericBox[].class, ToArray.ToArrayHandler.newArray(parameterized(GenericBox.class), 1).getClass());
+        assertEquals(Object[].class, ToArray.ToArrayHandler.newArray(unknownType(), 0).getClass());
         assertThrows(SerializeException.class, () -> StructHelper.newStruct(String.class));
 
-        assertTrue(StructHelper.legalStructField(FieldKinds.class.getDeclaredField("normal")));
-        assertFalse(StructHelper.legalStructField(FieldKinds.class.getDeclaredField("staticValue")));
-        assertFalse(StructHelper.legalStructField(FieldKinds.class.getDeclaredField("ignored")));
-        assertFalse(StructHelper.legalStructField(FieldKinds.class.getDeclaredField("transientValue")));
-        assertFalse(StructHelper.isIgnore(FieldKinds.class.getDeclaredField("normal")));
-        assertTrue(StructHelper.isIgnore(FieldKinds.class.getDeclaredField("ignored")));
-        assertTrue(StructHelper.isIgnore(FieldKinds.class.getDeclaredField("transientValue")));
+        assertTrue(StructField.legalStructField(FieldKinds.class.getDeclaredField("normal")));
+        assertFalse(StructField.legalStructField(FieldKinds.class.getDeclaredField("staticValue")));
+        assertFalse(StructField.legalStructField(FieldKinds.class.getDeclaredField("ignored")));
+        assertFalse(StructField.legalStructField(FieldKinds.class.getDeclaredField("transientValue")));
+        assertFalse(StructField.isIgnore(FieldKinds.class.getDeclaredField("normal")));
+        assertTrue(StructField.isIgnore(FieldKinds.class.getDeclaredField("ignored")));
+        assertTrue(StructField.isIgnore(FieldKinds.class.getDeclaredField("transientValue")));
 
-        BiFunction<ByteBuf, ByteOrder, ?> original = StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.get(cint.class);
+        BiFunction<ByteBuf, ByteOrder, ?> original = StructContext.BASIC_CONSTRUCTOR_CACHE.get(cint.class);
         try {
-            StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class,
-                    (buf, order) -> { throw new RuntimeException(new TooLessBytesException(4, buf.readableBytes())); });
+            StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class,
+                                                      (buf, order) -> { throw new RuntimeException(new TooLessBytesException(4, buf.readableBytes())); });
             assertThrows(TooLessBytesException.class,
                          () -> StructHelper.newBasic(cint.class, ByteOrder.BIG_ENDIAN, Unpooled.EMPTY_BUFFER));
 
-            StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class,
-                    (buf, order) -> { throw new IllegalStateException("constructor failure"); });
+            StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class,
+                                                      (buf, order) -> { throw new IllegalStateException("constructor failure"); });
             assertThrows(SerializeException.class,
                          () -> StructHelper.newBasic(cint.class, ByteOrder.BIG_ENDIAN, Unpooled.EMPTY_BUFFER));
         }
         finally {
-            StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, original);
+            StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, original);
         }
     }
 
@@ -250,21 +253,21 @@ public class StructCoreCoverageTest {
 
     @Test
     public void handlerAnnotationResolutionIgnoresUnrelatedInterfacesAndSupportsInheritance() {
-        assertEquals(TestHandlerAnnotation.class, StructSerializerContext.getTargetAnnotationType(MultiInterfaceHandler.class));
-        assertEquals(TestHandlerAnnotation.class, StructSerializerContext.getTargetAnnotationType(InheritedHandler.class));
-        assertNull(StructSerializerContext.getTargetAnnotationType(GenericHandler.class));
-        assertNull(StructSerializerContext.getTargetAnnotationType(StructFieldHandler.class));
+        assertEquals(TestHandlerAnnotation.class, StructContext.getTargetAnnotationType(MultiInterfaceHandler.class));
+        assertEquals(TestHandlerAnnotation.class, StructContext.getTargetAnnotationType(InheritedHandler.class));
+        assertNull(StructContext.getTargetAnnotationType(GenericHandler.class));
+        assertNull(StructContext.getTargetAnnotationType(StructFieldHandler.class));
     }
 
     @Test
     public void contextValidationCoversInvalidStructAndBasicDefinitions() {
-        new StructSerializerContext("java.lang");
-        assertTrue(StructSerializerContext.isScannableClass(AccessorBean.class));
-        assertFalse(StructSerializerContext.isScannableClass(String.class));
-        assertFalse(StructSerializerContext.isScannableClass(Integer.class));
-        assertFalse(StructSerializerContext.isScannableClass(StructFieldHandler.class));
-        assertFalse(StructSerializerContext.isScannableClass(AbstractCoverageStruct.class));
-        assertFalse(StructSerializerContext.isScannableClass(null));
+        new StructContext("java.lang");
+        assertTrue(StructContext.isScannableClass(AccessorBean.class));
+        assertFalse(StructContext.isScannableClass(String.class));
+        assertFalse(StructContext.isScannableClass(Integer.class));
+        assertFalse(StructContext.isScannableClass(StructFieldHandler.class));
+        assertFalse(StructContext.isScannableClass(AbstractCoverageStruct.class));
+        assertFalse(StructContext.isScannableClass(null));
         ExposedContext context = new ExposedContext();
 
         context.scanBasicTypes(Set.of(String.class, Basic.class));
@@ -285,11 +288,11 @@ public class StructCoreCoverageTest {
                 PlainBean.class.getDeclaredField("value"));
         StructField handled = new StructField(ByteOrder.BIG_ENDIAN,
                 HandledBean.class.getDeclaredField("value"));
-        assertEquals(StructField.Category.HANDLER, basicBase.category());
-        assertEquals(StructField.Category.HANDLER, plain.category());
-        assertEquals(StructField.Category.HANDLER, handled.category());
+        assertEquals(StructDefinition.Category.HANDLER, basicBase.category());
+        assertEquals(StructDefinition.Category.HANDLER, plain.category());
+        assertEquals(StructDefinition.Category.HANDLER, handled.category());
 
-        java.lang.reflect.Field typeResolver = StructField.class.getDeclaredField("type");
+        Field typeResolver = StructField.class.getDeclaredField("type");
         typeResolver.setAccessible(true);
         Object original = typeResolver.get(basicField);
         try {
@@ -363,7 +366,7 @@ public class StructCoreCoverageTest {
     }
 
     private static void assertInvalidProperty(Class<?> beanType) throws Exception {
-        java.lang.reflect.Field field = beanType.getDeclaredField("value");
+        Field field = beanType.getDeclaredField("value");
         assertThrows(SerializeException.class, () -> new StructField(ByteOrder.BIG_ENDIAN, field));
     }
 
@@ -372,7 +375,7 @@ public class StructCoreCoverageTest {
     }
 
     private static class WildcardHolder {
-        java.util.List<? extends BigEndianLeaf> values;
+        List<? extends BigEndianLeaf> values;
     }
 
     private static class Unannotated {
@@ -402,7 +405,8 @@ public class StructCoreCoverageTest {
     private static class InheritedHandler extends GenericHandler<TestHandlerAnnotation> {
     }
 
-    private static class ExposedContext extends StructSerializerContext {
+    private static class ExposedContext extends StructContext
+    {
         ExposedContext() {
             super("package.that.does.not.exist");
         }

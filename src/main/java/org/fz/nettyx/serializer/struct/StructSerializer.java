@@ -8,8 +8,9 @@ import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
+import org.fz.nettyx.serializer.basic.Basic;
 import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
 
 import java.lang.reflect.ParameterizedType;
@@ -21,8 +22,8 @@ import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static org.fz.nettyx.serializer.struct.StructHelper.*;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEFINITION_CACHE;
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
+import static org.fz.nettyx.serializer.struct.StructContext.STRUCT_DEFINITION_CACHE;
+import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 
 /**
  * the struct serializer
@@ -130,7 +131,7 @@ public final class StructSerializer implements Serializer {
             boolean   flexible)
     {
         if (!flexible) {
-            B[] basics = newArray(elementType, length);
+            B[] basics = ToArray.ToArrayHandler.newArray(elementType, length);
             for (int i = 0; i < length; i++) basics[i] = newBasic(elementType, byteOrder, byteBuf);
             return basics;
         }
@@ -141,7 +142,7 @@ public final class StructSerializer implements Serializer {
                 flexibleBasics.add(newBasic(elementType, byteOrder, byteBuf));
                 ensureReadProgress(elementType, byteBuf, readerIndex);
             }
-            return flexibleBasics.toArray(newArray(elementType, flexibleBasics.size()));
+            return flexibleBasics.toArray(ToArray.ToArrayHandler.newArray(elementType, flexibleBasics.size()));
         }
     }
 
@@ -152,7 +153,7 @@ public final class StructSerializer implements Serializer {
             boolean flexible)
     {
         if (!flexible) {
-            S[] structs = newArray(elementType, length);
+            S[] structs = ToArray.ToArrayHandler.newArray(elementType, length);
             for (int i = 0; i < length; i++) structs[i] = readStruct(elementType, byteBuf);
             return structs;
         }
@@ -163,7 +164,7 @@ public final class StructSerializer implements Serializer {
                 flexibleStructs.add(readStruct(elementType, byteBuf));
                 ensureReadProgress(elementType, byteBuf, readerIndex);
             }
-            return flexibleStructs.toArray(newArray(elementType, flexibleStructs.size()));
+            return flexibleStructs.toArray(ToArray.ToArrayHandler.newArray(elementType, flexibleStructs.size()));
         }
     }
 
@@ -195,7 +196,7 @@ public final class StructSerializer implements Serializer {
             ByteOrder byteOrder)
     {
         if (isBasic(componentType))
-            writeBasicArray((Basic<?>[]) arrayValue, StructHelper.findBasicSize(componentType), length, writing, flexible, byteOrder);
+            writeBasicArray((Basic<?>[]) arrayValue, StructContext.getBasicSize(componentType), length, writing, flexible, byteOrder);
         else
         if (isStruct(componentType))
             writeStructArray(arrayValue, componentType, length, writing, flexible);
@@ -233,7 +234,7 @@ public final class StructSerializer implements Serializer {
             ByteBuf writing,
             boolean flexible)
     {
-        T[] structArray = (T[]) defaultIfNull(structArrayValue, () -> newArray(elementType, (flexible ? 0 : length)));
+        T[] structArray = (T[]) defaultIfNull(structArrayValue, () -> ToArray.ToArrayHandler.newArray(elementType, (flexible ? 0 : length)));
 
         for (int i = 0; i < (flexible ? structArray.length : length); i++) {
             if (i < structArray.length)

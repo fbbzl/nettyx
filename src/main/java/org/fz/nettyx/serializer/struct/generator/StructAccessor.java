@@ -2,12 +2,12 @@ package org.fz.nettyx.serializer.struct.generator;
 
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
+import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 
 import java.lang.reflect.Type;
 
@@ -96,7 +96,7 @@ public interface StructAccessor {
             boolean flexible = toArray.flexible();
             Type componentType = componentType(root, field, fieldType);
             if (serializer.isBasic(componentType)) {
-                serializer.writeBasicArray((Basic<?>[]) value, StructHelper.findBasicSize(componentType),
+                serializer.writeBasicArray((Basic<?>[]) value, StructContext.getBasicSize(componentType),
                                            length, buf, flexible, field.byteOrder());
             }
             else {

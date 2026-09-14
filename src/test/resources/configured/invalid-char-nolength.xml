@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<structs namespace="badlen">
+    <struct name="C" endian="BE">
+        <field name="v" type="char"/>
+    </struct>
+</structs>

@@ -4,6 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.fz.nettyx.action.ChannelExceptionAction;
+import org.fz.nettyx.action.ChannelHandlerContextAction;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -104,32 +106,32 @@ public class ActionIdleStateHandlerTest {
 
     private static class ExposedReadTimeout extends ActionReadTimeoutHandler {
         ExposedReadTimeout(long timeout, TimeUnit unit,
-                           org.fz.nettyx.action.ChannelExceptionAction action, boolean fireNext) {
+                           ChannelExceptionAction action, boolean fireNext) {
             super(timeout, unit, action, fireNext);
         }
     }
 
     private static class ExposedWriteTimeout extends ActionWriteTimeoutHandler {
         ExposedWriteTimeout(long timeout, TimeUnit unit,
-                            org.fz.nettyx.action.ChannelExceptionAction action, boolean fireNext) {
+                            ChannelExceptionAction action, boolean fireNext) {
             super(timeout, unit, action, fireNext);
         }
     }
 
     private static class ExposedReadHeart extends IdledHeartBeater.ReadIdleHeartBeater {
-        ExposedReadHeart(int seconds, org.fz.nettyx.action.ChannelHandlerContextAction action) { super(seconds, action); }
+        ExposedReadHeart(int seconds, ChannelHandlerContextAction action) { super(seconds, action); }
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }
         String name() { return stateName(); }
     }
 
     private static class ExposedWriteHeart extends IdledHeartBeater.WriteIdleHeartBeater {
-        ExposedWriteHeart(int seconds, org.fz.nettyx.action.ChannelHandlerContextAction action) { super(seconds, action); }
+        ExposedWriteHeart(int seconds, ChannelHandlerContextAction action) { super(seconds, action); }
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }
         String name() { return stateName(); }
     }
 
     private static class ExposedAllHeart extends IdledHeartBeater.AllIdleHeartBeater {
-        ExposedAllHeart(int seconds, org.fz.nettyx.action.ChannelHandlerContextAction action) { super(seconds, action); }
+        ExposedAllHeart(int seconds, ChannelHandlerContextAction action) { super(seconds, action); }
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }
         String name() { return stateName(); }
     }

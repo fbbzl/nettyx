@@ -70,15 +70,15 @@ public class StructCycleValidationTest {
     public void acceptsReferenceToStructWithoutDefinition() {
         context.scanStructTypes(types(CycleStructs.MissingDefinitionRoot.class));
 
-        assertNotNull(StructSerializerContext.getStructDefinition(CycleStructs.MissingDefinitionRoot.class));
-        assertNull(StructSerializerContext.getStructDefinition(CycleStructs.MissingDefinitionLeaf.class));
+        assertNotNull(StructContext.getStructDefinition(CycleStructs.MissingDefinitionRoot.class));
+        assertNull(StructContext.getStructDefinition(CycleStructs.MissingDefinitionLeaf.class));
     }
 
     @Test
     public void rejectsToArrayOnNonArrayFieldBeforeCycleAnalysis() {
         assertThrows(SerializeException.class,
                      () -> context.scanStructTypes(types(CycleStructs.NonArrayAnnotation.class)));
-        assertNull(StructSerializerContext.getStructDefinition(CycleStructs.NonArrayAnnotation.class));
+        assertNull(StructContext.getStructDefinition(CycleStructs.NonArrayAnnotation.class));
     }
 
     @Test
@@ -87,21 +87,22 @@ public class StructCycleValidationTest {
                                       CycleStructs.AcyclicBranch.class,
                                       CycleStructs.AcyclicLeaf.class));
 
-        assertNotNull(StructSerializerContext.getStructDefinition(CycleStructs.AcyclicRoot.class));
+        assertNotNull(StructContext.getStructDefinition(CycleStructs.AcyclicRoot.class));
     }
 
     private static void assertCycle(String expectedPath, Class<?>... types) {
         StructDefinitionException exception = assertThrows(StructDefinitionException.class,
                                                             () -> context.scanStructTypes(types(types)));
         assertTrue(exception.getMessage(), exception.getMessage().contains(expectedPath));
-        for (Class<?> type : types) assertNull(StructSerializerContext.getStructDefinition(type));
+        for (Class<?> type : types) assertNull(StructContext.getStructDefinition(type));
     }
 
     private static Set<Class<?>> types(Class<?>... types) {
         return new LinkedHashSet<>(Set.of(types));
     }
 
-    private static class ExposedContext extends StructSerializerContext {
+    private static class ExposedContext extends StructContext
+    {
         ExposedContext() {
             super("package.that.does.not.exist");
         }

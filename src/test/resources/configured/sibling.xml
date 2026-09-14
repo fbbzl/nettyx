@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
+<structs namespace="sibling">
+    <struct name="Header" endian="BE">
+        <field name="magic" type="cuint"/>
+    </struct>
+    <struct name="Packet" endian="BE">
+        <field name="header" struct="Header"/>
+    </struct>
+</structs>

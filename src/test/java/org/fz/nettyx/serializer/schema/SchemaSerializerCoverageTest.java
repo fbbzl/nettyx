@@ -1,0 +1,240 @@
+package org.fz.nettyx.serializer.schema;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.exception.TooLessBytesException;
+import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
+import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cdouble;
+import org.fz.nettyx.serializer.basic.c.signed.cfloat;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.basic.cpp.cppbool;
+import org.junit.Test;
+
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.*;
+
+/**
+ * @author fengbinbin
+ * @since 2026-09-02
+ */
+public class SchemaSerializerCoverageTest
+{
+
+    private static final SchemaRegistry  REGISTRY = SchemaRegistry.load(
+            "configured/device.xml", "configured/geo.xml");
+    private static final SchemaCodec CODEC    = new SchemaCodec(REGISTRY);
+
+    @Test
+    public void reusableStructUpdatesValuesInPlaceAndRegularMapsAreReplaced()
+    {
+        Map<String, Object> reusable = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{1, 2}), reusable);
+
+        byte[]    raw    = (byte[]) reusable.get("raw");
+        List<?>   values = (List<?>) reusable.get("values");
+        Map<?, ?> gps    = (Map<?, ?>) reusable.get("gps");
+
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{3, 4}), reusable);
+
+        assertEquals(2, reusable.get("id"));
+        assertSame(raw, reusable.get("raw"));
+        assertSame(values, reusable.get("values"));
+        assertSame(gps, reusable.get("gps"));
+        assertArrayEquals(new byte[]{3, 4}, (byte[]) reusable.get("raw"));
+
+        reusable.put("marker", true);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(3, "second", new byte[]{5, 6}), reusable);
+        assertEquals(3, reusable.get("id"));
+        assertTrue(reusable.containsKey("marker"));
+        assertEquals(Boolean.TRUE, reusable.remove("marker"));
+        reusable.clear();
+        assertTrue(reusable.isEmpty());
+
+        Map<String, Object> regular = new LinkedHashMap<>(Map.of("stale", true));
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(4, "plain", new byte[]{7, 8}), regular);
+        assertFalse(regular.containsKey("stale"));
+        assertEquals(4, regular.get("id"));
+    }
+
+    @Test
+    public void flexibleArraysViewsDirectBuffersAndArrayInputsFollowTheirContracts()
+    {
+        Map<String, Object> reusable = SchemaSerializer.newReusableStruct(REGISTRY, "device.Flexible");
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(11, 22, 33), reusable);
+        List<?> tail = (List<?>) reusable.get("tail");
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(44), reusable);
+        assertSame(tail, reusable.get("tail"));
+        assertEquals(List.of(44), reusable.get("tail"));
+
+        SchemaView view = SchemaSerializer.newView(REGISTRY, "device.Device");
+        SchemaSerializer.viewInto(REGISTRY, "device.Device", deviceBuffer(5, "view", new byte[]{9, 10}), view);
+        assertEquals(5, view.get("id"));
+        assertThrows(SerializeException.class, () -> SchemaSerializer.newView(REGISTRY, "device.Flexible"));
+        assertThrows(SerializeException.class, () -> SchemaSerializer.viewInto(
+                REGISTRY, "device.Device", deviceBuffer(6, "other", new byte[]{1, 1}),
+                SchemaSerializer.newView(REGISTRY, "device.BenchmarkDevice")));
+        assertThrows(TooLessBytesException.class,
+                     () -> SchemaSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
+                                                         SchemaSerializer.newView(REGISTRY, "device.Device")));
+
+        ByteBuf direct = Unpooled.directBuffer(4);
+        try {
+            direct.writeBytes(new byte[]{'o', 'k', 0, 0});
+            assertEquals("ok", CODEC.readField(
+                    SchemaField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
+        }
+        finally {
+            direct.release();
+        }
+
+        SchemaField shortArray = SchemaField.basicArray("values", cshort.class, 2, false);
+        ByteBuf     writing    = Unpooled.buffer();
+        CODEC.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
+        assertArrayEquals(new byte[]{1, 0, 2, 0}, readableBytes(writing));
+        writing.clear();
+        CODEC.writeArray(shortArray, new int[]{3, 4}, ByteOrder.LITTLE_ENDIAN, writing);
+        assertArrayEquals(new byte[]{3, 0, 4, 0}, readableBytes(writing));
+        assertThrows(SerializeException.class, () -> CODEC.writeArray(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
+    }
+
+    @Test
+    public void reusableTargetsMustMatchTheirStructAndGenericCollectionsUseIterators()
+    {
+        Map<String, Object> deviceTarget = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
+        assertThrows(SerializeException.class, () -> SchemaSerializer.deserializeInto(
+                REGISTRY, "device.Flexible", flexibleBuffer(1), deviceTarget));
+
+        Map<String, Object> wrongNestedTarget = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
+        deviceTarget.put("gps", wrongNestedTarget);
+        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{1, 2}), deviceTarget);
+        Map<?, ?> gps = (Map<?, ?>) deviceTarget.get("gps");
+        assertNotSame(wrongNestedTarget, gps);
+        assertEquals(100, gps.get("longitude"));
+        assertEquals(200, gps.get("latitude"));
+
+        Collection<Integer> iteratorOnly = new AbstractCollection<>()
+        {
+            @Override
+            public Iterator<Integer> iterator()
+            {
+                return List.of(5, 6).iterator();
+            }
+
+            @Override
+            public int size()
+            {
+                return 2;
+            }
+
+            @Override
+            public Object[] toArray()
+            {
+                throw new AssertionError("writeArray must iterate generic collections");
+            }
+        };
+        ByteBuf writing = Unpooled.buffer();
+        CODEC.writeArray(SchemaField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
+        assertArrayEquals(new byte[]{5, 0, 6, 0}, readableBytes(writing));
+    }
+
+    @Test
+    public void codecReportsMissingBytesAndFixedSizeCacheHandlesNestedShapes()
+    {
+        SchemaField bytes = SchemaField.bytesField("bytes", 2);
+        assertThrows(TooLessBytesException.class,
+                     () -> CODEC.readField(bytes, ByteOrder.BIG_ENDIAN, Unpooled.wrappedBuffer(new byte[]{1})));
+        assertThrows(TooLessBytesException.class,
+                     () -> CODEC.readField(SchemaField.charField("text", 2, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN,
+                                           Unpooled.wrappedBuffer(new byte[]{1})));
+
+        assertTrue(CODEC.fixedSizeOf(REGISTRY.require("device.Device")) > 0);
+        assertEquals(CODEC.fixedSizeOf(REGISTRY.require("device.Device")),
+                     CODEC.fixedSizeOf(REGISTRY.require("device.Device")));
+        assertEquals(-1, CODEC.fixedSizeOf(REGISTRY.require("device.Flexible")));
+    }
+
+    @Test
+    public void basicReadersReportUnderflowAndFallbackTypesStillUseTheirConstructors()
+    {
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cchar.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cuchar.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cshort.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cushort.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cint.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(clong8.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cfloat.class));
+        assertUnderflow(BasicTypeResolver.valueReaderFor(cdouble.class));
+
+        assertEquals(Boolean.TRUE, BasicTypeResolver.valueBasic(cppbool.class, true).value());
+        assertEquals(1, BasicTypeResolver.sizeOf(cppbool.class));
+        ByteBuf input = Unpooled.wrappedBuffer(new byte[]{1});
+        assertEquals(Boolean.TRUE, BasicTypeResolver.readBasic(cppbool.class, ByteOrder.BIG_ENDIAN, input).value());
+    }
+
+    @Test
+    public void resolverRejectsUnknownNamesAndConvertsWriterInputs()
+    {
+        assertThrows(org.fz.nettyx.exception.TypeJudgmentException.class,
+                     () -> BasicTypeResolver.resolve("does_not_exist"));
+
+        ByteBuf writing = Unpooled.buffer();
+        BasicTypeResolver.valueWriterFor(cint.class).write(writing, ByteOrder.BIG_ENDIAN, "42");
+        BasicTypeResolver.valueWriterFor(cshort.class).write(writing, ByteOrder.LITTLE_ENDIAN, "258");
+        assertEquals(42, writing.readInt());
+        assertEquals((short) 258, writing.readShortLE());
+    }
+
+    private static void assertUnderflow(BasicTypeResolver.BasicValueReader reader)
+    {
+        assertThrows(TooLessBytesException.class, () -> reader.read(Unpooled.EMPTY_BUFFER, ByteOrder.BIG_ENDIAN));
+    }
+
+    private static ByteBuf deviceBuffer(int id, String name, byte[] raw)
+    {
+        ByteBuf buffer = Unpooled.buffer();
+        buffer.writeIntLE(id);
+        buffer.writeShortLE(0xAABB);
+        buffer.writeDoubleLE(36.6D);
+        byte[] nameBytes = name.getBytes(StandardCharsets.UTF_8);
+        buffer.writeBytes(nameBytes, 0, Math.min(nameBytes.length, 8));
+        buffer.writeZero(8 - Math.min(nameBytes.length, 8));
+        buffer.writeBytes(raw);
+        buffer.writeShortLE(1);
+        buffer.writeShortLE(2);
+        buffer.writeShortLE(3);
+        buffer.writeInt(100);
+        buffer.writeInt(200);
+        return buffer;
+    }
+
+    private static ByteBuf flexibleBuffer(int... values)
+    {
+        ByteBuf buffer = Unpooled.buffer();
+        buffer.writeByte(0x7F);
+        for (int value : values) buffer.writeShort(value);
+        return buffer;
+    }
+
+    private static byte[] readableBytes(ByteBuf buffer)
+    {
+        byte[] bytes = new byte[buffer.readableBytes()];
+        buffer.getBytes(buffer.readerIndex(), bytes);
+        return bytes;
+    }
+}

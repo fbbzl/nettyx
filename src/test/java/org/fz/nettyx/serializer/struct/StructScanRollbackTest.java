@@ -7,18 +7,18 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.STRUCT_DEFINITION_CACHE;
+import static org.fz.nettyx.serializer.struct.StructContext.STRUCT_DEFINITION_CACHE;
 import static org.junit.Assert.*;
 
 public class StructScanRollbackTest {
 
     @Test
     public void failedScanRestoresStructDefinitionCache() {
-        Map<Class<?>, StructSerializerContext.StructDefinition> before =
+        Map<Class<?>, StructContext.StructDefinition> before =
                 new HashMap<>(STRUCT_DEFINITION_CACHE);
 
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.rollback"));
+                     () -> new StructContext("org.fz.nettyx.beanmodel.rollback"));
 
         assertEquals(before, STRUCT_DEFINITION_CACHE);
         assertFalse(STRUCT_DEFINITION_CACHE.containsKey(AValidRollbackBean.class));

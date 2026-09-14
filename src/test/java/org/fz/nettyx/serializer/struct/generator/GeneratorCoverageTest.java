@@ -5,9 +5,9 @@ import io.netty.buffer.Unpooled;
 import org.fz.nettyx.beanmodel.coverage.BytecodeCoverageStruct;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.asm.MethodVisitor;
@@ -19,14 +19,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
+import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
 public class GeneratorCoverageTest {
 
     @BeforeClass
     public static void scanCoverageModel() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.coverage");
+        new StructContext("org.fz.nettyx.beanmodel.coverage");
     }
 
     @Test

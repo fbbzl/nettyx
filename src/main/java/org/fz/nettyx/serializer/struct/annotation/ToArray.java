@@ -6,16 +6,13 @@ import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.StructFieldHandlerException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 
 import static cn.hutool.core.util.ReflectUtil.getFields;
 import static java.lang.annotation.ElementType.FIELD;
@@ -46,6 +43,7 @@ public @interface ToArray {
     boolean flexible() default false;
 
     class ToArrayHandler implements StructFieldHandler<ToArray> {
+
         @Override
         public boolean isSingleton()
         {
@@ -95,6 +93,17 @@ public @interface ToArray {
             serializer.writeArray(fieldVal, componentType, length, writing, flexible, field.byteOrder());
         }
 
+        @SuppressWarnings("unchecked")
+        public static <T> T[] newArray(Type componentType, int length)
+        {
+            return switch (componentType)
+            {
+                case Class<?>          clazz             -> (T[]) Array.newInstance(clazz, length);
+                case ParameterizedType parameterizedType -> (T[]) Array.newInstance((Class<?>) parameterizedType.getRawType(), length);
+                default                                  -> (T[]) Array.newInstance(Object.class, length);
+            };
+        }
+
         public static Type getComponentType(Type root, Type type)
         {
             return switch (type)
@@ -113,7 +122,7 @@ public @interface ToArray {
             if (toArray.length() < 0 && !toArray.flexible())
                 throw new StructFieldHandlerException("array field must use @ToArray to assign array length or be flexible");
             if (toArray.flexible()) {
-                Field[] structFields = getFields(field.getDeclaringClass(), StructHelper::legalStructField);
+                Field[] structFields = getFields(field.getDeclaringClass(), StructField::legalStructField);
 
                 if (!structFields[structFields.length - 1].equals(field)) {
                     throw new StructFieldHandlerException("flexible array field must be the last field");

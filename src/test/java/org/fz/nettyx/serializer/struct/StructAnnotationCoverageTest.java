@@ -8,11 +8,11 @@ import org.fz.nettyx.beanmodel.valid.FlexibleGenericBasicArrayBean;
 import org.fz.nettyx.exception.StructFieldHandlerException;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.Chunk;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.annotation.ToCharSequence;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,14 +21,14 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.nio.charset.UnsupportedCharsetException;
 
-import static org.fz.nettyx.serializer.struct.StructSerializerContext.getStructDefinition;
+import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
 public class StructAnnotationCoverageTest {
 
     @BeforeClass
     public static void scanModels() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
     }
 
     @Test

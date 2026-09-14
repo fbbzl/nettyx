@@ -7,7 +7,7 @@ import org.fz.nettyx.beanmodel.valid.BasicArrayBean;
 import org.fz.nettyx.beanmodel.valid.FlexibleBasicArrayBean;
 import org.fz.nettyx.beanmodel.valid.InheritedAccessorBean;
 import org.fz.nettyx.exception.SerializeException;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.Test;
 
 import java.nio.ByteOrder;
@@ -21,7 +21,7 @@ public class StructBeanValidationTest {
 
     @Test
     public void generatedAccessorCallsBeanGetterAndSetter() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
 
         AccessorBean decoded = toStruct(AccessorBean.class,
                                         Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 42}));
@@ -44,7 +44,7 @@ public class StructBeanValidationTest {
 
     @Test
     public void inheritedBeanAccessorsAreSupported() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
 
         InheritedAccessorBean decoded = toStruct(InheritedAccessorBean.class,
                                                   Unpooled.wrappedBuffer(new byte[]{42, 0, 0, 0}));
@@ -53,7 +53,7 @@ public class StructBeanValidationTest {
 
     @Test
     public void littleEndianStructSerializesLeastSignificantByteFirst() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
         InheritedAccessorBean value = new InheritedAccessorBean();
         value.setInherited(new cint(42));
 
@@ -71,9 +71,9 @@ public class StructBeanValidationTest {
 
     @Test
     public void concreteBasicArrayDoesNotUseConstructorCacheAtRuntime() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
         BiFunction<ByteBuf, ByteOrder, ?> constructor =
-                StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.remove(cint.class);
+                StructContext.BASIC_CONSTRUCTOR_CACHE.remove(cint.class);
         try {
             BasicArrayBean decoded = toStruct(BasicArrayBean.class,
                                               Unpooled.wrappedBuffer(new byte[]{
@@ -84,15 +84,15 @@ public class StructBeanValidationTest {
             assertEquals(Integer.valueOf(2), decoded.getValues()[1].value());
         }
         finally {
-            StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, constructor);
+            StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, constructor);
         }
     }
 
     @Test
     public void flexibleConcreteBasicArrayDoesNotUseConstructorCacheAtRuntime() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.valid");
+        new StructContext("org.fz.nettyx.beanmodel.valid");
         BiFunction<ByteBuf, ByteOrder, ?> constructor =
-                StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.remove(cint.class);
+                StructContext.BASIC_CONSTRUCTOR_CACHE.remove(cint.class);
         try {
             FlexibleBasicArrayBean decoded = toStruct(FlexibleBasicArrayBean.class,
                                                       Unpooled.wrappedBuffer(new byte[]{
@@ -104,37 +104,37 @@ public class StructBeanValidationTest {
             assertEquals(Integer.valueOf(2), decoded.getValues()[1].value());
         }
         finally {
-            StructSerializerContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, constructor);
+            StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, constructor);
         }
     }
 
     @Test
     public void missingGetterIsRejectedDuringScan() {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.missinggetter"));
+                     () -> new StructContext("org.fz.nettyx.beanmodel.missinggetter"));
     }
 
     @Test
     public void missingSetterIsRejectedDuringScan() {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.missingsetter"));
+                     () -> new StructContext("org.fz.nettyx.beanmodel.missingsetter"));
     }
 
     @Test
     public void nonVoidSetterIsRejectedDuringScan() {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.wrongsetter"));
+                     () -> new StructContext("org.fz.nettyx.beanmodel.wrongsetter"));
     }
 
     @Test
     public void toArrayOnNonArrayFieldIsRejectedDuringScan() {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.invalidarray"));
+                     () -> new StructContext("org.fz.nettyx.beanmodel.invalidarray"));
     }
 
     @Test
     public void incompatibleCharSequenceFieldIsRejectedDuringScan() {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.beanmodel.invalidcharsequence"));
+                     () -> new StructContext("org.fz.nettyx.beanmodel.invalidcharsequence"));
     }
 }

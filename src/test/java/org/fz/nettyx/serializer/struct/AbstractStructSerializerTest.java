@@ -21,7 +21,7 @@ public abstract class AbstractStructSerializerTest {
     @BeforeClass
     public static void init()
     {
-        new StructSerializerContext("org.fz.nettyx.codec.model");
+        new StructContext("org.fz.nettyx.codec.model");
     }
 
     protected static void assertRoundTrip(TypeReference<?> typeRef, byte[] bytes)

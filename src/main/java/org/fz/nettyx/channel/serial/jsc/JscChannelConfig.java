@@ -1,7 +1,11 @@
 package org.fz.nettyx.channel.serial.jsc;
 
 
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.MessageSizeEstimator;
+import io.netty.channel.RecvByteBufAllocator;
+import io.netty.channel.WriteBufferWaterMark;
 import org.fz.nettyx.channel.serial.*;
 
 import java.util.Map;
@@ -46,10 +50,10 @@ public interface JscChannelConfig extends SerialChannelConfig {
     JscChannelConfig setWriteSpinCount(int writeSpinCount);
 
     @Override
-    JscChannelConfig setAllocator(io.netty.buffer.ByteBufAllocator allocator);
+    JscChannelConfig setAllocator(ByteBufAllocator allocator);
 
     @Override
-    JscChannelConfig setRecvByteBufAllocator(io.netty.channel.RecvByteBufAllocator allocator);
+    JscChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator);
 
     @Override
     JscChannelConfig setAutoRead(boolean autoRead);
@@ -64,10 +68,10 @@ public interface JscChannelConfig extends SerialChannelConfig {
     JscChannelConfig setWriteBufferLowWaterMark(int writeBufferLowWaterMark);
 
     @Override
-    JscChannelConfig setWriteBufferWaterMark(io.netty.channel.WriteBufferWaterMark writeBufferWaterMark);
+    JscChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark);
 
     @Override
-    JscChannelConfig setMessageSizeEstimator(io.netty.channel.MessageSizeEstimator estimator);
+    JscChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator);
 
     /**
      * @author fengbinbin
@@ -197,13 +201,13 @@ public interface JscChannelConfig extends SerialChannelConfig {
         }
 
         @Override
-        public JscChannelConfig setAllocator(io.netty.buffer.ByteBufAllocator allocator) {
+        public JscChannelConfig setAllocator(ByteBufAllocator allocator) {
             super.setAllocator(allocator);
             return this;
         }
 
         @Override
-        public JscChannelConfig setRecvByteBufAllocator(io.netty.channel.RecvByteBufAllocator allocator) {
+        public JscChannelConfig setRecvByteBufAllocator(RecvByteBufAllocator allocator) {
             super.setRecvByteBufAllocator(allocator);
             return this;
         }
@@ -233,13 +237,13 @@ public interface JscChannelConfig extends SerialChannelConfig {
         }
 
         @Override
-        public JscChannelConfig setWriteBufferWaterMark(io.netty.channel.WriteBufferWaterMark writeBufferWaterMark) {
+        public JscChannelConfig setWriteBufferWaterMark(WriteBufferWaterMark writeBufferWaterMark) {
             super.setWriteBufferWaterMark(writeBufferWaterMark);
             return this;
         }
 
         @Override
-        public JscChannelConfig setMessageSizeEstimator(io.netty.channel.MessageSizeEstimator estimator) {
+        public JscChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator) {
             super.setMessageSizeEstimator(estimator);
             return this;
         }

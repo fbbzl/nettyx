@@ -11,8 +11,8 @@ import org.fz.nettyx.beanmodel.valid.FlexibleGenericBasicArrayBean;
 import org.fz.nettyx.codec.model.GenericBox;
 import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,8 +26,8 @@ public class GenericSemanticCoverageTest {
 
     @BeforeClass
     public static void scanGenericModels() {
-        new StructSerializerContext("org.fz.nettyx.beanmodel.generic", "org.fz.nettyx.beanmodel.valid",
-                                    "org.fz.nettyx.codec.model");
+        new StructContext("org.fz.nettyx.beanmodel.generic", "org.fz.nettyx.beanmodel.valid",
+                          "org.fz.nettyx.codec.model");
     }
 
     @Test

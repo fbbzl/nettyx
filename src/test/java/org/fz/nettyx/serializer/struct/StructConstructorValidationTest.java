@@ -11,13 +11,13 @@ public class StructConstructorValidationTest {
     public void missingNoArgConstructorFailsDuringScan()
     {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.invalidmodel.missing"));
+                     () -> new StructContext("org.fz.nettyx.invalidmodel.missing"));
     }
 
     @Test
     public void privateNoArgConstructorFailsDuringScan()
     {
         assertThrows(SerializeException.class,
-                     () -> new StructSerializerContext("org.fz.nettyx.invalidmodel.privatector"));
+                     () -> new StructContext("org.fz.nettyx.invalidmodel.privatector"));
     }
 }

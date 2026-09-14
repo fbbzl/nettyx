@@ -9,8 +9,8 @@ import org.fz.nettyx.codec.model.RecursiveGeneric;
 import org.fz.nettyx.codec.model.WildcardGeneric;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cchar;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cchar;
+import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.junit.Test;
 
 import java.nio.ByteOrder;

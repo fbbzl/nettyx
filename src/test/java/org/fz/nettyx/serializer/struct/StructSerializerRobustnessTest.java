@@ -20,7 +20,7 @@ public class StructSerializerRobustnessTest {
     @BeforeClass
     public static void init()
     {
-        new StructSerializerContext("org.fz.nettyx.codec.model");
+        new StructContext("org.fz.nettyx.codec.model");
     }
 
     @Test

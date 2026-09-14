@@ -2,8 +2,8 @@ package org.fz.nettyx.serializer.struct;
 
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.TypeJudgmentException;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.basic.Basic;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -63,7 +63,7 @@ public interface StructFieldHandler<A extends Annotation> {
     {
         if (serializer.isBasic(fieldType)) {
             if (fieldVal != null) serializer.writeBasic((Basic<?>) fieldVal, field.byteOrder(), writing);
-            else                  writing.writeZero(StructHelper.findBasicSize(fieldType));
+            else                  writing.writeZero(StructContext.getBasicSize(fieldType));
             return;
         }
         if (serializer.isStruct(fieldType)) {

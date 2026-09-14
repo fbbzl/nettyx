@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  nettyx struct config DTD
+  used by org.fz.nettyx.serializer.schema
+
+  usage:
+  <!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
+-->
+
+<!ELEMENT structs (struct*)>
+<!ATTLIST structs
+        namespace CDATA #REQUIRED>
+
+<!ELEMENT struct (field*)>
+<!ATTLIST struct
+        name    CDATA #REQUIRED
+        endian  (BE | LE | NATIVE | BIG_ENDIAN | LITTLE_ENDIAN) "BE">
+
+<!ELEMENT field EMPTY>
+<!ATTLIST field
+        name    CDATA #REQUIRED
+        type    CDATA #IMPLIED
+        struct  CDATA #IMPLIED
+        length  CDATA #IMPLIED
+        array   CDATA #IMPLIED
+        charset CDATA #IMPLIED>

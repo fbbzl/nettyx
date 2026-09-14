@@ -4,7 +4,7 @@ import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.codec.model.You;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
+import org.fz.nettyx.serializer.struct.StructContext;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -31,7 +31,7 @@ public class StructSerializerBenchmark {
     private You    struct;
 
     static {
-        new StructSerializerContext("org.fz.nettyx.codec.model");
+        new StructContext("org.fz.nettyx.codec.model");
     }
 
     @Setup

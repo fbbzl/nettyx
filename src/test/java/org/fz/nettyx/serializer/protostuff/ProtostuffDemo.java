@@ -1,7 +1,5 @@
 package org.fz.nettyx.serializer.protostuff;
 
-import cn.hutool.core.date.StopWatch;
-import cn.hutool.core.lang.Console;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
@@ -10,7 +8,6 @@ import org.fz.nettyx.serializer.protostuff.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 public class ProtostuffDemo {
     public static void main(String[] args) {
@@ -41,24 +38,6 @@ public class ProtostuffDemo {
 
         // 反序列化
         byte[] data = ProtostuffIOUtil.toByteArray(user, schema, buffer);
-//        for (int i = 0; i < 1_000_000; i++) {
-//            try {
-//
-//
-//            } finally {
-//                buffer.clear();
-//            }
-//        }
         System.err.println(data.length);
-
-        for (int i = 0; i < 10; i++) {
-            StopWatch stopWatch = StopWatch.create("反序列");
-            stopWatch.start();
-            for (int j = 0; j < 1_000_000; j++) {
-                ProtostuffIOUtil.mergeFrom(data, user, schema);
-            }
-            stopWatch.stop();
-            Console.print(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-        }
     }
 }

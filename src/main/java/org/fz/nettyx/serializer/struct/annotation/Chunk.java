@@ -6,7 +6,7 @@ import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

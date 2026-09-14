@@ -3,14 +3,15 @@ package org.fz.nettyx.serializer.struct.generator;
 import cn.hutool.core.annotation.AnnotationUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.nettyx.serializer.struct.StructSerializer;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition;
-import org.fz.nettyx.serializer.struct.StructSerializerContext.StructDefinition.StructField;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
+import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
-import org.fz.nettyx.serializer.struct.basic.Basic;
+import org.fz.nettyx.serializer.basic.Basic;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -440,7 +441,7 @@ public final class StructAccessorFactory {
         method.visitVarInsn(ALOAD, 8);
         method.visitJumpInsn(IFNONNULL, notNull);
         method.visitVarInsn(ALOAD, 5);
-        pushInt(method, StructHelper.findBasicSize(rawFieldClass(field)));
+        pushInt(method, StructContext.getBasicSize(rawFieldClass(field)));
         method.visitMethodInsn(INVOKEVIRTUAL, BYTE_BUF_INTERNAL, "writeZero", "(I)L" + BYTE_BUF_INTERNAL + ";", false);
         method.visitInsn(POP);
         method.visitJumpInsn(GOTO, end);
@@ -507,7 +508,7 @@ public final class StructAccessorFactory {
         method.visitVarInsn(ALOAD, 6);
         callGetter(method, structInternal, field, fieldType);
         method.visitTypeInsn(CHECKCAST, BASIC_ARRAY_DESCRIPTOR);
-        pushInt(method, StructHelper.findBasicSize(componentClass));
+        pushInt(method, StructContext.getBasicSize(componentClass));
         pushInt(method, toArray.length());
         method.visitVarInsn(ALOAD, 5);
         pushBoolean(method, toArray.flexible());
@@ -626,7 +627,7 @@ public final class StructAccessorFactory {
             StructField[] fields) throws ReflectiveOperationException {
         StructFieldHandler[] handlers = new StructFieldHandler[fields.length];
         for (int i = 0; i < fields.length; i++) {
-            if (fields[i].category() == StructField.Category.HANDLER) handlers[i] = fields[i].handler();
+            if (fields[i].category() == StructDefinition.Category.HANDLER) handlers[i] = fields[i].handler();
         }
         Constructor<? extends StructAccessor> constructor = accessorClass.getConstructor(StructField[].class,
                                                                                          StructFieldHandler[].class);
@@ -646,11 +647,11 @@ public final class StructAccessorFactory {
     }
 
     private static boolean isDirectBasic(StructField field) {
-        return field.category() == StructField.Category.BASIC;
+        return field.category() == StructDefinition.Category.BASIC;
     }
 
     private static boolean isDirectStruct(StructField field) {
-        return field.category() == StructField.Category.STRUCT;
+        return field.category() == StructDefinition.Category.STRUCT;
     }
 
     private static Class<?> rawFieldClass(StructField field) {

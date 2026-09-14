@@ -25,11 +25,8 @@ public enum SerialDataBits {
     }
 
     public static SerialDataBits valueOf(int value) {
-        for (SerialDataBits dataBit : values()) {
-            if (dataBit.value == value) {
-                return dataBit;
-            }
-        }
+        for (SerialDataBits dataBit : values()) if (dataBit.value == value) return dataBit;
+
         throw new UnknownConfigException(SerialDataBits.class.getSimpleName(), value);
     }
 }

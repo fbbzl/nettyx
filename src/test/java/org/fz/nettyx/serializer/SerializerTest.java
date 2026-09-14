@@ -1,20 +1,16 @@
 package org.fz.nettyx.serializer;
 
-import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.codec.model.*;
-import org.fz.nettyx.serializer.struct.StructSerializerContext;
-import org.fz.nettyx.serializer.struct.basic.c.signed.cint;
-import org.fz.nettyx.serializer.struct.basic.c.signed.clong4;
+import org.fz.nettyx.serializer.struct.StructContext;
+import org.fz.nettyx.serializer.basic.c.signed.clong4;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
@@ -30,9 +26,9 @@ public class SerializerTest {
     private static final InternalLogger log = InternalLoggerFactory.getInstance(SerializerTest.class);
 
     static final TypeReference<You> youTypeRefer = new TypeReference<>() {};
-    static final TypeReference<Brother> brotherRefer = new TypeReference<>() {};
-    private static final StructSerializerContext context      =
-            new StructSerializerContext("org.fz.nettyx.codec.model");
+    static final         TypeReference<Brother> brotherRefer = new TypeReference<>() {};
+    private static final StructContext          context      =
+            new StructContext("org.fz.nettyx.codec.model");
 
     @Before
     public void correctnessTest() {
@@ -56,31 +52,4 @@ public class SerializerTest {
         log.info("");
     }
 
-    @Test
-    public void testStructSerializer() {
-        byte[] bytes = new byte[900];
-        Arrays.fill(bytes, (byte) 67);
-        You struct = toStruct(youTypeRefer, Unpooled.wrappedBuffer(bytes));
-        struct.setC(null);
-        struct.setChunk(null);
-        struct.setIsMarried(new cint(1));
-
-        ByteBuf youBytesBuf = Unpooled.buffer();
-        toByteBuf(youTypeRefer, struct, youBytesBuf);
-        byte[] bytes1 = new byte[youBytesBuf.readableBytes()];
-        youBytesBuf.readBytes(bytes1);
-        System.err.println("测试序列化字节数组长度:"+bytes1.length);
-
-        for (int i = 0; i < 10; i++) {
-            StopWatch stopWatch = StopWatch.create("反序列任务");
-            stopWatch.start();
-            for (int j = 0; j < 1_000_000; j++) {
-                toStruct(youTypeRefer, Unpooled.wrappedBuffer(bytes));
-            }
-            stopWatch.stop();
-            log.info(stopWatch.prettyPrint(TimeUnit.MILLISECONDS));
-        }
-
-
-    }
 }
