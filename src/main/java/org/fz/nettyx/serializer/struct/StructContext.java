@@ -72,12 +72,12 @@ public class StructContext {
         this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);
 
         synchronized (StructContext.class) {
-            Map<Type, Integer> sizeSnapshot = new HashMap<>(BASIC_SIZE_CACHE);
-            Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> constructorSnapshot =
-                    new HashMap<>(BASIC_CONSTRUCTOR_CACHE);
-            Map<Class<?>, StructDefinition> definitionSnapshot = new HashMap<>(STRUCT_DEFINITION_CACHE);
-            Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> handlerSnapshot =
-                    new HashMap<>(ANNOTATION_HANDLER_MAPPING_CACHE);
+            Map<Type, Integer>                                                sizeSnapshot        = new HashMap<>(BASIC_SIZE_CACHE);
+            Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> constructorSnapshot = new HashMap<>(BASIC_CONSTRUCTOR_CACHE);
+            Map<Class<?>, StructDefinition>                                   definitionSnapshot  = new HashMap<>(STRUCT_DEFINITION_CACHE);
+
+            Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> handlerSnapshot = new HashMap<>(ANNOTATION_HANDLER_MAPPING_CACHE);
+
             try {
                 scan();
             }
