@@ -3,9 +3,11 @@ package org.fz.nettyx.serializer.struct;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
+import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.exception.TypeJudgmentException;
 import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static org.fz.nettyx.serializer.struct.StructHelper.*;
+import static org.fz.nettyx.serializer.struct.StructContext.BASIC_CONSTRUCTOR_CACHE;
 import static org.fz.nettyx.serializer.struct.StructContext.STRUCT_DEFINITION_CACHE;
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 
@@ -76,6 +78,42 @@ public final class StructSerializer implements Serializer {
             case Class<?>          clazz             -> new StructSerializer(clazz).doSerialize(struct, writing);
             case ParameterizedType parameterizedType -> new StructSerializer(parameterizedType).doSerialize(struct, writing);
             default                                  -> throw new TypeJudgmentException(structType);
+        }
+    }
+
+    public static <B extends Basic<?>> B newBasic(
+            Class<?>  basicClass,
+            ByteOrder byteOrder,
+            ByteBuf   buf)
+    {
+        try
+        {
+            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(buf, byteOrder);
+        }
+        catch (Exception instanceError)
+        {
+            Throwable cause = instanceError.getCause();
+            if (instanceError instanceof TooLessBytesException tooLessBytes)
+                throw tooLessBytes;
+            if (cause instanceof TooLessBytesException tooLessBytes)
+                throw tooLessBytes;
+            else
+                throw new SerializeException("basic [" + basicClass + "] instantiate failed..., buffer hex is: [" + ByteBufUtil.hexDump(buf) + "]", instanceError);
+        }
+    }
+
+    public static <S> S newStruct(Type structType)
+    {
+        try
+        {
+            StructDefinition definition = getStructDefinition(structType);
+            if (definition == null)
+                throw new SerializeException("uncached struct type: " + structType);
+            return (S) StructAccessorFactory.get(definition).newInstance();
+        }
+        catch (Exception instanceError)
+        {
+            throw new SerializeException("struct [" + structType + "] instantiate failed...", instanceError);
         }
     }
 

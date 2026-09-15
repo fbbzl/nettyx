@@ -68,7 +68,7 @@ public interface StructFieldHandler<A extends Annotation> {
         }
         if (serializer.isStruct(fieldType)) {
             if (fieldVal != null) serializer.writeStruct(fieldType, fieldVal, writing);
-            else                  serializer.writeStruct(fieldType, StructHelper.newStruct(fieldType), writing);
+            else                  serializer.writeStruct(fieldType, StructSerializer.newStruct(fieldType), writing);
             return;
         }
         throw new TypeJudgmentException(field);

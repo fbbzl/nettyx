@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
-import org.fz.nettyx.serializer.struct.StructHelper;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
@@ -46,7 +45,7 @@ public final class StructAccessorFactory {
     private static final String HANDLER_INTERNAL         = org.objectweb.asm.Type.getInternalName(StructFieldHandler.class);
     private static final String BASIC_INTERNAL           = org.objectweb.asm.Type.getInternalName(Basic.class);
     private static final String BYTE_ORDER_INTERNAL      = org.objectweb.asm.Type.getInternalName(ByteOrder.class);
-    private static final String STRUCT_HELPER_INTERNAL   = org.objectweb.asm.Type.getInternalName(StructHelper.class);
+    private static final String SERIALIZE_EXCEPTION_INTERNAL = org.objectweb.asm.Type.getInternalName(SerializeException.class);
     private static final String TYPE_DESCRIPTOR          = org.objectweb.asm.Type.getDescriptor(Type.class);
     private static final String BYTE_ORDER_DESCRIPTOR    = org.objectweb.asm.Type.getDescriptor(ByteOrder.class);
     private static final String FIELD_ARRAY_DESCRIPTOR   = "[L" + FIELD_INTERNAL + ";";
@@ -393,10 +392,27 @@ public final class StructAccessorFactory {
         method.visitVarInsn(ALOAD, 4);
         method.visitMethodInsn(INVOKEVIRTUAL, BYTE_BUF_INTERNAL, "isReadable", "()Z", false);
         method.visitJumpInsn(IFEQ, loopEnd);
+        method.visitVarInsn(ALOAD, 4);
+        method.visitMethodInsn(INVOKEVIRTUAL, BYTE_BUF_INTERNAL, "readerIndex", "()I", false);
+        method.visitVarInsn(ISTORE, 9);
         method.visitVarInsn(ALOAD, 8);
         newBasic(method, componentClass, byteOrder);
         method.visitMethodInsn(INVOKEVIRTUAL, "java/util/ArrayList", "add", "(Ljava/lang/Object;)Z", false);
         method.visitInsn(POP);
+
+        Label readProgressed = new Label();
+        method.visitVarInsn(ALOAD, 4);
+        method.visitMethodInsn(INVOKEVIRTUAL, BYTE_BUF_INTERNAL, "readerIndex", "()I", false);
+        method.visitVarInsn(ILOAD, 9);
+        method.visitJumpInsn(IF_ICMPNE, readProgressed);
+        method.visitTypeInsn(NEW, SERIALIZE_EXCEPTION_INTERNAL);
+        method.visitInsn(DUP);
+        method.visitLdcInsn("flexible array element did not consume any bytes, element type: ["
+                            + componentClass.getTypeName() + "]");
+        method.visitMethodInsn(INVOKESPECIAL, SERIALIZE_EXCEPTION_INTERNAL, "<init>",
+                               "(Ljava/lang/String;)V", false);
+        method.visitInsn(ATHROW);
+        method.visitLabel(readProgressed);
         method.visitJumpInsn(GOTO, loopStart);
         method.visitLabel(loopEnd);
 
@@ -485,7 +501,7 @@ public final class StructAccessorFactory {
         method.visitVarInsn(ALOAD, 8);
         method.visitJumpInsn(IFNONNULL, notNull);
         loadClass(method, fieldClass);
-        method.visitMethodInsn(INVOKESTATIC, STRUCT_HELPER_INTERNAL, "newStruct",
+        method.visitMethodInsn(INVOKESTATIC, SERIALIZER_INTERNAL, "newStruct",
                                "(" + TYPE_DESCRIPTOR + ")Ljava/lang/Object;", false);
         method.visitVarInsn(ASTORE, 8);
         method.visitLabel(notNull);
