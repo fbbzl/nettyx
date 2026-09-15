@@ -174,7 +174,7 @@ public class StructCoreCoverageTest {
     }
 
     @Test
-    public void helperCoversLookupConstructionFieldAndArraySemantics() throws Exception {
+    public void serializerCoversLookupConstructionFieldAndArraySemantics() throws Exception {
         ParameterizedType parameterizedCint = parameterized(cint.class);
         assertEquals(4, StructContext.getBasicSize(cint.class));
         assertEquals(4, StructContext.getBasicSize(parameterizedCint));
@@ -185,7 +185,7 @@ public class StructCoreCoverageTest {
         assertEquals(cint[].class, ToArray.ToArrayHandler.newArray(cint.class, 2).getClass());
         assertEquals(GenericBox[].class, ToArray.ToArrayHandler.newArray(parameterized(GenericBox.class), 1).getClass());
         assertEquals(Object[].class, ToArray.ToArrayHandler.newArray(unknownType(), 0).getClass());
-        assertThrows(SerializeException.class, () -> StructHelper.newStruct(String.class));
+        assertThrows(SerializeException.class, () -> StructSerializer.newStruct(String.class));
 
         assertTrue(StructField.legalStructField(FieldKinds.class.getDeclaredField("normal")));
         assertFalse(StructField.legalStructField(FieldKinds.class.getDeclaredField("staticValue")));
@@ -200,12 +200,12 @@ public class StructCoreCoverageTest {
             StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class,
                                                       (buf, order) -> { throw new RuntimeException(new TooLessBytesException(4, buf.readableBytes())); });
             assertThrows(TooLessBytesException.class,
-                         () -> StructHelper.newBasic(cint.class, ByteOrder.BIG_ENDIAN, Unpooled.EMPTY_BUFFER));
+                         () -> StructSerializer.newBasic(cint.class, ByteOrder.BIG_ENDIAN, Unpooled.EMPTY_BUFFER));
 
             StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class,
                                                       (buf, order) -> { throw new IllegalStateException("constructor failure"); });
             assertThrows(SerializeException.class,
-                         () -> StructHelper.newBasic(cint.class, ByteOrder.BIG_ENDIAN, Unpooled.EMPTY_BUFFER));
+                         () -> StructSerializer.newBasic(cint.class, ByteOrder.BIG_ENDIAN, Unpooled.EMPTY_BUFFER));
         }
         finally {
             StructContext.BASIC_CONSTRUCTOR_CACHE.put(cint.class, original);

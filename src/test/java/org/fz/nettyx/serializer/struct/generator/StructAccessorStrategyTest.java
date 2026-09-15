@@ -7,6 +7,10 @@ import org.fz.nettyx.beanmodel.valid.*;
 import org.fz.nettyx.codec.model.GirlFriend;
 import org.fz.nettyx.codec.model.NestedGeneric;
 import org.fz.nettyx.codec.model.You;
+import org.fz.nettyx.exception.SerializeException;
+import org.fz.nettyx.serializer.basic.Basic;
+import org.fz.nettyx.serializer.struct.annotation.Struct;
+import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
@@ -17,8 +21,10 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Set;
 
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
@@ -31,6 +37,9 @@ public class StructAccessorStrategyTest {
     public static void scanStructs() {
         new StructContext("org.fz.nettyx.beanmodel.valid");
         new StructContext("org.fz.nettyx.codec.model");
+        FixtureContext fixtureContext = new FixtureContext();
+        fixtureContext.scanBasicTypes(Set.of(NoProgressBasic.class));
+        fixtureContext.scanStructTypes(Set.of(NoProgressStruct.class));
         definition = getStructDefinition(AccessorBean.class);
     }
 
@@ -64,6 +73,16 @@ public class StructAccessorStrategyTest {
     }
 
     @Test
+    public void factoryDoesNotReferenceStructHelper() throws Exception {
+        String resource = StructAccessorFactory.class.getSimpleName() + ".class";
+        try (InputStream input = StructAccessorFactory.class.getResourceAsStream(resource)) {
+            assertNotNull(input);
+            String classFile = new String(input.readAllBytes(), StandardCharsets.ISO_8859_1);
+            assertFalse(classFile.contains("StructHelper"));
+        }
+    }
+
+    @Test
     public void concreteBasicAsmAccessorDoesNotKeepGenericFieldDispatchState() throws Exception {
         StructAccessor asm = accessor();
         assertEquals(0, asm.getClass().getDeclaredFields().length);
@@ -92,6 +111,18 @@ public class StructAccessorStrategyTest {
 
         Type flexibleArrayType = new TypeReference<FlexibleGenericBasicArrayBean<cint>>() {}.getType();
         assertAsmRoundTrip(flexibleArrayType, new byte[]{1, 0, 0, 0, 2, 0, 0, 0});
+    }
+
+    @Test
+    public void concreteFlexibleBasicArrayRejectsElementsThatMakeNoReadProgress() {
+        ByteBuf input = Unpooled.wrappedBuffer(new byte[]{1});
+        try {
+            assertThrows(SerializeException.class,
+                         () -> StructSerializer.toStruct(NoProgressStruct.class, input));
+        }
+        finally {
+            input.release();
+        }
     }
 
     private static StructAccessor accessor() {
@@ -144,6 +175,46 @@ public class StructAccessorStrategyTest {
         finally {
             input.release();
             output.release();
+        }
+    }
+
+    private static final class FixtureContext extends StructContext {
+        private FixtureContext() {
+            super("package.that.does.not.exist");
+        }
+
+        private void scanBasicTypes(Set<Class<?>> types) {
+            super.scanBasic(types);
+        }
+
+        private void scanStructTypes(Set<Class<?>> types) {
+            super.scanStruct(types);
+        }
+    }
+
+    public static final class NoProgressBasic extends Basic<Integer> {
+        public NoProgressBasic(ByteBuf input, ByteOrder order) {
+            super(input, order);
+            input.writerIndex(input.readerIndex());
+        }
+
+        @Override public int size() { return 1; }
+        @Override public boolean hasSigned() { return true; }
+        @Override public void write(ByteBuf writingBuf, ByteOrder byteOrder) { }
+        @Override protected Integer read(ByteBuf readingBuf, ByteOrder byteOrder) { return 0; }
+    }
+
+    @Struct(endian = Struct.Endian.BE)
+    public static final class NoProgressStruct {
+        @ToArray(flexible = true)
+        private NoProgressBasic[] values;
+
+        public NoProgressBasic[] getValues() {
+            return values;
+        }
+
+        public void setValues(NoProgressBasic[] values) {
+            this.values = values;
         }
     }
 }
