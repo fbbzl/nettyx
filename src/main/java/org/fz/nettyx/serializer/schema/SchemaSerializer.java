@@ -9,6 +9,7 @@ import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * the configured struct serializer, parses binary data into {@link Map} by struct definitions
@@ -26,7 +27,7 @@ public final class SchemaSerializer implements Serializer
     Schema          root;
     SchemaCodec codec;
 
-    public SchemaSerializer(SchemaRegistry registry, String structName)
+    SchemaSerializer(SchemaRegistry registry, String structName)
     {
         this.root  = registry.require(structName);
         this.codec = new SchemaCodec(registry);
@@ -64,16 +65,6 @@ public final class SchemaSerializer implements Serializer
         registry.serializer(structName).deserializeInto(reading, target);
     }
 
-    public static SchemaView newView(SchemaRegistry registry, String structName)
-    {
-        return registry.serializer(structName).newView();
-    }
-
-    public static void viewInto(SchemaRegistry registry, String structName, ByteBuf reading, SchemaView target)
-    {
-        registry.serializer(structName).viewInto(reading, target);
-    }
-
     @Override
     public <S> S doDeserialize(ByteBuf reading)
     {
@@ -90,32 +81,19 @@ public final class SchemaSerializer implements Serializer
         codec.readStructInto(root, reading, target);
     }
 
-    public SchemaView newView()
+    public SchemaView view(ByteBuf source)
     {
+        Objects.requireNonNull(source, "source");
+
         int byteLength = codec.fixedSizeOf(root);
         if (byteLength < 0)
             throw new SerializeException("zero-copy view only supports fixed-length struct: [" + root.fqName() + "]");
-        return new SchemaView(this, codec, root, byteLength);
-    }
+        if (source.readableBytes() < byteLength)
+            throw new TooLessBytesException(byteLength, source.readableBytes());
 
-    public void viewInto(ByteBuf reading, SchemaView target)
-    {
-        if (!target.belongsTo(this))
-            throw new SerializeException("view belongs to a different configured serializer");
-        if (reading.readableBytes() < target.byteLength())
-            throw new TooLessBytesException(target.byteLength(), reading.readableBytes());
-
-        viewIntoUnchecked(reading, target);
-    }
-
-    /**
-     * Binds a reusable view without validating ownership or available bytes.
-     * Call this only after the framing layer has verified a complete fixed-length message.
-     */
-    void viewIntoUnchecked(ByteBuf reading, SchemaView target)
-    {
-        target.reset(reading, reading.readerIndex());
-        reading.skipBytes(target.byteLength());
+        SchemaView view = new SchemaView(codec, root, source, source.readerIndex(), byteLength);
+        source.skipBytes(byteLength);
+        return view;
     }
 
     @Override

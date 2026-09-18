@@ -82,16 +82,13 @@ public class SchemaSerializerCoverageTest
         assertSame(tail, reusable.get("tail"));
         assertEquals(List.of(44), reusable.get("tail"));
 
-        SchemaView view = SchemaSerializer.newView(REGISTRY, "device.Device");
-        SchemaSerializer.viewInto(REGISTRY, "device.Device", deviceBuffer(5, "view", new byte[]{9, 10}), view);
-        assertEquals(5, view.get("id"));
-        assertThrows(SerializeException.class, () -> SchemaSerializer.newView(REGISTRY, "device.Flexible"));
-        assertThrows(SerializeException.class, () -> SchemaSerializer.viewInto(
-                REGISTRY, "device.Device", deviceBuffer(6, "other", new byte[]{1, 1}),
-                SchemaSerializer.newView(REGISTRY, "device.BenchmarkDevice")));
+        SchemaView view = REGISTRY.serializer("device.Device")
+                                  .view(deviceBuffer(5, "view", new byte[]{9, 10}));
+        assertEquals(5, view.getInt("id"));
+        assertThrows(SerializeException.class,
+                     () -> REGISTRY.serializer("device.Flexible").view(flexibleBuffer(1)));
         assertThrows(TooLessBytesException.class,
-                     () -> SchemaSerializer.viewInto(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[1]),
-                                                         SchemaSerializer.newView(REGISTRY, "device.Device")));
+                     () -> REGISTRY.serializer("device.Device").view(Unpooled.wrappedBuffer(new byte[1])));
 
         ByteBuf direct = Unpooled.directBuffer(4);
         try {

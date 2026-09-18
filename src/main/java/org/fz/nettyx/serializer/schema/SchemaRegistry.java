@@ -96,7 +96,7 @@ public class SchemaRegistry
         return matched;
     }
 
-    SchemaSerializer serializer(String structName)
+    public SchemaSerializer serializer(String structName)
     {
         return serializerCache.computeIfAbsent(structName, name -> new SchemaSerializer(this, name));
     }
