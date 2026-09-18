@@ -1,0 +1,37 @@
+{
+  "namespace": "device",
+  "structs": [
+    {
+      "name": "Point",
+      "endian": "BE",
+      "fields": [
+        { "name": "x", "type": "cint" },
+        { "name": "y", "type": "cint" }
+      ]
+    },
+    {
+      "name": "Message",
+      "endian": "LE",
+      "fields": [
+        { "name": "byteValue", "type": "cchar" },
+        { "name": "shortValue", "type": "cshort" },
+        { "name": "id", "type": "cint" },
+        { "name": "timestamp", "type": "clong8" },
+        { "name": "ratio", "type": "cfloat" },
+        { "name": "temperature", "type": "cdouble" },
+        { "name": "active", "type": "cppbool" },
+        { "name": "name", "type": "char", "length": 8 },
+        { "name": "payload", "type": "byte", "length": 3 },
+        { "name": "values", "type": "cshort", "array": 2 },
+        { "name": "point", "struct": "Point" },
+        { "name": "points", "struct": "Point", "array": 2 }
+      ]
+    },
+    {
+      "name": "Nullable",
+      "fields": [
+        { "name": "value", "type": "nullbasic" }
+      ]
+    }
+  ]
+}

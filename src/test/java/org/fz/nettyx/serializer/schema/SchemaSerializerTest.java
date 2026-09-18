@@ -79,13 +79,11 @@ public class SchemaSerializerTest
                 0, 0, 0, 100,
                 0, 0, 0, (byte) 200
         });
-        SchemaSerializer serializer = new SchemaSerializer(REGISTRY, "device.Device");
-        SchemaView     view       = serializer.newView();
+        SchemaSerializer serializer = REGISTRY.serializer("device.Device");
+        SchemaView       view       = serializer.view(reading);
 
-        serializer.viewInto(reading, view);
-
-        assertEquals(0x11223344, view.get("id"));
-        assertEquals("netty", view.get("name"));
+        assertEquals(0x11223344, view.getInt("id"));
+        assertEquals("netty", view.getString("name"));
         assertEquals(0, reading.readableBytes());
     }
 
@@ -312,7 +310,7 @@ public class SchemaSerializerTest
     @Test(expected = SerializeException.class)
     public void testSerializeNonMap()
     {
-        new SchemaSerializer(REGISTRY, "device.Device").doSerialize(new Object(), Unpooled.buffer());
+        REGISTRY.serializer("device.Device").doSerialize(new Object(), Unpooled.buffer());
     }
 
     @Test
