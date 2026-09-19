@@ -3,16 +3,15 @@ package org.fz.nettyx.handler;
 import io.netty.channel.*;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.action.*;
 
 import java.net.SocketAddress;
 
+import static lombok.AccessLevel.PRIVATE;
 import static org.fz.nettyx.action.Actions.invokeAction;
 
 /**
@@ -30,24 +29,22 @@ public class ChannelAdvice {
      */
     @Setter
     @RequiredArgsConstructor
+    @FieldDefaults(level = PRIVATE)
     @Accessors(chain = true, fluent = true)
     public static class InboundAdvice extends ChannelInboundHandlerAdapter {
 
         private static final InternalLogger log = InternalLoggerFactory.getInstance(InboundAdvice.class);
-        private final        Channel        channel;
 
-        private ChannelHandlerContextAction
+        final Channel channel;
+        ChannelHandlerContextAction
                 whenChannelRegister,
                 whenChannelUnRegister,
                 whenChannelActive,
                 whenChannelInactive,
                 whenWritabilityChanged,
                 whenChannelReadComplete;
-
-        private ChannelReadAction        whenChannelRead;
-        private ChannelExceptionAction   whenExceptionCaught;
-        private ActionIdleStateHandler   readIdleStateHandler;
-        private ActionReadTimeoutHandler readTimeoutHandler;
+        ChannelReadAction      whenChannelRead;
+        ChannelExceptionAction whenExceptionCaught;
 
         /**
          * When read idle inbound advice.
@@ -60,8 +57,8 @@ public class ChannelAdvice {
                 int                         idleSeconds,
                 ChannelHandlerContextAction readIdleAct)
         {
-            this.readIdleStateHandler = ActionIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
-            this.channel.pipeline().addFirst(this.readIdleStateHandler);
+            ActionIdleStateHandler readIdleStateHandler = ActionIdleStateHandler.newReadIdleHandler(idleSeconds, readIdleAct);
+            this.channel.pipeline().addFirst(readIdleStateHandler);
             return this;
         }
 
@@ -84,8 +81,8 @@ public class ChannelAdvice {
                 boolean                fireTimeout,
                 ChannelExceptionAction timeoutAction)
         {
-            this.readTimeoutHandler = new ActionReadTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
-            this.channel.pipeline().addFirst(this.readTimeoutHandler);
+            ActionReadTimeoutHandler readTimeoutHandler = new ActionReadTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
+            this.channel.pipeline().addFirst(readTimeoutHandler);
             return this;
         }
 
@@ -168,19 +165,18 @@ public class ChannelAdvice {
      */
     @Setter
     @RequiredArgsConstructor
+    @FieldDefaults(level = PRIVATE)
     @Accessors(chain = true, fluent = true)
     public static class OutboundAdvice extends ChannelOutboundHandlerAdapter {
 
-        private static final InternalLogger       log = InternalLoggerFactory.getInstance(OutboundAdvice.class);
-        private final        Channel              channel;
+        private static final InternalLogger log = InternalLoggerFactory.getInstance(OutboundAdvice.class);
 
-        private ChannelBindAction    whenBind;
-        private ChannelConnectAction whenConnect;
-        private ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
-        private ChannelHandlerContextAction whenRead, whenFlush;
-        private ChannelWriteAction        whenWrite;
-        private ActionIdleStateHandler    writeIdleStateHandler;
-        private ActionWriteTimeoutHandler writeTimeoutHandler;
+        final Channel channel;
+        ChannelBindAction    whenBind;
+        ChannelConnectAction whenConnect;
+        ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
+        ChannelHandlerContextAction whenRead, whenFlush;
+        ChannelWriteAction whenWrite;
 
         /**
          * When write idle outbound advice.
@@ -191,19 +187,18 @@ public class ChannelAdvice {
          */
         public final OutboundAdvice whenWriteIdle(int idleSeconds, ChannelHandlerContextAction writeIdleAct)
         {
-            this.writeIdleStateHandler = ActionIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
-            this.channel.pipeline().addFirst(this.writeIdleStateHandler);
+            ActionIdleStateHandler writeIdleStateHandler = ActionIdleStateHandler.newWriteIdleHandler(idleSeconds, writeIdleAct);
+            this.channel.pipeline().addFirst(writeIdleStateHandler);
             return this;
         }
-
 
         public final OutboundAdvice whenWriteTimeout(
                 int                    timeoutSeconds,
                 boolean                fireTimeout,
                 ChannelExceptionAction timeoutAction)
         {
-            this.writeTimeoutHandler = new ActionWriteTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
-            this.channel.pipeline().addFirst(this.writeTimeoutHandler);
+            ActionWriteTimeoutHandler writeTimeoutHandler = new ActionWriteTimeoutHandler(timeoutSeconds, timeoutAction, fireTimeout);
+            this.channel.pipeline().addFirst(writeTimeoutHandler);
             return this;
         }
 
@@ -293,10 +288,12 @@ public class ChannelAdvice {
         @Setter
         @NoArgsConstructor
         @AllArgsConstructor
+        @FieldDefaults(level = PRIVATE)
         public static class SimpleOutboundExceptionHandler extends ChannelOutboundHandlerAdapter {
 
-            private static final InternalLogger         log = InternalLoggerFactory.getInstance(SimpleOutboundExceptionHandler.class);
-            private              ChannelExceptionAction whenExceptionCaught;
+            private static final InternalLogger log = InternalLoggerFactory.getInstance(SimpleOutboundExceptionHandler.class);
+
+            ChannelExceptionAction whenExceptionCaught;
 
             @Override
             public void bind(
