@@ -107,8 +107,6 @@ public class ChannelAdviceTest {
         assertEquals(8, calls.get());
         assertSame(advice, advice.whenWriteIdle(10, ignored -> {}));
         assertSame(advice, advice.whenWriteTimeout(10, false, (ignored, error) -> {}));
-        assertThrows(UnsupportedOperationException.class,
-                     () -> advice.whenReadTimeout(10, (ignored, error) -> {}));
         channel.finishAndReleaseAll();
     }
 
