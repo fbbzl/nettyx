@@ -1,6 +1,8 @@
 package org.fz.nettyx.util;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Objects;
 
@@ -12,17 +14,13 @@ import java.util.Objects;
  * @since 2023 /12/31 21:01
  */
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Bins {
 
     private static final byte[] digits = {0, 1};
 
     @Getter
     private final byte[] binaries;
-
-    private Bins(byte[] binaries)
-    {
-        this.binaries = binaries;
-    }
 
     public static Bins fromByte(int value)
     {
@@ -146,8 +144,7 @@ public class Bins {
 
     private byte[] copyBits(int startIndex, int length)
     {
-        if (startIndex < 0 || length < 0 || startIndex > length() - length)
-            throw new IndexOutOfBoundsException("startIndex [" + startIndex + "], length [" + length + "]");
+        checkRange(startIndex, length);
 
         byte[] copy = new byte[length];
         for (int i = 0; i < length; i++) {
@@ -174,6 +171,13 @@ public class Bins {
             throw new IndexOutOfBoundsException("index [" + index + "], length [" + binaries.length + "]");
     }
 
+    private void checkRange(int startIndex, int length)
+    {
+        if (startIndex < 0 || length < 0 || startIndex > binaries.length - length)
+            throw new IndexOutOfBoundsException(
+                    "startIndex [" + startIndex + "], length [" + length + "], this length [" + binaries.length + "]");
+    }
+
     public void set1(int index)
     {
         this.set(index, (byte) 1);
@@ -181,6 +185,7 @@ public class Bins {
 
     public void set1(int startIndex, int length)
     {
+        checkRange(startIndex, length);
         for (int i = startIndex, j = startIndex + length; i < j; i++) {
             this.set1(i);
         }
@@ -193,6 +198,7 @@ public class Bins {
 
     public void set0(int startIndex, int length)
     {
+        checkRange(startIndex, length);
         for (int i = startIndex; i < startIndex + length; i++) {
             set0(i);
         }
@@ -200,6 +206,7 @@ public class Bins {
 
     public void replace(int startIndex, int... bins)
     {
+        checkRange(startIndex, bins.length);
         for (int i = startIndex, j = startIndex + bins.length, k = 0; i < j; i++, k++) {
             this.set(i, bins[k]);
         }
@@ -207,14 +214,14 @@ public class Bins {
 
     public void replace(int startIndex, byte... bins)
     {
+        checkRange(startIndex, bins.length);
         for (int i = 0; i < bins.length; i++) set(startIndex + i, bins[i]);
     }
 
     public void replace(int startIndex, Bins bins)
     {
         Objects.requireNonNull(bins, "bins");
-        if (startIndex < 0 || startIndex + bins.length() > this.length())
-            throw new IndexOutOfBoundsException("startIndex [" + startIndex + "], bins length [" + bins.length() + "], this length [" + this.length() + "]");
+        checkRange(startIndex, bins.length());
         for (int k = 0; k < bins.length(); k++) {
             this.set(startIndex + k, bins.get(k));
         }

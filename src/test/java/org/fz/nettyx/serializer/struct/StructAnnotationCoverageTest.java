@@ -24,6 +24,13 @@ import java.nio.charset.UnsupportedCharsetException;
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
+/**
+ * Tests validation and binary behavior for array, text, and byte chunk field annotations.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class StructAnnotationCoverageTest {
 
     @BeforeClass
@@ -184,6 +191,13 @@ public class StructAnnotationCoverageTest {
         return new Type() {};
     }
 
+    /**
+     * Provides arrays with missing lengths and misplaced flexible fields for validation.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class InvalidArrayFields {
         @ToArray
         Object[] missingLength;
@@ -194,11 +208,25 @@ public class StructAnnotationCoverageTest {
         Object[] trailing;
     }
 
+    /**
+     * Provides an array field declared with a fixed length of zero.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ValidArrayFields {
         @ToArray(length = 0)
         Object[] fixed;
     }
 
+    /**
+     * Provides text fields with a valid charset and buffer length alongside invalid annotation targets and settings.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class StringFields {
         @ToCharSequence(bufferLength = 4, charset = "US-ASCII")
         String valid;
@@ -210,6 +238,13 @@ public class StructAnnotationCoverageTest {
         String negative;
     }
 
+    /**
+     * Provides byte chunk fields for checking valid lengths, invalid lengths, and incompatible field types.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ChunkFields {
         @Chunk(length = 4)
         byte[] valid;

@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.generator;
+package org.fz.nettyx.serializer.struct.accessor;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -22,6 +22,13 @@ import java.util.List;
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
+/**
+ * Exercises generated struct accessors and the failures produced by invalid definitions.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class GeneratorCoverageTest {
 
     @BeforeClass
@@ -41,11 +48,11 @@ public class GeneratorCoverageTest {
         ByteBuf output = Unpooled.buffer();
         try {
             assertThrows(RuntimeException.class,
-                         () -> StructAccessor.Support.readField(serializer, BytecodeCoverageStruct.class, bean,
+                         () -> StructAccessor.FieldAccessor.readField(serializer, BytecodeCoverageStruct.class, bean,
                                                                 BytecodeCoverageStruct.class, unsupported,
                                                                 unsupported.handler(), Unpooled.EMPTY_BUFFER));
             assertThrows(RuntimeException.class,
-                         () -> StructAccessor.Support.writeField(serializer, BytecodeCoverageStruct.class, bean,
+                         () -> StructAccessor.FieldAccessor.writeField(serializer, BytecodeCoverageStruct.class, bean,
                                                                  BytecodeCoverageStruct.class, unsupported,
                                                                  unsupported.handler(), new String[]{"x"}, output));
         }
@@ -57,7 +64,7 @@ public class GeneratorCoverageTest {
     @Test
     public void asmAccessorFactoryIsRemoved() {
         assertThrows(ClassNotFoundException.class,
-                     () -> Class.forName("org.fz.nettyx.serializer.struct.generator.AsmStructAccessorFactory"));
+                     () -> Class.forName("org.fz.nettyx.serializer.struct.accessor.AsmStructAccessorFactory"));
     }
 
     @Test
@@ -116,6 +123,13 @@ public class GeneratorCoverageTest {
         throw new AssertionError("field not found: " + name);
     }
 
+    /**
+     * Provides an unregistered class for the missing definition check in accessor generation.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class Unregistered {
     }
 }

@@ -1,6 +1,7 @@
 package org.fz.nettyx.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.system.OsInfo;
 import cn.hutool.system.SystemUtil;
 import lombok.SneakyThrows;
@@ -19,6 +20,8 @@ import static cn.hutool.core.text.CharSequenceUtil.containsIgnoreCase;
 
 
 /**
+ * Lists local serial ports on Windows and Linux.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 3/31/2022 11:06 AM
@@ -97,8 +100,8 @@ public final class CommPorts {
 
             Set<String> ttys = new HashSet<>();
             for (String info : infos) {
-                if (info.contains("ttyS") || info.contains("ttyU")) {
-                    String info2   = info.replace("[", "").replace(":", "").replace("]", "");
+                if (StrUtil.containsAny(info, "ttyS", "ttyU")) {
+                    String info2   = StrUtil.removeAll(info, '[', ':', ']');
                     String ttyPath = "/dev/" + info2;
 
                     File file = new File(ttyPath);

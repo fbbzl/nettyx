@@ -27,6 +27,13 @@ public @interface Struct {
 
     Endian endian();
 
+    /**
+     * Specifies the byte order used to serialize a struct.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2025-10-17
+     */
     @Getter
     @RequiredArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

@@ -8,6 +8,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Checks TLS configuration defaults and error wrapping for missing key or trust stores.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-14
+ */
 public class SslContextFactoryTest
 {
     @Test

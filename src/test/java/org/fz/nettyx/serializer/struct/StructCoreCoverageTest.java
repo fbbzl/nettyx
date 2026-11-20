@@ -42,6 +42,13 @@ import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
+/**
+ * Tests struct scanner internals, field classification, handler resolution, and generated accessor validation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class StructCoreCoverageTest {
 
     @BeforeClass
@@ -143,6 +150,15 @@ public class StructCoreCoverageTest {
         finally {
             output.release();
         }
+    }
+
+    @Test
+    public void emptyStructArraysDoNotRequireALookup()
+    {
+        StructSerializer serializer = new StructSerializer(AccessorBean.class);
+        assertArrayEquals(new String[0], serializer.readStructArray(String.class, Unpooled.EMPTY_BUFFER, 0, false));
+        assertArrayEquals(new String[0], serializer.readStructArray(String.class, Unpooled.EMPTY_BUFFER, 0, true));
+        serializer.writeStructArray(new String[0], String.class, 1, Unpooled.EMPTY_BUFFER, true);
     }
 
     @Test
@@ -253,28 +269,33 @@ public class StructCoreCoverageTest {
 
     @Test
     public void handlerAnnotationResolutionIgnoresUnrelatedInterfacesAndSupportsInheritance() {
-        assertEquals(TestHandlerAnnotation.class, StructContext.getTargetAnnotationType(MultiInterfaceHandler.class));
-        assertEquals(TestHandlerAnnotation.class, StructContext.getTargetAnnotationType(InheritedHandler.class));
-        assertNull(StructContext.getTargetAnnotationType(GenericHandler.class));
-        assertNull(StructContext.getTargetAnnotationType(StructFieldHandler.class));
+        assertEquals(TestHandlerAnnotation.class,
+                     StructScannerTestSupport.invoke("getTargetAnnotationType", Class.class, MultiInterfaceHandler.class));
+        assertEquals(TestHandlerAnnotation.class,
+                     StructScannerTestSupport.invoke("getTargetAnnotationType", Class.class, InheritedHandler.class));
+        assertNull(StructScannerTestSupport.invoke("getTargetAnnotationType", Class.class, GenericHandler.class));
+        assertNull(StructScannerTestSupport.invoke("getTargetAnnotationType", Class.class, StructFieldHandler.class));
     }
 
     @Test
     public void contextValidationCoversInvalidStructAndBasicDefinitions() {
         new StructContext("java.lang");
-        assertTrue(StructContext.isScannableClass(AccessorBean.class));
-        assertFalse(StructContext.isScannableClass(String.class));
-        assertFalse(StructContext.isScannableClass(Integer.class));
-        assertFalse(StructContext.isScannableClass(StructFieldHandler.class));
-        assertFalse(StructContext.isScannableClass(AbstractCoverageStruct.class));
-        assertFalse(StructContext.isScannableClass(null));
-        ExposedContext context = new ExposedContext();
-
-        context.scanBasicTypes(Set.of(String.class, Basic.class));
-        assertThrows(SerializeException.class, () -> context.scanBasicTypes(Set.of(MissingConstructorBasic.class)));
-        assertThrows(SerializeException.class, () -> context.scanStructTypes(Set.of(AbstractCoverageStruct.class)));
+        assertTrue(StructScannerTestSupport.invoke("isScannableClass", Class.class, AccessorBean.class));
+        assertFalse(StructScannerTestSupport.invoke("isScannableClass", Class.class, String.class));
+        assertFalse(StructScannerTestSupport.invoke("isScannableClass", Class.class, Integer.class));
+        assertFalse(StructScannerTestSupport.invoke("isScannableClass", Class.class, StructFieldHandler.class));
+        assertFalse(StructScannerTestSupport.invoke("isScannableClass", Class.class, AbstractCoverageStruct.class));
+        assertFalse(StructScannerTestSupport.invoke("isScannableClass", Class.class, null));
+        StructScannerTestSupport.invoke("scanBasic", Set.class, Set.of(String.class, Basic.class));
         assertThrows(SerializeException.class,
-                     () -> context.scanStructTypes(Set.of(InvalidNestedStructs.privateStructType())));
+                     () -> StructScannerTestSupport.invoke("scanBasic", Set.class,
+                                                          Set.of(MissingConstructorBasic.class)));
+        assertThrows(SerializeException.class,
+                     () -> StructScannerTestSupport.invoke("scanStruct", Set.class,
+                                                          Set.of(AbstractCoverageStruct.class)));
+        assertThrows(SerializeException.class,
+                     () -> StructScannerTestSupport.invoke("scanStruct", Set.class,
+                                                          Set.of(InvalidNestedStructs.privateStructType())));
     }
 
     @Test
@@ -370,17 +391,45 @@ public class StructCoreCoverageTest {
         assertThrows(SerializeException.class, () -> new StructField(ByteOrder.BIG_ENDIAN, field));
     }
 
+    /**
+     * Provides an array with a type variable as its component type.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class GenericArrayHolder<T> {
         T[] values;
     }
 
+    /**
+     * Provides a field whose collection element has an upper-bounded wildcard type.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class WildcardHolder {
         List<? extends BigEndianLeaf> values;
     }
 
+    /**
+     * Provides a class without a struct annotation for classification tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class Unannotated {
     }
 
+    /**
+     * Provides ordinary, static, ignored, and transient fields for field selection tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class FieldKinds {
         static int staticValue;
         int normal;
@@ -388,9 +437,23 @@ public class StructCoreCoverageTest {
         transient int transientValue;
     }
 
+    /**
+     * Supplies a field annotation type for testing handler type resolution.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private @interface TestHandlerAnnotation {
     }
 
+    /**
+     * Implements a comparable contract alongside a struct field handler to test interface selection.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class MultiInterfaceHandler
             implements Comparable<MultiInterfaceHandler>, StructFieldHandler<TestHandlerAnnotation> {
         @Override
@@ -399,39 +462,59 @@ public class StructCoreCoverageTest {
         }
     }
 
+    /**
+     * Leaves the handler annotation type open so a subclass can supply it.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class GenericHandler<A extends Annotation> implements StructFieldHandler<A> {
     }
 
+    /**
+     * Binds the handler annotation type through a generic superclass.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class InheritedHandler extends GenericHandler<TestHandlerAnnotation> {
     }
 
-    private static class ExposedContext extends StructContext
-    {
-        ExposedContext() {
-            super("package.that.does.not.exist");
-        }
-
-        void scanBasicTypes(Set<Class<?>> types) {
-            super.scanBasic(types);
-        }
-
-        void scanStructTypes(Set<Class<?>> types) {
-            super.scanStruct(types);
-        }
-    }
-
+    /**
+     * Declares a bean property typed as the abstract basic value base class.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class BasicBaseBean {
         private Basic value;
         public Basic getValue() { return value; }
         public void setValue(Basic value) { this.value = value; }
     }
 
+    /**
+     * Provides a String property without a field handler annotation.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class PlainBean {
         private String value;
         public String getValue() { return value; }
         public void setValue(String value) { this.value = value; }
     }
 
+    /**
+     * Provides a String property annotated for one-byte text serialization.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class HandledBean {
         @ToCharSequence(bufferLength = 1)
         private String value;
@@ -439,48 +522,104 @@ public class StructCoreCoverageTest {
         public void setValue(String value) { this.value = value; }
     }
 
+    /**
+     * Declares a static getter for an instance struct field.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class StaticGetterBean {
         private cint value;
         public static cint getValue() { return null; }
         public void setValue(cint value) { this.value = value; }
     }
 
+    /**
+     * Declares a getter whose return type differs from the field type.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class WrongGetterBean {
         private cint value;
         public String getValue() { return ""; }
         public void setValue(cint value) { this.value = value; }
     }
 
+    /**
+     * Declares a static setter for an instance struct field.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class StaticSetterBean {
         private cint value;
         public cint getValue() { return value; }
         public static void setValue(cint value) { }
     }
 
+    /**
+     * Declares a nonpublic getter for a struct field.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class PrivateGetterBean {
         private cint value;
         private cint getValue() { return value; }
         public void setValue(cint value) { this.value = value; }
     }
 
+    /**
+     * Declares a nonpublic setter for a struct field.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class PrivateSetterBean {
         private cint value;
         public cint getValue() { return value; }
         private void setValue(cint value) { this.value = value; }
     }
 
+    /**
+     * Declares a struct field setter that returns the assigned value.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class NonVoidSetterBean {
         private cint value;
         public cint getValue() { return value; }
         public cint setValue(cint value) { return this.value = value; }
     }
 
+    /**
+     * Declares a struct field setter with an extra parameter.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class MultiParameterSetterBean {
         private cint value;
         public cint getValue() { return value; }
         public void setValue(cint value, int ignored) { this.value = value; }
     }
 
+    /**
+     * Declares a setter that accepts a narrower type than the struct field.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     public static class SubtypeSetterBean {
         private Basic value;
         public Basic getValue() { return value; }

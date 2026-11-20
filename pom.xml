@@ -151,6 +151,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.6.0-jre</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.github.fbbzl</groupId>
             <artifactId>erwin</artifactId>
             <version>${erwin.version}</version>
@@ -197,7 +203,34 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>7.0.10</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.leangen.geantyref</groupId>
+            <artifactId>geantyref</artifactId>
+            <version>2.0.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>generic-library-comparison</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <version>3.21.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
@@ -259,12 +292,11 @@
                                 <exclude>org/fz/nettyx/handler/ActionWriteTimeoutHandler*</exclude>
                                 <!-- Dynamic schema resolution and malformed binary frame paths need specialized fixtures. -->
                                 <exclude>org/fz/nettyx/serializer/schema/type/BasicTypeResolver*</exclude>
-                                <exclude>org/fz/nettyx/serializer/schema/codec/SchemaCodec*</exclude>
                                 <exclude>org/fz/nettyx/serializer/schema/parser/XmlSchemaParser*</exclude>
                                 <exclude>org/fz/nettyx/serializer/schema/parser/YamlSchemaParser*</exclude>
                                 <exclude>org/fz/nettyx/serializer/schema/SchemaSerializer*</exclude>
                                 <exclude>org/fz/nettyx/serializer/schema/SchemaView*</exclude>
-                                <exclude>org/fz/nettyx/serializer/schema/SchemaRegistry*</exclude>
+                                <exclude>org/fz/nettyx/serializer/schema/SchemaContext*</exclude>
                                 <exclude>org/fz/nettyx/codec/EscapeCodec*</exclude>
                                 <exclude>org/fz/nettyx/codec/StartEndFlagFrameCodec*</exclude>
                                 <exclude>org/fz/nettyx/codec/DelimiterBasedFrameCodec*</exclude>
@@ -275,7 +307,6 @@
                                 <exclude>org/fz/nettyx/exception/TypeJudgmentException*</exclude>
                                 <!-- Fully covered lines with framework-state branch combinations. -->
                                 <exclude>org/fz/nettyx/handler/ChannelInterceptor*</exclude>
-                                <exclude>org/fz/nettyx/serializer/schema/codec/SchemaMap*</exclude>
                                 <exclude>org/fz/nettyx/event/ChannelEvents*</exclude>
                                 <exclude>org/fz/nettyx/serializer/schema/parser/SchemaParser*</exclude>
                                 <exclude>org/fz/nettyx/listener/ActionChannelFutureListener*</exclude>

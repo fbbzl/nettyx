@@ -8,9 +8,6 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.codec.EscapeCodec.EscapeDecoder;
 import org.fz.nettyx.codec.EscapeCodec.EscapeEncoder;
@@ -27,6 +24,7 @@ import static io.netty.buffer.ByteBufUtil.getBytes;
  * used to escape messages some sensitive characters can be replaced
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-27 18:07
  */
 public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, EscapeEncoder> {
@@ -42,7 +40,13 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         if (escapeDecoder.getMap().isEmpty() || escapeEncoder.getMap().isEmpty()) throw new IllegalArgumentException("escape map must not be empty");
     }
 
-    @Getter
+    /**
+     * Decodes configured escape sequences in inbound bytes.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-29
+     */
     @SuppressWarnings("all")
     public static class EscapeDecoder extends ByteToMessageDecoder {
 
@@ -50,15 +54,17 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
         public EscapeDecoder(EscapeMap map)
         {
-            this.map = map.getInverse();
+            this.map = map.snapshot().getInverse();
         }
+
+        public EscapeMap getMap() { return map.snapshot(); }
 
         @Override
         protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
         {
             ByteBuf decode = null;
             try {
-                decode = doEscape(in, map);
+                decode = doEscape(in, map.biMap);
                 out.add(decode);
             } catch (Exception e) {
                 ReferenceCountUtil.release(decode);
@@ -67,12 +73,23 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
     }
 
-    @Getter
-    @RequiredArgsConstructor
+    /**
+     * Replaces configured byte sequences with their escaped forms on write.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-29
+     */
     @SuppressWarnings("all")
     public static class EscapeEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final EscapeMap map;
+
+        public EscapeEncoder(EscapeMap map) {
+            this.map = map.snapshot();
+        }
+
+        public EscapeMap getMap() { return map.snapshot(); }
 
         @Override
         protected void encode(
@@ -80,7 +97,7 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
                 ByteBuf               msg,
                 ByteBuf               out)
         {
-            ByteBuf encoded = doEscape(msg, map);
+            ByteBuf encoded = doEscape(msg, map.biMap);
             try {
                 out.writeBytes(encoded);
             } finally {
@@ -164,9 +181,12 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
 
     /**
      * key is the real buf, and the value is the replacement buf
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-29
      */
-    public static class EscapeMap implements Map<byte[], byte[]> {
-        @Delegate
+    public static class EscapeMap {
         private final BiMap<byte[], byte[]> biMap;
 
         public EscapeMap() {
@@ -174,12 +194,47 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
         }
 
         public EscapeMap(Map<byte[], byte[]> map) {
-            this.biMap = new BiMap<>(map);
+            Map<byte[], byte[]> copy = new LinkedHashMap<>();
+            map.forEach((real, replacement) -> copy.put(real == null ? null : real.clone(),
+                                                        replacement == null ? null : replacement.clone()));
+            this.biMap = new BiMap<>(copy);
+            EscapeMapValidator.validate(biMap);
+        }
+
+        public int size() {
+            return biMap.size();
+        }
+
+        public boolean isEmpty() {
+            return biMap.isEmpty();
+        }
+
+        public byte[] put(byte[] real, byte[] replacement) {
+            byte[] realCopy = real == null ? null : real.clone();
+            byte[] replacementCopy = replacement == null ? null : replacement.clone();
+            Map<byte[], byte[]> candidate = new LinkedHashMap<>(biMap);
+            byte[] previous = null;
+            byte[] existingKey = null;
+            if (realCopy != null) {
+                for (Entry<byte[], byte[]> entry : candidate.entrySet()) {
+                    if (equalsContent(entry.getKey(), realCopy)) {
+                        existingKey = entry.getKey();
+                        previous = entry.getValue();
+                        break;
+                    }
+                }
+            }
+            if (existingKey != null) candidate.remove(existingKey);
+            candidate.put(realCopy, replacementCopy);
+            new EscapeMap(candidate);
+
+            if (existingKey != null) biMap.remove(existingKey);
+            biMap.put(realCopy, replacementCopy);
+            return previous == null ? null : previous.clone();
         }
 
         public void putHex(String realHex, String replacementHex) {
-            putIfAbsent(HexKit.decode(realHex), HexKit.decode(replacementHex));
-            checkEscapeMap();
+            put(HexKit.decode(realHex), HexKit.decode(replacementHex));
         }
 
         public void putBuf(ByteBuf real, ByteBuf replacement) {
@@ -189,38 +244,75 @@ public class EscapeCodec extends CombinedChannelDuplexHandler<EscapeDecoder, Esc
             real.readBytes(realBytes);
             replacement.readBytes(replacementBytes);
 
-            putIfAbsent(realBytes, replacementBytes);
-            checkEscapeMap();
+            put(realBytes, replacementBytes);
+        }
+
+        private EscapeMap snapshot() {
+            Map<byte[], byte[]> copy = new LinkedHashMap<>();
+            biMap.forEach((real, replacement) -> copy.put(real == null ? null : real.clone(),
+                                                         replacement == null ? null : replacement.clone()));
+            return new EscapeMap(copy);
         }
 
         public EscapeMap getInverse() {
             return new EscapeMap(biMap.getInverse());
         }
 
-        void checkEscapeMap()
+    }
+
+    /**
+     * Checks that escape mappings can be applied without ambiguity.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-11-18
+     */
+    private static final class EscapeMapValidator
+    {
+        private EscapeMapValidator() { }
+
+        private static void validate(Map<byte[], byte[]> map)
         {
-            // 1 check if byte buf is valid
-            for (Entry<byte[], byte[]> entry : this.entrySet()) {
+            for (Entry<byte[], byte[]> entry : map.entrySet()) {
                 byte[] real = entry.getKey(), replacement = entry.getValue();
                 Throws.ifTrue(PrimitiveArrayUtil.isEmpty(real) || PrimitiveArrayUtil.isEmpty(replacement),
                               () -> "reals or replacements contains invalid buf, please check");
             }
 
-            // 2 check if intersection is not empty
-            List<byte[]>
-                    reals        = new ArrayList<>(this.keySet()),
-                    replacements = new ArrayList<>(this.values());
-
+            List<byte[]> reals = new ArrayList<>(map.keySet());
+            List<byte[]> replacements = new ArrayList<>(map.values());
             Collection<byte[]> intersection = intersection(reals, replacements);
             Throws.ifNotEmpty(intersection, () -> "do not let the reals intersect with the replacements, please check");
 
-            // 3 check if replacements contains the reals
             for (byte[] real : reals) {
                 for (byte[] replacement : replacements) {
                     Throws.ifTrue(equalsContent(replacement, real),
                                   () -> "do not let the replacements: " + Arrays.toString(replacement) + " same as the reals: " + Arrays.toString(real));
                 }
             }
+
+            for (int i = 0; i < replacements.size(); i++) {
+                byte[] real = reals.get(i);
+                byte[] replacement = replacements.get(i);
+                for (int j = i + 1; j < replacements.size(); j++) {
+                    Throws.ifTrue(equalsContent(real, reals.get(j)),
+                                  () -> "real buffers must be unique: " + Arrays.toString(real));
+                    byte[] other = replacements.get(j);
+                    Throws.ifTrue(equalsContent(replacement, other),
+                                  () -> "replacement buffers must be unique: " + Arrays.toString(replacement));
+                    Throws.ifTrue(isPrefix(replacement, other) || isPrefix(other, replacement),
+                                  () -> "replacement buffers must not overlap by prefix: " + Arrays.toString(replacement) + " and " + Arrays.toString(other));
+                }
+            }
+        }
+
+        private static boolean isPrefix(byte[] prefix, byte[] value)
+        {
+            if (prefix.length >= value.length) return false;
+            for (int i = 0; i < prefix.length; i++) {
+                if (prefix[i] != value[i]) return false;
+            }
+            return true;
         }
     }
 }

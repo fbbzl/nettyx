@@ -1,8 +1,10 @@
-package org.fz.nettyx.serializer.struct.generator;
+package org.fz.nettyx.serializer.struct.accessor;
 
 import cn.hutool.core.lang.TypeReference;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.Getter;
+import lombok.Setter;
 import org.fz.nettyx.beanmodel.valid.*;
 import org.fz.nettyx.codec.model.GirlFriend;
 import org.fz.nettyx.codec.model.NestedGeneric;
@@ -13,6 +15,7 @@ import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructContext;
+import org.fz.nettyx.serializer.struct.StructScannerTestSupport;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
 import org.fz.nettyx.serializer.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.basic.c.signed.cint;
@@ -29,6 +32,13 @@ import java.util.Set;
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
+/**
+ * Verifies how struct accessors handle direct fields, delegated fields, and flexible reads that make no progress.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class StructAccessorStrategyTest {
 
     private static StructDefinition definition;
@@ -37,9 +47,8 @@ public class StructAccessorStrategyTest {
     public static void scanStructs() {
         new StructContext("org.fz.nettyx.beanmodel.valid");
         new StructContext("org.fz.nettyx.codec.model");
-        FixtureContext fixtureContext = new FixtureContext();
-        fixtureContext.scanBasicTypes(Set.of(NoProgressBasic.class));
-        fixtureContext.scanStructTypes(Set.of(NoProgressStruct.class));
+        StructScannerTestSupport.invoke("scanBasic", Set.class, Set.of(NoProgressBasic.class));
+        StructScannerTestSupport.invoke("scanStruct", Set.class, Set.of(NoProgressStruct.class));
         definition = getStructDefinition(AccessorBean.class);
     }
 
@@ -178,20 +187,13 @@ public class StructAccessorStrategyTest {
         }
     }
 
-    private static final class FixtureContext extends StructContext {
-        private FixtureContext() {
-            super("package.that.does.not.exist");
-        }
-
-        private void scanBasicTypes(Set<Class<?>> types) {
-            super.scanBasic(types);
-        }
-
-        private void scanStructTypes(Set<Class<?>> types) {
-            super.scanStruct(types);
-        }
-    }
-
+    /**
+     * Simulates a basic value reader that leaves the reader index unchanged.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-09-15
+     */
     public static final class NoProgressBasic extends Basic<Integer> {
         public NoProgressBasic(ByteBuf input, ByteOrder order) {
             super(input, order);
@@ -204,17 +206,18 @@ public class StructAccessorStrategyTest {
         @Override protected Integer read(ByteBuf readingBuf, ByteOrder byteOrder) { return 0; }
     }
 
+    /**
+     * Exposes a flexible array of basic values that consume no bytes.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-09-15
+     */
     @Struct(endian = Struct.Endian.BE)
+    @Getter
+    @Setter
     public static final class NoProgressStruct {
         @ToArray(flexible = true)
         private NoProgressBasic[] values;
-
-        public NoProgressBasic[] getValues() {
-            return values;
-        }
-
-        public void setValues(NoProgressBasic[] values) {
-            this.values = values;
-        }
     }
 }

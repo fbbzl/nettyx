@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
 import org.fz.nettyx.serializer.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.basic.c.signed.cdouble;
@@ -22,109 +21,129 @@ import java.nio.charset.StandardCharsets;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
 
 /**
+ * Exercises independent results, flexible arrays, direct buffers, and basic type conversion.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-09-02
  */
 public class SchemaSerializerCoverageTest
 {
 
-    private static final SchemaRegistry  REGISTRY = SchemaRegistry.load(
+    private static final SchemaContext  CONTEXT = SchemaContext.load(
             "configured/device.xml", "configured/geo.xml");
-    private static final SchemaCodec CODEC    = new SchemaCodec(REGISTRY);
+    private static final SchemaSerializer SERIALIZER = CONTEXT.serializer("device.Device");
 
     @Test
-    public void reusableStructUpdatesValuesInPlaceAndRegularMapsAreReplaced()
+    public void deserializingAgainKeepsPriorResultsIndependent()
     {
-        Map<String, Object> reusable = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(1, "first", new byte[]{1, 2}), reusable);
+        ByteBuf firstInput = deviceBuffer(1, "first", new byte[]{1, 2});
+        ByteBuf secondInput = deviceBuffer(2, "second", new byte[]{3, 4});
+        try {
+            Map<String, Object> first  = SERIALIZER.doDeserialize(firstInput);
+            Map<String, Object> second = SERIALIZER.doDeserialize(secondInput);
 
-        byte[]    raw    = (byte[]) reusable.get("raw");
-        List<?>   values = (List<?>) reusable.get("values");
-        Map<?, ?> gps    = (Map<?, ?>) reusable.get("gps");
+            assertNotSame(first, second);
+            assertNotSame(first.get("raw"), second.get("raw"));
+            assertNotSame(first.get("values"), second.get("values"));
+            assertNotSame(first.get("gps"), second.get("gps"));
+            assertEquals(List.of("id", "speed", "temperature", "name", "raw", "values", "gps"),
+                         List.copyOf(first.keySet()));
+            assertEquals(1, first.get("id"));
+            assertEquals(2, second.get("id"));
+            assertArrayEquals(new byte[]{1, 2}, (byte[]) first.get("raw"));
+            assertArrayEquals(new byte[]{3, 4}, (byte[]) second.get("raw"));
+            assertEquals(Map.of("longitude", 100, "latitude", 200), first.get("gps"));
+        }
+        finally {
+            firstInput.release();
+            secondInput.release();
+        }
+    }
 
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(2, "first", new byte[]{3, 4}), reusable);
+    @Test
+    public void nullMapSerializesAsZeroFilledFixedLengthBytes()
+    {
+        ByteBuf writing = Unpooled.buffer();
+        try {
+            SERIALIZER.doSerialize(null, writing);
 
-        assertEquals(2, reusable.get("id"));
-        assertSame(raw, reusable.get("raw"));
-        assertSame(values, reusable.get("values"));
-        assertSame(gps, reusable.get("gps"));
-        assertArrayEquals(new byte[]{3, 4}, (byte[]) reusable.get("raw"));
+            assertEquals(CONTEXT.fixedSizeOf(SERIALIZER.getSchema()), writing.readableBytes());
+            byte[] actual = new byte[writing.readableBytes()];
+            writing.readBytes(actual);
+            assertArrayEquals(new byte[actual.length], actual);
+        }
+        finally {
+            writing.release();
+        }
+    }
 
-        reusable.put("marker", true);
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(3, "second", new byte[]{5, 6}), reusable);
-        assertEquals(3, reusable.get("id"));
-        assertTrue(reusable.containsKey("marker"));
-        assertEquals(Boolean.TRUE, reusable.remove("marker"));
-        reusable.clear();
-        assertTrue(reusable.isEmpty());
+    @Test
+    public void flexibleArraysRejectZeroSizedSchemaElements()
+    {
+        SchemaContext context = SchemaContext.load("configured/device.json", "configured/geo.yml");
+        Schema.SchemaField field = Schema.SchemaField.schemaArray("empty", "Empty", null, true);
+        field.resolvedSchemaRef("device.Empty");
+        ByteBuf input = Unpooled.buffer().writeByte(1);
 
-        Map<String, Object> regular = new LinkedHashMap<>(Map.of("stale", true));
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(4, "plain", new byte[]{7, 8}), regular);
-        assertFalse(regular.containsKey("stale"));
-        assertEquals(4, regular.get("id"));
+        try {
+            SerializeException error = assertThrows(SerializeException.class,
+                                                     () -> context.serializer("device.Device").readField(
+                                                             field, ByteOrder.BIG_ENDIAN, input));
+            assertTrue(error.getMessage(), error.getMessage().contains("empty"));
+        }
+        finally {
+            input.release();
+        }
     }
 
     @Test
     public void flexibleArraysViewsDirectBuffersAndArrayInputsFollowTheirContracts()
     {
-        Map<String, Object> reusable = SchemaSerializer.newReusableStruct(REGISTRY, "device.Flexible");
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(11, 22, 33), reusable);
-        List<?> tail = (List<?>) reusable.get("tail");
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Flexible", flexibleBuffer(44), reusable);
-        assertSame(tail, reusable.get("tail"));
-        assertEquals(List.of(44), reusable.get("tail"));
+        Map<String, Object> first = SchemaSerializer.toMap(CONTEXT, "device.Flexible", flexibleBuffer(11, 22, 33));
+        Map<String, Object> second = SchemaSerializer.toMap(CONTEXT, "device.Flexible", flexibleBuffer(44));
+        assertEquals(List.of(11, 22, 33), first.get("tail"));
+        assertEquals(List.of(44), second.get("tail"));
 
-        SchemaView view = REGISTRY.serializer("device.Device")
+        SchemaView view = CONTEXT.serializer("device.Device")
                                   .view(deviceBuffer(5, "view", new byte[]{9, 10}));
         assertEquals(5, view.getInt("id"));
         assertThrows(SerializeException.class,
-                     () -> REGISTRY.serializer("device.Flexible").view(flexibleBuffer(1)));
+                     () -> CONTEXT.serializer("device.Flexible").view(flexibleBuffer(1)));
         assertThrows(TooLessBytesException.class,
-                     () -> REGISTRY.serializer("device.Device").view(Unpooled.wrappedBuffer(new byte[1])));
+                     () -> CONTEXT.serializer("device.Device").view(Unpooled.wrappedBuffer(new byte[1])));
 
         ByteBuf direct = Unpooled.directBuffer(4);
         try {
             direct.writeBytes(new byte[]{'o', 'k', 0, 0});
-            assertEquals("ok", CODEC.readField(
-                    SchemaField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
+            assertEquals("ok", SERIALIZER.readField(
+                    Schema.SchemaField.charField("text", 4, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN, direct));
         }
         finally {
             direct.release();
         }
 
-        SchemaField shortArray = SchemaField.basicArray("values", cshort.class, 2, false);
-        ByteBuf     writing    = Unpooled.buffer();
-        CODEC.writeArray(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
+        Schema.SchemaField shortArray = Schema.SchemaField.basicArray("values", cshort.class, 2, false);
+        ByteBuf            writing    = Unpooled.buffer();
+        SERIALIZER.writeField(shortArray, new LinkedHashSet<>(List.of(1, 2)), ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{1, 0, 2, 0}, readableBytes(writing));
         writing.clear();
-        CODEC.writeArray(shortArray, new int[]{3, 4}, ByteOrder.LITTLE_ENDIAN, writing);
+        SERIALIZER.writeField(shortArray, new int[]{3, 4}, ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{3, 0, 4, 0}, readableBytes(writing));
-        assertThrows(SerializeException.class, () -> CODEC.writeArray(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
+        assertThrows(SerializeException.class, () -> SERIALIZER.writeField(shortArray, 1, ByteOrder.LITTLE_ENDIAN, Unpooled.buffer()));
     }
 
     @Test
-    public void reusableTargetsMustMatchTheirStructAndGenericCollectionsUseIterators()
+    public void genericCollectionsUseIterators()
     {
-        Map<String, Object> deviceTarget = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
-        assertThrows(SerializeException.class, () -> SchemaSerializer.deserializeInto(
-                REGISTRY, "device.Flexible", flexibleBuffer(1), deviceTarget));
-
-        Map<String, Object> wrongNestedTarget = SchemaSerializer.newReusableStruct(REGISTRY, "device.Device");
-        deviceTarget.put("gps", wrongNestedTarget);
-        SchemaSerializer.deserializeInto(REGISTRY, "device.Device", deviceBuffer(7, "nested", new byte[]{1, 2}), deviceTarget);
-        Map<?, ?> gps = (Map<?, ?>) deviceTarget.get("gps");
-        assertNotSame(wrongNestedTarget, gps);
-        assertEquals(100, gps.get("longitude"));
-        assertEquals(200, gps.get("latitude"));
-
         Collection<Integer> iteratorOnly = new AbstractCollection<>()
         {
             @Override
@@ -146,24 +165,41 @@ public class SchemaSerializerCoverageTest
             }
         };
         ByteBuf writing = Unpooled.buffer();
-        CODEC.writeArray(SchemaField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicArray("values", cshort.class, 2, false), iteratorOnly, ByteOrder.LITTLE_ENDIAN, writing);
         assertArrayEquals(new byte[]{5, 0, 6, 0}, readableBytes(writing));
     }
 
     @Test
-    public void codecReportsMissingBytesAndFixedSizeCacheHandlesNestedShapes()
+    public void sequentialListsAreWrittenWithoutIndexedAccess()
     {
-        SchemaField bytes = SchemaField.bytesField("bytes", 2);
-        assertThrows(TooLessBytesException.class,
-                     () -> CODEC.readField(bytes, ByteOrder.BIG_ENDIAN, Unpooled.wrappedBuffer(new byte[]{1})));
-        assertThrows(TooLessBytesException.class,
-                     () -> CODEC.readField(SchemaField.charField("text", 2, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN,
-                                           Unpooled.wrappedBuffer(new byte[]{1})));
+        List<Integer> values = new LinkedList<>(List.of(5, 6))
+        {
+            @Override
+            public Integer get(int index)
+            {
+                throw new AssertionError("Sequential lists must be traversed with an iterator");
+            }
+        };
+        Schema.SchemaField field = Schema.SchemaField.basicArray("values", cshort.class, 3, false);
+        ByteBuf writing = Unpooled.buffer();
+        try {
+            SERIALIZER.writeField(field, values, ByteOrder.LITTLE_ENDIAN, writing);
+            assertArrayEquals(new byte[]{5, 0, 6, 0, 0, 0}, readableBytes(writing));
+        }
+        finally {
+            writing.release();
+        }
+    }
 
-        assertTrue(CODEC.fixedSizeOf(REGISTRY.require("device.Device")) > 0);
-        assertEquals(CODEC.fixedSizeOf(REGISTRY.require("device.Device")),
-                     CODEC.fixedSizeOf(REGISTRY.require("device.Device")));
-        assertEquals(-1, CODEC.fixedSizeOf(REGISTRY.require("device.Flexible")));
+    @Test
+    public void fieldReaderReportsMissingBytes()
+    {
+        Schema.SchemaField bytes = Schema.SchemaField.bytesField("bytes", 2);
+        assertThrows(TooLessBytesException.class,
+                     () -> SERIALIZER.readField(bytes, ByteOrder.BIG_ENDIAN, Unpooled.wrappedBuffer(new byte[]{1})));
+        assertThrows(TooLessBytesException.class,
+                     () -> SERIALIZER.readField(Schema.SchemaField.charField("text", 2, StandardCharsets.UTF_8), ByteOrder.BIG_ENDIAN,
+                                           Unpooled.wrappedBuffer(new byte[]{1})));
     }
 
     @Test

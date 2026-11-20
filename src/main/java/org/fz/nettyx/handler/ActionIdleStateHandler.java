@@ -19,6 +19,7 @@ import static org.fz.nettyx.action.Actions.invokeAction;
  * The type Actionable idle state handler.
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2021 -12-29 18:46
  */
 @Getter

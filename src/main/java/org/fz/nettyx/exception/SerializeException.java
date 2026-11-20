@@ -1,6 +1,8 @@
 package org.fz.nettyx.exception;
 
 /**
+ * Signals a failure while reading or writing serialized data.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021/10/20 9:52

@@ -67,7 +67,12 @@ public abstract class ServerTemplate {
                 .localAddress(bindAddress)
                 .channelFactory(() -> {
                     NioServerSocketChannel serverSocketChannel = new NioServerSocketChannel();
-                    doChannelConfig(serverSocketChannel);
+                    try {
+                        doChannelConfig(serverSocketChannel);
+                    } catch (RuntimeException | Error failure) {
+                        serverSocketChannel.unsafe().closeForcibly();
+                        throw failure;
+                    }
                     return serverSocketChannel;
                 })
                 .childHandler(childChannelInitializer());

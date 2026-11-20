@@ -7,7 +7,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Checks hexadecimal conversion and invalid input handling.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class HexKitTest {

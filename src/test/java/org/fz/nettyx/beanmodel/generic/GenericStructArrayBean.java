@@ -1,9 +1,20 @@
 package org.fz.nettyx.beanmodel.generic;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 
+/**
+ * Tests generic struct elements in both fixed and flexible arrays.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 @Struct(endian = Struct.Endian.BE)
+@Getter
+@Setter
 public class GenericStructArrayBean<T> {
 
     @ToArray(length = 2)
@@ -11,20 +22,4 @@ public class GenericStructArrayBean<T> {
 
     @ToArray(flexible = true)
     private T[] flexible;
-
-    public T[] getFixed() {
-        return fixed;
-    }
-
-    public void setFixed(T[] fixed) {
-        this.fixed = fixed;
-    }
-
-    public T[] getFlexible() {
-        return flexible;
-    }
-
-    public void setFlexible(T[] flexible) {
-        this.flexible = flexible;
-    }
 }

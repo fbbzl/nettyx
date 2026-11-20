@@ -1,10 +1,8 @@
 package org.fz.nettyx.serializer.struct;
 
 import cn.hutool.core.lang.TypeReference;
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
@@ -13,7 +11,8 @@ import org.fz.nettyx.serializer.Serializer;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.basic.Basic;
-import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
+import org.fz.nettyx.serializer.struct.accessor.StructAccessor;
+import org.fz.nettyx.serializer.struct.accessor.StructAccessorFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
-import static org.fz.nettyx.serializer.struct.StructContext.BASIC_CONSTRUCTOR_CACHE;
-import static org.fz.nettyx.serializer.struct.StructContext.STRUCT_DEFINITION_CACHE;
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 
 /**
@@ -88,7 +85,7 @@ public final class StructSerializer implements Serializer {
     {
         try
         {
-            return (B) BASIC_CONSTRUCTOR_CACHE.get(basicClass).apply(buf, byteOrder);
+            return (B) StructContext.getBasicConstructor(basicClass).apply(buf, byteOrder);
         }
         catch (Exception instanceError)
         {
@@ -104,12 +101,29 @@ public final class StructSerializer implements Serializer {
 
     public static <S> S newStruct(Type structType)
     {
+        return (S) newStruct(structType, structConstructor(structType));
+    }
+
+    private static StructAccessor structConstructor(Type structType)
+    {
         try
         {
             StructDefinition definition = getStructDefinition(structType);
             if (definition == null)
                 throw new SerializeException("uncached struct type: " + structType);
-            return (S) StructAccessorFactory.get(definition).newInstance();
+            return StructAccessorFactory.get(definition);
+        }
+        catch (Exception instanceError)
+        {
+            throw new SerializeException("struct [" + structType + "] instantiate failed...", instanceError);
+        }
+    }
+
+    private static Object newStruct(Type structType, StructAccessor accessor)
+    {
+        try
+        {
+            return accessor.newInstance();
         }
         catch (Exception instanceError)
         {
@@ -143,10 +157,16 @@ public final class StructSerializer implements Serializer {
             Type      structType,
             ByteBuf   byteBuf)
     {
-        StructDefinition structDef = getStructDefinition(structType);
-        Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when read, root type: [" + structType + "]"));
+        return (S) requireAccessor(structType, "read").read(this, root, structType, byteBuf);
+    }
 
-        return (S) StructAccessorFactory.get(structDef).read(this, root, structType, byteBuf);
+    private static StructAccessor requireAccessor(Type structType, String operation)
+    {
+        StructDefinition structDef = getStructDefinition(structType);
+        if (structDef == null)
+            throw new StructDefinitionException("struct definition can not be null when " + operation
+                                                + ", root type: [" + structType + "]");
+        return StructAccessorFactory.get(structDef);
     }
 
     public  <T> T[] readArray(
@@ -192,16 +212,23 @@ public final class StructSerializer implements Serializer {
     {
         if (!flexible) {
             S[] structs = ToArray.ToArrayHandler.newArray(elementType, length);
-            for (int i = 0; i < length; i++) structs[i] = readStruct(elementType, byteBuf);
+            if (length == 0) return structs;
+
+            StructAccessor accessor = requireAccessor(elementType, "read");
+            for (int i = 0; i < length; i++)
+                structs[i] = (S) accessor.read(this, root, elementType, byteBuf);
             return structs;
         }
         else {
+            if (!byteBuf.isReadable()) return ToArray.ToArrayHandler.newArray(elementType, 0);
+
+            StructAccessor accessor = requireAccessor(elementType, "read");
             List<S> flexibleStructs = new ArrayList<>();
-            while (byteBuf.isReadable()) {
+            do {
                 int readerIndex = byteBuf.readerIndex();
-                flexibleStructs.add(readStruct(elementType, byteBuf));
+                flexibleStructs.add((S) accessor.read(this, root, elementType, byteBuf));
                 ensureReadProgress(elementType, byteBuf, readerIndex);
-            }
+            } while (byteBuf.isReadable());
             return flexibleStructs.toArray(ToArray.ToArrayHandler.newArray(elementType, flexibleStructs.size()));
         }
     }
@@ -219,10 +246,7 @@ public final class StructSerializer implements Serializer {
             S       struct,
             ByteBuf writing)
     {
-        StructDefinition structDef = getStructDefinition(structType);
-        Throws.ifNull(structDef, () -> new StructDefinitionException("struct definition can not be null when write, " + "root type: [" + structType + "]"));
-
-        StructAccessorFactory.get(structDef).write(this, root, structType, struct, writing);
+        requireAccessor(structType, "write").write(this, root, structType, struct, writing);
     }
 
     public void writeArray(
@@ -274,11 +298,17 @@ public final class StructSerializer implements Serializer {
     {
         T[] structArray = (T[]) defaultIfNull(structArrayValue, () -> ToArray.ToArrayHandler.newArray(elementType, (flexible ? 0 : length)));
 
-        for (int i = 0; i < (flexible ? structArray.length : length); i++) {
-            if (i < structArray.length)
-                writeStruct(elementType, defaultIfNull(structArray[i], () -> newStruct(elementType)), writing);
-            else
-                writeStruct(elementType, newStruct(elementType), writing);
+        int writeCount = flexible ? structArray.length : length;
+        if (writeCount <= 0) return;
+
+        // Preserve construction errors when the first element is supplied by default.
+        StructAccessor accessor = structArray.length == 0 || structArray[0] == null
+                                  ? structConstructor(elementType)
+                                  : requireAccessor(elementType, "write");
+        for (int i = 0; i < writeCount; i++) {
+            Object element = i < structArray.length ? structArray[i] : null;
+            if (element == null) element = newStruct(elementType, accessor);
+            accessor.write(this, root, elementType, element, writing);
         }
     }
 
@@ -287,7 +317,10 @@ public final class StructSerializer implements Serializer {
         return switch (type)
         {
             case Class<?>        clazz   -> Basic.class.isAssignableFrom(clazz) && Basic.class != type;
-            case TypeVariable<?> ignored -> isBasic(TypeUtil.getActualType(root, type));
+            case TypeVariable<?> ignored -> {
+                Type actual = StructContext.resolveType(root, type);
+                yield !(actual instanceof TypeVariable<?>) && isBasic(actual);
+            }
             default                      -> false;
         };
     }
@@ -296,9 +329,12 @@ public final class StructSerializer implements Serializer {
     {
         return switch (type)
         {
-            case Class<?>          clazz             -> STRUCT_DEFINITION_CACHE.containsKey(clazz);
+            case Class<?>          clazz             -> getStructDefinition(clazz) != null;
             case ParameterizedType parameterizedType -> isStruct(parameterizedType.getRawType());
-            case TypeVariable<?>   ignored           -> isStruct(TypeUtil.getActualType(root, type));
+            case TypeVariable<?> ignored -> {
+                Type actual = StructContext.resolveType(root, type);
+                yield !(actual instanceof TypeVariable<?>) && isStruct(actual);
+            }
             default                                  -> false;
         };
     }

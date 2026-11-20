@@ -11,6 +11,7 @@ import java.util.HexFormat;
  * The Hex util.
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-29 21:07
  */
 @UtilityClass

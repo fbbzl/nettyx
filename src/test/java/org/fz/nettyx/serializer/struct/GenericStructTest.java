@@ -11,6 +11,13 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+/**
+ * Checks round trips for generic structs with one, two, and three independent type arguments.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-21
+ */
 public class GenericStructTest extends AbstractStructSerializerTest {
 
     @Test

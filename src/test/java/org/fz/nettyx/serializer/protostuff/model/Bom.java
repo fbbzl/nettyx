@@ -5,6 +5,8 @@ import lombok.Data;
 
 
 /**
+ * Groups three generic values in the Protostuff sample model.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/19 11:17

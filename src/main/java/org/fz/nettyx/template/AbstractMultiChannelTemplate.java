@@ -9,17 +9,19 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
-import lombok.experimental.Delegate;
 import org.fz.erwin.exception.Throws;
-import org.fz.erwin.lambda.Try;
 import org.fz.nettyx.listener.ActionChannelFutureListener;
 import org.fz.nettyx.util.ChannelState;
 
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static org.fz.nettyx.util.ChannelState.CHANNEL_STATE_KEY;
@@ -68,13 +70,10 @@ public abstract class AbstractMultiChannelTemplate<K, S extends SocketAddress, C
 
     protected void storeChannel(K key, Channel channel)
     {
-        channelStorage.compute(key, Try.apply((k, old) -> {
-            if (isActive(old)) {
-                old.close();
-            }
+        channelStorage.compute(key, (k, old) -> {
             log.debug("has stored channel [{}]", channel);
             return channel;
-        }));
+        });
     }
 
     protected void storeChannel(ChannelFuture cf)
@@ -142,7 +141,25 @@ public abstract class AbstractMultiChannelTemplate<K, S extends SocketAddress, C
 
     protected void clear()
     {
-        channelStorage.clear();
+        for (Channel channel : channelStorage.clearAndGetValues()) {
+            closeChannel(channel);
+        }
+    }
+
+    private static void closeChannel(Channel channel)
+    {
+        try {
+            if (!channel.isOpen()) return;
+            if (channel.isRegistered()) channel.close();
+            else                        channel.unsafe().closeForcibly();
+        } catch (Exception exception) {
+            try {
+                if (channel.isOpen()) channel.unsafe().closeForcibly();
+            } catch (Exception forceCloseException) {
+                exception.addSuppressed(forceCloseException);
+            }
+            log.warn("Failed to close channel", exception);
+        }
     }
 
     protected void doChannelConfig(K channelKey, F channelConfig)
@@ -163,7 +180,12 @@ public abstract class AbstractMultiChannelTemplate<K, S extends SocketAddress, C
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
                     C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                    doChannelConfig(key, (F) chl.config());
+                    try {
+                        doChannelConfig(key, (F) chl.config());
+                    } catch (RuntimeException | Error failure) {
+                        chl.unsafe().closeForcibly();
+                        throw failure;
+                    }
                     return chl;
                 })
                 .handler(channelInitializer());
@@ -194,7 +216,6 @@ public abstract class AbstractMultiChannelTemplate<K, S extends SocketAddress, C
      */
     public static class ChannelStorage<K> {
 
-        @Delegate
         private final Map<K, Channel> storage;
 
         /**
@@ -249,6 +270,80 @@ public abstract class AbstractMultiChannelTemplate<K, S extends SocketAddress, C
                 int   concurrencyLevel)
         {
             this.storage = new SafeConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
+        }
+
+        public synchronized Channel compute(K key, BiFunction<? super K, ? super Channel, ? extends Channel> remappingFunction)
+        {
+            Channel[] replaced = new Channel[1];
+            Channel updated = storage.compute(key, (currentKey, old) -> {
+                Channel replacement = remappingFunction.apply(currentKey, old);
+                if (old != replacement) replaced[0] = old;
+                return replacement;
+            });
+            if (replaced[0] != null && !storage.containsValue(replaced[0])) closeChannel(replaced[0]);
+            return updated;
+        }
+
+        private synchronized List<Channel> clearAndGetValues()
+        {
+            List<Channel> channels = new ArrayList<>(storage.values());
+            storage.clear();
+            return channels;
+        }
+
+        void clear()
+        {
+            storage.clear();
+        }
+
+        public Channel get(K key)
+        {
+            return storage.get(key);
+        }
+
+        public Channel getOrDefault(K key, Channel defaultValue)
+        {
+            return storage.getOrDefault(key, defaultValue);
+        }
+
+        public int size()
+        {
+            return storage.size();
+        }
+
+        public boolean isEmpty()
+        {
+            return storage.isEmpty();
+        }
+
+        public boolean containsKey(K key)
+        {
+            return storage.containsKey(key);
+        }
+
+        public boolean containsValue(Channel value)
+        {
+            return storage.containsValue(value);
+        }
+
+        public Set<K> keySet()
+        {
+            return Collections.unmodifiableSet(storage.keySet());
+        }
+
+        public Collection<Channel> values()
+        {
+            return Collections.unmodifiableCollection(storage.values());
+        }
+
+        public Set<Map.Entry<K, Channel>> entrySet()
+        {
+            return Collections.unmodifiableMap(storage).entrySet();
+        }
+
+        public void forEach(java.util.function.BiConsumer<? super K, ? super Channel> action)
+        {
+            storage.forEach(action);
         }
 
         /**
@@ -366,5 +461,6 @@ public abstract class AbstractMultiChannelTemplate<K, S extends SocketAddress, C
         public String toString() {
             return this.storage.toString();
         }
+
     }
 }

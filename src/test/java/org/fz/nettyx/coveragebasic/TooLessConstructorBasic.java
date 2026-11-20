@@ -6,6 +6,13 @@ import org.fz.nettyx.serializer.basic.Basic;
 
 import java.nio.ByteOrder;
 
+/**
+ * Throws a short-buffer exception when the reflective constructor reads its input.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-14
+ */
 public class TooLessConstructorBasic extends Basic<Integer> {
     public TooLessConstructorBasic(ByteBuf input, ByteOrder order) {
         super(input, order);

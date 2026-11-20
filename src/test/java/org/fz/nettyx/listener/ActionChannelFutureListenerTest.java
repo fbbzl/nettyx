@@ -9,6 +9,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
+/**
+ * Verifies channel future callbacks dispatch for success, failure, and cancellation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class ActionChannelFutureListenerTest {
 
     @Test

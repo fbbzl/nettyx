@@ -13,6 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
+/**
+ * Verifies listener retries run on the event loop and stop at the configured retry limit.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class ListenerActionTest {
 
     @Test

@@ -39,6 +39,13 @@ public class DelimiterBasedFrameCodec extends CombinedChannelDuplexHandler<Delim
         this(new DelimiterBasedFrameDecoder(maxFrameLength, stripDelimiter, failFast, delimiter.slice(delimiter.readerIndex(), delimiter.readableBytes())), new DelimiterBasedFrameEncoder(delimiter));
     }
 
+    /**
+     * Appends the configured delimiter to each outbound frame.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
+     */
     public static class DelimiterBasedFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final ByteBuf delimiter;

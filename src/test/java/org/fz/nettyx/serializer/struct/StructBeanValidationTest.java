@@ -17,6 +17,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 import static org.junit.Assert.*;
 
+/**
+ * Checks generated bean accessors, field encoding, and rejection of invalid definitions during scanning.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class StructBeanValidationTest {
 
     @Test

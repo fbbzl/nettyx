@@ -9,6 +9,8 @@ import org.fz.nettyx.channel.bluetooth.client.BtChannel;
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 
 /**
+ * Defines the configuration options for a Bluetooth client channel.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/5/15 17:29
@@ -37,6 +39,8 @@ public interface BtChannelConfig extends ChannelConfig {
     void setMaster(boolean master);
 
     /**
+     * Stores Bluetooth channel settings and exposes them through Netty channel options.
+     *
      * @author fengbinbin
      * @version 1.0
      * @since 2024/5/16 23:06
@@ -58,12 +62,6 @@ public interface BtChannelConfig extends ChannelConfig {
         public DefaultBtChannelConfig(BtChannel channel)
         {
             super(channel);
-        }
-
-        @Override
-        public int getConnectTimeoutMillis()
-        {
-            return connectTimeoutMillis;
         }
 
         @Override

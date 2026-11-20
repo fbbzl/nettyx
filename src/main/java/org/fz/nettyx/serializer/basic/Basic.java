@@ -2,6 +2,9 @@ package org.fz.nettyx.serializer.basic;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.TooLessBytesException;
@@ -23,8 +26,11 @@ import static lombok.AccessLevel.PROTECTED;
  */
 
 @FieldDefaults(level = PROTECTED)
+@AllArgsConstructor(access = PROTECTED)
 public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic<V>> {
 
+    @Getter
+    @Accessors(fluent = true)
     V value;
 
     protected Basic(ByteBuf byteBuf, ByteOrder byteOrder) {
@@ -37,10 +43,6 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
             if (readableBytes < expectedBytes) throw new TooLessBytesException(expectedBytes, readableBytes);
             throw error;
         }
-    }
-
-    protected Basic(V value) {
-        this.value = value;
     }
 
     public static int reflectForSize(Class<? extends Basic<?>> basicClass)
@@ -74,10 +76,6 @@ public abstract class Basic<V extends Comparable<V>> implements Comparable<Basic
     public abstract void write(ByteBuf writingBuf, ByteOrder byteOrder);
 
     protected abstract V read(ByteBuf readingBuf, ByteOrder byteOrder);
-
-    public V value() {
-        return value;
-    }
 
     @Override
     public int hashCode() {

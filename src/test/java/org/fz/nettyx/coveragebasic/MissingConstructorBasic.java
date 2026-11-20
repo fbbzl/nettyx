@@ -5,6 +5,13 @@ import org.fz.nettyx.serializer.basic.Basic;
 
 import java.nio.ByteOrder;
 
+/**
+ * Omits the buffer constructor required for reflective basic type registration.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class MissingConstructorBasic extends Basic<Integer> {
     public MissingConstructorBasic(Integer value) { super(value); }
     @Override public boolean hasSigned() { return true; }

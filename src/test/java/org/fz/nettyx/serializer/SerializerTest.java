@@ -17,6 +17,8 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 
 
 /**
+ * Exercises struct deserialization and re-encoding with nested generic models and sample binary input.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2023/5/23 21:35

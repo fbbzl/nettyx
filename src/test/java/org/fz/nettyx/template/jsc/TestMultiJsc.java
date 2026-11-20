@@ -22,6 +22,8 @@ import static org.fz.nettyx.action.ListenerAction.redo;
 import static org.fz.nettyx.codec.UserCodec.TEST_USER;
 
 /**
+ * Demonstrates keyed serial channels backed by jSerialComm.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 22:58

@@ -5,6 +5,13 @@ import org.fz.nettyx.serializer.basic.Basic;
 
 import java.nio.ByteOrder;
 
+/**
+ * Provides a one-byte basic type that returns a null value when read.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-18
+ */
 public final class nullbasic extends Basic<Integer>
 {
     public nullbasic(Integer value)

@@ -11,7 +11,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Verifies inbound and outbound predicate filtering and error propagation when a predicate throws.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class MessageFilterTest {

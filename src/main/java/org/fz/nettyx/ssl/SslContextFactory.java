@@ -44,6 +44,10 @@ public class SslContextFactory {
 
     /**
      * The type One way.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-24
      */
     @RequiredArgsConstructor(access = PACKAGE)
     public static class OneWay {
@@ -130,6 +134,10 @@ public class SslContextFactory {
 
     /**
      * The type Two way.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-24
      */
     @RequiredArgsConstructor(access = PACKAGE)
     public static class TwoWay {
@@ -352,6 +360,10 @@ public class SslContextFactory {
 
         /**
          * The type Trust.
+         *
+         * @author fengbinbin
+         * @version 1.0
+         * @since 2022-03-08
          */
         @Setter
         public static class Trust {

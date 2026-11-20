@@ -1,6 +1,6 @@
 package org.fz.nettyx.template;
 
-import cn.hutool.core.util.TypeUtil;
+import com.google.common.reflect.TypeToken;
 import io.netty.channel.*;
 import lombok.Getter;
 
@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
  * top level template based on netty
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2021 /5/6 16:49
  */
 @Getter
@@ -32,20 +33,11 @@ abstract class Template<C extends Channel> {
 
     protected Class<C> findChannelClass()
     {
-        Type     supperType;
-        Class<?> supperClass = this.getClass();
-        do {
-            supperType  = supperClass.getGenericSuperclass();
-            supperClass = supperClass.getSuperclass();
-        } while (supperClass != null && supperClass != Template.class);
-
-        Type typeArgument = TypeUtil.getTypeArgument(supperType);
-
-        Type[] actualTypes = TypeUtil.getActualTypes(this.getClass(), typeArgument);
-        if (actualTypes == null || actualTypes.length == 0) {
-            throw new IllegalStateException("can not resolve channel class for template [" + this.getClass() + "]");
+        Type channelType = TypeToken.of(this.getClass()).resolveType(Template.class.getTypeParameters()[0]).getType();
+        if (channelType instanceof Class<?> channelClass && Channel.class.isAssignableFrom(channelClass)) {
+            return (Class<C>) channelClass;
         }
-        return (Class<C>) actualTypes[0];
+        throw new IllegalStateException("can not resolve channel class for template [" + this.getClass() + "]");
     }
 
     protected abstract EventLoopGroup newEventLoopGroup();

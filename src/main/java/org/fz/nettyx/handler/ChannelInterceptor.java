@@ -1,6 +1,8 @@
 package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.fz.erwin.exception.Throws;
 
 import java.net.SocketAddress;
@@ -17,6 +19,7 @@ import java.util.Map;
  * @since 2021 /4/25 15:46
  */
 @SuppressWarnings("unchecked")
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
 
     protected final boolean defaultInterceptAll;
@@ -64,13 +67,12 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         this(false);
     }
 
-    protected ChannelInterceptor(boolean defaultInterceptAll)
-    {
-        this.defaultInterceptAll = defaultInterceptAll;
-    }
-
     /**
      * Subclass [InboundInterceptor, OutboundInterceptor] implementation start
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-01-17
      */
 
     @SuppressWarnings("unchecked")
@@ -298,6 +300,13 @@ public abstract class ChannelInterceptor extends ChannelHandlerAdapter {
         }
     }
 
+    /**
+     * Intercepts outbound channel operations until the interceptor is freed.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-01-17
+     */
     public static class OutboundInterceptor extends ChannelInterceptor implements ChannelOutboundHandler {
 
         @Override

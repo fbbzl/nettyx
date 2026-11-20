@@ -14,6 +14,8 @@ import static io.netty.handler.logging.ByteBufFormat.HEX_DUMP;
 
 
 /**
+ * Installs the shared pipeline used by the transport examples.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 22:59

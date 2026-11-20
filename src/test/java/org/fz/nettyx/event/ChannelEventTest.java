@@ -15,6 +15,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies channel events retain their contexts and carry the expected payloads, promises, and addresses.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class ChannelEventTest {
 
     @Test

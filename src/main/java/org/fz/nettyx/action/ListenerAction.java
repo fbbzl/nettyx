@@ -14,6 +14,8 @@ import java.util.function.UnaryOperator;
 import static org.fz.nettyx.util.ChannelState.getChannelState;
 
 /**
+ * Defines callbacks for channel future listeners and provides helpers for scheduling retries.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/6/10 12:43

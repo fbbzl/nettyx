@@ -2,7 +2,7 @@ package org.fz.nettyx.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.fz.nettyx.serializer.schema.SchemaRegistry;
+import org.fz.nettyx.serializer.schema.SchemaContext;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -14,10 +14,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Verifies schema codec output and optional retention of unread trailing bytes.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-19
+ */
 public class SchemaCodecTest
 {
 
-    private static final SchemaRegistry REGISTRY = SchemaRegistry.load(
+    private static final SchemaContext CONTEXT = SchemaContext.load(
             "configured/device.xml", "configured/geo.xml");
 
     private static final Map<String, Object> TRACK = Map.of(
@@ -37,7 +44,7 @@ public class SchemaCodecTest
     @Test
     public void defaultCodecEncodesAndSkipsTrailingBytes()
     {
-        SchemaCodec codec   = new SchemaCodec(REGISTRY, "device.Track");
+        SchemaCodec codec   = new SchemaCodec(CONTEXT, "device.Track");
         ByteBuf     encoded = Unpooled.buffer();
 
         codec.encode(null, TRACK, encoded);
@@ -54,7 +61,7 @@ public class SchemaCodecTest
     @Test
     public void configuredCodecCanKeepTrailingBytes()
     {
-        SchemaCodec codec = new SchemaCodec(REGISTRY, "device.Track", false);
+        SchemaCodec codec = new SchemaCodec(CONTEXT, "device.Track", false);
         ByteBuf input = Unpooled.wrappedBuffer(new byte[]{
                 2,
                 0, 0, 0, 11,

@@ -3,7 +3,7 @@ package org.fz.nettyx.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.fz.nettyx.serializer.schema.SchemaRegistry;
+import org.fz.nettyx.serializer.schema.SchemaContext;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,10 +13,17 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Verifies schema-based encoding and decoding through a Netty channel pipeline.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-19
+ */
 public class SchemaCodecIntegrationTest
 {
 
-    private static final SchemaRegistry REGISTRY = SchemaRegistry.load(
+    private static final SchemaContext CONTEXT = SchemaContext.load(
             "configured/device.xml", "configured/geo.xml");
 
     private static final Map<String, Object> TRACK = Map.of(
@@ -36,7 +43,7 @@ public class SchemaCodecIntegrationTest
     @Test
     public void codecParticipatesInNettyInboundAndOutboundPipelines()
     {
-        EmbeddedChannel channel = new EmbeddedChannel(new SchemaCodec(REGISTRY, "device.Track"));
+        EmbeddedChannel channel = new EmbeddedChannel(new SchemaCodec(CONTEXT, "device.Track"));
 
         assertTrue(channel.writeOutbound(TRACK));
         ByteBuf encoded = channel.readOutbound();

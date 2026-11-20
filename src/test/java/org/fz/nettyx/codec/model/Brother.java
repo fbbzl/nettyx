@@ -7,6 +7,8 @@ import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.basic.c.signed.cint;
 
 /**
+ * Holds a flexible array of parameterized {@code Son} structs in a little-endian fixture.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/9/26 0:41

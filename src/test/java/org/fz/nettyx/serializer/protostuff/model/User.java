@@ -6,6 +6,13 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
+/**
+ * Provides scalar, nested, list, and array fields for the Protostuff serialization example.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024-02-23
+ */
 @Data
 
 @FieldDefaults(level = AccessLevel.PRIVATE)

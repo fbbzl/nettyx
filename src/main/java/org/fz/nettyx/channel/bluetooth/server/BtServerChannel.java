@@ -12,6 +12,13 @@ import javax.microedition.io.StreamConnectionNotifier;
 import java.net.SocketAddress;
 import java.util.List;
 
+/**
+ * Accepts Bluetooth stream connections and passes child channels to the Netty pipeline.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024-05-15
+ */
 @SuppressWarnings("deprecation")
 public class BtServerChannel extends AbstractOioMessageChannel implements ServerChannel {
 
@@ -78,7 +85,7 @@ public class BtServerChannel extends AbstractOioMessageChannel implements Server
 
     @Override
     protected boolean isCompatible(EventLoop loop) {
-        return loop instanceof OioEventLoopGroup;
+        return loop.parent() instanceof OioEventLoopGroup;
     }
 
     @Override

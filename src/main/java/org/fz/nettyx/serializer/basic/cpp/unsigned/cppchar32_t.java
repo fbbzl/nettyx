@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.basic.cpp.cppbasic;
 
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 /**
  * this type in Cpp language is char32_t
@@ -56,7 +57,7 @@ public class cppchar32_t extends cppbasic<Long> {
 
     @Override
     public String toString() {
-        return value != null ? value.toString() : "";
+        return Objects.toString(value, "");
     }
 
 }

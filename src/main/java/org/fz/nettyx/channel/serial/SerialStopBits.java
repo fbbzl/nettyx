@@ -1,6 +1,8 @@
 package org.fz.nettyx.channel.serial;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import org.fz.nettyx.exception.UnknownConfigException;
 
 /**
@@ -17,11 +19,9 @@ public enum SerialStopBits {
     STOP_BITS_2(2),
     STOP_BITS_1_5(3);
 
+    @Getter
+    @Accessors(fluent = true)
     private final int value;
-
-    public int value() {
-        return value;
-    }
 
     public static SerialStopBits valueOf(int value) {
         for (SerialStopBits stopBit : values()) if (stopBit.value == value) return stopBit;

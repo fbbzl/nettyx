@@ -6,7 +6,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 /**
+ * Reports a type that the serializer cannot resolve or classify.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022-01-16 20:01
  **/
 public class TypeJudgmentException extends RuntimeException {

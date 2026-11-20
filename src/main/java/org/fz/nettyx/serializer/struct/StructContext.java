@@ -7,7 +7,9 @@ import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.lang.Filter;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ModifierUtil;
-import cn.hutool.core.util.TypeUtil;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.reflect.TypeToken;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -23,13 +25,14 @@ import org.fz.nettyx.serializer.struct.annotation.Ignore;
 import org.fz.nettyx.serializer.struct.annotation.Struct;
 import org.fz.nettyx.serializer.struct.annotation.ToArray;
 import org.fz.nettyx.serializer.basic.Basic;
-import org.fz.nettyx.serializer.struct.generator.StructAccessorFactory;
+import org.fz.nettyx.serializer.struct.accessor.StructAccessorFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -39,12 +42,13 @@ import static cn.hutool.core.annotation.AnnotationUtil.hasAnnotation;
 import static cn.hutool.core.text.CharSequenceUtil.EMPTY;
 import static cn.hutool.core.util.ArrayUtil.*;
 import static cn.hutool.core.util.ModifierUtil.hasModifier;
+import static cn.hutool.core.util.ObjectUtil.defaultIfNull;
 import static cn.hutool.core.util.ReflectUtil.getFields;
 import static org.fz.erwin.lambda.LambdaMetas.lambdaConstructor;
 import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_FIELD_HANDLER;
 
 /**
- * The type Struct cache.
+ * Initializes struct metadata in registration caches shared by all contexts.
  *
  * @author fengbinbin
  * @version 1.0
@@ -53,43 +57,22 @@ import static org.fz.nettyx.serializer.struct.StructFieldHandler.DEFAULT_STRUCT_
 @SuppressWarnings("all")
 public class StructContext {
 
-    static final String[] ALL_PACKAGES = { EMPTY };
-
-    @Getter
-    private final String[] basePackages;
-
     static final Map<Type, Integer>                                                BASIC_SIZE_CACHE        = new ConcurrentHashMap<>(64);
     static final Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> BASIC_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>(64);
     static final Map<Class<?>, StructDefinition>                                   STRUCT_DEFINITION_CACHE = new ConcurrentHashMap<>(256);
 
     static final Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> ANNOTATION_HANDLER_MAPPING_CACHE = new ConcurrentHashMap<>(32);
 
+    private static final Cache<ResolutionKey, Type> TYPE_RESOLUTION_CACHE = CacheBuilder.newBuilder()
+            .maximumSize(4096)
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build();
+
     static final InternalLogger log = InternalLoggerFactory.getInstance(StructContext.class);
 
     public StructContext(String... basePackages)
     {
-        // will scan all packages if user do not assign
-        this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);
-
-        synchronized (StructContext.class) {
-            Map<Type, Integer>                                                sizeSnapshot        = new HashMap<>(BASIC_SIZE_CACHE);
-            Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> constructorSnapshot = new HashMap<>(BASIC_CONSTRUCTOR_CACHE);
-            Map<Class<?>, StructDefinition>                                   definitionSnapshot  = new HashMap<>(STRUCT_DEFINITION_CACHE);
-
-            Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> handlerSnapshot = new HashMap<>(ANNOTATION_HANDLER_MAPPING_CACHE);
-
-            try {
-                scan();
-            }
-            catch (RuntimeException | Error exception) {
-                restoreCache(BASIC_SIZE_CACHE, sizeSnapshot);
-                restoreCache(BASIC_CONSTRUCTOR_CACHE, constructorSnapshot);
-                restoreCache(STRUCT_DEFINITION_CACHE, definitionSnapshot);
-                restoreCache(ANNOTATION_HANDLER_MAPPING_CACHE, handlerSnapshot);
-                log.error("exception occur while scanning classes", exception);
-                throw exception;
-            }
-        }
+        new StructScanner(basePackages).scan();
     }
 
     public static int getBasicSize(Type basicClass) {
@@ -99,214 +82,31 @@ public class StructContext {
         return size;
     }
 
-    /**
-     * start package scan
-     */
-    protected void scan()
-    {
-        Set<Class<?>> classes = this.classesForScan();
-
-        // 1 scan field handler
-        this.scanHandler(classes);
-
-        // 2 scan basic
-        this.scanBasic(classes);
-
-        // 3 validate, generate and publish struct definitions
-        this.scanStruct(classes);
-
+    static BiFunction<ByteBuf, ByteOrder, ?> getBasicConstructor(Class<?> basicClass) {
+        return BASIC_CONSTRUCTOR_CACHE.get(basicClass);
     }
 
-    private static <K, V> void restoreCache(Map<K, V> cache, Map<K, V> snapshot)
-    {
-        cache.clear();
-        cache.putAll(snapshot);
+    public static Type resolveType(Type root, Type type) {
+        if (type instanceof Class<?>) return type;
+
+        // The same field can resolve differently for each generic root type.
+        ResolutionKey key = new ResolutionKey(root, type);
+        Type resolved = TYPE_RESOLUTION_CACHE.getIfPresent(key);
+        if (resolved != null) return resolved;
+
+        Type computed = TypeToken.of(root).resolveType(type).getType();
+        Type previous = TYPE_RESOLUTION_CACHE.asMap().putIfAbsent(key, computed);
+        return previous == null ? computed : previous;
     }
 
     /**
-     * find class for scan
+     * Keys the type resolution cache by the root type and the type being resolved.
      *
-     * @return the classes can be scanned
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-11-11
      */
-    protected Set<Class<?>> classesForScan()
-    {
-        Set<Class<?>> classesForScan = new HashSet<>(256);
-
-        Filter<Class<?>> scanCondition = StructContext::isScannableClass;
-
-        String[] basePackages = getBasePackages();
-
-        for (String pack : append(basePackages, ClassUtil.getPackage(this.getClass()))) {
-            classesForScan.addAll(ClassScanner.scanAllPackage(pack, scanCondition));
-        }
-        // Basic wire types are shared by the schema and struct serializers and
-        // must be available even when callers scan only their model packages.
-        classesForScan.addAll(ClassScanner.scanAllPackage("org.fz.nettyx.serializer.basic", scanCondition));
-
-        log.debug("serializer context finished scanning, base-packages: {}", Arrays.toString(basePackages));
-
-        return classesForScan;
-    }
-
-    static boolean isScannableClass(Class<?> clazz)
-    {
-        if (!ClassUtil.isNormalClass(clazz)) return false;
-        return !ClassUtil.isJdkClass(clazz);
-    }
-
-    protected void scanHandler(Set<Class<?>> classes)
-    {
-        for (Class<?> clazz : classes) {
-            boolean isFieldHandler = StructFieldHandler.class.isAssignableFrom(clazz);
-
-            if (isFieldHandler) {
-                Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
-                if (annotationType != null) {
-                    // cache annotation handler mapping relation
-                    ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(annotationType,
-                                                                 (Class<? extends StructFieldHandler<? extends Annotation>>) clazz);
-                }
-            }
-        }
-    }
-
-    protected void scanStruct(Set<Class<?>> classes)
-    {
-        Map<Class<?>, StructDefinition> definitions = new HashMap<>();
-        for (Class<?> clazz : classes) {
-            try {
-                if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
-                    if (ClassUtil.isAbstractOrInterface(clazz))   throw new SerializeException("struct class can not be interface or abstract: [" + clazz + "]");
-                    if (Modifier.isPrivate(clazz.getModifiers())) throw new SerializeException("struct class can not be private: [" + clazz + "]");
-
-                    Field[] structFields = getFields(clazz, StructDefinition.StructField::legalStructField);
-                    if (structFields.length > 0 && !BeanUtil.isBean(clazz)) throw new SerializeException("struct class must be a JavaBean: [" + clazz + "]");
-
-                    try {
-                        Constructor<?> constructor = clazz.getDeclaredConstructor();
-                        if (Modifier.isPrivate(constructor.getModifiers())) throw new SerializeException("struct no-arg constructor can not be private: [" + clazz + "]");
-                    } catch (NoSuchMethodException e) {
-                        throw new SerializeException("struct class must have a non-private no-arg constructor: [" + clazz + "]", e);
-                    }
-                    definitions.put(clazz, new StructDefinition(clazz, structFields));
-                }
-            }
-            catch (RuntimeException | Error throwable) {
-                throw new SerializeException("scan struct failed: [" + clazz + "]", throwable);
-            }
-        }
-
-        Map<Class<?>, StructDefinition> allDefinitions = new HashMap<>(STRUCT_DEFINITION_CACHE);
-        allDefinitions.putAll(definitions);
-        validateNoCircularReferences(allDefinitions);
-
-        StructAccessorFactory.generate(definitions.values());
-        STRUCT_DEFINITION_CACHE.putAll(definitions);
-    }
-
-    private static void validateNoCircularReferences(Map<Class<?>, StructDefinition> definitions)
-    {
-        Set<Type> visited = new HashSet<>();
-        List<Class<?>> typePath = new ArrayList<>();
-        List<String> fieldPath = new ArrayList<>();
-
-        definitions.keySet().stream()
-                   .sorted(Comparator.comparing(Class::getName))
-                   .forEach(type -> detectCircularReference(type, definitions, visited, typePath, fieldPath));
-    }
-
-    private static void detectCircularReference(
-            Type type,
-            Map<Class<?>, StructDefinition> definitions,
-            Set<Type> visited,
-            List<Class<?>> typePath,
-            List<String> fieldPath)
-    {
-        if (!visited.add(type)) return;
-
-        Class<?> rawType = rawStructClass(type);
-        typePath.add(rawType);
-        for (StructDefinition.StructField field : definitions.get(rawType).fields()) {
-            Type dependencyType = structDependency(type, field);
-            Class<?> dependency = rawStructClass(dependencyType);
-            if (dependency == null || !definitions.containsKey(dependency)) continue;
-
-            String edge = rawType.getSimpleName() + "." + field.wrapped().getName();
-            if (typePath.contains(dependency)) {
-                int cycleStart = typePath.indexOf(dependency);
-                List<String> cycle = new ArrayList<>(fieldPath.subList(cycleStart, fieldPath.size()));
-                cycle.add(edge);
-                throw new StructDefinitionException("circular struct reference: ["
-                                                    + String.join(" -> ", cycle)
-                                                    + " -> " + dependency.getSimpleName() + "]");
-            }
-
-            fieldPath.add(edge);
-            detectCircularReference(dependencyType, definitions, visited, typePath, fieldPath);
-            fieldPath.removeLast();
-        }
-        typePath.removeLast();
-    }
-
-    private static Type structDependency(Type root, StructDefinition.StructField field)
-    {
-        if (field.annotation() != null && !(field.annotation() instanceof ToArray)) return null;
-
-        Type fieldType;
-        try
-        {
-            fieldType = field.type(root);
-        }
-        catch (TypeJudgmentException ignored)
-        {
-            fieldType = field.wrapped().getGenericType();
-        }
-        return field.annotation() instanceof ToArray ? arrayComponentType(fieldType) : fieldType;
-    }
-
-    private static Type arrayComponentType(Type type)
-    {
-        if (type instanceof Class<?> clazz)
-            return clazz.getComponentType();
-        return
-            ((GenericArrayType) type).getGenericComponentType();
-    }
-
-    private static Class<?> rawStructClass(Type type)
-    {
-        if (type == null) return null;
-
-        Class<?> rawType = switch (type)
-        {
-            case Class<?> clazz                  -> clazz;
-            case ParameterizedType parameterized -> (Class<?>) parameterized.getRawType();
-            default                              -> null;
-        };
-        return rawType != null && AnnotationUtil.hasAnnotation(rawType, Struct.class) ? rawType : null;
-    }
-
-    protected void scanBasic(Set<Class<?>> classes)
-    {
-        for (Class<?> clazz : classes) {
-            try
-            {
-                boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
-
-                if (isBasic)
-                {
-                    // cache basics constructor
-                    BASIC_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                        lambdaConstructor(clazz, ByteBuf.class, ByteOrder.class));
-
-                    // cache bytes size
-                    BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
-                                                 Basic.reflectForSize((Class<? extends Basic<?>>) clazz));
-                }
-            }
-            catch (RuntimeException | Error throwable) {
-                throw new SerializeException("scan basic failed: [" + clazz + "]", throwable);
-            }
-        }
+    private record ResolutionKey(Type root, Type type) {
     }
 
     static <A extends Annotation, H extends StructFieldHandler<A>> Supplier<H> getHandlerSupplier(
@@ -350,22 +150,250 @@ public class StructContext {
         };
     }
 
-    static <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz)
+    /**
+     * Discovers types and generates accessors during context initialization.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-01-29
+     */
+    private static final class StructScanner
     {
-        if (!ClassUtil.isNormalClass(clazz)) return null;
+        private static final String[] ALL_PACKAGES = { EMPTY };
 
-        for (ParameterizedType genericType : TypeUtil.getGenerics(clazz))
+        private final String[] basePackages;
+
+        private StructScanner(String... basePackages)
         {
-            Class<?> rawClass = (Class<?>) genericType.getRawType();
-            if (!StructFieldHandler.class.isAssignableFrom(rawClass)) continue;
-
-            Type annotationType = TypeUtil.getActualType(clazz, genericType.getActualTypeArguments()[0]);
-
-            if (annotationType instanceof Class<?> annotationClass) return (Class<A>) annotationClass;
+            // Keep full-classpath scanning when no package is specified.
+            this.basePackages = defaultIfEmpty(removeNull(basePackages), ALL_PACKAGES);
         }
-        return null;
+
+        private void scan()
+        {
+            // Serialize scans so rollback cannot overwrite another context's registrations.
+            synchronized (StructContext.class) {
+                Map<Type, Integer>                                                sizeSnapshot        = new HashMap<>(BASIC_SIZE_CACHE);
+                Map<Class<? extends Basic<?>>, BiFunction<ByteBuf, ByteOrder, ?>> constructorSnapshot = new HashMap<>(BASIC_CONSTRUCTOR_CACHE);
+                Map<Class<?>, StructDefinition>                                   definitionSnapshot  = new HashMap<>(STRUCT_DEFINITION_CACHE);
+
+                Map<Class<? extends Annotation>, Class<? extends StructFieldHandler<? extends Annotation>>> handlerSnapshot = new HashMap<>(ANNOTATION_HANDLER_MAPPING_CACHE);
+
+                try {
+                    Set<Class<?>> classes = classesForScan();
+                    // Field metadata requires handlers and basic types to be registered first.
+                    scanHandler(classes);
+                    scanBasic(classes);
+                    scanStruct(classes);
+                }
+                catch (RuntimeException | Error exception) {
+                    // Restore registrations only; already loaded ASM classes cannot be unloaded here.
+                    restoreCache(BASIC_SIZE_CACHE, sizeSnapshot);
+                    restoreCache(BASIC_CONSTRUCTOR_CACHE, constructorSnapshot);
+                    restoreCache(STRUCT_DEFINITION_CACHE, definitionSnapshot);
+                    restoreCache(ANNOTATION_HANDLER_MAPPING_CACHE, handlerSnapshot);
+                    log.error("exception occur while scanning classes", exception);
+                    throw exception;
+                }
+            }
+        }
+
+        private <K, V> void restoreCache(Map<K, V> cache, Map<K, V> snapshot)
+        {
+            cache.keySet().removeIf(key -> !snapshot.containsKey(key));
+        }
+
+        private Set<Class<?>> classesForScan()
+        {
+            Set<Class<?>> classesForScan = new HashSet<>(256);
+
+            Filter<Class<?>> scanCondition = this::isScannableClass;
+
+            for (String pack : append(basePackages, ClassUtil.getPackage(StructContext.class))) {
+                classesForScan.addAll(ClassScanner.scanAllPackage(pack, scanCondition));
+            }
+            // Schema and Struct share basic types, even when only model packages are requested.
+            classesForScan.addAll(ClassScanner.scanAllPackage("org.fz.nettyx.serializer.basic", scanCondition));
+
+            log.debug("serializer context finished scanning, base-packages: {}", Arrays.toString(basePackages));
+
+            return classesForScan;
+        }
+
+        private boolean isScannableClass(Class<?> clazz)
+        {
+            if (!ClassUtil.isNormalClass(clazz)) return false;
+            return !ClassUtil.isJdkClass(clazz);
+        }
+
+        private void scanHandler(Set<Class<?>> classes)
+        {
+            for (Class<?> clazz : classes) {
+                boolean isFieldHandler = StructFieldHandler.class.isAssignableFrom(clazz);
+
+                if (isFieldHandler) {
+                    Class<? extends Annotation> annotationType = getTargetAnnotationType(clazz);
+                    if (annotationType != null) {
+                        ANNOTATION_HANDLER_MAPPING_CACHE.putIfAbsent(annotationType,
+                                                                     (Class<? extends StructFieldHandler<? extends Annotation>>) clazz);
+                    }
+                }
+            }
+        }
+
+        private void scanStruct(Set<Class<?>> classes)
+        {
+            Map<Class<?>, StructDefinition> definitions = new HashMap<>();
+            for (Class<?> clazz : classes) {
+                try {
+                    if (AnnotationUtil.hasAnnotation(clazz, Struct.class)) {
+                        if (ClassUtil.isAbstractOrInterface(clazz))   throw new SerializeException("struct class can not be interface or abstract: [" + clazz + "]");
+                        if (Modifier.isPrivate(clazz.getModifiers())) throw new SerializeException("struct class can not be private: [" + clazz + "]");
+
+                        Field[] structFields = getFields(clazz, StructDefinition.StructField::legalStructField);
+                        if (structFields.length > 0 && !BeanUtil.isBean(clazz)) throw new SerializeException("struct class must be a JavaBean: [" + clazz + "]");
+
+                        try {
+                            Constructor<?> constructor = clazz.getDeclaredConstructor();
+                            if (Modifier.isPrivate(constructor.getModifiers())) throw new SerializeException("struct no-arg constructor can not be private: [" + clazz + "]");
+                        } catch (NoSuchMethodException e) {
+                            throw new SerializeException("struct class must have a non-private no-arg constructor: [" + clazz + "]", e);
+                        }
+                        definitions.put(clazz, new StructDefinition(clazz, structFields));
+                    }
+                }
+                catch (RuntimeException | Error throwable) {
+                    throw new SerializeException("scan struct failed: [" + clazz + "]", throwable);
+                }
+            }
+
+            Map<Class<?>, StructDefinition> allDefinitions = new HashMap<>(STRUCT_DEFINITION_CACHE);
+            allDefinitions.putAll(definitions);
+            validateNoCircularReferences(allDefinitions);
+
+            // Validate the whole batch before generating accessors and publishing definitions.
+            StructAccessorFactory.generate(definitions.values());
+            STRUCT_DEFINITION_CACHE.putAll(definitions);
+        }
+
+        private void validateNoCircularReferences(Map<Class<?>, StructDefinition> definitions)
+        {
+            Set<Type> visited = new HashSet<>();
+            List<Class<?>> typePath = new ArrayList<>();
+            List<String> fieldPath = new ArrayList<>();
+
+            definitions.keySet().stream()
+                       .sorted(Comparator.comparing(Class::getName))
+                       .forEach(type -> detectCircularReference(type, definitions, visited, typePath, fieldPath));
+        }
+
+        private void detectCircularReference(
+                Type type,
+                Map<Class<?>, StructDefinition> definitions,
+                Set<Type> visited,
+                List<Class<?>> typePath,
+                List<String> fieldPath)
+        {
+            // Track resolved types as visited, but detect recursion by raw classes on the current path.
+            if (!visited.add(type)) return;
+
+            Class<?> rawType = rawStructClass(type);
+            typePath.add(rawType);
+            for (StructDefinition.StructField field : definitions.get(rawType).fields()) {
+                Type dependencyType = structDependency(type, field);
+                Class<?> dependency = rawStructClass(dependencyType);
+                if (dependency == null || !definitions.containsKey(dependency)) continue;
+
+                String edge = rawType.getSimpleName() + "." + field.wrapped().getName();
+                if (typePath.contains(dependency)) {
+                    int cycleStart = typePath.indexOf(dependency);
+                    List<String> cycle = new ArrayList<>(fieldPath.subList(cycleStart, fieldPath.size()));
+                    cycle.add(edge);
+                    throw new StructDefinitionException("circular struct reference: [" + String.join(" -> ", cycle) + " -> " + dependency.getSimpleName() + "]");
+                }
+
+                fieldPath.add(edge);
+                detectCircularReference(dependencyType, definitions, visited, typePath, fieldPath);
+                fieldPath.removeLast();
+            }
+            typePath.removeLast();
+        }
+
+        private Type structDependency(Type root, StructDefinition.StructField field)
+        {
+            if (field.annotation() != null && !(field.annotation() instanceof ToArray)) return null;
+
+            Type fieldType;
+            try
+            {
+                fieldType = field.type(root);
+            }
+            catch (TypeJudgmentException ignored)
+            {
+                fieldType = field.wrapped().getGenericType();
+            }
+            return field.annotation() instanceof ToArray ? arrayComponentType(fieldType) : fieldType;
+        }
+
+        private Type arrayComponentType(Type type)
+        {
+            if (type instanceof Class<?> clazz)
+                return clazz.getComponentType();
+            return
+                ((GenericArrayType) type).getGenericComponentType();
+        }
+
+        private Class<?> rawStructClass(Type type)
+        {
+            if (type == null) return null;
+
+            Class<?> rawType = switch (type)
+            {
+                case Class<?> clazz                  -> clazz;
+                case ParameterizedType parameterized -> (Class<?>) parameterized.getRawType();
+                default                              -> null;
+            };
+            return rawType != null && AnnotationUtil.hasAnnotation(rawType, Struct.class) ? rawType : null;
+        }
+
+        private void scanBasic(Set<Class<?>> classes)
+        {
+            for (Class<?> clazz : classes) {
+                try
+                {
+                    boolean isBasic = Basic.class.isAssignableFrom(clazz) && Basic.class != clazz;
+
+                    if (isBasic)
+                    {
+                        BASIC_CONSTRUCTOR_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
+                                                            lambdaConstructor(clazz, ByteBuf.class, ByteOrder.class));
+
+                        BASIC_SIZE_CACHE.putIfAbsent((Class<? extends Basic<?>>) clazz,
+                                                     Basic.reflectForSize((Class<? extends Basic<?>>) clazz));
+                    }
+                }
+                catch (RuntimeException | Error throwable) {
+                    throw new SerializeException("scan basic failed: [" + clazz + "]", throwable);
+                }
+            }
+        }
+
+        private <A extends Annotation> Class<A> getTargetAnnotationType(Class<?> clazz)
+        {
+            if (!ClassUtil.isNormalClass(clazz)) return null;
+
+            Type annotationType = TypeToken.of(clazz).resolveType(StructFieldHandler.class.getTypeParameters()[0]).getType();
+            return annotationType instanceof Class<?> annotationClass ? (Class<A>) annotationClass : null;
+        }
     }
 
+    /**
+     * Holds the validated fields used to generate a struct accessor.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2025-08-19
+     */
     @SuppressWarnings("unchecked")
     public record StructDefinition(
             Class<?>      type,
@@ -379,9 +407,23 @@ public class StructContext {
                 );
         }
 
+        /**
+         * Distinguishes basic fields, nested struct fields, and fields with a custom handler.
+         *
+         * @author fengbinbin
+         * @version 1.0
+         * @since 2026-06-21
+         */
         public enum Category
         { BASIC, STRUCT, HANDLER }
 
+        /**
+         * Stores field access, type resolution and serialization metadata.
+         *
+         * @author fengbinbin
+         * @version 1.0
+         * @since 2025-08-19
+         */
         @Getter
         @RequiredArgsConstructor
         @Accessors(fluent = true)
@@ -437,35 +479,12 @@ public class StructContext {
 
             static UnaryOperator<Type> typeSupplier(Field field) {
                 Type fieldType = field.getGenericType();
-                Class<?> declaringClass = field.getDeclaringClass();
                 if (fieldType instanceof Class<?>) return root -> fieldType;
 
-                Map<Type, Type> resolvedTypes = new ConcurrentHashMap<>();
-                return root -> resolvedTypes.computeIfAbsent(root, actualRoot -> {
-                    Type context = resolveContext(actualRoot, declaringClass);
-                    return TypeUtil.getActualType(context != null ? context : actualRoot, fieldType);
-                });
-            }
-
-            private static Type resolveContext(Type root, Class<?> declaringClass) {
-                if (root instanceof ParameterizedType pt) {
-                    Class<?> rawType = (Class<?>) pt.getRawType();
-                    if (rawType == declaringClass) return root;
-                    Type superType = rawType.getGenericSuperclass();
-                    if (superType != null) {
-                        Type resolved = resolveContext(superType, declaringClass);
-                        if (resolved != null) return TypeUtil.getActualType(root, resolved);
-                    }
-                }
-                else if (root instanceof Class<?> clazz) {
-                    if (clazz == declaringClass) return root;
-                    Type superType = clazz.getGenericSuperclass();
-                    if (superType != null) {
-                        Type resolved = resolveContext(superType, declaringClass);
-                        if (resolved != null) return resolved;
-                    }
-                }
-                return null;
+                return root -> {
+                    if (!(root instanceof Class<?> || root instanceof ParameterizedType)) return fieldType;
+                    return resolveType(root, fieldType);
+                };
             }
 
             public Type type(Type root) {

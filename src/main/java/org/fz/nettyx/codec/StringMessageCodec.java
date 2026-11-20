@@ -8,6 +8,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -32,7 +33,8 @@ public class StringMessageCodec extends ByteToMessageCodec<String> {
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, String msg, ByteBuf out)
     {
-        out.writeBytes(msg.getBytes(charset));
+        if (StandardCharsets.UTF_8.equals(charset)) out.writeCharSequence(msg, charset);
+        else                                        out.writeBytes(msg.getBytes(charset));
     }
 
 }

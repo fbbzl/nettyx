@@ -11,6 +11,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Verifies TLS context factory overload selection and the OpenSSL configuration accessors.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class OpenSslContextFactoryTest {
 
     @Test
@@ -40,6 +47,25 @@ public class OpenSslContextFactoryTest {
     }
 
     @Test
+    public void emptyAndWhitespacePasswordsKeepTheirDistinctMeaning() throws Exception
+    {
+        OpenSslConfig config = config();
+        TrackingFactory factory = new TrackingFactory(config);
+
+        config.setKeyPass("");
+        factory.getServerSslContext();
+        factory.getClientSslContext();
+        assertFalse(factory.serverPasswordOverload);
+        assertFalse(factory.clientPasswordOverload);
+
+        config.setKeyPass(" ");
+        factory.getServerSslContext();
+        factory.getClientSslContext();
+        assertTrue(factory.serverPasswordOverload);
+        assertTrue(factory.clientPasswordOverload);
+    }
+
+    @Test
     public void configAccessorsAndEqualityFollowLombokContract()
     {
         OpenSslConfig config = config();
@@ -64,6 +90,13 @@ public class OpenSslContextFactoryTest {
         return config;
     }
 
+    /**
+     * Records which context creation overloads the OpenSSL factory invokes.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-11
+     */
     private static final class TrackingFactory extends OpenSslContextFactory {
         private boolean serverPasswordOverload;
         private boolean clientPasswordOverload;

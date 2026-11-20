@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
  * The top-level parent class of all custom serialization processors default is not singleton
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-16 16:39
  */
 @SuppressWarnings("all")

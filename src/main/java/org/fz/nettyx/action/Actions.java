@@ -8,6 +8,8 @@ import java.net.SocketAddress;
 import java.util.function.Consumer;
 
 /**
+ * Invokes channel callbacks when the caller has provided one.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2023/12/15 14:46

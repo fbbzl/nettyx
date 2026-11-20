@@ -8,7 +8,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Verifies conversion between byte arrays and Netty buffers, including empty and single-byte payloads.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class ByteArrayCodecTest {

@@ -6,16 +6,16 @@
 #                                                                                #
 ##################################################################################
 
-参考文献:
-  脚本参考连接: https://my.oschina.net/u/176493/blog/688541
-  openssl指令参考连接: https://www.cnblogs.com/aixiaoxiaoyu/p/8650180.html
+References:
+  Script reference: https://my.oschina.net/u/176493/blog/688541
+  OpenSSL command reference: https://www.cnblogs.com/aixiaoxiaoyu/p/8650180.html
 
 ******************************************************************************
 
-第一步 编辑openssl_env.sh文件, 根据自身业务需要覆盖其中的变量值, 如jar路径, 证书存放路径等等
-第二步 将nettyx-tools-openssl目录复制到服务器上
-第三步 安装openssl, 如未安装, 可以使用yum install openssl进行安装
-第三步 执行openssl_auto.sh脚本, 然后根据控制台的提示输入openssl所需要的信息, 你会得到如下的文件
+Step 1: Edit openssl_env.sh and set the variables for your application, including the JAR path and certificate directory.
+Step 2: Copy the nettyx-tools-openssl directory to the server.
+Step 3: Install OpenSSL if needed, for example with yum install openssl.
+Step 4: Run openssl_auto.sh and enter the OpenSSL information requested by the console prompts. The following files will be generated:
 
 CA ROOT:
 ca_root.key
@@ -33,7 +33,7 @@ youappname_server.crt
 youappname_server.key
 youappname_pkcs8_rsa_server.key
 
-以上文件是在你实现openssl所必需的
+These files are required for the OpenSSL setup.
 
 
 

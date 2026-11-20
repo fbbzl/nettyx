@@ -2,6 +2,7 @@ package org.fz.nettyx.channel.serial;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.*;
+import lombok.Getter;
 
 import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 
@@ -15,10 +16,15 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 @SuppressWarnings("deprecation")
 public abstract class AbstractSerialChannelConfig extends DefaultChannelConfig implements SerialChannelConfig {
 
+    @Getter(onMethod_ = @Override)
     volatile int             baudRate    = 115200;
+    @Getter(onMethod_ = @Override)
     volatile SerialStopBits  stopBits    = SerialStopBits.STOP_BITS_1;
+    @Getter(onMethod_ = @Override)
     volatile SerialDataBits  dataBits    = SerialDataBits.DATA_BITS_8;
+    @Getter(onMethod_ = @Override)
     volatile SerialParityBit parityBit   = SerialParityBit.NO;
+    @Getter(onMethod_ = @Override)
     volatile int             readTimeout = 1000;
     volatile boolean         dtr;
     volatile boolean         rts;
@@ -29,19 +35,9 @@ public abstract class AbstractSerialChannelConfig extends DefaultChannelConfig i
     }
 
     @Override
-    public int getBaudRate() {
-        return baudRate;
-    }
-
-    @Override
     public SerialChannelConfig setBaudRate(int baudRate) {
         this.baudRate = baudRate;
         return this;
-    }
-
-    @Override
-    public SerialStopBits getStopBits() {
-        return stopBits;
     }
 
     @Override
@@ -51,19 +47,9 @@ public abstract class AbstractSerialChannelConfig extends DefaultChannelConfig i
     }
 
     @Override
-    public SerialDataBits getDataBits() {
-        return dataBits;
-    }
-
-    @Override
     public SerialChannelConfig setDataBits(SerialDataBits dataBits) {
         this.dataBits = dataBits;
         return this;
-    }
-
-    @Override
-    public SerialParityBit getParityBit() {
-        return parityBit;
     }
 
     @Override
@@ -92,11 +78,6 @@ public abstract class AbstractSerialChannelConfig extends DefaultChannelConfig i
     public SerialChannelConfig setRts(boolean rts) {
         this.rts = rts;
         return this;
-    }
-
-    @Override
-    public int getReadTimeout() {
-        return readTimeout;
     }
 
     @Override

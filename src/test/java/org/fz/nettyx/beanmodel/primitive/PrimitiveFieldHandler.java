@@ -7,6 +7,13 @@ import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructFiel
 
 import java.lang.reflect.Type;
 
+/**
+ * Reads and writes annotated Java primitives with the corresponding {@code ByteBuf} operations.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class PrimitiveFieldHandler implements StructFieldHandler<PrimitiveField> {
 
     @Override

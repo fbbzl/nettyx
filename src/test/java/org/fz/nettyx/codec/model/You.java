@@ -15,6 +15,8 @@ import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.BE;
 import static org.fz.nettyx.serializer.struct.annotation.Struct.Endian.LE;
 
 /**
+ * Combines a byte chunk, numeric fields, and nested little-endian structs in a big-endian fixture.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/4/19 16:48
@@ -45,6 +47,13 @@ public class You {
     cfloat  address2;
 
 
+    /**
+     * Provides the little-endian unsigned integer nested in the big-endian {@code You} struct.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2025-04-20
+     */
     @Data
     @Struct(endian = LE)
     public static class Hit {

@@ -6,6 +6,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelPromise;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -21,25 +23,12 @@ import java.net.SocketAddress;
  */
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class ChannelEvent<S> {
 
     private final long                  happenTime = System.currentTimeMillis();
     private       S                     source;
     private final ChannelHandlerContext ctx;
-
-    /**
-     * Instantiates a new Channel event.
-     *
-     * @param source the source
-     * @param ctx    the ctx
-     */
-    protected ChannelEvent(
-            S                     source,
-            ChannelHandlerContext ctx)
-    {
-        this.source = source;
-        this.ctx    = ctx;
-    }
 
     /**
      * Gets channel.
@@ -77,6 +66,9 @@ public abstract class ChannelEvent<S> {
      * The type Channel register
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class ChannelRegister<T> extends ChannelEvent<T> {
 
@@ -108,6 +100,9 @@ public abstract class ChannelEvent<S> {
      * The type Channel un register
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class ChannelUnRegister<T> extends ChannelEvent<T> {
 
@@ -139,6 +134,9 @@ public abstract class ChannelEvent<S> {
      * The type Channel active
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class ChannelActive<T> extends ChannelEvent<T> {
 
@@ -168,6 +166,9 @@ public abstract class ChannelEvent<S> {
      * The type Channel inactive
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class ChannelInactive<T> extends ChannelEvent<T> {
 
@@ -197,6 +198,9 @@ public abstract class ChannelEvent<S> {
      * The type Channel read.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class ChannelRead<T> extends ChannelEvent<T> {
@@ -248,6 +252,9 @@ public abstract class ChannelEvent<S> {
      * The type Channel read complete
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class ChannelReadComplete<T> extends ChannelEvent<T> {
 
@@ -279,6 +286,9 @@ public abstract class ChannelEvent<S> {
      * The type User event triggered.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class UserEventTriggered<T> extends ChannelEvent<T> {
@@ -343,6 +353,9 @@ public abstract class ChannelEvent<S> {
      * The type Writability changed
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class WritabilityChanged<T> extends ChannelEvent<T> {
 
@@ -374,6 +387,9 @@ public abstract class ChannelEvent<S> {
      * The type ExceptionCaught.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     @Getter
     public static class ExceptionCaught<T> extends ChannelEvent<T> {
@@ -425,6 +441,9 @@ public abstract class ChannelEvent<S> {
      * The type Read idle
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class ReadIdle<T> extends ChannelEvent<T> {
 
@@ -456,6 +475,9 @@ public abstract class ChannelEvent<S> {
      * The type Write idle
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class WriteIdle<T> extends ChannelEvent<T> {
 
@@ -485,6 +507,9 @@ public abstract class ChannelEvent<S> {
      * The type Bind.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class Bind<T> extends ChannelEvent<T> {
@@ -593,6 +618,9 @@ public abstract class ChannelEvent<S> {
      * The type Connect.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class Connect<T> extends ChannelEvent<T> {
@@ -713,6 +741,9 @@ public abstract class ChannelEvent<S> {
      * The type Disconnect.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class Disconnect<T> extends ChannelEvent<T> {
@@ -777,6 +808,9 @@ public abstract class ChannelEvent<S> {
      * The type Close.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class Close<T> extends ChannelEvent<T> {
@@ -839,6 +873,9 @@ public abstract class ChannelEvent<S> {
      * The type Deregister.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class Deregister<T> extends ChannelEvent<T> {
@@ -903,6 +940,9 @@ public abstract class ChannelEvent<S> {
      * The type Read.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     public static class ReadInWrite<T> extends ChannelEvent<T> {
 
@@ -932,6 +972,9 @@ public abstract class ChannelEvent<S> {
      * The type Write.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     @Getter
     public static class Write<T> extends ChannelEvent<T> {
@@ -1040,6 +1083,9 @@ public abstract class ChannelEvent<S> {
      * The type Flush.
      *
      * @param <T> the type parameter
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2022-01-10
      */
     public static class Flush<T> extends ChannelEvent<T> {
 

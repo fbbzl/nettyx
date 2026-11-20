@@ -54,6 +54,10 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
 
     /**
      * The type Inbound heart beater.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-02-27
      */
     public static class ReadIdleHeartBeater extends IdledHeartBeater {
         @Override
@@ -73,6 +77,13 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
     }
 
+    /**
+     * Runs a heartbeat callback when the channel has been idle for writes.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-02-27
+     */
     public static class WriteIdleHeartBeater extends IdledHeartBeater {
         @Override
         boolean condition(IdleStateEvent evt)
@@ -92,6 +103,13 @@ public abstract class IdledHeartBeater extends ActionIdleStateHandler {
         }
     }
 
+    /**
+     * Runs a heartbeat callback when the channel has been idle for both reads and writes.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-02-27
+     */
     public static class AllIdleHeartBeater extends IdledHeartBeater {
         @Override
         boolean condition(IdleStateEvent evt)

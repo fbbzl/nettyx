@@ -12,6 +12,7 @@ import org.fz.nettyx.template.AbstractSingleChannelTemplate;
  * single rxtx channel template
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022-01-26 20:25
  **/
 

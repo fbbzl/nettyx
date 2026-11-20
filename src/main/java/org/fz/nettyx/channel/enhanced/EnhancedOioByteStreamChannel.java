@@ -50,15 +50,15 @@ public abstract class EnhancedOioByteStreamChannel extends OioByteStreamChannel 
             return 0;
         } catch (EOFException e) {
             log.debug("doReadBytes reached EOF", e);
-            unsafe().closeForcibly();
+            unsafe().close(voidPromise());
             return -1;
         } catch (IOException e) {
             log.debug("doReadBytes IO error", e);
-            unsafe().closeForcibly();
+            unsafe().close(voidPromise());
             return -1;
         } catch (Exception e) {
             log.error("doReadBytes failed", e);
-            unsafe().closeForcibly();
+            unsafe().close(voidPromise());
             return -1;
         }
     }

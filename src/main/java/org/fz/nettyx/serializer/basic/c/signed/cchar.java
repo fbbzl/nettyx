@@ -5,6 +5,7 @@ import org.fz.nettyx.exception.TooLessBytesException;
 import org.fz.nettyx.serializer.basic.c.cbasic;
 
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 /**
  * this type in C language is char
@@ -46,7 +47,7 @@ public class cchar extends cbasic<Byte> {
 
     @Override
     public String toString() {
-        return value != null ? value.toString() : "";
+        return Objects.toString(value, "");
     }
 
 }

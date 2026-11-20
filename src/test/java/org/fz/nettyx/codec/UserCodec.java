@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Binds the struct codec to the parameterized user fixture used by channel examples.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/7/26 19:52

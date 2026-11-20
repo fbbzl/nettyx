@@ -6,11 +6,18 @@ import io.netty.buffer.Unpooled;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Demonstrates replacing matched byte sequences using a configured escape map.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2025-05-23
+ */
 public class AIEscape {
 
-    // 转义映射表
+    // Escape mappings
     private final Map<byte[], byte[]> escapeMappings;
-    // 反转义映射表
+    // Unescape mappings
     private final Map<byte[], byte[]> unescapeMappings;
 
     public AIEscape(Map<byte[], byte[]> escapeMappings) {
@@ -21,9 +28,9 @@ public class AIEscape {
         }
     }
 
-    // 转义方法
+    // Escape a message
     public ByteBuf escape(ByteBuf message) {
-        ByteBuf output = Unpooled.buffer(message.readableBytes() * 2); // 最坏情况下，每个字节都可能被转义
+        ByteBuf output = Unpooled.buffer(message.readableBytes() * 2); // Reserve initial capacity for escaping every byte
         int readerIndex = message.readerIndex();
         int writerIndex = message.writerIndex();
 
@@ -47,7 +54,7 @@ public class AIEscape {
                     }
                     if (fullMatch) {
                         output.writeBytes(entry.getValue());
-                        i += key.length - 1; // 跳过已处理的字节
+                        i += key.length - 1; // Skip bytes already matched
                         matched = true;
                         break;
                     }
@@ -55,7 +62,7 @@ public class AIEscape {
             }
 
             if (!matched) {
-                output.writeByte(currentByte); // 写入原始字节
+                output.writeByte(currentByte); // Preserve unmatched bytes
             }
         }
 
@@ -63,18 +70,18 @@ public class AIEscape {
     }
 
     public static void main(String[] args) {
-        // 定义转义映射
+        // Define escape mappings
         Map<byte[], byte[]> escapeMappings = new HashMap<>();
-        escapeMappings.put(new byte[]{0x7E}, new byte[]{0x7E, 0x7E}); // 将0x7E转义为0x7E 0x7E
-        escapeMappings.put(new byte[]{0x7D, 0x5E}, new byte[]{0x7E, 0x7D, 0x5E}); // 将0x7D 0x5E转义为0x7E 0x7D 0x5E
+        escapeMappings.put(new byte[]{0x7E}, new byte[]{0x7E, 0x7E}); // Escape 0x7E as 0x7E 0x7E
+        escapeMappings.put(new byte[]{0x7D, 0x5E}, new byte[]{0x7E, 0x7D, 0x5E}); // Escape 0x7D 0x5E as 0x7E 0x7D 0x5E
 
-        // 创建转义工具实例
+        // Create the escape utility
         AIEscape escapeTool = new AIEscape(escapeMappings);
 
-        // 生成测试消息
+        // Create the test message
         ByteBuf testMessage = Unpooled.copiedBuffer(new byte[]{0x01, 0x02, 0x7E, 0x04, 0x7D, 0x5E, 0x06, 0x07});
 
-        // 开始性能测试
+        // Start the benchmark
         long startTime = System.currentTimeMillis();
 
         for (int i = 0; i < 10_000_000; i++) {
@@ -86,7 +93,7 @@ public class AIEscape {
 
         System.out.println("Total time for 50,000,000 iterations: " + (endTime - startTime) + " ms");
 
-        // 释放资源
+        // Release resources
         testMessage.release();
     }
 }

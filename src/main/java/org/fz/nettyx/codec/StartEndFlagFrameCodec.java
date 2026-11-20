@@ -7,6 +7,7 @@ import io.netty.channel.CombinedChannelDuplexHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.ReferenceCountUtil;
+import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameDecoder;
 import org.fz.nettyx.codec.StartEndFlagFrameCodec.StartEndFlagFrameEncoder;
 import org.fz.nettyx.util.HexKit;
@@ -42,6 +43,10 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
 
     /**
      * The type Start end flag frame decoder.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
     public static class StartEndFlagFrameDecoder extends DelimiterBasedFrameDecoder {
 
@@ -86,7 +91,12 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
 
     /**
      * The type Start end flag frame encoder.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-22
      */
+    @RequiredArgsConstructor
     public static class StartEndFlagFrameEncoder extends MessageToByteEncoder<ByteBuf> {
 
         private final byte[] startFlag, endFlag;
@@ -98,17 +108,6 @@ public class StartEndFlagFrameCodec extends CombinedChannelDuplexHandler<StartEn
          */
         public StartEndFlagFrameEncoder(byte[] startEndSameFlag) {
             this.startFlag = this.endFlag = startEndSameFlag;
-        }
-
-        /**
-         * Instantiates a new Start end flag frame encoder.
-         *
-         * @param startFlag the start flag
-         * @param endFlag   the end flag
-         */
-        public StartEndFlagFrameEncoder(byte[] startFlag, byte[] endFlag) {
-            this.startFlag = startFlag;
-            this.endFlag   = endFlag;
         }
 
         @Override

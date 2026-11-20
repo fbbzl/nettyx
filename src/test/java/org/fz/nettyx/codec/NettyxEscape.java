@@ -5,9 +5,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.fz.nettyx.codec.EscapeCodec.EscapeMap;
 import org.fz.nettyx.util.HexKit;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +17,8 @@ import static io.netty.buffer.ByteBufUtil.getBytes;
 
 
 /**
+ * Demonstrates and times byte sequence escaping with one-to-one replacement mappings.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/5/21 10:38
@@ -27,9 +29,9 @@ public class NettyxEscape {
 
     public static void main(String[] args) {
         ByteBuf   in        = Unpooled.copiedBuffer(HexKit.decode("7e27e04060707d"));
-        EscapeMap escapeMap =  new EscapeMap();
-        escapeMap.putHex("7e", "7d5e");
-        escapeMap.putHex("7d", "7d5d");
+        Map<byte[], byte[]> escapeMap = new HashMap<>();
+        escapeMap.put(HexKit.decode("7e"), HexKit.decode("7d5e"));
+        escapeMap.put(HexKit.decode("7d"), HexKit.decode("7d5d"));
 
         StopWatch stopWatch = StopWatch.create("");
         stopWatch.start("escape");

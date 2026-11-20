@@ -32,6 +32,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Checks TCP detection requests, retries, interruption, and connection failure propagation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-08-02
+ */
 public class RemoteDetectorTest {
 
     private final EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -154,6 +161,13 @@ public class RemoteDetectorTest {
         return new TestDetector((InetSocketAddress) serverChannel.localAddress());
     }
 
+    /**
+     * Creates a fresh probe buffer per attempt and records how many probes the detector creates.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class TestDetector extends RemoteDetector<ByteBuf> {
 
         private final AtomicInteger detectMessageCount = new AtomicInteger();

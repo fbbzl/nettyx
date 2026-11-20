@@ -5,6 +5,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies that the echo handler writes each inbound message back to the channel.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-01
+ */
 public class MessageEchoHandlerTest {
 
     @Test

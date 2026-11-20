@@ -7,7 +7,10 @@ import java.math.BigInteger;
 import static org.junit.Assert.*;
 
 /**
+ * Checks conversions between numeric values and byte sequences in both byte orders.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class EndianKitTest {

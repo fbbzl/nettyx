@@ -15,6 +15,7 @@ import java.util.Map;
  * multi rxtx channel template
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022-01-26 20:26
  **/
 @Getter

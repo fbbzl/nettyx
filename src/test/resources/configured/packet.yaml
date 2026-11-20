@@ -1,0 +1,9 @@
+namespace: packet
+structs:
+  - name: Header
+    endian: LE
+    fields:
+      - name: id
+        type: cint
+      - name: flags
+        type: cushort

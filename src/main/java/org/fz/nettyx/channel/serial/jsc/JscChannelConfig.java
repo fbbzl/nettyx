@@ -74,6 +74,8 @@ public interface JscChannelConfig extends SerialChannelConfig {
     JscChannelConfig setMessageSizeEstimator(MessageSizeEstimator estimator);
 
     /**
+     * Maps Netty channel options to jSerialComm serial port settings.
+     *
      * @author fengbinbin
      * @version 1.0
      * @since 2024/3/2 13:29

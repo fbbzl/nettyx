@@ -47,7 +47,7 @@ public abstract class AbstractSingleChannelTemplate<S extends SocketAddress, C e
         storeChannel((C) cf.channel());
     }
 
-    protected void storeChannel(C channel)
+    protected synchronized void storeChannel(C channel)
     {
         if (isActive(this.channel)) this.channel.close();
 
@@ -120,7 +120,12 @@ public abstract class AbstractSingleChannelTemplate<S extends SocketAddress, C e
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
                     C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                    doChannelConfig((F) chl.config());
+                    try {
+                        doChannelConfig((F) chl.config());
+                    } catch (RuntimeException | Error failure) {
+                        chl.unsafe().closeForcibly();
+                        throw failure;
+                    }
                     return chl;
                 })
                 .attr(CHANNEL_STATE_KEY, new ChannelState())

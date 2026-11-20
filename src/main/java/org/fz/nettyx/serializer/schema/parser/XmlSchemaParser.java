@@ -2,10 +2,8 @@ package org.fz.nettyx.serializer.schema.parser;
 
 import lombok.experimental.UtilityClass;
 import org.fz.nettyx.exception.StructDefinitionException;
-import org.fz.nettyx.serializer.schema.SchemaField;
+import org.fz.nettyx.serializer.schema.Schema.SchemaField;
 import org.fz.nettyx.serializer.schema.Schema;
-import org.fz.nettyx.serializer.schema.type.BasicTypeResolver;
-import org.fz.nettyx.serializer.basic.Basic;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
@@ -16,16 +14,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
- * parses xml struct config files:
+ * Parses XML schema configuration:
  * <pre>{@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
@@ -54,34 +49,43 @@ public class XmlSchemaParser
 
     static final String DTD_RESOURCE = "org/fz/nettyx/serializer/schema/struct-config.dtd";
 
+    /**
+     * Defines the element names recognized in an XML schema document.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-09-12
+     */
     @UtilityClass
     private class Tag
     {
         private static final String
-                STRUCTS = "structs",
-                STRUCT  = "struct",
+                SCHEMAS = "structs",
+                SCHEMA  = "struct",
                 FIELD   = "field";
     }
 
+    /**
+     * Defines the attribute names recognized in an XML schema document.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-09-12
+     */
     @UtilityClass
     private class Attributes
     {
 
         private static final String
-                NAMESPACE = "namespace",
-                NAME      = "name",
-                ENDIAN    = "endian",
-                TYPE      = "type",
-                STRUCT    = "struct",
-                LENGTH    = "length",
-                ARRAY     = "array",
-                CHARSET   = "charset";
+                NAMESPACE  = "namespace",
+                NAME       = "name",
+                ENDIAN     = "endian",
+                TYPE       = "type",
+                SCHEMA_REF = "struct",
+                LENGTH     = "length",
+                ARRAY      = "array",
+                CHARSET    = "charset";
     }
-
-    static final String TYPE_CHAR = "char";
-    static final String TYPE_BYTE = "byte";
-
-    static final String ARRAY_FLEXIBLE = "*";
 
     public Map<String, Schema> parse(String location, InputStream input)
     {
@@ -90,22 +94,22 @@ public class XmlSchemaParser
             harden(factory);
 
             DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver(structDtdResolver());
+            builder.setEntityResolver(schemaDtdResolver());
 
-            Element structsEl = builder.parse(input).getDocumentElement();
-            if (!Tag.STRUCTS.equals(structsEl.getTagName()))
+            Element schemasEl = builder.parse(input).getDocumentElement();
+            if (!Tag.SCHEMAS.equals(schemasEl.getTagName()))
                 throw new StructDefinitionException("root element must be <structs>, location: [" + location + "]");
 
-            String namespace = requiredAttr(structsEl, Attributes.NAMESPACE, location);
+            String namespace = requiredAttr(schemasEl, Attributes.NAMESPACE, location);
 
-            Map<String, Schema> structs     = new LinkedHashMap<>();
-            NodeList                  structNodes = structsEl.getElementsByTagName(Tag.STRUCT);
-            for (int i = 0; i < structNodes.getLength(); i++) {
-                Schema struct = parseStruct(namespace, (Element) structNodes.item(i), location);
-                if (structs.put(struct.fqName(), struct) != null)
-                    throw new StructDefinitionException("duplicated struct [" + struct.fqName() + "], location: [" + location + "]");
+            Map<String, Schema> schemas     = new LinkedHashMap<>();
+            NodeList            schemaNodes = schemasEl.getElementsByTagName(Tag.SCHEMA);
+            for (int i = 0; i < schemaNodes.getLength(); i++) {
+                Schema schema = parseSchema(namespace, (Element) schemaNodes.item(i), location);
+                if (schemas.put(schema.fqName(), schema) != null)
+                    throw new StructDefinitionException("duplicated struct [" + schema.fqName() + "], location: [" + location + "]");
             }
-            return structs;
+            return schemas;
         }
         catch (StructDefinitionException definitionError) {
             throw definitionError;
@@ -115,129 +119,29 @@ public class XmlSchemaParser
         }
     }
 
-    private Schema parseStruct(String namespace, Element structEl, String location)
+    private Schema parseSchema(String namespace, Element schemaEl, String location)
     {
-        String    name      = requiredAttr(structEl, Attributes.NAME, location);
-        ByteOrder byteOrder = parseEndian(attr(structEl, Attributes.ENDIAN), namespace + "." + name, location);
+        String    name      = requiredAttr(schemaEl, Attributes.NAME, location);
+        ByteOrder byteOrder = SchemaParser.parseEndian(attr(schemaEl, Attributes.ENDIAN), namespace + "." + name, location);
 
         List<SchemaField> fields     = new ArrayList<>();
-        NodeList          fieldNodes = structEl.getElementsByTagName(Tag.FIELD);
+        NodeList          fieldNodes = schemaEl.getElementsByTagName(Tag.FIELD);
         for (int i = 0; i < fieldNodes.getLength(); i++)
              fields.add(parseField((Element) fieldNodes.item(i), namespace + "." + name, location));
 
         return new Schema(namespace, name, byteOrder, fields);
     }
 
-    private SchemaField parseField(Element fieldEl, String structName, String location)
+    private SchemaField parseField(Element fieldEl, String schemaName, String location)
     {
         String name      = requiredAttr(fieldEl, Attributes.NAME, location);
         String type      = attr(fieldEl, Attributes.TYPE);
-        String structRef = attr(fieldEl, Attributes.STRUCT);
+        String schemaRef = attr(fieldEl, Attributes.SCHEMA_REF);
         String length    = attr(fieldEl, Attributes.LENGTH);
         String array     = attr(fieldEl, Attributes.ARRAY);
         String charset   = attr(fieldEl, Attributes.CHARSET);
 
-        boolean hasType   = type != null;
-        boolean hasStruct = structRef != null;
-        boolean hasLength = length != null;
-        boolean hasArray  = array != null;
-
-        if (hasType == hasStruct)
-            throw definitionError("field must declare exactly one of [" + Attributes.TYPE + "] or [" + Attributes.STRUCT + "]", fieldEl, structName, location);
-
-        if (hasStruct) {
-            if (hasLength)
-                throw definitionError("struct field can not declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
-            if (charset != null)
-                throw definitionError("struct field can not declare [" + Attributes.CHARSET + "]", fieldEl, structName, location);
-            return hasArray
-                   ? SchemaField.structArray(name, structRef, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
-                   : SchemaField.structField(name, structRef);
-        }
-
-        if (TYPE_CHAR.equals(type)) {
-            if (!hasLength)
-                throw definitionError("char field must declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
-            if (hasArray)
-                throw definitionError("char field can not declare [" + Attributes.ARRAY + "]", fieldEl, structName, location);
-            return SchemaField.charField(name, parseLength(length, fieldEl, structName, location),
-                                         parseCharset(charset, fieldEl, structName, location));
-        }
-
-        if (charset != null)
-            throw definitionError("only char field can declare [" + Attributes.CHARSET + "]", fieldEl, structName, location);
-
-        if (TYPE_BYTE.equals(type)) {
-            if (!hasLength)
-                throw definitionError("byte field must declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
-            if (hasArray)
-                throw definitionError("byte field can not declare [" + Attributes.ARRAY + "]", fieldEl, structName, location);
-            return SchemaField.bytesField(name, parseLength(length, fieldEl, structName, location));
-        }
-
-        if (hasLength)
-            throw definitionError("basic field can not declare [" + Attributes.LENGTH + "]", fieldEl, structName, location);
-
-        Class<? extends Basic<?>> basicType = BasicTypeResolver.resolve(type);
-        return hasArray
-               ? SchemaField.basicArray(name, basicType, parseArrayLength(array, fieldEl, structName, location), isFlexible(array))
-               : SchemaField.basicField(name, basicType);
-    }
-
-    private static Charset parseCharset(String charset, Element fieldEl, String structName, String location)
-    {
-        if (charset == null) return StandardCharsets.UTF_8;
-
-        try {
-            return Charset.forName(charset);
-        }
-        catch (Exception charsetError) {
-            throw definitionError("unknown [" + Attributes.CHARSET + "] value [" + charset + "]", fieldEl, structName, location);
-        }
-    }
-
-    private static ByteOrder parseEndian(String endian, String structName, String location)
-    {
-        if (endian == null) return ByteOrder.BIG_ENDIAN;
-
-        return switch (endian.toUpperCase(Locale.ROOT)) {
-            case "BE", "BIG_ENDIAN" -> ByteOrder.BIG_ENDIAN;
-            case "LE", "LITTLE_ENDIAN" -> ByteOrder.LITTLE_ENDIAN;
-            case "NATIVE" -> ByteOrder.nativeOrder();
-            default -> throw new StructDefinitionException(
-                    "unknown endian [" + endian + "] of struct [" + structName + "], location: [" + location + "]");
-        };
-    }
-
-    private static boolean isFlexible(String array)
-    {
-        return ARRAY_FLEXIBLE.equals(array.trim());
-    }
-
-    private static int parseLength(String length, Element fieldEl, String structName, String location)
-    {
-        try {
-            int value = Integer.parseInt(length.trim());
-            if (value <= 0) throw new NumberFormatException("length must be positive");
-            return value;
-        }
-        catch (NumberFormatException formatError) {
-            throw definitionError("invalid [" + Attributes.LENGTH + "] value [" + length + "]", fieldEl, structName, location);
-        }
-    }
-
-    private static Integer parseArrayLength(String array, Element fieldEl, String structName, String location)
-    {
-        if (isFlexible(array)) return null;
-
-        try {
-            int value = Integer.parseInt(array.trim());
-            if (value <= 0) throw new NumberFormatException("array length must be positive");
-            return value;
-        }
-        catch (NumberFormatException formatError) {
-            throw definitionError("invalid [" + Attributes.ARRAY + "] value [" + array + "], use positive number or *", fieldEl, structName, location);
-        }
+        return SchemaField.fromConfig(name, type, schemaRef, length, array, charset, schemaName, location);
     }
 
     private static String attr(Element element, String name)
@@ -255,12 +159,6 @@ public class XmlSchemaParser
         return value;
     }
 
-    private static StructDefinitionException definitionError(String message, Element fieldEl, String structName, String location)
-    {
-        return new StructDefinitionException(
-                message + ", field [" + attr(fieldEl, Attributes.NAME) + "] of struct [" + structName + "], location: [" + location + "]");
-    }
-
     private static void harden(DocumentBuilderFactory factory)
     {
         try {
@@ -273,10 +171,10 @@ public class XmlSchemaParser
     }
 
     /**
-     * resolves the declared struct config dtd to the bundled one like mybatis mapper entity resolver,
+     * resolves the declared schema configuration DTD to the bundled one like mybatis mapper entity resolver,
      * any other external entity is blocked with an empty source
      */
-    private static EntityResolver structDtdResolver()
+    private static EntityResolver schemaDtdResolver()
     {
         return (publicId, systemId) -> {
             if (DOCTYPE_PUBLIC_ID.equals(publicId)

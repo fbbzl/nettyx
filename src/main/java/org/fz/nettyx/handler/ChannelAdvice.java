@@ -1,6 +1,7 @@
 package org.fz.nettyx.handler;
 
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.*;
@@ -26,6 +27,10 @@ public class ChannelAdvice {
 
     /**
      * The type Inbound advice.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-24
      */
     @Setter
     @RequiredArgsConstructor
@@ -45,6 +50,13 @@ public class ChannelAdvice {
                 whenChannelReadComplete;
         ChannelReadAction      whenChannelRead;
         ChannelExceptionAction whenExceptionCaught;
+
+        /** Observes inbound messages before automatic forwarding; the callback must not forward or release the message. */
+        public final InboundAdvice whenChannelRead(ChannelReadAction action)
+        {
+            this.whenChannelRead = action;
+            return this;
+        }
 
         /**
          * When read idle inbound advice.
@@ -127,7 +139,12 @@ public class ChannelAdvice {
         {
             log.debug("channel read, remote-address is [{}], local-address is [{}], message is [{}]",
                       ctx.channel().remoteAddress(), ctx.channel().localAddress(), msg);
-            invokeAction(whenChannelRead, ctx, msg);
+            try {
+                invokeAction(whenChannelRead, ctx, msg);
+            } catch (Exception | Error failure) {
+                ReferenceCountUtil.safeRelease(msg);
+                throw failure;
+            }
             super.channelRead(ctx, msg);
         }
 
@@ -162,6 +179,10 @@ public class ChannelAdvice {
 
     /**
      * The type Outbound advice.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2021-12-24
      */
     @Setter
     @RequiredArgsConstructor
@@ -177,6 +198,13 @@ public class ChannelAdvice {
         ChannelPromiseAction whenDisconnect, whenClose, whenDeregister;
         ChannelHandlerContextAction whenRead, whenFlush;
         ChannelWriteAction whenWrite;
+
+        /** Observes outbound messages before automatic forwarding; the callback must not forward or release the message. */
+        public final OutboundAdvice whenWrite(ChannelWriteAction action)
+        {
+            this.whenWrite = action;
+            return this;
+        }
 
         /**
          * When write idle outbound advice.
@@ -272,7 +300,12 @@ public class ChannelAdvice {
         {
             log.debug("channel write, remote-address is [{}], local-address is [{}]", ctx.channel().remoteAddress(),
                       ctx.channel().localAddress());
-            invokeAction(whenWrite, ctx, msg, promise);
+            try {
+                invokeAction(whenWrite, ctx, msg, promise);
+            } catch (Exception | Error failure) {
+                ReferenceCountUtil.safeRelease(msg);
+                throw failure;
+            }
             super.write(ctx, msg, promise);
         }
 
@@ -285,6 +318,13 @@ public class ChannelAdvice {
             super.flush(ctx);
         }
 
+        /**
+         * Attaches failure listeners to outbound operations so the configured exception callback can run.
+         *
+         * @author fengbinbin
+         * @version 1.0
+         * @since 2024-02-27
+         */
         @Setter
         @NoArgsConstructor
         @AllArgsConstructor
