@@ -15,6 +15,13 @@ import java.lang.reflect.Field;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+/**
+ * Checks buffer ownership, text padding, length validation, and constructor access under serialization edge cases.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class StructSerializerRobustnessTest {
 
     @BeforeClass
@@ -110,11 +117,25 @@ public class StructSerializerRobustnessTest {
     }
 
 
+    /**
+     * Provides a correctly annotated fixed-width text field for testing string serialization.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-11
+     */
     private static class ValidFields {
         @ToCharSequence(bufferLength = 5)
         String text;
     }
 
+    /**
+     * Provides chunk and text fields with negative annotation lengths.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-11
+     */
     private static class InvalidFields {
         @Chunk(length = -1)
         byte[] chunk;

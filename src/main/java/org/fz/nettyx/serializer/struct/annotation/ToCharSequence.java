@@ -48,6 +48,13 @@ public @interface ToCharSequence {
      */
     int bufferLength();
 
+    /**
+     * Reads and writes text fields using the length and charset from {@link ToCharSequence}.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-02-23
+     */
     class ToStringHandler implements StructFieldHandler<ToCharSequence> {
         @Override
         public boolean isSingleton()
@@ -93,13 +100,16 @@ public @interface ToCharSequence {
             int    bufferLength = toCharSequence.bufferLength();
             String charset      = toCharSequence.charset();
 
-            if (fieldVal != null) {
+            if (fieldVal != null)
+            {
                 byte[] encoded  = fieldVal.toString().getBytes(Charset.forName(charset));
                 int    writeLen = Math.min(encoded.length, bufferLength);
                 writing.writeBytes(encoded, 0, writeLen);
                 int pad = bufferLength - writeLen;
                 if (pad > 0) writing.writeZero(pad);
-            } else writing.writeZero(bufferLength);
+            }
+            else
+                writing.writeZero(bufferLength);
         }
 
         @Override

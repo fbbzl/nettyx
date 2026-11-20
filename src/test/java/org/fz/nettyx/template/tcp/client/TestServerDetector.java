@@ -8,6 +8,8 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.net.InetSocketAddress;
 
 /**
+ * Defines a text probe and response check for detecting a TCP server.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/5/16 18:39

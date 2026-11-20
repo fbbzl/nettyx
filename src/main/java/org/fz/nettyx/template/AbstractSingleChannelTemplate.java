@@ -2,7 +2,6 @@ package org.fz.nettyx.template;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import lombok.Getter;
@@ -47,7 +46,7 @@ public abstract class AbstractSingleChannelTemplate<S extends SocketAddress, C e
         storeChannel((C) cf.channel());
     }
 
-    protected void storeChannel(C channel)
+    protected synchronized void storeChannel(C channel)
     {
         if (isActive(this.channel)) this.channel.close();
 
@@ -77,40 +76,12 @@ public abstract class AbstractSingleChannelTemplate<S extends SocketAddress, C e
 
     public ChannelPromise write(Object message)
     {
-        if (this.notActive(channel) || notWritable(channel)) {
-            log.debug("channel not in usable status, message will be discard: {}", message);
-            ReferenceCountUtil.safeRelease(message);
-            return failurePromise(channel, "channel: [" + channel + "] is not usable");
-        }
-
-        ChannelPromise promise = channel.newPromise();
-        try {
-            channel.write(message, promise);
-            return promise;
-        } catch (Exception exception) {
-            ReferenceCountUtil.safeRelease(message);
-            throw new ChannelException("exception occurred while sending the message [" + message + "], address is ["
-                                       + channel.remoteAddress() + "]", exception);
-        }
+        return Template.send(this, channel, message, false, false, null, log);
     }
 
     public ChannelPromise writeAndFlush(Object message)
     {
-        if (this.notActive(channel) || notWritable(channel)) {
-            log.debug("channel not in usable status, message will be discard: {}", message);
-            ReferenceCountUtil.safeRelease(message);
-            return failurePromise(channel, "channel: [" + channel + "] is not usable");
-        }
-
-        ChannelPromise promise = channel.newPromise();
-        try {
-            channel.writeAndFlush(message, promise);
-            return promise;
-        } catch (Exception exception) {
-            ReferenceCountUtil.safeRelease(message);
-            throw new ChannelException("exception occurred while sending the message [" + message + "], address is ["
-                                       + channel.remoteAddress() + "]", exception);
-        }
+        return Template.send(this, channel, message, true, false, null, log);
     }
 
     protected Bootstrap newBootstrap(S remoteAddress)
@@ -120,7 +91,12 @@ public abstract class AbstractSingleChannelTemplate<S extends SocketAddress, C e
                 .group(getEventLoopGroup())
                 .channelFactory(() -> {
                     C chl = new ReflectiveChannelFactory<>(getChannelClass()).newChannel();
-                    doChannelConfig((F) chl.config());
+                    try {
+                        doChannelConfig((F) chl.config());
+                    } catch (RuntimeException | Error failure) {
+                        chl.unsafe().closeForcibly();
+                        throw failure;
+                    }
                     return chl;
                 })
                 .attr(CHANNEL_STATE_KEY, new ChannelState())

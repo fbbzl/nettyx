@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE structs PUBLIC "-//fbbzl//DTD Nettyx Struct Config 1.0//EN" "https://github.com/fbbzl/nettyx/dtd/struct-config.dtd">
+<structs namespace="benchmark">
+    <struct name="CharMessage" endian="BE">
+        <field name="value" type="char" length="32"/>
+    </struct>
+    <struct name="CIntMessage" endian="LE">
+        <field name="value" type="cint"/>
+    </struct>
+    <struct name="CppIntMessage" endian="LE">
+        <field name="value" type="cppint"/>
+    </struct>
+</structs>

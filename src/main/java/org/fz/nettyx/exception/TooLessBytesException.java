@@ -3,6 +3,8 @@ package org.fz.nettyx.exception;
 import lombok.Getter;
 
 /**
+ * Reports that a buffer has fewer readable bytes than a value requires.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2021/10/20 16:42

@@ -1,7 +1,8 @@
-package org.fz.nettyx.serializer.struct.generator;
+package org.fz.nettyx.serializer.struct.accessor;
 
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
@@ -16,25 +17,29 @@ import static org.fz.nettyx.serializer.struct.annotation.ToArray.ToArrayHandler.
 /**
  * Generated constructor, reader and writer for a struct type.
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-16 16:39
  */
-public interface StructAccessor {
+public interface StructAccessor
+{
+
     Object newInstance();
 
     Object read(StructSerializer serializer, Type root, Type structType, ByteBuf buf);
 
     void write(StructSerializer serializer, Type root, Type structType, Object struct, ByteBuf buf);
 
-    /** Runtime semantics for fields whose concrete types cannot be emitted directly. */
+    /**
+     * Runtime semantics for fields whose concrete types cannot be emitted directly.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-11-11
+     */
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @SuppressWarnings({"rawtypes", "unchecked"})
-    final class Support {
-
-        private Support() {
-        }
-
-        public static Type resolveStructType(Type root, Type structType) {
-            return structType instanceof Class<?> ? structType : TypeUtil.getActualType(root, structType);
-        }
+    final class FieldAccessor
+    {
 
         public static Object readField(
                 StructSerializer serializer,
@@ -43,12 +48,13 @@ public interface StructAccessor {
                 Type actualStructType,
                 StructField field,
                 StructFieldHandler handler,
-                ByteBuf buf) {
+                ByteBuf buf)
+        {
             Type fieldType = field.type(actualStructType);
-            if (field.annotation() instanceof ToArray toArray) {
+            if (field.annotation() instanceof ToArray toArray)
                 return readArray(serializer, root, field, fieldType, buf, toArray);
-            }
-            return handler.doRead(serializer, root, struct, field, fieldType, buf, field.annotation());
+            else
+                return handler.doRead(serializer, root, struct, field, fieldType, buf, field.annotation());
         }
 
         public static void writeField(
@@ -59,7 +65,8 @@ public interface StructAccessor {
                 StructField field,
                 StructFieldHandler handler,
                 Object value,
-                ByteBuf buf) {
+                ByteBuf buf)
+        {
             Type fieldType = field.type(actualStructType);
             if (field.annotation() instanceof ToArray toArray) {
                 writeArray(serializer, root, field, fieldType, value, buf, toArray);
@@ -74,14 +81,15 @@ public interface StructAccessor {
                 StructField field,
                 Type fieldType,
                 ByteBuf buf,
-                ToArray toArray) {
+                ToArray toArray)
+        {
             int length = toArray.length();
             boolean flexible = toArray.flexible();
             Type componentType = componentType(root, field, fieldType);
-            if (serializer.isBasic(componentType)) {
+            if (serializer.isBasic(componentType))
                 return serializer.readBasicArray((Class<?>) componentType, field.byteOrder(), buf, length, flexible);
-            }
-            return serializer.readStructArray(componentType, buf, length, flexible);
+            else
+                return serializer.readStructArray(componentType, buf, length, flexible);
         }
 
         private static void writeArray(
@@ -99,9 +107,7 @@ public interface StructAccessor {
                 serializer.writeBasicArray((Basic<?>[]) value, StructContext.getBasicSize(componentType),
                                            length, buf, flexible, field.byteOrder());
             }
-            else {
-                serializer.writeStructArray(value, componentType, length, buf, flexible);
-            }
+            else serializer.writeStructArray(value, componentType, length, buf, flexible);
         }
 
         private static Type componentType(Type root, StructField field, Type fieldType) {
@@ -110,8 +116,7 @@ public interface StructAccessor {
         }
 
         private static Class<?> concreteComponentClass(StructField field) {
-            Type fieldType = field.wrapped().getGenericType();
-            return fieldType instanceof Class<?> fieldClass ? fieldClass.getComponentType() : null;
+            return field.wrapped().getGenericType() instanceof Class<?> fieldClass ? fieldClass.getComponentType() : null;
         }
     }
 }

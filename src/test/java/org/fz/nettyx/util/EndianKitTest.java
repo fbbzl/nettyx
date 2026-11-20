@@ -7,7 +7,10 @@ import java.math.BigInteger;
 import static org.junit.Assert.*;
 
 /**
+ * Checks conversions between numeric values and byte sequences in both byte orders.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class EndianKitTest {
@@ -259,6 +262,39 @@ public class EndianKitTest {
                          endian.reverseUnsignedLong(unsignedLong));
             assertEquals(other.toFloat(endian.fromFloat(123.25f)), endian.reverseFloat(123.25f), 0.0f);
             assertEquals(other.toDouble(endian.fromDouble(123.25)), endian.reverseDouble(123.25), 0.0);
+        }
+    }
+
+    @Test
+    public void reverseOperationsPreserveTruncationAndFloatingPointBits() {
+        BigInteger unsignedLong = BigInteger.ONE.shiftLeft(Long.SIZE).add(new BigInteger("FEDCBA9876543210", 16));
+        int[] floatBits = {0, 0x80000000, 0x7F800000, 0x7FC00001, 0xFFC12345};
+        long[] doubleBits = {0L, 0x8000000000000000L, 0x7FF0000000000000L,
+                             0x7FF8000000000001L, 0xFFF8123456789ABCL};
+
+        for (EndianKit endian : EndianKit.values()) {
+            EndianKit other = endian == EndianKit.BE ? EndianKit.LE : EndianKit.BE;
+            assertEquals(other.toUnsignedByte(endian.fromUnsignedByte((short) -1)),
+                         endian.reverseUnsignedByte((short) -1));
+            assertEquals(other.toUnsignedShort(endian.fromUnsignedShort(0x1FEDC)),
+                         endian.reverseUnsignedShort(0x1FEDC));
+            assertEquals(other.toUnsignedInt(endian.fromUnsignedInt(0x1FEDCBA98L)),
+                         endian.reverseUnsignedInt(0x1FEDCBA98L));
+            assertEquals(other.toUnsignedLong(endian.fromUnsignedLong(unsignedLong)),
+                         endian.reverseUnsignedLong(unsignedLong));
+
+            for (int bits : floatBits) {
+                float value = Float.intBitsToFloat(bits);
+                float expected = other.toFloat(endian.fromFloat(value));
+                assertEquals(Float.floatToRawIntBits(expected),
+                             Float.floatToRawIntBits(endian.reverseFloat(value)));
+            }
+            for (long bits : doubleBits) {
+                double value = Double.longBitsToDouble(bits);
+                double expected = other.toDouble(endian.fromDouble(value));
+                assertEquals(Double.doubleToRawLongBits(expected),
+                             Double.doubleToRawLongBits(endian.reverseDouble(value)));
+            }
         }
     }
 

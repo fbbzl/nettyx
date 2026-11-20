@@ -1,6 +1,8 @@
 package org.fz.nettyx.channel.serial;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import org.fz.nettyx.exception.UnknownConfigException;
 
 /**
@@ -19,11 +21,9 @@ public enum SerialParityBit {
     MARK(3),
     SPACE(4);
 
+    @Getter
+    @Accessors(fluent = true)
     private final int value;
-
-    public int value() {
-        return value;
-    }
 
     public static SerialParityBit valueOf(int value) {
         for (SerialParityBit parityBit : values()) if (parityBit.value == value) return parityBit;

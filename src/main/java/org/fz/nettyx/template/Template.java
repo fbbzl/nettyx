@@ -1,7 +1,9 @@
 package org.fz.nettyx.template;
 
-import cn.hutool.core.util.TypeUtil;
+import com.google.common.reflect.TypeToken;
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
+import io.netty.util.internal.logging.InternalLogger;
 import lombok.Getter;
 
 import java.lang.reflect.Type;
@@ -10,6 +12,7 @@ import java.lang.reflect.Type;
  * top level template based on netty
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2021 /5/6 16:49
  */
 @Getter
@@ -32,20 +35,11 @@ abstract class Template<C extends Channel> {
 
     protected Class<C> findChannelClass()
     {
-        Type     supperType;
-        Class<?> supperClass = this.getClass();
-        do {
-            supperType  = supperClass.getGenericSuperclass();
-            supperClass = supperClass.getSuperclass();
-        } while (supperClass != null && supperClass != Template.class);
-
-        Type typeArgument = TypeUtil.getTypeArgument(supperType);
-
-        Type[] actualTypes = TypeUtil.getActualTypes(this.getClass(), typeArgument);
-        if (actualTypes == null || actualTypes.length == 0) {
-            throw new IllegalStateException("can not resolve channel class for template [" + this.getClass() + "]");
+        Type channelType = TypeToken.of(this.getClass()).resolveType(Template.class.getTypeParameters()[0]).getType();
+        if (channelType instanceof Class<?> channelClass && Channel.class.isAssignableFrom(channelClass)) {
+            return (Class<C>) channelClass;
         }
-        return (Class<C>) actualTypes[0];
+        throw new IllegalStateException("can not resolve channel class for template [" + this.getClass() + "]");
     }
 
     protected abstract EventLoopGroup newEventLoopGroup();
@@ -103,6 +97,32 @@ abstract class Template<C extends Channel> {
             throw new ChannelException(message);
         }
         return new DefaultChannelPromise(channel).setFailure(new ChannelException(message));
+    }
+
+    static ChannelPromise send(Template<?> template, Channel channel, Object message, boolean flush,
+                               boolean multiChannel, Object channelKey, InternalLogger logger)
+    {
+        if (template.notActive(channel) || template.notWritable(channel)) {
+            if (multiChannel) {
+                logger.debug("channel not in usable status, channel key is [{}], message will be discard: {}",
+                             channelKey, message);
+            } else {
+                logger.debug("channel not in usable status, message will be discard: {}", message);
+            }
+            ReferenceCountUtil.safeRelease(message);
+            return template.failurePromise(channel, "channel: [" + channel + "] is not usable");
+        }
+
+        ChannelPromise promise = channel.newPromise();
+        try {
+            if (flush) channel.writeAndFlush(message, promise);
+            else       channel.write(message, promise);
+            return promise;
+        } catch (Exception exception) {
+            ReferenceCountUtil.safeRelease(message);
+            throw new ChannelException("exception occurred while sending the message [" + message + "], address is ["
+                                       + channel.remoteAddress() + "]", exception);
+        }
     }
 
     protected void shutdownGracefully()

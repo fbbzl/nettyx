@@ -1,5 +1,7 @@
 package org.fz.nettyx.serializer.schema.parser;
 
+import org.fz.nettyx.serializer.schema.Schema;
+import org.fz.nettyx.serializer.schema.Schema.SchemaField;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +15,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import org.fz.nettyx.exception.StructDefinitionException;
 
+/**
+ * Checks XML schema validation, bundled DTD resolution, and field parity with JSON.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-14
+ */
 public class XmlSchemaParserTest {
 
     @Test
@@ -66,6 +75,38 @@ public class XmlSchemaParserTest {
         };
         for (String xml : invalid)
             assertThrows(StructDefinitionException.class, () -> parse(xml));
+    }
+
+    @Test
+    public void xmlAndJsonBuildEquivalentFieldDefinitions()
+    {
+        String json = "{\"namespace\":\"x\",\"structs\":[{\"name\":\"Child\"},{\"name\":\"S\",\"fields\":["
+                      + "{\"name\":\"text\",\"type\":\"char\",\"length\":\"4\"},"
+                      + "{\"name\":\"raw\",\"type\":\"byte\",\"length\":\"2\"},"
+                      + "{\"name\":\"values\",\"type\":\"cint\",\"array\":\"2\"},"
+                      + "{\"name\":\"children\",\"struct\":\"Child\",\"array\":\"*\"}]}]}";
+        String xml = "<structs namespace=\"x\"><struct name=\"Child\"/><struct name=\"S\">"
+                     + "<field name=\"text\" type=\"char\" length=\"4\"/>"
+                     + "<field name=\"raw\" type=\"byte\" length=\"2\"/>"
+                     + "<field name=\"values\" type=\"cint\" array=\"2\"/>"
+                     + "<field name=\"children\" struct=\"Child\" array=\"*\"/>"
+                     + "</struct></structs>";
+
+        Schema jsonSchema = new JsonSchemaParser().parse("same.json", new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8))).get("x.S");
+        Schema xmlSchema = parse(xml).get("x.S");
+        assertEquals(jsonSchema.fields().size(), xmlSchema.fields().size());
+        for (int i = 0; i < jsonSchema.fields().size(); i++) {
+            SchemaField jsonField = jsonSchema.fields().get(i);
+            SchemaField xmlField = xmlSchema.fields().get(i);
+            assertEquals(jsonField.name(), xmlField.name());
+            assertEquals(jsonField.kind(), xmlField.kind());
+            assertEquals(jsonField.basicType(), xmlField.basicType());
+            assertEquals(jsonField.length(), xmlField.length());
+            assertEquals(jsonField.flexible(), xmlField.flexible());
+            assertEquals(jsonField.schemaRef(), xmlField.schemaRef());
+            assertEquals(jsonField.elementKind(), xmlField.elementKind());
+            assertEquals(jsonField.charset(), xmlField.charset());
+        }
     }
 
     private static java.util.Map<String, org.fz.nettyx.serializer.schema.Schema> parse(String xml)

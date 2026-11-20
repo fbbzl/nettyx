@@ -7,6 +7,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Verifies idle event matching accepts the requested state and rejects unrelated inputs.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class ChannelEventsTest {
 
     @Test

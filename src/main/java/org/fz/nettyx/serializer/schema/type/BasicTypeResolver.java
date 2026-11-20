@@ -17,9 +17,39 @@ import org.fz.nettyx.serializer.basic.c.signed.cfloat;
 import org.fz.nettyx.serializer.basic.c.signed.cint;
 import org.fz.nettyx.serializer.basic.c.signed.clong4;
 import org.fz.nettyx.serializer.basic.c.signed.clong8;
+import org.fz.nettyx.serializer.basic.c.signed.clonglong;
 import org.fz.nettyx.serializer.basic.c.signed.cshort;
+import org.fz.nettyx.serializer.basic.c.stdint.signed.cint16_t;
+import org.fz.nettyx.serializer.basic.c.stdint.signed.cint32_t;
+import org.fz.nettyx.serializer.basic.c.stdint.signed.cint64_t;
+import org.fz.nettyx.serializer.basic.c.stdint.signed.cint8_t;
+import org.fz.nettyx.serializer.basic.c.stdint.unsigned.cuint16_t;
+import org.fz.nettyx.serializer.basic.c.stdint.unsigned.cuint32_t;
+import org.fz.nettyx.serializer.basic.c.stdint.unsigned.cuint64_t;
+import org.fz.nettyx.serializer.basic.c.stdint.unsigned.cuint8_t;
 import org.fz.nettyx.serializer.basic.c.unsigned.cuchar;
+import org.fz.nettyx.serializer.basic.c.unsigned.cuint;
+import org.fz.nettyx.serializer.basic.c.unsigned.culong4;
+import org.fz.nettyx.serializer.basic.c.unsigned.culong8;
+import org.fz.nettyx.serializer.basic.c.unsigned.culonglong;
 import org.fz.nettyx.serializer.basic.c.unsigned.cushort;
+import org.fz.nettyx.serializer.basic.cpp.cppbool;
+import org.fz.nettyx.serializer.basic.cpp.signed.cppdouble;
+import org.fz.nettyx.serializer.basic.cpp.signed.cppfloat;
+import org.fz.nettyx.serializer.basic.cpp.signed.cppint;
+import org.fz.nettyx.serializer.basic.cpp.signed.cpplong4;
+import org.fz.nettyx.serializer.basic.cpp.signed.cpplong8;
+import org.fz.nettyx.serializer.basic.cpp.signed.cpplonglong;
+import org.fz.nettyx.serializer.basic.cpp.signed.cppshort;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppchar16_t;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppchar32_t;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppchar8_t;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppuchar;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppuint;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppulong4;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppulong8;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppulonglong;
+import org.fz.nettyx.serializer.basic.cpp.unsigned.cppushort;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
@@ -28,7 +58,10 @@ import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.ByteOrder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,6 +81,13 @@ public class BasicTypeResolver
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(BasicTypeResolver.class);
 
+    private static final BigInteger MAX_UNSIGNED_BYTE              = BigInteger.valueOf(0xFF);
+    private static final BigInteger MAX_UNSIGNED_SHORT             = BigInteger.valueOf(0xFFFF);
+    private static final BigInteger MAX_UNSIGNED_INT               = BigInteger.valueOf(0xFFFF_FFFFL);
+    private static final BigDecimal MAX_UNSIGNED_BYTE_EXCLUSIVE    = BigDecimal.valueOf(0x100);
+    private static final BigDecimal MAX_UNSIGNED_SHORT_EXCLUSIVE   = BigDecimal.valueOf(0x1_0000);
+    private static final BigDecimal MAX_UNSIGNED_INT_EXCLUSIVE     = BigDecimal.valueOf(0x1_0000_0000L);
+
     private static final Map<String, Class<? extends Basic<?>>>           BASIC_TYPE_CACHE        = new ConcurrentHashMap<>(64);
     private static final Map<Class<? extends Basic<?>>, Integer>          BASIC_SIZE_CACHE        = new ConcurrentHashMap<>(64);
     private static final Map<Class<? extends Basic<?>>, BasicReader>      READING_READER_CACHE    = new ConcurrentHashMap<>(64);
@@ -62,9 +102,14 @@ public class BasicTypeResolver
                          && clazz != Basic.class
                          && !Modifier.isAbstract(clazz.getModifiers()));
 
+        registerBasicTypes(BASIC_TYPE_CACHE, scanned);
+    }
+
+    static void registerBasicTypes(Map<String, Class<? extends Basic<?>>> types, Set<Class<?>> scanned)
+    {
         for (Class<?> clazz : scanned) {
             Class<? extends Basic<?>> basicClass = (Class<? extends Basic<?>>) clazz;
-            BASIC_TYPE_CACHE.merge(basicClass.getSimpleName(), basicClass, (existing, incoming) -> {
+            types.merge(basicClass.getSimpleName(), basicClass, (existing, incoming) -> {
                 log.warn("duplicated basic type simple name [{}], keep [{}], ignore [{}]",
                          basicClass.getSimpleName(), existing.getName(), incoming.getName());
                 return existing;
@@ -109,13 +154,13 @@ public class BasicTypeResolver
     /**
      * wrap a plain java value into basic, the value will be converted to the value constructor parameter type
      */
-    public static Basic<?> valueBasic(Class<? extends Basic<?>> basicClass, Object value)
+    public static <B extends Basic<?>> B valueBasic(Class<B> basicClass, Object value)
     {
         try {
             Constructor<?> valueConstructor = VALUE_CONSTRUCTOR_CACHE.computeIfAbsent(basicClass, BasicTypeResolver::findValueConstructor);
             Class<?>       parameterType    = valueConstructor.getParameterTypes()[0];
 
-            return (Basic<?>) valueConstructor.newInstance(Convert.convert(parameterType, value));
+            return basicClass.cast(valueConstructor.newInstance(Convert.convert(parameterType, value)));
         }
         catch (SerializeException serializeError) {
             throw serializeError;
@@ -156,207 +201,209 @@ public class BasicTypeResolver
 
     private static BasicValueReader newValueReader(Class<? extends Basic<?>> basicClass)
     {
-        if (basicClass == cchar.class) return BasicTypeResolver::readByte;
-        if (basicClass == cuchar.class) return BasicTypeResolver::readUnsignedByte;
-        if (basicClass == cshort.class) return BasicTypeResolver::readShort;
-        if (basicClass == cushort.class) return BasicTypeResolver::readUnsignedShort;
-        if (basicClass == cint.class || basicClass == clong4.class) return BasicTypeResolver::readInt;
-        if (basicClass == clong8.class) return BasicTypeResolver::readLong;
-        if (basicClass == cfloat.class) return BasicTypeResolver::readFloat;
-        if (basicClass == cdouble.class) return BasicTypeResolver::readDouble;
+        ValueWireType wireType = valueWireTypeFor(basicClass);
+        Class<? extends Basic<?>> readerType = wireType == null ? basicClass : wireType.basicClass;
+        BasicReader reader = readerFor(readerType);
+        BasicValueReader valueReader = (byteBuf, byteOrder) -> reader.read(byteBuf, byteOrder).value();
 
-        BasicReader reader = readerFor(basicClass);
-        return (byteBuf, byteOrder) -> reader.read(byteBuf, byteOrder).value();
+        if (wireType == null || wireType == ValueWireType.UNSIGNED_LONG) return valueReader;
+        return checkedReader(sizeOf(readerType), valueReader);
     }
 
     private static BasicValueWriter newValueWriter(Class<? extends Basic<?>> basicClass)
     {
-        if (basicClass == cchar.class) return BasicTypeResolver::writeByte;
-        if (basicClass == cuchar.class) return BasicTypeResolver::writeUnsignedByte;
-        if (basicClass == cshort.class) return BasicTypeResolver::writeShort;
-        if (basicClass == cushort.class) return BasicTypeResolver::writeUnsignedShort;
-        if (basicClass == cint.class || basicClass == clong4.class) return BasicTypeResolver::writeInt;
-        if (basicClass == clong8.class) return BasicTypeResolver::writeLong;
-        if (basicClass == cfloat.class) return BasicTypeResolver::writeFloat;
-        if (basicClass == cdouble.class) return BasicTypeResolver::writeDouble;
-
+        ValueWireType wireType = valueWireTypeFor(basicClass);
+        if (wireType != null) return wireType.writer;
         return (byteBuf, byteOrder, value) -> valueBasic(basicClass, value).write(byteBuf, byteOrder);
     }
 
-    private static Byte readByte(ByteBuf byteBuf, ByteOrder byteOrder)
+    // Built-in aliases keep the same conversion and wire format as their representative type.
+    enum ValueWireType
     {
-        try {
-            return byteBuf.readByte();
+        SIGNED_BYTE(cchar.class, (buf, order, value) -> new cchar(intValue(value)).write(buf, order), cint8_t.class),
+        UNSIGNED_BYTE(cuchar.class, (buf, order, value) -> {
+            int number = (int) unsignedIntegerValue(value, MAX_UNSIGNED_BYTE, MAX_UNSIGNED_BYTE_EXCLUSIVE, "unsigned byte");
+            new cuchar(number).write(buf, order);
+        }, cuint8_t.class, cppchar8_t.class, cppuchar.class),
+        SIGNED_SHORT(cshort.class, (buf, order, value) -> new cshort(intValue(value)).write(buf, order),
+                     cint16_t.class, cppshort.class),
+        UNSIGNED_SHORT(cushort.class, (buf, order, value) -> {
+            int number = (int) unsignedIntegerValue(value, MAX_UNSIGNED_SHORT, MAX_UNSIGNED_SHORT_EXCLUSIVE, "unsigned short");
+            new cushort(number).write(buf, order);
+        }, cuint16_t.class, cppushort.class),
+        SIGNED_INT(cint.class, (buf, order, value) -> new cint(intValue(value)).write(buf, order),
+                   clong4.class, cint32_t.class, cppint.class, cpplong4.class),
+        SIGNED_LONG(clong8.class, (buf, order, value) -> new clong8(longValue(value)).write(buf, order),
+                    clonglong.class, cint64_t.class, cpplong8.class, cpplonglong.class),
+        UNSIGNED_INT(cuint.class, (buf, order, value) -> {
+            long number = unsignedIntegerValue(value, MAX_UNSIGNED_INT, MAX_UNSIGNED_INT_EXCLUSIVE, "unsigned int");
+            new cuint(number).write(buf, order);
+        }, culong4.class, cuint32_t.class, cppuint.class, cppulong4.class, cppchar32_t.class),
+        UNSIGNED_LONG(culong8.class, (buf, order, value) -> new culong8(unsignedBigIntegerValue(value)).write(buf, order),
+                      culonglong.class, cuint64_t.class, cppulong8.class, cppulonglong.class),
+        FLOAT(cfloat.class, (buf, order, value) -> new cfloat(floatValue(value)).write(buf, order), cppfloat.class),
+        DOUBLE(cdouble.class, (buf, order, value) -> new cdouble(doubleValue(value)).write(buf, order), cppdouble.class),
+        BOOLEAN(cppbool.class, (buf, order, value) -> new cppbool(Convert.convert(Boolean.class, value)).write(buf, order)),
+        CHAR16(cppchar16_t.class, (buf, order, value) ->
+                new cppchar16_t(Convert.convert(Character.class, value)).write(buf, order));
+
+        private static final BigInteger MAX_UNSIGNED_LONG              = BigInteger.ONE.shiftLeft(Long.SIZE).subtract(BigInteger.ONE);
+        private static final BigDecimal MIN_UNSIGNED_DECIMAL_EXCLUSIVE = BigDecimal.valueOf(-1);
+        private static final BigDecimal MAX_UNSIGNED_LONG_EXCLUSIVE    = new BigDecimal("18446744073709551616");
+
+        private static final Map<Class<?>, ValueWireType> BY_CLASS = indexBuiltInTypes();
+
+        private final Class<? extends Basic<?>> basicClass;
+        private final BasicValueWriter writer;
+        private final Class<?>[] aliases;
+
+        ValueWireType(Class<? extends Basic<?>> basicClass, BasicValueWriter writer, Class<?>... aliases)
+        {
+            this.basicClass = basicClass;
+            this.writer = writer;
+            this.aliases = aliases;
         }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Byte.BYTES);
+
+        private static Map<Class<?>, ValueWireType> indexBuiltInTypes()
+        {
+            Map<Class<?>, ValueWireType> types = new HashMap<>();
+            for (ValueWireType type : values()) {
+                types.put(type.basicClass, type);
+                for (Class<?> alias : type.aliases) types.put(alias, type);
+            }
+            return Map.copyOf(types);
+        }
+
+        private static long unsignedIntegerValue(Object value, BigInteger maximum, BigDecimal maximumExclusive, String typeName)
+        {
+            if (value instanceof BigInteger integer) {
+                if (integer.signum() < 0 || integer.compareTo(maximum) > 0)
+                    throw unsignedValueOutOfRange(value, maximum, typeName);
+                return integer.longValue();
+            }
+            if (value instanceof BigDecimal decimal)
+                return unsignedDecimalValue(decimal, maximumExclusive, maximum.longValue(), typeName);
+            if (value instanceof CharSequence)
+                return unsignedDecimalValue(Convert.convert(BigDecimal.class, value), maximumExclusive, maximum.longValue(), typeName);
+
+            Long number = value instanceof Number numeric ? numeric.longValue() : Convert.convert(Long.class, value);
+            if (number == null || number < 0 || number > maximum.longValue())
+                throw unsignedValueOutOfRange(value, maximum, typeName);
+            return number;
+        }
+
+        private static long unsignedDecimalValue(BigDecimal value, BigDecimal maximumExclusive, long maximum, String typeName)
+        {
+            if (!isUnsignedDecimalInRange(value, maximumExclusive))
+                throw unsignedValueOutOfRange(value, BigInteger.valueOf(maximum), typeName);
+            return value.longValue();
+        }
+
+        private static BigInteger unsignedBigIntegerValue(Object value)
+        {
+            if (value instanceof BigInteger integer) {
+                if (integer.signum() < 0 || integer.compareTo(MAX_UNSIGNED_LONG) > 0)
+                    throw unsignedValueOutOfRange(value, MAX_UNSIGNED_LONG, "unsigned long");
+                return integer;
+            }
+
+            BigDecimal decimal = switch (value) {
+                case BigDecimal number -> number;
+                case Number number -> new BigDecimal(number.toString());
+                case null, default -> Convert.convert(BigDecimal.class, value);
+            };
+
+            if (!isUnsignedDecimalInRange(decimal, MAX_UNSIGNED_LONG_EXCLUSIVE))
+                throw unsignedValueOutOfRange(value, MAX_UNSIGNED_LONG, "unsigned long");
+            return decimal.toBigInteger();
+        }
+
+        private static boolean isUnsignedDecimalInRange(BigDecimal value, BigDecimal maximumExclusive)
+        {
+            return value != null
+                   && value.compareTo(MIN_UNSIGNED_DECIMAL_EXCLUSIVE) > 0
+                   && value.compareTo(maximumExclusive) < 0;
+        }
+
+        private static IllegalArgumentException unsignedValueOutOfRange(Object value, BigInteger maximum, String typeName)
+        {
+            return new IllegalArgumentException(typeName + " value out of range [0, " + maximum + "]: " + value);
+        }
+
+        private static int intValue(Object value)
+        {
+            return value instanceof Number number ? number.intValue() : Convert.toInt(value);
+        }
+
+        private static long longValue(Object value)
+        {
+            return value instanceof Number number ? number.longValue() : Convert.toLong(value);
+        }
+
+        private static float floatValue(Object value)
+        {
+            return value instanceof Number number ? number.floatValue() : Convert.toFloat(value);
+        }
+
+        private static double doubleValue(Object value)
+        {
+            return value instanceof Number number ? number.doubleValue() : Convert.toDouble(value);
         }
     }
 
-    private static Short readUnsignedByte(ByteBuf byteBuf, ByteOrder byteOrder)
+    static ValueWireType valueWireTypeFor(Class<? extends Basic<?>> basicClass)
     {
-        try {
-            return byteBuf.readUnsignedByte();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Byte.BYTES);
-        }
+        // Custom subclasses may change constructor or value semantics while inheriting read and write.
+        return basicClass == null ? null : ValueWireType.BY_CLASS.get(basicClass);
     }
 
-    private static Short readShort(ByteBuf byteBuf, ByteOrder byteOrder)
+    private static BasicValueReader checkedReader(int expectedBytes, BasicValueReader reader)
     {
-        try {
-            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readShortLE() : byteBuf.readShort();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Short.BYTES);
-        }
+        return (byteBuf, byteOrder) -> {
+            try {
+                return reader.read(byteBuf, byteOrder);
+            }
+            catch (IndexOutOfBoundsException error) {
+                throw new TooLessBytesException(expectedBytes, byteBuf.readableBytes());
+            }
+        };
     }
 
-    private static Integer readUnsignedShort(ByteBuf byteBuf, ByteOrder byteOrder)
-    {
-        try {
-            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readUnsignedShortLE() : byteBuf.readUnsignedShort();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Short.BYTES);
-        }
-    }
-
-    private static Integer readInt(ByteBuf byteBuf, ByteOrder byteOrder)
-    {
-        try {
-            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readIntLE() : byteBuf.readInt();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Integer.BYTES);
-        }
-    }
-
-    private static Long readLong(ByteBuf byteBuf, ByteOrder byteOrder)
-    {
-        try {
-            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readLongLE() : byteBuf.readLong();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Long.BYTES);
-        }
-    }
-
-    private static Float readFloat(ByteBuf byteBuf, ByteOrder byteOrder)
-    {
-        try {
-            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readFloatLE() : byteBuf.readFloat();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Float.BYTES);
-        }
-    }
-
-    private static Double readDouble(ByteBuf byteBuf, ByteOrder byteOrder)
-    {
-        try {
-            return byteOrder == ByteOrder.LITTLE_ENDIAN ? byteBuf.readDoubleLE() : byteBuf.readDouble();
-        }
-        catch (IndexOutOfBoundsException error) {
-            throw tooLessBytes(byteBuf, Double.BYTES);
-        }
-    }
-
-    private static void writeByte(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        byteBuf.writeByte(intValue(value));
-    }
-
-    private static void writeUnsignedByte(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        int unsigned = intValue(value);
-        if (unsigned < 0 || unsigned > 0xFF)
-            throw new IllegalArgumentException("cuchar value out of range [0, 255]: " + unsigned);
-        byteBuf.writeByte(unsigned);
-    }
-
-    private static void writeShort(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        int number = intValue(value);
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeShortLE(number);
-        else byteBuf.writeShort(number);
-    }
-
-    private static void writeUnsignedShort(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        int unsigned = intValue(value);
-        if (unsigned < 0 || unsigned > 0xFFFF)
-            throw new IllegalArgumentException("cushort value out of range [0, 65535]: " + unsigned);
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeShortLE(unsigned);
-        else byteBuf.writeShort(unsigned);
-    }
-
-    private static void writeInt(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        int number = intValue(value);
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeIntLE(number);
-        else byteBuf.writeInt(number);
-    }
-
-    private static void writeLong(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        long number = longValue(value);
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeLongLE(number);
-        else byteBuf.writeLong(number);
-    }
-
-    private static void writeFloat(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        float number = floatValue(value);
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeFloatLE(number);
-        else byteBuf.writeFloat(number);
-    }
-
-    private static void writeDouble(ByteBuf byteBuf, ByteOrder byteOrder, Object value)
-    {
-        double number = doubleValue(value);
-        if (byteOrder == ByteOrder.LITTLE_ENDIAN) byteBuf.writeDoubleLE(number);
-        else byteBuf.writeDouble(number);
-    }
-
-    private static int intValue(Object value)
-    {
-        return value instanceof Number number ? number.intValue() : Convert.toInt(value);
-    }
-
-    private static long longValue(Object value)
-    {
-        return value instanceof Number number ? number.longValue() : Convert.toLong(value);
-    }
-
-    private static float floatValue(Object value)
-    {
-        return value instanceof Number number ? number.floatValue() : Convert.toFloat(value);
-    }
-
-    private static double doubleValue(Object value)
-    {
-        return value instanceof Number number ? number.doubleValue() : Convert.toDouble(value);
-    }
-
-    private static TooLessBytesException tooLessBytes(ByteBuf byteBuf, int expectedBytes)
-    {
-        return new TooLessBytesException(expectedBytes, byteBuf.readableBytes());
-    }
-
+    /**
+     * Reads a binary value into a basic type wrapper using the specified byte order.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-23
+     */
     @FunctionalInterface
     public interface BasicReader
     {
+        // The runtime class is selected from the schema and its value type is unknown to callers.
+        @SuppressWarnings("java:S1452")
         Basic<?> read(ByteBuf byteBuf, ByteOrder byteOrder);
     }
 
+    /**
+     * Reads the underlying value of a basic type using the specified byte order.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-23
+     */
     @FunctionalInterface
     public interface BasicValueReader
     {
         Object read(ByteBuf byteBuf, ByteOrder byteOrder);
     }
 
+    /**
+     * Writes the underlying value of a basic type using the specified byte order.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-23
+     */
     @FunctionalInterface
     public interface BasicValueWriter
     {

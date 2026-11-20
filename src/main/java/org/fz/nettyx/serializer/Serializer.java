@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
  * The top level interface Byte buf serializer.
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-02 10:15
  */
 public interface Serializer {
@@ -21,5 +22,5 @@ public interface Serializer {
     /**
      * Do serialize byte buf.
      */
-    <T> void doSerialize(T object, ByteBuf writing);
+    <T> void doSerialize(T struct, ByteBuf writing);
 }

@@ -1,4 +1,4 @@
-﻿# Nettyx
+# Nettyx
 
 <p align="center">
   <img src="https://img.shields.io/maven-central/v/io.github.fbbzl/nettyx?style=flat-square&label=Maven%20Central" alt="Maven Central">
@@ -32,7 +32,7 @@
 <dependency>
     <groupId>io.github.fbbzl</groupId>
     <artifactId>nettyx</artifactId>
-    <version>2.6.33</version>
+    <version>2.6.34</version>
 </dependency>
 ```
 

@@ -13,6 +13,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies interceptor forwarding, bypass and reset behavior, and lookup in a channel pipeline.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class ChannelInterceptorTest {
 
     @Test
@@ -163,6 +170,13 @@ public class ChannelInterceptorTest {
         channel.finishAndReleaseAll();
     }
 
+    /**
+     * Counts inbound reads without forwarding the messages.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-11
+     */
     private static final class BlockingInbound extends ChannelInterceptor.InboundInterceptor<Object> {
         private int interceptedReads;
 
@@ -172,6 +186,13 @@ public class ChannelInterceptorTest {
         }
     }
 
+    /**
+     * Exposes the protected inbound forwarding helpers for direct invocation in tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static final class ExposedInbound extends ChannelInterceptor.InboundInterceptor<Object> {
         void exercise(ChannelHandlerContext ctx) {
             Throwable error = new IllegalStateException("test");
@@ -196,11 +217,25 @@ public class ChannelInterceptorTest {
         }
     }
 
+    /**
+     * Consumes exceptions propagated by the channel pipeline during tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static final class ExceptionSink extends ChannelInboundHandlerAdapter {
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {}
     }
 
+    /**
+     * Exposes the protected outbound forwarding helpers for direct invocation in tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static final class ExposedOutbound extends ChannelInterceptor.OutboundInterceptor {
         void exercise(ChannelHandlerContext ctx) {
             SocketAddress local = new InetSocketAddress(10001);
@@ -224,6 +259,13 @@ public class ChannelInterceptorTest {
         }
     }
 
+    /**
+     * Records the outbound operations that reach it in the channel pipeline.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static final class CapturingOutbound extends ChannelOutboundHandlerAdapter {
         private int calls;
 

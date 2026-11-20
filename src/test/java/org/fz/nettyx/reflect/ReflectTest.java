@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 import static java.lang.invoke.MethodType.methodType;
 
 /**
+ * Measures object construction through a supplier created with {@code LambdaMetafactory}.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/7/8 22:25
@@ -27,6 +29,13 @@ public class ReflectTest {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(ReflectTest.class);
 
+    /**
+     * Provides the constructor target used by the reflection benchmark.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-07-08
+     */
     @Data
     public static class Order {
         private int       id;

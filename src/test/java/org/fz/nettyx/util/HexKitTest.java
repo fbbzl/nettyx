@@ -7,7 +7,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Checks hexadecimal conversion and invalid input handling.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class HexKitTest {
@@ -60,7 +63,20 @@ public class HexKitTest {
 
     @Test
     public void testDecodeEmpty() {
+        assertArrayEquals(new byte[0], HexKit.decode(null));
         assertArrayEquals(new byte[0], HexKit.decode(""));
+    }
+
+    @Test
+    public void decodeAcceptsSignedPairsAndUnicodeDigits() {
+        assertArrayEquals(new byte[]{15, -15, (byte) 0xFF}, HexKit.decode("+F-F\uFF26\uFF26"));
+    }
+
+    @Test
+    public void decodeReportsInvalidPairsAfterPadding() {
+        NumberFormatException expected = assertThrows(NumberFormatException.class, () -> HexKit.toByte("0G"));
+        NumberFormatException actual = assertThrows(NumberFormatException.class, () -> HexKit.decode("G"));
+        assertEquals(expected.getMessage(), actual.getMessage());
     }
 
     @Test

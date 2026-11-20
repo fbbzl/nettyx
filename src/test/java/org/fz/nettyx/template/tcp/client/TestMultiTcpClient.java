@@ -19,6 +19,8 @@ import static org.fz.nettyx.codec.UserCodec.TEST_USER;
 
 
 /**
+ * Demonstrates managing multiple TCP connections by key.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/29 14:58

@@ -5,6 +5,13 @@ import org.fz.nettyx.serializer.basic.Basic;
 
 import java.nio.ByteOrder;
 
+/**
+ * Throws an unexpected index exception during construction to exercise error propagation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class UnexpectedIndexBasic extends Basic<Integer> {
 
     public UnexpectedIndexBasic(ByteBuf input, ByteOrder order) {

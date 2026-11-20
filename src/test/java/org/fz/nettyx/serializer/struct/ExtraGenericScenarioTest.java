@@ -20,6 +20,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+/**
+ * Checks ignored recursive fields and rejection of unsupported generic arrays or wildcards.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-21
+ */
 public class ExtraGenericScenarioTest extends AbstractStructSerializerTest {
 
     @Test

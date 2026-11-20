@@ -5,6 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * Provides boxed scalars, a list, and a nested record in the Protostuff sample model.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/4/19 16:48
@@ -34,6 +36,13 @@ public class You {
     Float  address2;
 
 
+    /**
+     * Provides the nested interest value referenced by the Protostuff sample model.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2025-04-20
+     */
     @Data
 
     public static class Hit {

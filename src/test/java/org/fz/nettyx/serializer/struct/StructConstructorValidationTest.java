@@ -5,6 +5,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertThrows;
 
+/**
+ * Checks that registration rejects structs without an accessible no-argument constructor.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class StructConstructorValidationTest {
 
     @Test

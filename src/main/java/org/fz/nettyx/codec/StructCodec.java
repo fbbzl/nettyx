@@ -1,12 +1,14 @@
 package org.fz.nettyx.codec;
 
-import cn.hutool.core.util.TypeUtil;
+import com.google.common.reflect.TypeToken;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 
 import java.lang.reflect.Type;
@@ -21,6 +23,7 @@ import java.util.List;
  */
 
 @Getter
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class StructCodec<S> extends ByteToMessageCodec<S>
 {
 
@@ -28,18 +31,13 @@ public abstract class StructCodec<S> extends ByteToMessageCodec<S>
 
     private static final boolean DEFAULT_SKIP_LEFT_BYTES = true;
 
-    private final Type type = TypeUtil.getTypeArgument(this.getClass());
+    private final Type type = TypeToken.of(this.getClass()).resolveType(StructCodec.class.getTypeParameters()[0]).getType();
 
     private final boolean skipLeftBytes;
 
     protected StructCodec()
     {
         this.skipLeftBytes = DEFAULT_SKIP_LEFT_BYTES;
-    }
-
-    protected StructCodec(boolean skipLeftBytes)
-    {
-        this.skipLeftBytes = skipLeftBytes;
     }
 
     @Override

@@ -9,6 +9,7 @@ import lombok.Data;
  * to save connect state history
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2021 -12-29 18:46
  */
 @Data

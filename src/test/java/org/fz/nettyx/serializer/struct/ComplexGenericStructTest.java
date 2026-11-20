@@ -15,6 +15,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 import static org.junit.Assert.assertNotNull;
 
+/**
+ * Tests serialization of nested generics, bounded parameters, and repeated generic classes with different arguments.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-21
+ */
 public class ComplexGenericStructTest extends AbstractStructSerializerTest {
 
     @Test

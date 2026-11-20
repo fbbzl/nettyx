@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.basic.c.unsigned.cuchar;
 
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 /**
  * this type in Cpp language is unsigned char
@@ -24,7 +25,7 @@ public class cppuchar extends cuchar {
 
     @Override
     public String toString() {
-        return value != null ? value.toString() : "";
+        return Objects.toString(value, "");
     }
 
 }

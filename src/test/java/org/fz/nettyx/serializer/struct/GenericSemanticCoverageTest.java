@@ -22,6 +22,13 @@ import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 import static org.junit.Assert.*;
 
+/**
+ * Checks that resolved types preserve byte order, field widths, and array semantics during serialization.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class GenericSemanticCoverageTest {
 
     @BeforeClass

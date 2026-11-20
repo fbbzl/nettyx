@@ -8,6 +8,8 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.fz.nettyx.template.TestChannelInitializer;
 
 /**
+ * Demonstrates running a TCP server with the shared test channel pipeline.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/23 12:40
@@ -30,7 +32,7 @@ public class TestServer extends ServerTemplate {
         ChannelFuture bindFuture = testServer.bind();
         bindFuture.addListener(cf -> log.info("binding state:" + cf.isSuccess()));
         bindFuture.channel().closeFuture().addListener(cf -> {
-            log.info("关闭了");
+            log.info("Server channel closed");
             testServer.shutdownGracefully();
         });
 

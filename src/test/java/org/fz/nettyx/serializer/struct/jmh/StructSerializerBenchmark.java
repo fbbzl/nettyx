@@ -17,6 +17,13 @@ import java.util.concurrent.TimeUnit;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 
+/**
+ * Measures the cost of reading and writing a preconfigured binary struct.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-21
+ */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Benchmark)

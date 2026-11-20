@@ -34,6 +34,13 @@ public @interface Chunk {
      */
     int length();
 
+    /**
+     * Reads and writes fixed length chunks declared with {@link Chunk}.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2025-05-11
+     */
     class ChunkHandler implements StructFieldHandler<Chunk> {
 
         @Override

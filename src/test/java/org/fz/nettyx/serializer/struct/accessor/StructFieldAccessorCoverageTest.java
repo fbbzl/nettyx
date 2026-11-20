@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.generator;
+package org.fz.nettyx.serializer.struct.accessor;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -26,7 +26,14 @@ import java.util.Arrays;
 import static org.fz.nettyx.serializer.struct.StructContext.getStructDefinition;
 import static org.junit.Assert.*;
 
-public class StructAccessorSupportCoverageTest {
+/**
+ * Verifies direct basic and struct field access, array access, and delegation to field handlers.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-11-11
+ */
+public class StructFieldAccessorCoverageTest {
 
     @BeforeClass
     public static void scanModels() {
@@ -34,27 +41,27 @@ public class StructAccessorSupportCoverageTest {
     }
 
     @Test
-    public void supportIsNestedInStructAccessor() {
+    public void fieldAccessorIsNestedInStructAccessor() {
         assertTrue(Arrays.stream(StructAccessor.class.getDeclaredClasses())
-                         .anyMatch(type -> type.getSimpleName().equals("Support")));
+                         .anyMatch(type -> type.getSimpleName().equals("FieldAccessor")));
         assertThrows(ClassNotFoundException.class,
-                     () -> Class.forName("org.fz.nettyx.serializer.struct.generator.StructAccessorSupport"));
+                     () -> Class.forName("org.fz.nettyx.serializer.struct.accessor.StructAccessorSupport"));
     }
 
     @Test
-    public void supportReadsAndWritesDirectBasicAndStructFields() {
+    public void fieldAccessorReadsAndWritesDirectBasicAndStructFields() {
         StructField basicField = field(AccessorBean.class, "value");
         StructSerializer basicSerializer = new StructSerializer(AccessorBean.class);
         AccessorBean basicBean = new AccessorBean();
         ByteBuf basicInput = Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 42});
         ByteBuf basicOutput = Unpooled.buffer();
         try {
-            Object basic = StructAccessor.Support.readField(basicSerializer, AccessorBean.class, basicBean,
+            Object basic = StructAccessor.FieldAccessor.readField(basicSerializer, AccessorBean.class, basicBean,
                                                             AccessorBean.class, basicField, basicField.handler(), basicInput);
             assertEquals(Integer.valueOf(42), ((cint) basic).value());
-            StructAccessor.Support.writeField(basicSerializer, AccessorBean.class, basicBean, AccessorBean.class,
+            StructAccessor.FieldAccessor.writeField(basicSerializer, AccessorBean.class, basicBean, AccessorBean.class,
                                                basicField, basicField.handler(), basic, basicOutput);
-            StructAccessor.Support.writeField(basicSerializer, AccessorBean.class, basicBean, AccessorBean.class,
+            StructAccessor.FieldAccessor.writeField(basicSerializer, AccessorBean.class, basicBean, AccessorBean.class,
                                                basicField, basicField.handler(), null, basicOutput);
             assertEquals(8, basicOutput.readableBytes());
         }
@@ -69,14 +76,14 @@ public class StructAccessorSupportCoverageTest {
         ByteBuf structInput = Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 7});
         ByteBuf structOutput = Unpooled.buffer();
         try {
-            BigEndianLeaf leaf = (BigEndianLeaf) StructAccessor.Support.readField(
+            BigEndianLeaf leaf = (BigEndianLeaf) StructAccessor.FieldAccessor.readField(
                     structSerializer, ConcreteStructHolder.class, holder, ConcreteStructHolder.class,
                     structField, structField.handler(), structInput);
             assertEquals(Integer.valueOf(7), leaf.getValue().value());
-            StructAccessor.Support.writeField(structSerializer, ConcreteStructHolder.class, holder,
+            StructAccessor.FieldAccessor.writeField(structSerializer, ConcreteStructHolder.class, holder,
                                                ConcreteStructHolder.class, structField, structField.handler(),
                                                leaf, structOutput);
-            StructAccessor.Support.writeField(structSerializer, ConcreteStructHolder.class, holder,
+            StructAccessor.FieldAccessor.writeField(structSerializer, ConcreteStructHolder.class, holder,
                                                ConcreteStructHolder.class, structField, structField.handler(),
                                                null, structOutput);
             assertEquals(8, structOutput.readableBytes());
@@ -88,7 +95,7 @@ public class StructAccessorSupportCoverageTest {
     }
 
     @Test
-    public void supportDelegatesNonArrayFieldsToHandler() {
+    public void fieldAccessorDelegatesNonArrayFieldsToHandler() {
         StructField field = field(AccessorBean.class, "value");
         StructSerializer serializer = new StructSerializer(AccessorBean.class);
         Object expected = new Object();
@@ -123,10 +130,10 @@ public class StructAccessorSupportCoverageTest {
         ByteBuf input = Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 1});
         ByteBuf output = Unpooled.buffer();
         try {
-            assertSame(expected, StructAccessor.Support.readField(
+            assertSame(expected, StructAccessor.FieldAccessor.readField(
                     serializer, AccessorBean.class, new AccessorBean(), AccessorBean.class,
                     field, handler, input));
-            StructAccessor.Support.writeField(
+            StructAccessor.FieldAccessor.writeField(
                     serializer, AccessorBean.class, new AccessorBean(), AccessorBean.class,
                     field, handler, expected, output);
             assertSame(expected, written[0]);
@@ -139,7 +146,7 @@ public class StructAccessorSupportCoverageTest {
     }
 
     @Test
-    public void supportReadsAndWritesConcreteBasicArrays() {
+    public void fieldAccessorReadsAndWritesConcreteBasicArrays() {
         assertConcreteArrayRoundTrip(BasicArrayBean.class, "values",
                                      new byte[]{0, 0, 0, 1, 0, 0, 0, 2});
         assertConcreteArrayRoundTrip(FlexibleBasicArrayBean.class, "values",
@@ -147,7 +154,7 @@ public class StructAccessorSupportCoverageTest {
     }
 
     @Test
-    public void supportReadsAndWritesConcreteStructArrays() {
+    public void fieldAccessorReadsAndWritesConcreteStructArrays() {
         StructDefinition definition = getStructDefinition(ConcreteStructArrayBean.class);
         StructSerializer serializer = new StructSerializer(ConcreteStructArrayBean.class);
         ConcreteStructArrayBean bean = new ConcreteStructArrayBean();
@@ -157,18 +164,18 @@ public class StructAccessorSupportCoverageTest {
         ByteBuf flexibleInput = Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 3});
         ByteBuf output = Unpooled.buffer();
         try {
-            BigEndianLeaf[] fixedValues = (BigEndianLeaf[]) StructAccessor.Support.readField(
+            BigEndianLeaf[] fixedValues = (BigEndianLeaf[]) StructAccessor.FieldAccessor.readField(
                     serializer, ConcreteStructArrayBean.class, bean, ConcreteStructArrayBean.class,
                     fixed, fixed.handler(), fixedInput);
-            BigEndianLeaf[] flexibleValues = (BigEndianLeaf[]) StructAccessor.Support.readField(
+            BigEndianLeaf[] flexibleValues = (BigEndianLeaf[]) StructAccessor.FieldAccessor.readField(
                     serializer, ConcreteStructArrayBean.class, bean, ConcreteStructArrayBean.class,
                     flexible, flexible.handler(), flexibleInput);
             assertEquals(2, fixedValues.length);
             assertEquals(1, flexibleValues.length);
-            StructAccessor.Support.writeField(serializer, ConcreteStructArrayBean.class, bean,
+            StructAccessor.FieldAccessor.writeField(serializer, ConcreteStructArrayBean.class, bean,
                                                ConcreteStructArrayBean.class, fixed, fixed.handler(),
                                                fixedValues, output);
-            StructAccessor.Support.writeField(serializer, ConcreteStructArrayBean.class, bean,
+            StructAccessor.FieldAccessor.writeField(serializer, ConcreteStructArrayBean.class, bean,
                                                ConcreteStructArrayBean.class, flexible, flexible.handler(),
                                                flexibleValues, output);
             assertEquals(12, output.readableBytes());
@@ -181,8 +188,8 @@ public class StructAccessorSupportCoverageTest {
     }
 
     @Test
-    public void supportDoesNotUseMethodHandles() throws Exception {
-        String resource = StructAccessor.class.getSimpleName() + "$" + StructAccessor.Support.class.getSimpleName() + ".class";
+    public void fieldAccessorDoesNotUseMethodHandles() throws Exception {
+        String resource = StructAccessor.class.getSimpleName() + "$" + StructAccessor.FieldAccessor.class.getSimpleName() + ".class";
         try (InputStream input = StructAccessor.class.getResourceAsStream(resource)) {
             assertNotNull(input);
             String classFile = new String(input.readAllBytes(), StandardCharsets.ISO_8859_1);
@@ -203,9 +210,9 @@ public class StructAccessorSupportCoverageTest {
         ByteBuf input = Unpooled.wrappedBuffer(bytes);
         ByteBuf output = Unpooled.buffer();
         try {
-            Object values = StructAccessor.Support.readField(serializer, beanType, bean, beanType,
+            Object values = StructAccessor.FieldAccessor.readField(serializer, beanType, bean, beanType,
                                                              field, field.handler(), input);
-            StructAccessor.Support.writeField(serializer, beanType, bean, beanType,
+            StructAccessor.FieldAccessor.writeField(serializer, beanType, bean, beanType,
                                                field, field.handler(), values, output);
             byte[] actual = new byte[output.readableBytes()];
             output.readBytes(actual);

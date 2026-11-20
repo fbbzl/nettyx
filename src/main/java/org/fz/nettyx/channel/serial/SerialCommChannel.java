@@ -93,6 +93,13 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
         throw new UnsupportedOperationException("doBind");
     }
 
+    /**
+     * Opens the serial port, activates its streams, and completes the connection promise.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-07-05
+     */
     protected final class SerialCommUnsafe extends AbstractUnsafe {
         @Override
         public void connect(
@@ -108,15 +115,17 @@ public abstract class SerialCommChannel extends EnhancedOioByteStreamChannel {
                 safeSetSuccess(promise);
 
                 if (isActive()) pipeline().fireChannelActive();
-            } catch (Exception t) {
+            } catch (Throwable t) {
+                close(voidPromise());
                 safeSetFailure(promise, t);
-                closeIfClosed();
             }
         }
     }
 
 
     /**
+     * Represents a serial port by its device name or path.
+     *
      * @author fengbinbin
      * @version 1.0
      * @since 2024/5/15 12:44

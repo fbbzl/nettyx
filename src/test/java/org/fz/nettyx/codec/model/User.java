@@ -10,6 +10,13 @@ import org.fz.nettyx.serializer.basic.c.signed.clong4;
 import org.fz.nettyx.serializer.basic.c.stdint.unsigned.cuint8_t;
 import org.fz.nettyx.serializer.basic.cpp.unsigned.cppushort;
 
+/**
+ * Combines generic fields, nested structs, fixed arrays, and an excluded transient field for codec tests.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024-02-23
+ */
 @Data
 @Struct(endian = Struct.Endian.NATIVE)
 @FieldDefaults(level = AccessLevel.PRIVATE)

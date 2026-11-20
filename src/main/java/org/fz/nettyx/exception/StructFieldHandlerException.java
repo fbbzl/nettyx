@@ -1,6 +1,8 @@
 package org.fz.nettyx.exception;
 
 /**
+ * Signals an invalid field handler configuration.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2025/10/3 23:35

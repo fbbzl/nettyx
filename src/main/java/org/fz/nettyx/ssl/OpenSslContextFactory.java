@@ -1,5 +1,6 @@
 package org.fz.nettyx.ssl;
 
+import cn.hutool.core.util.StrUtil;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -33,7 +34,7 @@ public class OpenSslContextFactory {
         Path key  = Paths.get(openSslConfig.key());
         Path root = Paths.get(openSslConfig.root());
         String keyPass = openSslConfig.keyPass();
-        return keyPass == null || keyPass.isEmpty()
+        return StrUtil.isEmpty(keyPass)
                ? getServerSslContext(cert, key, root)
                : getServerSslContext(cert, key, keyPass, root);
     }
@@ -44,7 +45,7 @@ public class OpenSslContextFactory {
         Path key  = Paths.get(openSslConfig.key());
         Path root = Paths.get(openSslConfig.root());
         String keyPass = openSslConfig.keyPass();
-        return keyPass == null || keyPass.isEmpty()
+        return StrUtil.isEmpty(keyPass)
                ? getClientSslContext(cert, key, root)
                : getClientSslContext(cert, key, keyPass, root);
     }
@@ -91,6 +92,13 @@ public class OpenSslContextFactory {
                                 .trustManager(rootPath.toFile()).build();
     }
 
+    /**
+     * Holds the certificate, key, trust root, and handshake settings for the OpenSSL context.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2023-05-22
+     */
     @Data
     public static class OpenSslConfig {
 

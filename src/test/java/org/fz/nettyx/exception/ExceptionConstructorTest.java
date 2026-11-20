@@ -8,6 +8,13 @@ import java.lang.reflect.Type;
 
 import static org.junit.Assert.assertNotNull;
 
+/**
+ * Verifies exception constructors and the details exposed by type and buffer length errors.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-14
+ */
 public class ExceptionConstructorTest
 {
     @Test
@@ -44,6 +51,13 @@ public class ExceptionConstructorTest
         assertNotNull(new TypeJudgmentException((Field) null));
     }
 
+    /**
+     * Provides a field and its reflected type for the type judgment exception tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-09-14
+     */
     private static final class Holder
     {
         private int value;

@@ -18,6 +18,13 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies JSC and RXTX serial channel options, defaults, and value validation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class SerialChannelConfigTest {
 
     @Test

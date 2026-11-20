@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import org.fz.nettyx.serializer.basic.c.cbasic;
 
 import java.nio.ByteOrder;
+import java.util.Objects;
 
 /**
  * this type in C language is unsigned char
@@ -49,7 +50,7 @@ public class cuchar extends cbasic<Short> {
 
     @Override
     public String toString() {
-        return value != null ? value.toString() : "";
+        return Objects.toString(value, "");
     }
 
 }

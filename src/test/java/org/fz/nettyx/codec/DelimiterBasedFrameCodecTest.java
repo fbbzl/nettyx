@@ -8,7 +8,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Verifies delimiter appending and frame extraction, including empty frames and multi-byte delimiters.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class DelimiterBasedFrameCodecTest {

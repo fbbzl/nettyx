@@ -10,6 +10,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketAddress;
 
+/**
+ * Exposes an accepted Bluetooth stream connection as a Netty child channel.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-02
+ */
 public class BtAcceptedChannel extends EnhancedOioByteStreamChannel {
 
     private static final BtDeviceAddress LOCAL_ADDRESS = new BtDeviceAddress("localhost");
@@ -20,7 +27,7 @@ public class BtAcceptedChannel extends EnhancedOioByteStreamChannel {
 
     private boolean open = true;
 
-    private InputStream inputStream;
+    private final InputStream inputStream;
 
     public BtAcceptedChannel(Channel parent, StreamConnection connection) throws Exception {
         super(parent);

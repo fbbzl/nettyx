@@ -9,10 +9,17 @@ import org.fz.nettyx.serializer.protostuff.model.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * Builds a sample user, serializes it with a Protostuff runtime schema, and prints the byte count.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2025-05-08
+ */
 public class ProtostuffDemo {
     public static void main(String[] args) {
 
-        // 创建 User 对象
+        // Create the User object
         User<Bill, Wife<Son<Long, Bill>, Son<Long, Bill>>, Long> user = new User<>();
         user.setUid(0L);
         user.setQqNames(new Short[0]);
@@ -29,14 +36,14 @@ public class ProtostuffDemo {
         user.setWives121212(new Wife[0]);
         user.setUname('9');
 
-        // 获取 Schema
+        // Resolve the schema
         Schema<User> schema = RuntimeSchema.getSchema(User.class);
 
-        // 序列化
+        // Allocate the serialization buffer
 
         LinkedBuffer buffer = LinkedBuffer.allocate(1024);
 
-        // 反序列化
+        // Serialize the object
         byte[] data = ProtostuffIOUtil.toByteArray(user, schema, buffer);
         System.err.println(data.length);
     }

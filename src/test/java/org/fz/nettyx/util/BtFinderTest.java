@@ -1,5 +1,7 @@
 package org.fz.nettyx.util;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.junit.Test;
 
 import javax.bluetooth.DataElement;
@@ -19,7 +21,45 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Checks Bluetooth discovery result isolation, callbacks, cancellation, and timeouts.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-08-02
+ */
 public class BtFinderTest {
+
+    @Test(timeout = 1_000)
+    public void deviceSearchResultsStayIndependentAcrossSearches()
+    {
+        RemoteDevice device = new TestRemoteDevice("001122334455");
+        StubDeviceFinder finder = new StubDeviceFinder(null, device);
+        List<RemoteDevice> first = finder.getDevices();
+        List<RemoteDevice> second = finder.getDevices();
+        second.clear();
+
+        assertEquals(List.of(device), first);
+        assertTrue(finder.getDevices(found -> false).isEmpty());
+        assertEquals(List.of(device), first);
+    }
+
+    @Test(timeout = 2_000)
+    public void serviceSearchResultsStayIndependentAcrossSearches() throws Exception
+    {
+        RemoteDevice device = new TestRemoteDevice("001122334455");
+        AsyncServiceFinder finder = new AsyncServiceFinder(null, 17, new TestServiceRecord("btspp://current:1"));
+        List<String> first = finder.getServices(device, "1101");
+        finder.callbackThread.join(500);
+        List<String> second = finder.getServices(device, "1101");
+        finder.callbackThread.join(500);
+        second.clear();
+
+        assertEquals(List.of("btspp://current:1"), first);
+        assertTrue(finder.getServices(device, "1101", found -> false).isEmpty());
+        finder.callbackThread.join(500);
+        assertEquals(List.of("btspp://current:1"), first);
+    }
 
     @Test(timeout = 1_000)
     public void deviceFinderKeepsInternalStateWhenUserListenerIsPresent()
@@ -154,6 +194,13 @@ public class BtFinderTest {
         assertEquals(17, finder.cancelledTransactionId);
     }
 
+    /**
+     * Reports fixture devices through the Bluetooth inquiry callbacks.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class StubDeviceFinder extends BtFinder.DeviceFinder {
 
         private final RemoteDevice device;
@@ -181,6 +228,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Creates a remote device fixture from a supplied Bluetooth address.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class TestRemoteDevice extends RemoteDevice {
 
         private TestRemoteDevice(String address)
@@ -189,6 +243,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Leaves a Bluetooth inquiry pending so interruption can trigger cancellation.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class BlockingDeviceFinder extends BtFinder.DeviceFinder {
 
         private final CountDownLatch started = new CountDownLatch(1);
@@ -209,6 +270,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Leaves Bluetooth inquiry pending and sets a five-millisecond deadline to exercise timeout handling.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class TimedOutDeviceFinder extends BtFinder.DeviceFinder {
 
         private boolean cancelled;
@@ -233,6 +301,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Reports Bluetooth service records from a worker thread.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class AsyncServiceFinder extends BtFinder.ServiceFinder {
 
         private final int transactionId;
@@ -264,6 +339,14 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Emits service discovery callbacks with controlled transaction identifiers.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class TransactionServiceFinder extends BtFinder.ServiceFinder {
 
         private final int transactionId;
@@ -271,13 +354,6 @@ public class BtFinderTest {
         private final ServiceRecord currentRecord;
         private DiscoveryListener listener;
         private Thread callbackThread;
-
-        private TransactionServiceFinder(int transactionId, ServiceRecord staleRecord, ServiceRecord currentRecord)
-        {
-            this.transactionId = transactionId;
-            this.staleRecord = staleRecord;
-            this.currentRecord = currentRecord;
-        }
 
         @Override
         int searchServices(UUID[] searchUuidSet, RemoteDevice btDevice, DiscoveryListener listener)
@@ -304,6 +380,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Leaves a Bluetooth service search pending and sets a five-millisecond deadline to exercise timeout handling.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class TimedOutServiceFinder extends BtFinder.ServiceFinder {
 
         @Override
@@ -325,6 +408,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Leaves a Bluetooth service search pending so interruption can trigger cancellation.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class BlockingServiceFinder extends BtFinder.ServiceFinder {
 
         private final CountDownLatch started = new CountDownLatch(1);
@@ -345,6 +435,13 @@ public class BtFinderTest {
         }
     }
 
+    /**
+     * Provides a Bluetooth service record with a fixed connection URL.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private record TestServiceRecord(String url) implements ServiceRecord {
 
         @Override

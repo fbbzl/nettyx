@@ -12,17 +12,26 @@ import org.fz.nettyx.serializer.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.basic.c.signed.cdouble;
 import org.fz.nettyx.serializer.basic.c.signed.cfloat;
 import org.fz.nettyx.serializer.basic.c.signed.cint;
+import org.fz.nettyx.serializer.basic.c.signed.cshort;
 import org.fz.nettyx.serializer.basic.c.unsigned.cuchar;
 import org.fz.nettyx.serializer.basic.c.unsigned.culong8;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 
 import static org.fz.nettyx.serializer.struct.StructSerializer.toByteBuf;
 import static org.fz.nettyx.serializer.struct.StructSerializer.toStruct;
 import static org.junit.Assert.*;
 
+/**
+ * Checks struct round trips, text and flexible arrays, and rejection of unsupported classes.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-01
+ */
 public class StructSerializerStructTest {
 
     @BeforeClass
@@ -57,14 +66,43 @@ public class StructSerializerStructTest {
     }
 
     @Test
-    public void testStructWithString() {
+    public void nativeEndianShortStructMatchesKnownBytesAndRoundTrips() {
         Lover lover = new Lover();
+        lover.setUname(new cshort(0x1234));
         ByteBuf loverBuf = Unpooled.buffer();
-        toByteBuf(lover, loverBuf);
-        byte[] bytes = new byte[loverBuf.readableBytes()];
-        loverBuf.readBytes(bytes);
-        assertNotNull(bytes);
-        assertEquals(2, bytes.length);
+        try {
+            toByteBuf(lover, loverBuf);
+            byte[] expected = ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN
+                              ? new byte[]{0x34, 0x12}
+                              : new byte[]{0x12, 0x34};
+            byte[] bytes = new byte[loverBuf.readableBytes()];
+            loverBuf.getBytes(loverBuf.readerIndex(), bytes);
+            assertArrayEquals(expected, bytes);
+
+            ByteBuf reading = Unpooled.wrappedBuffer(expected);
+            Lover decoded;
+            try {
+                decoded = toStruct(Lover.class, reading);
+                assertEquals(Short.valueOf((short) 0x1234), decoded.getUname().value());
+            }
+            finally {
+                reading.release();
+            }
+
+            ByteBuf reencoded = Unpooled.buffer();
+            try {
+                toByteBuf(decoded, reencoded);
+                byte[] roundTrip = new byte[reencoded.readableBytes()];
+                reencoded.readBytes(roundTrip);
+                assertArrayEquals(expected, roundTrip);
+            }
+            finally {
+                reencoded.release();
+            }
+        }
+        finally {
+            loverBuf.release();
+        }
     }
 
     @Test

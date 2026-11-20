@@ -9,6 +9,13 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies that string encoding and decoding use the configured charset.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class StringMessageCodecTest {
 
     @Test
@@ -25,6 +32,21 @@ public class StringMessageCodecTest {
 
         assertTrue(channel.writeInbound(Unpooled.wrappedBuffer(actual)));
         assertEquals(message, channel.readInbound());
+        channel.finishAndReleaseAll();
+    }
+
+    @Test
+    public void utf8EncodingMatchesJdkBytes() {
+        EmbeddedChannel channel = new EmbeddedChannel(new StringMessageCodec(StandardCharsets.UTF_8));
+        String message = "Nettyx\u4E32" + String.valueOf((char) 0xD800);
+
+        assertTrue(channel.writeOutbound(message));
+        ByteBuf encoded = channel.readOutbound();
+        byte[] actual = new byte[encoded.readableBytes()];
+        encoded.readBytes(actual);
+        encoded.release();
+
+        assertArrayEquals(message.getBytes(StandardCharsets.UTF_8), actual);
         channel.finishAndReleaseAll();
     }
 }

@@ -8,12 +8,19 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
-/** Covers validation branches shared by JSON and YAML schema parsers. */
+/**
+ * Covers validation branches shared by JSON and YAML schema parsers.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-14
+ */
 public class SchemaParserEdgeCoverageTest
 {
     @Test
-    public void acceptsNativeEndianAndStructArrays()
+    public void acceptsNativeEndianAndSchemaArrays()
     {
         String json = "{\"namespace\":\"edge\",\"structs\":["
                       + "{\"name\":\"Point\",\"endian\":\"NATIVE\",\"fields\":[{\"name\":\"x\",\"type\":\"cint\"}]},"
@@ -64,10 +71,35 @@ public class SchemaParserEdgeCoverageTest
     }
 
     @Test
-    public void rejectsUnknownEndianAndDuplicateStructs()
+    public void rejectsUnknownEndianAndDuplicateSchemas()
     {
         assertParseError("{\"namespace\":\"x\",\"structs\":[{\"name\":\"S\",\"endian\":\"middle\"}]}");
         assertParseError("{\"namespace\":\"x\",\"structs\":[{\"name\":\"S\"},{\"name\":\"S\"}]}");
+    }
+
+    @Test
+    public void rejectsDuplicateFieldNamesAcrossSchemaFormats()
+    {
+        String json = "{\"namespace\":\"x\",\"structs\":[{\"name\":\"S\",\"fields\":["
+                      + "{\"name\":\"id\",\"type\":\"cuchar\"},"
+                      + "{\"name\":\"id\",\"type\":\"cint\"}]}]}";
+        String yaml = """
+                namespace: x
+                structs:
+                  - name: S
+                    fields:
+                      - name: id
+                        type: cuchar
+                      - name: id
+                        type: cint
+                """;
+        String xml = "<structs namespace=\"x\"><struct name=\"S\">"
+                     + "<field name=\"id\" type=\"cuchar\"/><field name=\"id\" type=\"cint\"/>"
+                     + "</struct></structs>";
+
+        assertDuplicateFieldNameRejected(() -> new JsonSchemaParser().parse("duplicate.json", input(json)));
+        assertDuplicateFieldNameRejected(() -> new YamlSchemaParser().parse("duplicate.yml", input(yaml)));
+        assertDuplicateFieldNameRejected(() -> new XmlSchemaParser().parse("duplicate.xml", input(xml)));
     }
 
     @Test
@@ -82,6 +114,12 @@ public class SchemaParserEdgeCoverageTest
     {
         assertThrows(StructDefinitionException.class,
                      () -> new JsonSchemaParser().parse("edge.json", input(json)));
+    }
+
+    private static void assertDuplicateFieldNameRejected(Runnable parse)
+    {
+        StructDefinitionException error = assertThrows(StructDefinitionException.class, parse::run);
+        assertTrue(error.getMessage().contains("duplicated field name [id] in struct [x.S]"));
     }
 
     private static ByteArrayInputStream input(String json)

@@ -20,6 +20,13 @@ public class MessageFilter extends ChannelHandlerAdapter {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(MessageFilter.class);
 
+    /**
+     * Forwards inbound messages that satisfy the configured predicate and releases rejected messages.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-04-17
+     */
     @RequiredArgsConstructor
     public static class InboundFilter<M> extends ChannelInboundHandlerAdapter {
 
@@ -42,6 +49,13 @@ public class MessageFilter extends ChannelHandlerAdapter {
         }
     }
 
+    /**
+     * Writes outbound messages that satisfy the configured predicate and releases rejected messages.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-04-17
+     */
     @RequiredArgsConstructor
     public static class OutboundFilter<M> extends ChannelOutboundHandlerAdapter {
 

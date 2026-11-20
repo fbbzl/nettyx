@@ -6,7 +6,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 /**
+ * Checks numeric conversion, slicing, mutation, and bounds checks for bit sequences.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class BinsTest {
@@ -160,5 +163,20 @@ public class BinsTest {
         assertThrows(NullPointerException.class, () -> bins.replace(0, (Bins) null));
         assertThrows(IndexOutOfBoundsException.class, () -> bins.replace(-1, Bins.fromByte(0)));
         assertThrows(IndexOutOfBoundsException.class, () -> bins.replace(1, Bins.fromByte(0)));
+    }
+
+    @Test
+    public void rejectsOverflowingMutationRangesBeforeChangingBits() {
+        Bins zeros = Bins.fromByte(0);
+        assertThrows(IndexOutOfBoundsException.class, () -> zeros.set1(Integer.MAX_VALUE, 1));
+        assertThrows(IndexOutOfBoundsException.class, () -> zeros.replace(Integer.MAX_VALUE, 1));
+        assertThrows(IndexOutOfBoundsException.class, () -> zeros.set1(7, 2));
+        assertThrows(IndexOutOfBoundsException.class, () -> zeros.replace(7, 1, 1));
+        assertThrows(IndexOutOfBoundsException.class, () -> zeros.replace(7, new byte[]{1, 1}));
+        assertEquals("00000000", zeros.toString());
+
+        Bins ones = Bins.fromByte(255);
+        assertThrows(IndexOutOfBoundsException.class, () -> ones.set0(Integer.MAX_VALUE, 1));
+        assertEquals("11111111", ones.toString());
     }
 }

@@ -21,6 +21,8 @@ import static org.fz.nettyx.codec.UserCodec.TEST_USER;
 
 
 /**
+ * Demonstrates one RXTX channel and its serial port configuration.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/29 10:31

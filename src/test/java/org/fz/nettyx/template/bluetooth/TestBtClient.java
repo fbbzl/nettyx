@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import static org.fz.nettyx.codec.UserCodec.TEST_USER;
 
 /**
+ * Runs a single Bluetooth client with the test channel pipeline.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/5/30 19:57

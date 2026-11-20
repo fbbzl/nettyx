@@ -6,6 +6,13 @@ import org.fz.nettyx.template.TestChannelInitializer;
 
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Runs a Bluetooth server using the template and a test child pipeline.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-02
+ */
 public class BtServerManualTest extends BtServerTemplate {
 
     public static final String serverName = "Bluetooth Test";

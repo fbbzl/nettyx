@@ -24,14 +24,23 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies binary round trips in both byte orders and boundary behavior for built-in basic types.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class AllBasicTypesTest {
 
     @Test
-    public void everyConcreteBasicTypeRoundTripsBothByteOrders() throws Exception {
+    public void everyBuiltInBasicTypeRoundTripsBothByteOrders() throws Exception {
+        var productionSource = Basic.class.getProtectionDomain().getCodeSource();
         List<Class<?>> basicTypes = ClassScanner.scanAllPackage(
                         "org.fz.nettyx.serializer.basic",
                         type -> type != Basic.class
                                 && Basic.class.isAssignableFrom(type)
+                                && productionSource.equals(type.getProtectionDomain().getCodeSource())
                                 && !type.isAnonymousClass()
                                 && !type.isMemberClass()
                                 && type.getEnclosingClass() == null

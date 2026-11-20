@@ -5,6 +5,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.fz.nettyx.handler.ChannelAdvice.InboundAdvice;
 import org.fz.nettyx.handler.ChannelAdvice.OutboundAdvice;
 import org.junit.Test;
@@ -14,6 +16,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies inbound and outbound advice dispatch and buffer cleanup when callbacks fail.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-01
+ */
 public class ChannelAdviceTest {
 
     @Test
@@ -40,6 +49,40 @@ public class ChannelAdviceTest {
         channel.writeInbound("test");
         assertEquals("test", channel.readInbound());
         assertFalse(channel.finish());
+    }
+
+    @Test
+    public void inboundCallbackFailureReleasesUnforwardedMessage() {
+        EmbeddedChannel channel = new EmbeddedChannel();
+        InboundAdvice advice = new InboundAdvice(channel).whenChannelRead((ctx, msg) -> {
+            throw new IllegalStateException("inbound callback failed");
+        });
+        ByteBuf message = Unpooled.buffer().writeByte(1);
+        channel.pipeline().addLast(advice);
+
+        try {
+            assertThrows(IllegalStateException.class, () -> channel.writeInbound(message));
+            assertEquals(0, message.refCnt());
+        } finally {
+            channel.finishAndReleaseAll();
+        }
+    }
+
+    @Test
+    public void outboundCallbackFailureReleasesUnforwardedMessage() {
+        EmbeddedChannel channel = new EmbeddedChannel();
+        OutboundAdvice advice = new OutboundAdvice(channel).whenWrite((ctx, msg, promise) -> {
+            throw new IllegalStateException("outbound callback failed");
+        });
+        ByteBuf message = Unpooled.buffer().writeByte(1);
+        channel.pipeline().addLast(advice);
+
+        try {
+            assertThrows(IllegalStateException.class, () -> channel.writeOutbound(message));
+            assertEquals(0, message.refCnt());
+        } finally {
+            channel.finishAndReleaseAll();
+        }
     }
 
     @Test

@@ -12,6 +12,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies channel action dispatch preserves its arguments and treats missing actions as no-ops.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class ActionsTest {
 
     @Test

@@ -8,7 +8,10 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Checks success and failure counters, state accessors, and reset behavior.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class ChannelStateTest {

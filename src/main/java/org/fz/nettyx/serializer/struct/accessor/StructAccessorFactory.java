@@ -1,4 +1,4 @@
-package org.fz.nettyx.serializer.struct.generator;
+package org.fz.nettyx.serializer.struct.accessor;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import io.netty.buffer.ByteBuf;
@@ -31,6 +31,7 @@ import static org.objectweb.asm.Opcodes.*;
 /**
  * Generates and caches direct constructor/getter/setter StructAccessor implementations with ASM.
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-16 16:39
  * */
 public final class StructAccessorFactory {
@@ -38,9 +39,10 @@ public final class StructAccessorFactory {
     private static volatile Map<Class<?>, StructAccessor> STRUCT_ACCESSOR_CACHE = Map.of();
 
     private static final String ACCESSOR_INTERNAL        = org.objectweb.asm.Type.getInternalName(StructAccessor.class);
+    private static final String CONTEXT_INTERNAL         = org.objectweb.asm.Type.getInternalName(StructContext.class);
     private static final String SERIALIZER_INTERNAL      = org.objectweb.asm.Type.getInternalName(StructSerializer.class);
     private static final String BYTE_BUF_INTERNAL        = org.objectweb.asm.Type.getInternalName(ByteBuf.class);
-    private static final String SUPPORT_INTERNAL         = org.objectweb.asm.Type.getInternalName(StructAccessor.Support.class);
+    private static final String FIELD_ACCESSOR_INTERNAL         = org.objectweb.asm.Type.getInternalName(StructAccessor.FieldAccessor.class);
     private static final String FIELD_INTERNAL           = org.objectweb.asm.Type.getInternalName(StructField.class);
     private static final String HANDLER_INTERNAL         = org.objectweb.asm.Type.getInternalName(StructFieldHandler.class);
     private static final String BASIC_INTERNAL           = org.objectweb.asm.Type.getInternalName(Basic.class);
@@ -49,7 +51,6 @@ public final class StructAccessorFactory {
     private static final String TYPE_DESCRIPTOR          = org.objectweb.asm.Type.getDescriptor(Type.class);
     private static final String BYTE_ORDER_DESCRIPTOR    = org.objectweb.asm.Type.getDescriptor(ByteOrder.class);
     private static final String FIELD_ARRAY_DESCRIPTOR   = "[L" + FIELD_INTERNAL + ";";
-    private static final String HANDLER_ARRAY_DESCRIPTOR = "[L" + HANDLER_INTERNAL + ";";
     private static final String BASIC_ARRAY_DESCRIPTOR   = "[L" + BASIC_INTERNAL + ";";
 
     private static final String RESOLVE_DESCRIPTOR = org.objectweb.asm.Type.getMethodDescriptor(
@@ -136,11 +137,9 @@ public final class StructAccessorFactory {
 
         StructField[] fields = definition.fields();
         for (int i = 0; i < fields.length; i++) {
-            if (needsSupportState(fields[i])) {
+            if (needsFieldAccessorState(fields[i])) {
                 writer.visitField(ACC_PRIVATE | ACC_FINAL, fieldStateName(i),
                                   "L" + FIELD_INTERNAL + ";", null, null).visitEnd();
-                writer.visitField(ACC_PRIVATE | ACC_FINAL, handlerStateName(i),
-                                  "L" + HANDLER_INTERNAL + ";", null, null).visitEnd();
             }
         }
 
@@ -155,25 +154,19 @@ public final class StructAccessorFactory {
     }
 
     private static void addConstructor(ClassWriter writer, String internalName, StructField[] fields) {
-        String descriptor = "(" + FIELD_ARRAY_DESCRIPTOR + HANDLER_ARRAY_DESCRIPTOR + ")V";
+        String descriptor = "(" + FIELD_ARRAY_DESCRIPTOR + ")V";
         MethodVisitor method = writer.visitMethod(ACC_PUBLIC, "<init>", descriptor, null, null);
         method.visitCode();
         method.visitVarInsn(ALOAD, 0);
         method.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
 
         for (int i = 0; i < fields.length; i++) {
-            if (needsSupportState(fields[i])) {
+            if (needsFieldAccessorState(fields[i])) {
                 method.visitVarInsn(ALOAD, 0);
                 method.visitVarInsn(ALOAD, 1);
                 pushInt(method, i);
                 method.visitInsn(AALOAD);
                 method.visitFieldInsn(PUTFIELD, internalName, fieldStateName(i), "L" + FIELD_INTERNAL + ";");
-
-                method.visitVarInsn(ALOAD, 0);
-                method.visitVarInsn(ALOAD, 2);
-                pushInt(method, i);
-                method.visitInsn(AALOAD);
-                method.visitFieldInsn(PUTFIELD, internalName, handlerStateName(i), "L" + HANDLER_INTERNAL + ";");
             }
         }
 
@@ -208,7 +201,7 @@ public final class StructAccessorFactory {
         method.visitVarInsn(ASTORE, 5);
         method.visitVarInsn(ALOAD, 2);
         method.visitVarInsn(ALOAD, 3);
-        method.visitMethodInsn(INVOKESTATIC, SUPPORT_INTERNAL, "resolveStructType", RESOLVE_DESCRIPTOR, false);
+        method.visitMethodInsn(INVOKESTATIC, CONTEXT_INTERNAL, "resolveType", RESOLVE_DESCRIPTOR, false);
         method.visitVarInsn(ASTORE, 6);
 
         for (int i = 0; i < fields.length; i++) {
@@ -262,7 +255,7 @@ public final class StructAccessorFactory {
         }
 
         method.visitVarInsn(ALOAD, 5);
-        callSupportRead(method, internalName, index);
+        callFieldRead(method, internalName, index);
         castOrUnbox(method, fieldType);
         callSetter(method, structInternal, field, fieldType);
     }
@@ -281,7 +274,7 @@ public final class StructAccessorFactory {
         method.visitVarInsn(ASTORE, 6);
         method.visitVarInsn(ALOAD, 2);
         method.visitVarInsn(ALOAD, 3);
-        method.visitMethodInsn(INVOKESTATIC, SUPPORT_INTERNAL, "resolveStructType", RESOLVE_DESCRIPTOR, false);
+        method.visitMethodInsn(INVOKESTATIC, CONTEXT_INTERNAL, "resolveType", RESOLVE_DESCRIPTOR, false);
         method.visitVarInsn(ASTORE, 7);
 
         for (int i = 0; i < fields.length; i++) {
@@ -327,7 +320,7 @@ public final class StructAccessorFactory {
         callGetter(method, structInternal, field, fieldType);
         box(method, fieldType);
         method.visitVarInsn(ASTORE, 8);
-        callSupportWrite(method, internalName, index, 8);
+        callFieldWrite(method, internalName, index, 8);
     }
 
     private static void addConcreteBasicArrayRead(
@@ -552,27 +545,31 @@ public final class StructAccessorFactory {
                                "(Ljava/lang/Object;" + TYPE_DESCRIPTOR + "IL" + BYTE_BUF_INTERNAL + ";Z)V", false);
     }
 
-    private static void callSupportRead(MethodVisitor method, String internalName, int index) {
+    private static void callFieldRead(MethodVisitor method, String internalName, int index) {
         method.visitVarInsn(ALOAD, 1);
         method.visitVarInsn(ALOAD, 2);
         method.visitVarInsn(ALOAD, 5);
         method.visitVarInsn(ALOAD, 6);
         loadStateField(method, internalName, fieldStateName(index), FIELD_INTERNAL);
-        loadStateField(method, internalName, handlerStateName(index), HANDLER_INTERNAL);
+        method.visitInsn(DUP);
+        method.visitMethodInsn(INVOKEVIRTUAL, FIELD_INTERNAL, "handler",
+                               "()L" + HANDLER_INTERNAL + ";", false);
         method.visitVarInsn(ALOAD, 4);
-        method.visitMethodInsn(INVOKESTATIC, SUPPORT_INTERNAL, "readField", READ_FIELD_DESCRIPTOR, false);
+        method.visitMethodInsn(INVOKESTATIC, FIELD_ACCESSOR_INTERNAL, "readField", READ_FIELD_DESCRIPTOR, false);
     }
 
-    private static void callSupportWrite(MethodVisitor method, String internalName, int index, int valueLocal) {
+    private static void callFieldWrite(MethodVisitor method, String internalName, int index, int valueLocal) {
         method.visitVarInsn(ALOAD, 1);
         method.visitVarInsn(ALOAD, 2);
         method.visitVarInsn(ALOAD, 6);
         method.visitVarInsn(ALOAD, 7);
         loadStateField(method, internalName, fieldStateName(index), FIELD_INTERNAL);
-        loadStateField(method, internalName, handlerStateName(index), HANDLER_INTERNAL);
+        method.visitInsn(DUP);
+        method.visitMethodInsn(INVOKEVIRTUAL, FIELD_INTERNAL, "handler",
+                               "()L" + HANDLER_INTERNAL + ";", false);
         method.visitVarInsn(ALOAD, valueLocal);
         method.visitVarInsn(ALOAD, 5);
-        method.visitMethodInsn(INVOKESTATIC, SUPPORT_INTERNAL, "writeField", WRITE_FIELD_DESCRIPTOR, false);
+        method.visitMethodInsn(INVOKESTATIC, FIELD_ACCESSOR_INTERNAL, "writeField", WRITE_FIELD_DESCRIPTOR, false);
     }
 
     private static void newBasic(MethodVisitor method, Class<?> basicClass, ByteOrder byteOrder) {
@@ -641,16 +638,11 @@ public final class StructAccessorFactory {
     private static StructAccessor instantiate(
             Class<? extends StructAccessor> accessorClass,
             StructField[] fields) throws ReflectiveOperationException {
-        StructFieldHandler[] handlers = new StructFieldHandler[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i].category() == StructDefinition.Category.HANDLER) handlers[i] = fields[i].handler();
-        }
-        Constructor<? extends StructAccessor> constructor = accessorClass.getConstructor(StructField[].class,
-                                                                                         StructFieldHandler[].class);
-        return constructor.newInstance(fields, handlers);
+        Constructor<? extends StructAccessor> constructor = accessorClass.getConstructor(StructField[].class);
+        return constructor.newInstance((Object) fields);
     }
 
-    private static boolean needsSupportState(StructField field) {
+    private static boolean needsFieldAccessorState(StructField field) {
         if (isDirectBasic(field) || isDirectStruct(field)) return false;
         Annotation annotation = field.annotation();
         if (annotation instanceof ToArray) {
@@ -687,10 +679,13 @@ public final class StructAccessorFactory {
         return "field" + index;
     }
 
-    private static String handlerStateName(int index) {
-        return "handler" + index;
-    }
-
+    /**
+     * Identifies the wrapper class and unboxing method used to generate primitive field access.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private record Primitive(String wrapperInternal, String unboxMethod) {
         static Primitive of(Class<?> type) {
             if (type == boolean.class) return new Primitive("java/lang/Boolean", "booleanValue");

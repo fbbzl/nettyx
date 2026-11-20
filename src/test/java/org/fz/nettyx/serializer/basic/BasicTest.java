@@ -20,6 +20,13 @@ import java.nio.ByteOrder;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies basic value semantics, binary reads and writes, and unsigned 64-bit edge cases.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-11
+ */
 public class BasicTest {
 
     @Test
@@ -56,6 +63,13 @@ public class BasicTest {
         try {
             new cint(0x01020304).write(bigEndian, ByteOrder.BIG_ENDIAN);
             new cint(0x01020304).write(littleEndian, ByteOrder.LITTLE_ENDIAN);
+
+            byte[] bigEndianBytes = new byte[bigEndian.readableBytes()];
+            bigEndian.getBytes(bigEndian.readerIndex(), bigEndianBytes);
+            assertArrayEquals(new byte[]{1, 2, 3, 4}, bigEndianBytes);
+            byte[] littleEndianBytes = new byte[littleEndian.readableBytes()];
+            littleEndian.getBytes(littleEndian.readerIndex(), littleEndianBytes);
+            assertArrayEquals(new byte[]{4, 3, 2, 1}, littleEndianBytes);
 
             assertEquals(Integer.valueOf(0x01020304),
                          new cint(bigEndian, ByteOrder.BIG_ENDIAN).value());

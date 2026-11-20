@@ -20,6 +20,8 @@ import static org.fz.nettyx.action.ListenerAction.redo;
 
 
 /**
+ * Demonstrates one jSerialComm channel and its serial port configuration.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/2/28 14:49

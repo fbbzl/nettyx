@@ -23,6 +23,8 @@ import static org.fz.nettyx.codec.UserCodec.TEST_USER;
 
 
 /**
+ * Demonstrates keyed serial channels backed by RXTX.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/3/1 22:58

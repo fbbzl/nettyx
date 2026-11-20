@@ -32,6 +32,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Checks TCP detection requests, retries, interruption, and connection failure propagation.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-08-02
+ */
 public class RemoteDetectorTest {
 
     private final EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -101,6 +108,22 @@ public class RemoteDetectorTest {
     }
 
     @Test
+    public void retriesConsumeRetainedCopiesOfAProvidedBuffer() throws Exception {
+        TestDetector detector = newDetector();
+        ByteBuf probe = Unpooled.buffer(1).writeByte(1);
+        try {
+            detector.connect().sync();
+            detector.trySend(probe, 2, 0);
+            assertTrue("detect message was not received", received.await(1, TimeUnit.SECONDS));
+            assertEquals("probe and all retained copies should be released", 0, probe.refCnt());
+        }
+        finally {
+            detector.shutdown();
+            if (probe.refCnt() > 0) probe.release();
+        }
+    }
+
+    @Test
     public void interruptIsPropagatedAndRestored() throws Exception {
         TestDetector detector = newDetector();
         detector.setDetectRetryTimes(3);
@@ -154,6 +177,13 @@ public class RemoteDetectorTest {
         return new TestDetector((InetSocketAddress) serverChannel.localAddress());
     }
 
+    /**
+     * Creates a fresh probe buffer per attempt and records how many probes the detector creates.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-08-02
+     */
     private static final class TestDetector extends RemoteDetector<ByteBuf> {
 
         private final AtomicInteger detectMessageCount = new AtomicInteger();

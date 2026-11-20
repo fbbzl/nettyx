@@ -154,56 +154,47 @@ public enum EndianKit {
 
         @Override
         public short reverseUnsignedByte(short b) {
-            byte[] bytes = fromUnsignedByte(b);
-            return LE.toUnsignedByte(bytes);
+            return (short) (b & 0xff);
         }
 
         @Override
         public short reverseShort(short s) {
-            byte[] bytes = fromShort(s);
-            return LE.toShort(bytes);
+            return Short.reverseBytes(s);
         }
 
         @Override
         public int reverseUnsignedShort(int s) {
-            byte[] bytes = fromUnsignedShort(s);
-            return LE.toUnsignedShort(bytes);
+            return Short.toUnsignedInt(Short.reverseBytes((short) s));
         }
 
         @Override
         public int reverseInt(int i) {
-            byte[] bytes = fromInt(i);
-            return LE.toInt(bytes);
+            return Integer.reverseBytes(i);
         }
 
         @Override
         public long reverseUnsignedInt(long i) {
-            byte[] bytes = fromUnsignedInt(i);
-            return LE.toUnsignedInt(bytes);
+            return Integer.toUnsignedLong(Integer.reverseBytes((int) i));
         }
 
         @Override
         public long reverseLong(long l) {
-            byte[] bytes = fromLong(l);
-            return LE.toLong(bytes);
+            return Long.reverseBytes(l);
         }
 
         @Override
         public BigInteger reverseUnsignedLong(BigInteger l) {
-            byte[] bytes = fromUnsignedLong(l);
-            return LE.toUnsignedLong(bytes);
+            return toUnsignedBigInteger(Long.reverseBytes(l.longValue()));
         }
 
         @Override
         public float reverseFloat(float f) {
-            byte[] bytes = fromFloat(f);
-            return LE.toFloat(bytes);
+            return Float.intBitsToFloat(Integer.reverseBytes(Float.floatToRawIntBits(f)));
         }
 
         @Override
         public double reverseDouble(double d) {
-            byte[] bytes = fromDouble(d);
-            return LE.toDouble(bytes);
+            return Double.longBitsToDouble(Long.reverseBytes(Double.doubleToRawLongBits(d)));
         }
 
         /**
@@ -374,56 +365,47 @@ public enum EndianKit {
 
         @Override
         public short reverseUnsignedByte(short b) {
-            byte[] bytes = fromUnsignedByte(b);
-            return BE.toUnsignedByte(bytes);
+            return (short) (b & 0xff);
         }
 
         @Override
         public short reverseShort(short s) {
-            byte[] bytes = fromShort(s);
-            return BE.toShort(bytes);
+            return Short.reverseBytes(s);
         }
 
         @Override
         public int reverseUnsignedShort(int s) {
-            byte[] bytes = fromUnsignedShort(s);
-            return BE.toUnsignedShort(bytes);
+            return Short.toUnsignedInt(Short.reverseBytes((short) s));
         }
 
         @Override
         public int reverseInt(int i) {
-            byte[] bytes = fromInt(i);
-            return BE.toInt(bytes);
+            return Integer.reverseBytes(i);
         }
 
         @Override
         public long reverseUnsignedInt(long i) {
-            byte[] bytes = fromUnsignedInt(i);
-            return BE.toUnsignedInt(bytes);
+            return Integer.toUnsignedLong(Integer.reverseBytes((int) i));
         }
 
         @Override
         public long reverseLong(long l) {
-            byte[] bytes = fromLong(l);
-            return BE.toLong(bytes);
+            return Long.reverseBytes(l);
         }
 
         @Override
         public BigInteger reverseUnsignedLong(BigInteger l) {
-            byte[] bytes = fromUnsignedLong(l);
-            return BE.toUnsignedLong(bytes);
+            return toUnsignedBigInteger(Long.reverseBytes(l.longValue()));
         }
 
         @Override
         public float reverseFloat(float f) {
-            byte[] bytes = fromFloat(f);
-            return BE.toFloat(bytes);
+            return Float.intBitsToFloat(Integer.reverseBytes(Float.floatToRawIntBits(f)));
         }
 
         @Override
         public double reverseDouble(double d) {
-            byte[] bytes = fromDouble(d);
-            return BE.toDouble(bytes);
+            return Double.longBitsToDouble(Long.reverseBytes(Double.doubleToRawLongBits(d)));
         }
 
         /**

@@ -8,7 +8,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Verifies frame encoding and decoding with start and end flags, including optional flag stripping.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2024
  */
 public class StartEndFlagFrameCodecTest {

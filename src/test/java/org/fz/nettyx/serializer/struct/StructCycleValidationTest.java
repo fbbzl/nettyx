@@ -11,13 +11,18 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
+/**
+ * Checks detection of cyclic struct references, including those introduced through generic arguments or arrays.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class StructCycleValidationTest {
-
-    private static ExposedContext context;
 
     @BeforeClass
     public static void init() {
-        context = new ExposedContext();
+        new StructContext("package.that.does.not.exist");
     }
 
     @Test
@@ -61,14 +66,14 @@ public class StructCycleValidationTest {
 
     @Test
     public void rejectsCycleCompletedByLaterScan() {
-        context.scanStructTypes(types(CycleStructs.CrossBatchA.class));
+        StructScannerTestSupport.invoke("scanStruct", Set.class, types(CycleStructs.CrossBatchA.class));
 
         assertCycle("CrossBatchA.b -> CrossBatchB.a -> CrossBatchA", CycleStructs.CrossBatchB.class);
     }
 
     @Test
     public void acceptsReferenceToStructWithoutDefinition() {
-        context.scanStructTypes(types(CycleStructs.MissingDefinitionRoot.class));
+        StructScannerTestSupport.invoke("scanStruct", Set.class, types(CycleStructs.MissingDefinitionRoot.class));
 
         assertNotNull(StructContext.getStructDefinition(CycleStructs.MissingDefinitionRoot.class));
         assertNull(StructContext.getStructDefinition(CycleStructs.MissingDefinitionLeaf.class));
@@ -77,38 +82,30 @@ public class StructCycleValidationTest {
     @Test
     public void rejectsToArrayOnNonArrayFieldBeforeCycleAnalysis() {
         assertThrows(SerializeException.class,
-                     () -> context.scanStructTypes(types(CycleStructs.NonArrayAnnotation.class)));
+                     () -> StructScannerTestSupport.invoke("scanStruct", Set.class,
+                                                          types(CycleStructs.NonArrayAnnotation.class)));
         assertNull(StructContext.getStructDefinition(CycleStructs.NonArrayAnnotation.class));
     }
 
     @Test
     public void acceptsAcyclicStructGraph() {
-        context.scanStructTypes(types(CycleStructs.AcyclicRoot.class,
-                                      CycleStructs.AcyclicBranch.class,
-                                      CycleStructs.AcyclicLeaf.class));
+        StructScannerTestSupport.invoke("scanStruct", Set.class,
+                                        types(CycleStructs.AcyclicRoot.class,
+                                              CycleStructs.AcyclicBranch.class,
+                                              CycleStructs.AcyclicLeaf.class));
 
         assertNotNull(StructContext.getStructDefinition(CycleStructs.AcyclicRoot.class));
     }
 
     private static void assertCycle(String expectedPath, Class<?>... types) {
         StructDefinitionException exception = assertThrows(StructDefinitionException.class,
-                                                            () -> context.scanStructTypes(types(types)));
+                                                            () -> StructScannerTestSupport.invoke("scanStruct", Set.class,
+                                                                                                 types(types)));
         assertTrue(exception.getMessage(), exception.getMessage().contains(expectedPath));
         for (Class<?> type : types) assertNull(StructContext.getStructDefinition(type));
     }
 
     private static Set<Class<?>> types(Class<?>... types) {
         return new LinkedHashSet<>(Set.of(types));
-    }
-
-    private static class ExposedContext extends StructContext
-    {
-        ExposedContext() {
-            super("package.that.does.not.exist");
-        }
-
-        void scanStructTypes(Set<Class<?>> types) {
-            super.scanStruct(types);
-        }
     }
 }

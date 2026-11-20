@@ -1,6 +1,8 @@
 package org.fz.nettyx.exception;
 
 /**
+ * Signals that a listener action should stop scheduling retries.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/6/10 20:40

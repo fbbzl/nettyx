@@ -5,6 +5,13 @@ import org.fz.nettyx.serializer.basic.c.signed.cchar;
 
 import java.nio.ByteOrder;
 
+/**
+ * Exposes the protected {@code cchar} reader for direct buffer tests.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-07-29
+ */
 public class CcharProbe extends cchar {
 
     public CcharProbe() {

@@ -2,17 +2,19 @@ package org.fz.nettyx.serializer.schema;
 
 import io.netty.buffer.ByteBuf;
 import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.fz.nettyx.exception.SerializeException;
-import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * An immutable, zero-copy view over one fixed-length configured struct.
+ * An immutable, zero-copy view over a fixed-length schema.
  * The caller must keep the source buffer valid and unchanged while using the view.
  *
  * @author fengbinbin
@@ -23,54 +25,63 @@ import java.util.Map;
 public final class SchemaView
 {
 
-    SchemaCodec codec;
-    Schema      struct;
-    ByteBuf     source;
-    int         startIndex;
-    int         byteLength;
+    SchemaSerializer     serializer;
+    Schema               schema;
+    ByteBuf              source;
+    Map<String, Integer> fieldIndexes;
+    int[]                fieldOffsets;
+    @Getter
+    @Accessors(fluent = true)
+    int byteLength;
 
-    SchemaView(SchemaCodec codec, Schema struct, ByteBuf source, int startIndex, int byteLength)
+    SchemaView(SchemaSerializer serializer, SchemaContext context, ByteBuf source, int startIndex, int byteLength)
     {
-        this.codec      = codec;
-        this.struct     = struct;
-        this.source     = source;
-        this.startIndex = startIndex;
-        this.byteLength = byteLength;
-    }
-
-    public int byteLength()
-    {
-        return byteLength;
+        this.serializer   = serializer;
+        this.schema       = serializer.getSchema();
+        this.source       = source;
+        this.byteLength   = byteLength;
+        List<Schema.SchemaField> fields = schema.fields();
+        this.fieldIndexes = HashMap.newHashMap(fields.size());
+        this.fieldOffsets = new int[fields.size()];
+        int offset = startIndex;
+        for (int i = 0; i < fields.size(); i++) {
+            this.fieldIndexes.put(fields.get(i).name(), i);
+            this.fieldOffsets[i] = offset;
+            int fieldSize = context.fixedFieldSizeOf(fields.get(i));
+            if (fieldSize < 0)
+                throw new SerializeException("zero-copy view only supports fixed-length struct: [" + schema.fqName() + "]");
+            offset += fieldSize;
+        }
     }
 
     public byte getByte(String fieldName)
     {
-        requireKind(fieldName, "byte", SchemaField.Kind.BASIC);
-        return (byte) requireInteger(fieldName, "byte", Byte.MIN_VALUE, Byte.MAX_VALUE);
+        int fieldIndex = requireKind(fieldName, "byte", Schema.SchemaField.Kind.BASIC);
+        return (byte) requireInteger(fieldIndex, fieldName, "byte", Byte.MIN_VALUE, Byte.MAX_VALUE);
     }
 
     public short getShort(String fieldName)
     {
-        requireKind(fieldName, "short", SchemaField.Kind.BASIC);
-        return (short) requireInteger(fieldName, "short", Short.MIN_VALUE, Short.MAX_VALUE);
+        int fieldIndex = requireKind(fieldName, "short", Schema.SchemaField.Kind.BASIC);
+        return (short) requireInteger(fieldIndex, fieldName, "short", Short.MIN_VALUE, Short.MAX_VALUE);
     }
 
     public int getInt(String fieldName)
     {
-        requireKind(fieldName, "int", SchemaField.Kind.BASIC);
-        return (int) requireInteger(fieldName, "int", Integer.MIN_VALUE, Integer.MAX_VALUE);
+        int fieldIndex = requireKind(fieldName, "int", Schema.SchemaField.Kind.BASIC);
+        return (int) requireInteger(fieldIndex, fieldName, "int", Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public long getLong(String fieldName)
     {
-        requireKind(fieldName, "long", SchemaField.Kind.BASIC);
-        return requireInteger(fieldName, "long", Long.MIN_VALUE, Long.MAX_VALUE);
+        int fieldIndex = requireKind(fieldName, "long", Schema.SchemaField.Kind.BASIC);
+        return requireInteger(fieldIndex, fieldName, "long", Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
     public float getFloat(String fieldName)
     {
-        requireKind(fieldName, "float", SchemaField.Kind.BASIC);
-        Object value = readValue(fieldName);
+        int fieldIndex = requireKind(fieldName, "float", Schema.SchemaField.Kind.BASIC);
+        Object value = readValue(fieldIndex);
         if (value instanceof Float number) return number;
         if (value instanceof Double) throw typeError(fieldName, "float", value);
 
@@ -83,8 +94,8 @@ public final class SchemaView
 
     public double getDouble(String fieldName)
     {
-        requireKind(fieldName, "double", SchemaField.Kind.BASIC);
-        Object value = readValue(fieldName);
+        int fieldIndex = requireKind(fieldName, "double", Schema.SchemaField.Kind.BASIC);
+        Object value = readValue(fieldIndex);
         if (value instanceof Double number) return number;
         if (value instanceof Float number) return number.doubleValue();
 
@@ -97,48 +108,47 @@ public final class SchemaView
 
     public boolean getBoolean(String fieldName)
     {
-        requireKind(fieldName, "boolean", SchemaField.Kind.BASIC);
-        Object value = readValue(fieldName);
+        int fieldIndex = requireKind(fieldName, "boolean", Schema.SchemaField.Kind.BASIC);
+        Object value = readValue(fieldIndex);
         if (value instanceof Boolean bool) return bool;
         throw typeError(fieldName, "boolean", value);
     }
 
     public String getString(String fieldName)
     {
-        requireKind(fieldName, "String", SchemaField.Kind.CHAR);
-        Object value = readValue(fieldName);
-        if (value instanceof String string) return string;
-        throw typeError(fieldName, "String", value);
+        int fieldIndex = requireKind(fieldName, "String", Schema.SchemaField.Kind.CHAR);
+        return (String) readValue(fieldIndex);
     }
 
     public byte[] getBytes(String fieldName)
     {
-        requireKind(fieldName, "byte[]", SchemaField.Kind.BYTES);
-        Object value = readValue(fieldName);
-        if (value instanceof byte[] bytes) return bytes;
-        throw typeError(fieldName, "byte[]", value);
+        int fieldIndex = requireKind(fieldName, "byte[]", Schema.SchemaField.Kind.BYTES);
+        return (byte[]) readValue(fieldIndex);
     }
 
     public List<?> getList(String fieldName)
     {
-        requireKind(fieldName, "List", SchemaField.Kind.ARRAY);
-        Object value = readValue(fieldName);
-        if (value instanceof List<?> list) return list;
-        throw typeError(fieldName, "List", value);
+        int fieldIndex = requireKind(fieldName, "List", Schema.SchemaField.Kind.ARRAY);
+        return (List<?>) readValue(fieldIndex);
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getStruct(String fieldName)
+    public Map<String, Object> getMap(String fieldName)
     {
-        requireKind(fieldName, "Map<String, Object>", SchemaField.Kind.STRUCT);
-        Object value = readValue(fieldName);
-        if (value instanceof Map<?, ?> map) return (Map<String, Object>) map;
-        throw typeError(fieldName, "Map<String, Object>", value);
+        int fieldIndex = requireKind(fieldName, "Map<String, Object>", Schema.SchemaField.Kind.SCHEMA);
+        return (Map<String, Object>) readValue(fieldIndex);
     }
 
-    private long requireInteger(String fieldName, String expectedType, long minimum, long maximum)
+    private long requireInteger(int fieldIndex, String fieldName, String expectedType, long minimum, long maximum)
     {
-        Object value = readValue(fieldName);
+        Object value = readValue(fieldIndex);
+        if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
+            long integer = ((Number) value).longValue();
+            if (integer < minimum || integer > maximum)
+                throw typeError(fieldName, expectedType, value);
+            return integer;
+        }
+
         BigInteger integer = requireIntegralValue(fieldName, expectedType, value);
         if (integer.compareTo(BigInteger.valueOf(minimum)) < 0
             || integer.compareTo(BigInteger.valueOf(maximum)) > 0)
@@ -154,26 +164,23 @@ public final class SchemaView
         throw typeError(fieldName, expectedType, value);
     }
 
-    private Object readValue(String fieldName)
+    private Object readValue(int fieldIndex)
     {
         ByteBuf reading = source.duplicate();
-        reading.readerIndex(startIndex);
-        for (SchemaField field : struct.fields()) {
-            Object value = codec.readField(field, struct.byteOrder(), reading);
-            if (field.name().equals(fieldName)) return value;
-        }
-        throw typeError(fieldName, "existing field", MissingField.INSTANCE);
+        reading.readerIndex(fieldOffsets[fieldIndex]);
+        return serializer.readField(schema.fields().get(fieldIndex), schema.byteOrder(), reading);
     }
 
-    private void requireKind(String fieldName, String expectedType, SchemaField.Kind expectedKind)
+    private int requireKind(String fieldName, String expectedType, Schema.SchemaField.Kind expectedKind)
     {
         if (fieldName == null) throw typeError(null, expectedType, MissingField.INSTANCE);
 
-        for (SchemaField field : struct.fields()) {
-            if (!field.name().equals(fieldName)) continue;
-            if (field.kind() == expectedKind) return;
+        Integer fieldIndex = fieldIndexes.get(fieldName);
+        if (fieldIndex != null) {
+            Schema.SchemaField field = schema.fields().get(fieldIndex);
+            if (field.kind() == expectedKind) return fieldIndex;
 
-            Object value = readValue(fieldName);
+            Object value = readValue(fieldIndex);
             throw typeError(fieldName, expectedType, value);
         }
         throw typeError(fieldName, expectedType, MissingField.INSTANCE);
@@ -182,7 +189,7 @@ public final class SchemaView
     private SerializeException typeError(String fieldName, String expectedType, Object actual)
     {
         return new SerializeException(
-                "struct [" + struct.fqName() + "], field [" + fieldName + "], expected [" + expectedType
+                "struct [" + schema.fqName() + "], field [" + fieldName + "], expected [" + expectedType
                 + "], actual [" + actualType(actual) + "]");
     }
 
@@ -193,19 +200,10 @@ public final class SchemaView
         return value.getClass().getTypeName();
     }
 
-    private static BigInteger decimalValue(float value)
-    {
-        try {
-            return new BigDecimal(value).toBigIntegerExact();
-        }
-        catch (ArithmeticException error) {
-            return null;
-        }
-    }
-
     private static BigInteger decimalValue(double value)
     {
         try {
+            // The shortest decimal representation can differ from the exact binary value.
             return new BigDecimal(value).toBigIntegerExact();
         }
         catch (ArithmeticException error) {
@@ -213,6 +211,13 @@ public final class SchemaView
         }
     }
 
+    /**
+     * Marks a field lookup that found no matching schema field.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-09-18
+     */
     private enum MissingField
     {
         INSTANCE

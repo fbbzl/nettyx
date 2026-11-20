@@ -13,6 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
+/**
+ * Verifies timeout configuration, idle callback dispatch, and which idle events trigger each heartbeat handler.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-06-01
+ */
 public class ActionIdleStateHandlerTest {
 
     @Test
@@ -97,6 +104,13 @@ public class ActionIdleStateHandlerTest {
         channel.finishAndReleaseAll();
     }
 
+    /**
+     * Exposes the protected idle callback for direct invocation in tests.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ExposedIdle extends ActionIdleStateHandler {
         ExposedIdle(boolean observeOutput, long reader, long writer, long all, TimeUnit unit, boolean fireNext) {
             super(observeOutput, reader, writer, all, unit, fireNext);
@@ -104,6 +118,13 @@ public class ActionIdleStateHandlerTest {
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }
     }
 
+    /**
+     * Exposes the protected read timeout constructor to test its configuration.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ExposedReadTimeout extends ActionReadTimeoutHandler {
         ExposedReadTimeout(long timeout, TimeUnit unit,
                            ChannelExceptionAction action, boolean fireNext) {
@@ -111,6 +132,13 @@ public class ActionIdleStateHandlerTest {
         }
     }
 
+    /**
+     * Exposes the protected write timeout constructor to test its configuration.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ExposedWriteTimeout extends ActionWriteTimeoutHandler {
         ExposedWriteTimeout(long timeout, TimeUnit unit,
                             ChannelExceptionAction action, boolean fireNext) {
@@ -118,18 +146,39 @@ public class ActionIdleStateHandlerTest {
         }
     }
 
+    /**
+     * Exposes the read idle heartbeat callback and state name for assertions.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ExposedReadHeart extends IdledHeartBeater.ReadIdleHeartBeater {
         ExposedReadHeart(int seconds, ChannelHandlerContextAction action) { super(seconds, action); }
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }
         String name() { return stateName(); }
     }
 
+    /**
+     * Exposes the write idle heartbeat callback and state name for assertions.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ExposedWriteHeart extends IdledHeartBeater.WriteIdleHeartBeater {
         ExposedWriteHeart(int seconds, ChannelHandlerContextAction action) { super(seconds, action); }
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }
         String name() { return stateName(); }
     }
 
+    /**
+     * Exposes the all idle heartbeat callback and state name for assertions.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2026-07-29
+     */
     private static class ExposedAllHeart extends IdledHeartBeater.AllIdleHeartBeater {
         ExposedAllHeart(int seconds, ChannelHandlerContextAction action) { super(seconds, action); }
         void trigger(ChannelHandlerContext ctx, IdleStateEvent event) throws Exception { channelIdle(ctx, event); }

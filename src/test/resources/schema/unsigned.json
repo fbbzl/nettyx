@@ -1,0 +1,17 @@
+{
+  "namespace": "device",
+  "structs": [
+    {
+      "name": "Unsigned",
+      "fields": [
+        { "name": "value", "type": "cuint64_t" }
+      ]
+    },
+    {
+      "name": "HugeInteger",
+      "fields": [
+        { "name": "value", "type": "cTestHugeInteger" }
+      ]
+    }
+  ]
+}

@@ -5,15 +5,16 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.Getter;
 import org.fz.nettyx.serializer.schema.Schema;
-import org.fz.nettyx.serializer.schema.SchemaRegistry;
+import org.fz.nettyx.serializer.schema.SchemaContext;
 import org.fz.nettyx.serializer.schema.SchemaSerializer;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Netty codec for structs defined by a {@link SchemaRegistry}.
+ * Netty codec for maps encoded using a schema from a {@link SchemaContext}.
  *
  * @author fengbinbin
  * @version 1.0
@@ -26,30 +27,22 @@ public class SchemaCodec extends ByteToMessageCodec<Map<String, Object>>
 
     private static final boolean DEFAULT_SKIP_LEFT_BYTES = true;
 
+    @Getter
     private final Schema           schema;
     private final SchemaSerializer serializer;
+    @Getter
     private final boolean          skipLeftBytes;
 
-    public SchemaCodec(SchemaRegistry registry, String schemaName)
+    public SchemaCodec(SchemaContext context, String schemaName)
     {
-        this(registry, schemaName, DEFAULT_SKIP_LEFT_BYTES);
+        this(context, schemaName, DEFAULT_SKIP_LEFT_BYTES);
     }
 
-    public SchemaCodec(SchemaRegistry registry, String schemaName, boolean skipLeftBytes)
+    public SchemaCodec(SchemaContext context, String schemaName, boolean skipLeftBytes)
     {
-        this.schema        = registry.require(schemaName);
-        this.serializer    = registry.serializer(schema.fqName());
+        this.schema        = context.require(schemaName);
+        this.serializer    = context.serializer(schema.fqName());
         this.skipLeftBytes = skipLeftBytes;
-    }
-
-    public Schema getSchema()
-    {
-        return schema;
-    }
-
-    public boolean isSkipLeftBytes()
-    {
-        return skipLeftBytes;
     }
 
     @Override
@@ -66,8 +59,8 @@ public class SchemaCodec extends ByteToMessageCodec<Map<String, Object>>
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Map<String, Object> struct, ByteBuf out)
+    protected void encode(ChannelHandlerContext ctx, Map<String, Object> values, ByteBuf out)
     {
-        serializer.doSerialize(struct, out);
+        serializer.doSerialize(values, out);
     }
 }

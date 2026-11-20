@@ -137,6 +137,13 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
         return config;
     }
 
+    /**
+     * Completes Bluetooth connection promises and fires channel activation after a successful connect.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-05-15
+     */
     protected final class BluetoothUnsafe extends AbstractUnsafe {
         @Override
         public void connect(
@@ -153,9 +160,9 @@ public class BtChannel extends EnhancedOioByteStreamChannel {
                 safeSetSuccess(promise);
 
                 if (!wasActive && isActive()) pipeline().fireChannelActive();
-            } catch (Exception t) {
+            } catch (Throwable t) {
+                close(voidPromise());
                 promise.tryFailure(t);
-                closeIfClosed();
             }
         }
     }

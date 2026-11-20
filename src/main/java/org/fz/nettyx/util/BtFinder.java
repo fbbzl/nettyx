@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 /**
+ * Discovers nearby Bluetooth devices and the services they expose.
+ *
  * @author fengbinbin
  * @version 1.0
  * @since 2024/5/30 11:04
@@ -27,6 +29,13 @@ public final class BtFinder {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(BtFinder.class);
 
+    /**
+     * Collects devices reported by a Bluetooth inquiry.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-05-30
+     */
     @NoArgsConstructor
     public static class DeviceFinder {
 
@@ -87,13 +96,12 @@ public final class BtFinder {
                         }
                     }
                     devices.removeIf(condition.negate());
+                    return new ArrayList<>(devices);
                 }
             } catch (BluetoothStateException stateException) {
                 log.error("bluetooth state is illegal, please check");
                 return Collections.emptyList();
             }
-
-            return devices;
         }
 
         boolean startInquiry(DiscoveryListener listener) throws BluetoothStateException
@@ -112,6 +120,13 @@ public final class BtFinder {
         }
     }
 
+    /**
+     * Finds connection URLs for a Bluetooth service advertised by a remote device.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-05-30
+     */
     @RequiredArgsConstructor
     public static class ServiceFinder {
 
@@ -190,9 +205,8 @@ public final class BtFinder {
                     activeTransactionId = NO_ACTIVE_TRANSACTION;
                     cancelServiceSearch(transactionId);
                 }
+                return new ArrayList<>(services);
             }
-
-            return services;
         }
 
         int searchServices(UUID[] searchUuidSet, RemoteDevice btDevice, DiscoveryListener listener) throws BluetoothStateException
@@ -212,6 +226,13 @@ public final class BtFinder {
         }
     }
 
+    /**
+     * Provides no-op Bluetooth discovery callbacks that subclasses can override selectively.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-05-30
+     */
     abstract static class DiscoveryListenerAdapter implements DiscoveryListener {
         @Override
         public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {

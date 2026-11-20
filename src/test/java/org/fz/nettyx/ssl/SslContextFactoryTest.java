@@ -1,6 +1,14 @@
 package org.fz.nettyx.ssl;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import javax.net.ssl.SSLContext;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyStore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,8 +16,59 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Checks TLS configuration defaults and error wrapping for missing key or trust stores.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2026-09-14
+ */
 public class SslContextFactoryTest
 {
+    @Rule
+    public TemporaryFolder stores = new TemporaryFolder();
+
+    @Test
+    public void initializesOneWayContextsFromReadableStores() throws Exception
+    {
+        String store = writeEmptyStore("one-way.p12", "store-password");
+
+        assertTlsContext(SslContextFactory.ONEWAY.getServerContext(store, "store-password"));
+        assertTlsContext(SslContextFactory.ONEWAY.getClientContext(store, "store-password"));
+    }
+
+    @Test
+    public void initializesTwoWayContextsWithSeparateKeyAndTrustStores() throws Exception
+    {
+        String keys = writeEmptyStore("keys.p12", "key-password");
+        String trust = writeEmptyStore("trust.p12", "trust-password");
+
+        assertTlsContext(SslContextFactory.TWOWAY.getServerContext(keys, "key-password"));
+        assertTlsContext(SslContextFactory.TWOWAY.getClientContext(keys, "key-password"));
+        assertTlsContext(SslContextFactory.TWOWAY.getServerContext(keys, "key-password", trust, "trust-password"));
+        assertTlsContext(SslContextFactory.TWOWAY.getClientContext(keys, "key-password", trust, "trust-password"));
+        assertThrows(SecurityException.class,
+                     () -> SslContextFactory.TWOWAY.getClientContext(keys, "key-password", trust, "wrong-password"));
+    }
+
+    private String writeEmptyStore(String fileName, String password) throws Exception
+    {
+        Path path = stores.newFile(fileName).toPath();
+        char[] chars = password.toCharArray();
+        KeyStore store = KeyStore.getInstance(KeyStore.getDefaultType());
+        store.load(null, chars);
+        try (OutputStream output = Files.newOutputStream(path)) {
+            store.store(output, chars);
+        }
+        return path.toString();
+    }
+
+    private static void assertTlsContext(SSLContext context)
+    {
+        assertEquals("TLS", context.getProtocol());
+        assertTrue(context.createSSLEngine().getEnabledProtocols().length > 0);
+    }
+
     @Test
     public void oneWayFactoryWrapsMissingKeyStoreErrors()
     {

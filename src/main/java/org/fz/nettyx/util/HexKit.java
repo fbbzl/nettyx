@@ -11,6 +11,7 @@ import java.util.HexFormat;
  * The Hex util.
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2022 -01-29 21:07
  */
 @UtilityClass
@@ -41,23 +42,13 @@ public class HexKit {
     public static byte[] decode(String hex)
     {
         if (hex == null) return new byte[0];
-        int    hexLen = hex.length();
-        byte[] result;
-        if (hexLen % 2 == 1) {
-            //odd
-            hexLen++;
-            result = new byte[(hexLen / 2)];
-            hex    = "0" + hex;
-        } else {
-            //even
-            result = new byte[(hexLen / 2)];
-        }
-        int j = 0;
-        for (int i = 0; i < hexLen; i += 2) {
-            result[j] = toByte(hex.substring(i, i + 2));
-            j++;
-        }
+        if (hex.length() % 2 != 0) hex = "0" + hex;
 
+        byte[] result = new byte[hex.length() / 2];
+        for (int i = 0; i < result.length; i++) {
+            int offset = i * 2;
+            result[i] = toByte(hex.substring(offset, offset + 2));
+        }
         return result;
     }
 }

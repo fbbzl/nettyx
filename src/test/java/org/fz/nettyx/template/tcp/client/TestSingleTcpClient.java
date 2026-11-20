@@ -16,6 +16,13 @@ import static org.fz.nettyx.action.ListenerAction.redo;
 import static org.fz.nettyx.codec.UserCodec.TEST_USER;
 
 
+/**
+ * Demonstrates connecting one TCP client through the client template.
+ *
+ * @author fengbinbin
+ * @version 1.0
+ * @since 2024-05-16
+ */
 public class TestSingleTcpClient extends SingleChannelClientTemplate {
 
     private static final InternalLogger log = InternalLoggerFactory.getInstance(TestSingleTcpClient.class);
@@ -40,7 +47,7 @@ public class TestSingleTcpClient extends SingleChannelClientTemplate {
                     log.info(cf.channel().localAddress() + ": ok");
                 })
                 .whenCancelled((ls, cf) -> log.info("cancel"))
-                .whenFailure(redo(testClient::connect, 10, TimeUnit.SECONDS, 3, (l, c) -> System.err.println("最后次失败后执行")))
+                .whenFailure(redo(testClient::connect, 10, TimeUnit.SECONDS, 3, (l, c) -> System.err.println("Final retry failed")))
                 .whenDone((ls, cf) -> log.info("done"));
 
         testClient.connect().addListener(listener);

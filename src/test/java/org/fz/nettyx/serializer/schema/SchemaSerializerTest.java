@@ -5,7 +5,6 @@ import io.netty.buffer.Unpooled;
 import org.fz.nettyx.exception.SerializeException;
 import org.fz.nettyx.exception.StructDefinitionException;
 import org.fz.nettyx.exception.TooLessBytesException;
-import org.fz.nettyx.serializer.schema.codec.SchemaCodec;
 import org.fz.nettyx.serializer.basic.c.signed.cchar;
 import org.fz.nettyx.serializer.basic.c.signed.cdouble;
 import org.fz.nettyx.serializer.basic.c.signed.cfloat;
@@ -30,15 +29,18 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 /**
+ * Verifies schema based serialization, type resolution, and configuration validation.
+ *
  * @author fengbinbin
+ * @version 1.0
  * @since 2026-08-16
  */
 public class SchemaSerializerTest
 {
 
-    static final SchemaRegistry  REGISTRY = SchemaRegistry.load(
+    static final SchemaContext  CONTEXT = SchemaContext.load(
             "configured/device.xml", "configured/geo.xml");
-    static final SchemaCodec CODEC    = new SchemaCodec(REGISTRY);
+    static final SchemaSerializer SERIALIZER = CONTEXT.serializer("device.Device");
 
     @Test
     public void testSchemaSerializer()
@@ -57,10 +59,10 @@ public class SchemaSerializerTest
         ByteBuf writing = Unpooled.buffer(bytes.length);
 
         assertEquals(122, bytes.length);
-        Map<String, Object> message = SchemaSerializer.toStruct(REGISTRY, "device.BenchmarkDevice", reading);
+        Map<String, Object> message = SchemaSerializer.toMap(CONTEXT, "device.BenchmarkDevice", reading);
         assertEquals(0x11223344, message.get("id"));
         assertEquals("netty", message.get("name"));
-        SchemaSerializer.toByteBuf(REGISTRY, "device.BenchmarkDevice", message, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.BenchmarkDevice", message, writing);
         assertEquals(bytes.length, writing.readableBytes());
 
         assertArrayEquals(bytes, writing.array());
@@ -79,7 +81,7 @@ public class SchemaSerializerTest
                 0, 0, 0, 100,
                 0, 0, 0, (byte) 200
         });
-        SchemaSerializer serializer = REGISTRY.serializer("device.Device");
+        SchemaSerializer serializer = CONTEXT.serializer("device.Device");
         SchemaView       view       = serializer.view(reading);
 
         assertEquals(0x11223344, view.getInt("id"));
@@ -88,7 +90,7 @@ public class SchemaSerializerTest
     }
 
     @Test
-    public void testConfiguredStructMapSerializesByNameForDifferentStruct()
+    public void testSchemaValuesSerializeByNameForDifferentSchemas()
     {
         ByteBuf reading = Unpooled.buffer();
         reading.writeIntLE(0x11223344);
@@ -102,10 +104,10 @@ public class SchemaSerializerTest
         reading.writeInt(100);
         reading.writeInt(200);
 
-        Map<String, Object> device  = SchemaSerializer.toStruct(REGISTRY, "device.Device", reading);
+        Map<String, Object> device  = SchemaSerializer.toMap(CONTEXT, "device.Device", reading);
         ByteBuf             writing = Unpooled.buffer();
 
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Track", device, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Track", device, writing);
 
         byte[] actual = new byte[writing.readableBytes()];
         writing.readBytes(actual);
@@ -113,7 +115,7 @@ public class SchemaSerializerTest
     }
 
     @Test
-    public void testConfiguredStructMapSerializesSameStructWithoutChangingBytes()
+    public void testSchemaValuesSerializeWithoutChangingBytes()
     {
         byte[] expected = {
                 0x44, 0x33, 0x22, 0x11,
@@ -125,11 +127,11 @@ public class SchemaSerializerTest
                 0, 0, 0, 100,
                 0, 0, 0, (byte) 200
         };
-        Map<String, Object> device = SchemaSerializer.toStruct(
-                REGISTRY, "device.Device", Unpooled.wrappedBuffer(expected));
+        Map<String, Object> device = SchemaSerializer.toMap(
+                CONTEXT, "device.Device", Unpooled.wrappedBuffer(expected));
         ByteBuf writing = Unpooled.buffer(expected.length);
 
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Device", device, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Device", device, writing);
 
         byte[] actual = new byte[writing.readableBytes()];
         writing.readBytes(actual);
@@ -141,15 +143,15 @@ public class SchemaSerializerTest
     {
         ByteBuf writing = Unpooled.buffer();
 
-        CODEC.writeField(SchemaField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
-        CODEC.writeField(SchemaField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cchar.class), -1, ByteOrder.BIG_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cuchar.class), 0xFF, ByteOrder.BIG_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cshort.class), 0x1234, ByteOrder.LITTLE_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cushort.class), 0xABCD, ByteOrder.BIG_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cint.class), 0x10203040, ByteOrder.LITTLE_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", clong4.class), 0x50607080, ByteOrder.BIG_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", clong8.class), 0x0102030405060708L, ByteOrder.LITTLE_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cfloat.class), 1.0F, ByteOrder.BIG_ENDIAN, writing);
+        SERIALIZER.writeField(Schema.SchemaField.basicField("v", cdouble.class), 1.0D, ByteOrder.LITTLE_ENDIAN, writing);
 
         byte[] actual = new byte[writing.readableBytes()];
         writing.readBytes(actual);
@@ -165,9 +167,9 @@ public class SchemaSerializerTest
         }, actual);
 
         assertThrows(IllegalArgumentException.class,
-                     () -> CODEC.writeField(SchemaField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                     () -> SERIALIZER.writeField(Schema.SchemaField.basicField("v", cuchar.class), 0x100, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
         assertThrows(IllegalArgumentException.class,
-                     () -> CODEC.writeField(SchemaField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
+                     () -> SERIALIZER.writeField(Schema.SchemaField.basicField("v", cushort.class), 0x1_0000, ByteOrder.BIG_ENDIAN, Unpooled.buffer()));
     }
 
     @Test
@@ -185,7 +187,7 @@ public class SchemaSerializerTest
         buf.writeInt(100);
         buf.writeInt(200);
 
-        Map<String, Object> device = SchemaSerializer.toStruct(REGISTRY, "device.Device", buf);
+        Map<String, Object> device = SchemaSerializer.toMap(CONTEXT, "device.Device", buf);
 
         assertEquals(0x11223344, device.get("id"));
         assertEquals(0xAABB, device.get("speed"));
@@ -218,13 +220,13 @@ public class SchemaSerializerTest
         device.put("gps", gps);
 
         ByteBuf buf = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Device", device, buf);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Device", device, buf);
 
         byte[] bytes = new byte[buf.readableBytes()];
         buf.readBytes(bytes);
         assertEquals(4 + 2 + 8 + 8 + 2 + 6 + 8, bytes.length);
 
-        Map<String, Object> deserialized = SchemaSerializer.toStruct(REGISTRY, "device.Device", Unpooled.wrappedBuffer(bytes));
+        Map<String, Object> deserialized = SchemaSerializer.toMap(CONTEXT, "device.Device", Unpooled.wrappedBuffer(bytes));
         assertEquals(device.get("id"), deserialized.get("id"));
         assertEquals(device.get("speed"), deserialized.get("speed"));
         assertEquals(device.get("temperature"), deserialized.get("temperature"));
@@ -238,11 +240,11 @@ public class SchemaSerializerTest
     public void testSerializeWithMissingFields()
     {
         ByteBuf buf = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Device", new LinkedHashMap<>(), buf);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Device", new LinkedHashMap<>(), buf);
 
         assertEquals(4 + 2 + 8 + 8 + 2 + 6 + 8, buf.readableBytes());
 
-        Map<String, Object> device = SchemaSerializer.toStruct(REGISTRY, "device.Device", buf);
+        Map<String, Object> device = SchemaSerializer.toMap(CONTEXT, "device.Device", buf);
         assertEquals(0, device.get("id"));
         assertEquals("", device.get("name"));
         assertEquals(List.of((short) 0, (short) 0, (short) 0), device.get("values"));
@@ -257,14 +259,14 @@ public class SchemaSerializerTest
         buf.writeShort(22);
         buf.writeShort(33);
 
-        Map<String, Object> flexible = SchemaSerializer.toStruct(REGISTRY, "device.Flexible", buf);
+        Map<String, Object> flexible = SchemaSerializer.toMap(CONTEXT, "device.Flexible", buf);
 
         assertEquals((short) 0x7F, flexible.get("head"));
         assertEquals(List.of(11, 22, 33), flexible.get("tail"));
         assertEquals(0, buf.readableBytes());
 
         ByteBuf writing = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Flexible", flexible, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Flexible", flexible, writing);
 
         byte[] written = new byte[writing.readableBytes()];
         writing.readBytes(written);
@@ -278,7 +280,7 @@ public class SchemaSerializerTest
         buf.writeInt(1);
         buf.writeInt(2);
 
-        Map<String, Object> gps = SchemaSerializer.toStruct(REGISTRY, "GpsPoint", buf);
+        Map<String, Object> gps = SchemaSerializer.toMap(CONTEXT, "GpsPoint", buf);
         assertEquals(1, gps.get("longitude"));
         assertEquals(2, gps.get("latitude"));
     }
@@ -286,65 +288,109 @@ public class SchemaSerializerTest
     @Test
     public void testSameNamespaceReference()
     {
-        SchemaRegistry registry = SchemaRegistry.load("configured/sibling.xml");
+        SchemaContext context = SchemaContext.load("configured/sibling.xml");
 
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(0xCAFE);
 
-        Map<String, Object> packet = SchemaSerializer.toStruct(registry, "sibling.Packet", buf);
+        Map<String, Object> packet = SchemaSerializer.toMap(context, "sibling.Packet", buf);
         assertEquals(Map.of("magic", 0xCAFEL), packet.get("header"));
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testCycleDetection()
     {
-        SchemaRegistry.load("configured/cycle.xml");
+        SchemaContext.load("configured/cycle.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
-    public void testUnknownStruct()
+    public void testUnknownSchema()
     {
-        REGISTRY.require("device.NotExists");
+        CONTEXT.require("device.NotExists");
     }
 
     @Test(expected = SerializeException.class)
     public void testSerializeNonMap()
     {
-        REGISTRY.serializer("device.Device").doSerialize(new Object(), Unpooled.buffer());
+        CONTEXT.serializer("device.Device").doSerialize(new Object(), Unpooled.buffer());
     }
 
     @Test
     public void testCharset()
     {
         ByteBuf buf      = Unpooled.buffer();
-        byte[]  gbkTitle = "串口".getBytes(Charset.forName("GBK"));
+        byte[]  gbkTitle = "\u4e32\u53e3".getBytes(Charset.forName("GBK"));
         buf.writeBytes(gbkTitle);
         buf.writeZero(8 - gbkTitle.length);
         buf.writeBytes("abc".getBytes(StandardCharsets.UTF_8));
         buf.writeZero(5);
 
-        Map<String, Object> msg = SchemaSerializer.toStruct(REGISTRY, "device.TextMsg", buf);
-        assertEquals("串口", msg.get("title"));
+        Map<String, Object> msg = SchemaSerializer.toMap(CONTEXT, "device.TextMsg", buf);
+        assertEquals("\u4e32\u53e3", msg.get("title"));
         assertEquals("abc", msg.get("note"));
 
         ByteBuf writing = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(REGISTRY, "device.TextMsg", msg, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.TextMsg", msg, writing);
         assertEquals(16, writing.readableBytes());
 
-        Map<String, Object> roundTrip = SchemaSerializer.toStruct(REGISTRY, "device.TextMsg", writing);
+        Map<String, Object> roundTrip = SchemaSerializer.toMap(CONTEXT, "device.TextMsg", writing);
         assertEquals(msg, roundTrip);
+    }
+
+    @Test
+    public void testUtf8CharFieldPreservesPaddingAndTruncation()
+    {
+        byte[] padded = serializeText("12345678", "netty");
+        byte[] expectedPaddedNote = Arrays.copyOf("netty".getBytes(StandardCharsets.UTF_8), 8);
+        assertArrayEquals(expectedPaddedNote, Arrays.copyOfRange(padded, 8, 16));
+
+        String exact = "netty\u4E32";
+        byte[] exactBytes = serializeText("12345678", exact);
+        assertArrayEquals(exact.getBytes(StandardCharsets.UTF_8), Arrays.copyOfRange(exactBytes, 8, 16));
+
+        String oversized = "1234567\u4E2D";
+        byte[] truncated = serializeText("12345678", oversized);
+        byte[] expectedTruncatedNote = Arrays.copyOf(oversized.getBytes(StandardCharsets.UTF_8), 8);
+        assertArrayEquals(expectedTruncatedNote, Arrays.copyOfRange(truncated, 8, 16));
+    }
+
+    @Test
+    public void testUtf8CharFieldPreservesCharactersAfterAnUnpairedHighSurrogate()
+    {
+        byte[] serialized = serializeText("12345678", "\uD800\u4E2D");
+        assertArrayEquals(new byte[]{0x3F, (byte) 0xE4, (byte) 0xB8, (byte) 0xAD, 0, 0, 0, 0},
+                          Arrays.copyOfRange(serialized, 8, 16));
+    }
+
+    private byte[] serializeText(String title, String note)
+    {
+        Map<String, Object> message = new LinkedHashMap<>();
+        message.put("title", title);
+        message.put("note", note);
+
+        ByteBuf writing = Unpooled.buffer(16);
+        try {
+            SchemaSerializer.toByteBuf(CONTEXT, "device.TextMsg", message, writing);
+            assertEquals(16, writing.readableBytes());
+            byte[] bytes = new byte[writing.readableBytes()];
+            writing.readBytes(bytes);
+            return bytes;
+        }
+        finally {
+            writing.release();
+        }
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testCharsetOnNonCharFieldRejected()
     {
-        SchemaRegistry.load("configured/invalid-charset.xml");
+        SchemaContext.load("configured/invalid-charset.xml");
     }
 
     @Test(expected = TooLessBytesException.class)
     public void testTooLessBytesOnBasicField()
     {
-        SchemaSerializer.toStruct(REGISTRY, "device.Device", Unpooled.wrappedBuffer(new byte[2]));
+        SchemaSerializer.toMap(CONTEXT, "device.Device", Unpooled.wrappedBuffer(new byte[2]));
     }
 
     @Test(expected = TooLessBytesException.class)
@@ -356,42 +402,42 @@ public class SchemaSerializerTest
         buf.writeDoubleLE(3.0D);
         buf.writeBytes(new byte[4]);
 
-        SchemaSerializer.toStruct(REGISTRY, "device.Device", buf);
+        SchemaSerializer.toMap(CONTEXT, "device.Device", buf);
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testAmbiguousBareNameRejected()
     {
-        SchemaRegistry registry = SchemaRegistry.load("configured/ambiguous-a.xml", "configured/ambiguous-b.xml");
-        registry.require("Point");
+        SchemaContext context = SchemaContext.load("configured/ambiguous-a.xml", "configured/ambiguous-b.xml");
+        context.require("Point");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testUnknownBasicTypeRejected()
     {
-        SchemaRegistry.load("configured/unknown-type.xml");
+        SchemaContext.load("configured/unknown-type.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testInvalidCharsetValueRejected()
     {
-        SchemaRegistry.load("configured/invalid-charset-value.xml");
+        SchemaContext.load("configured/invalid-charset-value.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
     public void testCharMissingLengthRejected()
     {
-        SchemaRegistry.load("configured/invalid-char-nolength.xml");
+        SchemaContext.load("configured/invalid-char-nolength.xml");
     }
 
     @Test(expected = StructDefinitionException.class)
-    public void testTypeAndStructBothDeclaredRejected()
+    public void testTypeAndSchemaReferenceBothDeclaredRejected()
     {
-        SchemaRegistry.load("configured/invalid-both.xml");
+        SchemaContext.load("configured/invalid-both.xml");
     }
 
     @Test
-    public void testStructArrayFixedRoundTrip()
+    public void testFixedSchemaArrayRoundTrip()
     {
         ByteBuf buf = Unpooled.buffer();
         buf.writeByte(2);
@@ -400,7 +446,7 @@ public class SchemaSerializerTest
         buf.writeInt(21);
         buf.writeInt(22);
 
-        Map<String, Object> track = SchemaSerializer.toStruct(REGISTRY, "device.Track", buf);
+        Map<String, Object> track = SchemaSerializer.toMap(CONTEXT, "device.Track", buf);
 
         assertEquals((short) 2, track.get("count"));
         List<?> points = (List<?>) track.get("points");
@@ -411,14 +457,14 @@ public class SchemaSerializerTest
         assertEquals(22, ((Map<?, ?>) points.get(1)).get("latitude"));
 
         ByteBuf writing = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Track", track, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Track", track, writing);
 
-        Map<String, Object> roundTrip = SchemaSerializer.toStruct(REGISTRY, "device.Track", writing);
+        Map<String, Object> roundTrip = SchemaSerializer.toMap(CONTEXT, "device.Track", writing);
         assertEquals(track, roundTrip);
     }
 
     @Test
-    public void testStructArrayFlexible()
+    public void testFlexibleSchemaArray()
     {
         ByteBuf buf = Unpooled.buffer();
         buf.writeByte(9);
@@ -427,7 +473,7 @@ public class SchemaSerializerTest
         buf.writeInt(3);
         buf.writeInt(4);
 
-        Map<String, Object> stream = SchemaSerializer.toStruct(REGISTRY, "device.Stream", buf);
+        Map<String, Object> stream = SchemaSerializer.toMap(CONTEXT, "device.Stream", buf);
 
         assertEquals((short) 9, stream.get("head"));
         List<?> points = (List<?>) stream.get("points");
@@ -436,7 +482,7 @@ public class SchemaSerializerTest
         assertEquals(0, buf.readableBytes());
 
         ByteBuf writing = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(REGISTRY, "device.Stream", stream, writing);
+        SchemaSerializer.toByteBuf(CONTEXT, "device.Stream", stream, writing);
 
         byte[] written = new byte[writing.readableBytes()];
         writing.readBytes(written);
@@ -446,10 +492,10 @@ public class SchemaSerializerTest
     @Test
     public void testDefaultEndianIsBigEndian()
     {
-        SchemaRegistry registry = SchemaRegistry.load("configured/default-endian.xml");
+        SchemaContext context = SchemaContext.load("configured/default-endian.xml");
 
-        Map<String, Object> map = SchemaSerializer.toStruct(
-                registry, "defs.NoEndian", Unpooled.wrappedBuffer(new byte[]{0x11, 0x22, 0x33, 0x44}));
+        Map<String, Object> map = SchemaSerializer.toMap(
+                context, "defs.NoEndian", Unpooled.wrappedBuffer(new byte[]{0x11, 0x22, 0x33, 0x44}));
         assertEquals(0x11223344, map.get("v"));
     }
 
@@ -467,9 +513,9 @@ public class SchemaSerializerTest
                     </structs>
                     """);
 
-            SchemaRegistry registry = SchemaRegistry.load(tempFile.toAbsolutePath().toString());
-            Map<String, Object> map = SchemaSerializer.toStruct(
-                    registry, "temp.T", Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 7}));
+            SchemaContext context = SchemaContext.load(tempFile.toAbsolutePath().toString());
+            Map<String, Object> map = SchemaSerializer.toMap(
+                    context, "temp.T", Unpooled.wrappedBuffer(new byte[]{0, 0, 0, 7}));
             assertEquals(7, map.get("v"));
         }
         finally {
@@ -480,17 +526,17 @@ public class SchemaSerializerTest
     @Test
     public void testJsonAndYamlConfigLoading()
     {
-        SchemaRegistry registry = SchemaRegistry.load("configured/device.json", "configured/geo.yml");
+        SchemaContext context = SchemaContext.load("configured/device.json", "configured/geo.yml");
 
         ByteBuf flexibleBuffer = Unpooled.buffer();
         flexibleBuffer.writeByte(0x7F);
         flexibleBuffer.writeShort(11);
         flexibleBuffer.writeShort(22);
-        Map<String, Object> flexible = SchemaSerializer.toStruct(registry, "device.Flexible", flexibleBuffer);
+        Map<String, Object> flexible = SchemaSerializer.toMap(context, "device.Flexible", flexibleBuffer);
         assertEquals(List.of(11, 22), flexible.get("tail"));
 
         ByteBuf flexibleWriting = Unpooled.buffer();
-        SchemaSerializer.toByteBuf(registry, "device.Flexible", flexible, flexibleWriting);
+        SchemaSerializer.toByteBuf(context, "device.Flexible", flexible, flexibleWriting);
         byte[] flexibleBytes = new byte[flexibleWriting.readableBytes()];
         flexibleWriting.readBytes(flexibleBytes);
         assertArrayEquals(new byte[]{0x7F, 0, 11, 0, 22}, flexibleBytes);
@@ -499,47 +545,47 @@ public class SchemaSerializerTest
         gpsBuffer.writeInt(100);
         gpsBuffer.writeInt(200);
         assertEquals(Map.of("longitude", 100, "latitude", 200),
-                     SchemaSerializer.toStruct(registry, "geo.GpsPoint", gpsBuffer));
-        assertEquals(Map.of(), SchemaSerializer.toStruct(registry, "device.Empty", Unpooled.EMPTY_BUFFER));
+                     SchemaSerializer.toMap(context, "geo.GpsPoint", gpsBuffer));
+        assertEquals(Map.of(), SchemaSerializer.toMap(context, "device.Empty", Unpooled.EMPTY_BUFFER));
     }
 
     @Test
     public void testUnknownJsonSchemaFieldRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> SchemaRegistry.load("configured/invalid-property.json"));
+        assertThrows(StructDefinitionException.class, () -> SchemaContext.load("configured/invalid-property.json"));
     }
 
     @Test
     public void testDuplicateJsonSchemaFieldRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> SchemaRegistry.load("configured/duplicate-property.json"));
+        assertThrows(StructDefinitionException.class, () -> SchemaContext.load("configured/duplicate-property.json"));
     }
 
     @Test
     public void testDuplicateYamlSchemaFieldRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> SchemaRegistry.load("configured/duplicate-property.yml"));
+        assertThrows(StructDefinitionException.class, () -> SchemaContext.load("configured/duplicate-property.yml"));
     }
 
     @Test
     public void testTrailingJsonRootRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> SchemaRegistry.load("configured/trailing-root.json"));
+        assertThrows(StructDefinitionException.class, () -> SchemaContext.load("configured/trailing-root.json"));
     }
 
     @Test
     public void testTrailingYamlDocumentRejected()
     {
-        assertThrows(StructDefinitionException.class, () -> SchemaRegistry.load("configured/trailing-document.yml"));
+        assertThrows(StructDefinitionException.class, () -> SchemaContext.load("configured/trailing-document.yml"));
     }
 
     @Test
     public void testExternalDtdBlockedAndIgnored()
     {
-        SchemaRegistry registry = SchemaRegistry.load("configured/xxe-external-dtd.xml");
+        SchemaContext context = SchemaContext.load("configured/xxe-external-dtd.xml");
 
-        Map<String, Object> map = SchemaSerializer.toStruct(
-                registry, "xxe.X", Unpooled.wrappedBuffer(new byte[]{0x7F}));
+        Map<String, Object> map = SchemaSerializer.toMap(
+                context, "xxe.X", Unpooled.wrappedBuffer(new byte[]{0x7F}));
         assertEquals((short) 0x7F, map.get("v"));
     }
 
@@ -556,7 +602,7 @@ public class SchemaSerializerTest
         buf.writeInt(7);
         buf.writeInt(8);
 
-        Map<String, Object> device = SchemaSerializer.toStruct(REGISTRY, "device.Device", buf);
+        Map<String, Object> device = SchemaSerializer.toMap(CONTEXT, "device.Device", buf);
         Map<?, ?>           gps    = (Map<?, ?>) device.get("gps");
         assertEquals(7, gps.get("longitude"));
         assertEquals(8, gps.get("latitude"));

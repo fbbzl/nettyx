@@ -1,10 +1,10 @@
 package org.fz.nettyx.serializer.struct.annotation;
 
-import cn.hutool.core.util.TypeUtil;
 import io.netty.buffer.ByteBuf;
 import org.fz.erwin.exception.Throws;
 import org.fz.nettyx.exception.StructFieldHandlerException;
 import org.fz.nettyx.exception.TypeJudgmentException;
+import org.fz.nettyx.serializer.struct.StructContext;
 import org.fz.nettyx.serializer.struct.StructFieldHandler;
 import org.fz.nettyx.serializer.struct.StructSerializer;
 import org.fz.nettyx.serializer.struct.StructContext.StructDefinition.StructField;
@@ -23,6 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * array field must use this to assign array length!!!
  *
  * @author fengbinbin
+ * @version 1.0
  * @since 2021 -10-20 08:18
  */
 @Documented
@@ -42,6 +43,13 @@ public @interface ToArray {
      */
     boolean flexible() default false;
 
+    /**
+     * Reads and writes arrays declared with {@link ToArray}.
+     *
+     * @author fengbinbin
+     * @version 1.0
+     * @since 2024-01-07
+     */
     class ToArrayHandler implements StructFieldHandler<ToArray> {
 
         @Override
@@ -109,7 +117,7 @@ public @interface ToArray {
             return switch (type)
             {
                 case Class<?>         clazz            -> clazz.getComponentType();
-                case GenericArrayType genericArrayType -> TypeUtil.getActualType(root, genericArrayType.getGenericComponentType());
+                case GenericArrayType genericArrayType -> StructContext.resolveType(root, genericArrayType.getGenericComponentType());
                 default                                -> type;
             };
         }
